@@ -1,0 +1,616 @@
+﻿---
+import Layout from "../layouts/Layout.astro";
+import InquiryBox from "../components/InquiryBox.astro";
+import InquirySection from "../components/InquirySection.astro";
+import SubscribeBanner from "../components/SubscribeBanner.astro";
+import LiteYouTubeEmbed from "../components/LiteYouTubeEmbed.astro";
+
+type ArticleFrontmatter = {
+  title?: string;
+  description?: string;
+  youtubeId?: string;
+  audioUrl?: string;
+  tags?: string[];
+  tallyUrl?: string;
+  faq?: Array<{ question: string; answer: string }>;
+  pubDate?: string | Date;
+  updatedDate?: string | Date;
+  image?: string;
+  author?: string;
+  draft?: boolean;
+};
+
+type ArticleModule = {
+  default?: any;
+  frontmatter?: ArticleFrontmatter;
+  rawContent?: string;
+  compiledContent?: string;
+};
+
+const articleEntries = import.meta.glob("../content/articles/**/*.mdx");
+
+export async function getStaticPaths() {
+  const entries = Object.entries(import.meta.glob("../content/articles/**/*.mdx"));
+  const paths = await Promise.all(
+    entries.map(async ([path, loader]) => {
+      const mod = (await loader()) as ArticleModule;
+      if (mod.frontmatter?.draft === true) {
+        return null;
+      }
+
+      const slug = path
+        .replace("../content/articles/", "")
+        .replace(/\.mdx$/, "");
+
+      return {
+        params: { slug: `articles/${slug}` },
+        props: { mod },
+      };
+    })
+  );
+
+  return paths.filter(Boolean);
+}
+
+const { mod } = Astro.props as { mod?: ArticleModule };
+const articleModule = mod ?? {};
+const Content = articleModule.default;
+const frontmatter = articleModule.frontmatter ?? {};
+const title = frontmatter.title ?? "מאמר";
+const description = frontmatter.description ?? "";
+const youtubeId = frontmatter.youtubeId;
+const audioUrl = frontmatter.audioUrl;
+const tags = Array.isArray(frontmatter.tags) ? frontmatter.tags : [];
+const web3formsKey = "94b32b6c-7590-4ac6-b8b4-1bc73dd2e5c8";
+const siteUrl = Astro.site?.toString() ?? "https://www.nevermind.co.il";
+const shareUrl = Astro.url ? new URL(Astro.url.pathname, siteUrl).toString() : siteUrl;
+const whatsappShareUrl = `https://wa.me/?text=${encodeURIComponent(`מצאתי תובנה מעניינת ב-NeverMind: ${title} - ${shareUrl}`)}`;
+
+const slugValue = Astro.params.slug as string | string[] | undefined;
+const slugParam = Array.isArray(slugValue) ? slugValue.join("/") : slugValue ?? "";
+const transitionId = slugParam.replace(/^articles\//, "").replace(/[^\w-]+/g, "-");
+
+const rawContent = articleModule.rawContent ?? articleModule.compiledContent ?? "";
+const wordCount = rawContent
+  .replace(/<[^>]*>/g, " ")
+  .split(/\s+/)
+  .filter(Boolean).length;
+const readingMinutes = Math.max(1, Math.round(wordCount / 200));
+const depthFromTags = tags.find((tag: string) =>
+  ["עמוק", "עמוק מאוד", "מתקדם", "בסיס"].includes(tag)
+);
+const depthFromWords =
+  wordCount > 1400 ? "עמוק מאוד" : wordCount > 900 ? "עמוק" : "נגיש";
+const depth = depthFromTags ?? depthFromWords;
+const hasInquirySection = rawContent.includes("InquirySection");
+const faqItems = Array.isArray(frontmatter.faq) ? frontmatter.faq : [];
+
+const allArticles = (
+  await Promise.all(
+    Object.entries(articleEntries).map(async ([path, loader]) => {
+      const loadedModule = (await loader()) as ArticleModule;
+      const data = loadedModule.frontmatter ?? {};
+      if (data.draft === true) {
+        return null;
+      }
+
+      const slug = path
+        .replace("../content/articles/", "")
+        .replace(/\.mdx$/, "");
+      const articleTags = Array.isArray(data.tags) ? data.tags : [];
+
+      return {
+        slug: `articles/${slug}`,
+        title: data.title ?? "מאמר",
+        description: data.description ?? "",
+        tags: articleTags,
+      };
+    })
+  )
+).filter((article): article is { slug: string; title: string; description: string; tags: string[] } => article !== null);
+
+const currentSlug = slugParam.startsWith("articles/") ? slugParam : `articles/${slugParam}`;
+const relatedArticles = allArticles
+  .filter(
+    (article) =>
+      article.slug !== currentSlug &&
+      article.tags.some((tag: string) => tags.includes(tag))
+  )
+  .slice(0, 2);
+
+const components = {
+  InquiryBox,
+  InquirySection,
+  SubscribeBanner,
+};
+---
+<Layout
+  title={title}
+  description={description}
+  frontmatter={frontmatter}
+  hasInquirySection={hasInquirySection}
+  faqItems={faqItems}
+>
+  <div aria-hidden="true" class="fixed inset-x-0 top-0 z-40 h-px bg-transparent">
+    <span id="reading-progress" class="block h-px w-0 bg-[#1A1A1A]"></span>
+  </div>
+
+  <article
+    data-autolink
+    class="mx-auto max-w-[72ch] space-y-[clamp(2.5rem,3vw,3.5rem)] leading-[1.8]"
+  >
+    <header class="space-y-5">
+      <h1
+        transition:name={`article-${transitionId}`}
+        class="text-[clamp(2.2rem,1.7rem+2vw,3.2rem)] font-semibold text-[#1A1A1A]"
+      >
+        {title}
+      </h1>
+      {description && (
+        <p class="text-[clamp(1.05rem,1rem+0.35vw,1.4rem)] text-[#1A1A1A]/70">
+          {description}
+        </p>
+      )}
+      <div class="flex flex-wrap items-center gap-3 text-[clamp(0.85rem,0.82rem+0.2vw,1rem)] text-[#1A1A1A]/60">
+        <span>זמן קריאה: {readingMinutes} דק׳</span>
+        <span>רמת עומק: {depth}</span>
+      </div>
+      <div class="flex flex-wrap items-center gap-3">
+        {tags.length > 0 && (
+          <ul class="flex flex-wrap gap-2 text-[clamp(0.85rem,0.82rem+0.2vw,1rem)] text-[#1A1A1A]/60">
+            {tags.map((tag: string) => (
+              <li class="rounded-full border border-[#1A1A1A]/10 bg-white/70 px-3 py-1">
+                {tag}
+              </li>
+            ))}
+          </ul>
+        )}
+        <button
+          type="button"
+          data-focus-toggle
+          aria-pressed="false"
+          class="rounded-full border border-[#1A1A1A]/10 bg-white/70 px-4 py-2 text-[clamp(0.85rem,0.82rem+0.2vw,1rem)] text-[#1A1A1A]/70 transition-colors duration-300 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A]/20"
+        >
+          מצב פוקוס
+        </button>
+      </div>
+    </header>
+
+    {audioUrl && (
+      <div class="overflow-hidden rounded-2xl border border-[#1A1A1A]/10 bg-white/70 p-4 shadow-sm backdrop-blur-md">
+        <audio
+          class="w-full max-w-[400px] accent-[#1A1A1A] text-[#1A1A1A]"
+          controls
+          src={audioUrl}
+        >
+          הדפדפן שלך לא תומך בהשמעת אודיו.
+        </audio>
+      </div>
+    )}
+
+    {youtubeId && <LiteYouTubeEmbed youtubeId={youtubeId} title={title} />}
+
+    {Content && <Content components={components} />}
+  </article>
+
+  <section class="mx-auto mt-[clamp(2.5rem,4vw,3.5rem)] max-w-[72ch] space-y-4">
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+      <a
+        href={whatsappShareUrl}
+        target="_blank"
+        rel="noreferrer"
+        class="inline-flex items-center justify-center rounded-full border border-[#1A1A1A]/10 bg-white/70 px-4 py-2 text-[clamp(0.9rem,0.85rem+0.2vw,1.05rem)] text-[#1A1A1A]/75 transition-colors duration-300 hover:bg-white"
+      >
+        שתף בוואצאפ
+      </a>
+      <button
+        type="button"
+        data-copy-link
+        data-copy-value={shareUrl}
+        class="inline-flex items-center justify-center rounded-full border border-[#1A1A1A]/10 bg-white/70 px-4 py-2 text-[clamp(0.9rem,0.85rem+0.2vw,1.05rem)] text-[#1A1A1A]/75 transition-colors duration-300 hover:bg-white"
+      >
+        העתק קישור
+      </button>
+    </div>
+    <div
+      data-copy-toast
+      class="pointer-events-none fixed bottom-6 right-6 z-50 rounded-full border border-[#1A1A1A]/10 bg-white/90 px-4 py-2 text-[clamp(0.85rem,0.8rem+0.2vw,1rem)] text-[#1A1A1A]/70 opacity-0 transition-opacity duration-300"
+    >
+      הועתק
+    </div>
+  </section>
+
+  {relatedArticles.length === 2 && (
+    <section class="mx-auto mt-[clamp(3rem,5vw,4rem)] max-w-[72ch] space-y-4">
+      <h2 class="text-[clamp(1.4rem,1.15rem+1vw,2rem)] font-semibold text-[#1A1A1A]">
+        חקירה משלימה
+      </h2>
+      <div class="grid gap-4 md:grid-cols-2">
+        {relatedArticles.map((article) => (
+          <a
+            href={`/${article.slug}`}
+            class="flex h-full flex-col justify-between gap-3 rounded-3xl border border-[#1A1A1A]/10 bg-white/70 px-5 py-4 text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] text-[#1A1A1A]/80 shadow-sm transition-all duration-500 hover:translate-y-[-2px] hover:bg-white"
+          >
+            <span class="text-[clamp(0.8rem,0.78rem+0.2vw,0.95rem)] text-[#1A1A1A]/55">
+              חקירה משלימה
+            </span>
+            <span class="font-semibold text-[#1A1A1A]">{article.title}</span>
+            {article.description && (
+              <span class="text-[clamp(0.85rem,0.82rem+0.2vw,1rem)] text-[#1A1A1A]/60">
+                {article.description}
+              </span>
+            )}
+          </a>
+        ))}
+      </div>
+    </section>
+  )}
+
+  <section class="mx-auto mt-[clamp(3rem,6vw,5rem)] max-w-2xl space-y-6">
+    <h2 class="text-center text-[clamp(1.4rem,1.15rem+1vw,2rem)] font-semibold text-[#1A1A1A]">
+      אפשר להשאיר שאלה או פנייה
+    </h2>
+    <form
+      data-contact-form
+      class="space-y-4 rounded-3xl border border-[#1A1A1A]/10 bg-white/70 p-6"
+      action="https://api.web3forms.com/submit"
+      method="POST"
+    >
+      <input type="hidden" name="access_key" value={web3formsKey} />
+      <input type="hidden" name="subject" value="פנייה מ-NeverMind" />
+      <input type="hidden" name="page" value={title} />
+      <input
+        type="text"
+        name="botcheck"
+        style="display:none"
+        tabindex="-1"
+        autocomplete="off"
+        aria-hidden="true"
+      />
+      <div class="space-y-2 text-right">
+        <label class="text-[clamp(0.9rem,0.85rem+0.2vw,1.05rem)] text-[#1A1A1A]/70" for="name">
+          שם מלא
+        </label>
+        <input
+          id="name"
+          name="name"
+          type="text"
+          required
+          class="w-full rounded-2xl border border-[#1A1A1A]/20 bg-white/80 px-4 py-3 text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] text-[#1A1A1A] outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A]/20"
+        />
+      </div>
+      <div class="space-y-2 text-right">
+        <label class="text-[clamp(0.9rem,0.85rem+0.2vw,1.05rem)] text-[#1A1A1A]/70" for="email">
+          אימייל
+        </label>
+        <input
+          id="email"
+          name="email"
+          type="email"
+          required
+          class="w-full rounded-2xl border border-[#1A1A1A]/20 bg-white/80 px-4 py-3 text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] text-[#1A1A1A] outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A]/20"
+        />
+      </div>
+      <div class="space-y-2 text-right">
+        <label class="text-[clamp(0.9rem,0.85rem+0.2vw,1.05rem)] text-[#1A1A1A]/70" for="message">
+          הודעה
+        </label>
+        <textarea
+          id="message"
+          name="message"
+          rows="4"
+          required
+          class="w-full rounded-2xl border border-[#1A1A1A]/20 bg-white/80 px-4 py-3 text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] text-[#1A1A1A] outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A]/20"
+        ></textarea>
+      </div>
+      <button
+        type="submit"
+        class="w-full rounded-full border border-[#1A1A1A]/10 bg-white px-5 py-3 text-[clamp(0.95rem,0.9rem+0.3vw,1.1rem)] text-[#1A1A1A]/80 transition-colors duration-300 hover:bg-white/90"
+      >
+        שליחה
+      </button>
+      <p
+        data-form-status
+        aria-live="polite"
+        class="text-center text-[clamp(0.85rem,0.8rem+0.2vw,1rem)] text-[#1A1A1A]/60 opacity-0 transition-opacity duration-300"
+      >
+        תודה, ההודעה עברה.
+      </p>
+    </form>
+  </section>
+
+  <div class="mt-[clamp(3rem,6vw,5rem)]">
+    <SubscribeBanner />
+  </div>
+
+  <style>
+    .nm-footnote-tooltip {
+      position: fixed;
+      max-width: 280px;
+      border: 1px solid rgba(26, 26, 26, 0.12);
+      background: rgba(249, 248, 246, 0.98);
+      padding: 0.75rem 1rem;
+      border-radius: 16px;
+      font-size: clamp(0.85rem, 0.8rem + 0.2vw, 1rem);
+      color: rgba(26, 26, 26, 0.75);
+      box-shadow: 0 12px 24px rgba(26, 26, 26, 0.08);
+      z-index: 70;
+    }
+
+    .nm-topic-link {
+      border-bottom: 1px solid rgba(26, 26, 26, 0.35);
+      text-decoration: none;
+      color: inherit;
+    }
+
+    article :global(h2) {
+      font-size: clamp(1.6rem, 1.25rem + 1.2vw, 2.2rem);
+      line-height: 1.2;
+      margin-top: clamp(2rem, 2vw, 2.8rem);
+      margin-bottom: 0.8rem;
+    }
+
+    article :global(h3) {
+      font-size: clamp(1.3rem, 1.1rem + 0.9vw, 1.8rem);
+      line-height: 1.3;
+      margin-top: clamp(1.6rem, 1.8vw, 2.2rem);
+      margin-bottom: 0.6rem;
+    }
+
+    article :global(p),
+    article :global(li) {
+      font-size: clamp(1rem, 0.95rem + 0.35vw, 1.2rem);
+    }
+
+    article :global(ul),
+    article :global(ol) {
+      padding-inline-start: 1.4rem;
+      margin-top: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    article :global(blockquote) {
+      font-size: clamp(1.05rem, 1rem + 0.4vw, 1.3rem);
+      border-inline-start: 2px solid rgba(26, 26, 26, 0.2);
+      padding-inline-start: 1rem;
+      margin: 1.5rem 0;
+      color: rgba(26, 26, 26, 0.7);
+    }
+
+    article :global(a) {
+      color: inherit;
+      text-decoration: none;
+      border-bottom: 1px solid rgba(26, 26, 26, 0.3);
+    }
+
+    article :global(code) {
+      font-size: clamp(0.9rem, 0.86rem + 0.2vw, 1.05rem);
+      background: rgba(26, 26, 26, 0.06);
+      padding: 0.1rem 0.35rem;
+      border-radius: 0.4rem;
+    }
+  </style>
+
+  <script is:inline>
+    document.addEventListener("astro:page-load", () => {
+      if (window.__nmArticleCleanup) {
+        window.__nmArticleCleanup();
+      }
+
+      const progressBar = document.getElementById("reading-progress");
+      const focusToggle = document.querySelector("[data-focus-toggle]");
+      const article = document.querySelector("[data-autolink]");
+      const copyButton = document.querySelector("[data-copy-link]");
+      const toast = document.querySelector("[data-copy-toast]");
+      const contactForm = document.querySelector("[data-contact-form]");
+      const formStatus = document.querySelector("[data-form-status]");
+      const cleanups = [];
+      let ticking = false;
+      let tooltip;
+      let toastTimeout;
+
+      const updateProgress = () => {
+        const doc = document.documentElement;
+        const scrollTop = doc.scrollTop || document.body.scrollTop;
+        const scrollHeight = doc.scrollHeight - doc.clientHeight;
+        const progress = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+
+        if (progressBar) {
+          progressBar.style.width = `${progress}%`;
+        }
+
+        ticking = false;
+      };
+
+      const onScroll = () => {
+        if (!ticking) {
+          ticking = true;
+          window.requestAnimationFrame(updateProgress);
+        }
+      };
+
+      const setFocusMode = (enabled) => {
+        document.body.classList.toggle("is-focus-mode", enabled);
+        if (focusToggle) {
+          focusToggle.setAttribute("aria-pressed", String(enabled));
+          focusToggle.textContent = enabled ? "יציאה ממצב פוקוס" : "מצב פוקוס";
+        }
+      };
+
+      const hideTooltip = () => {
+        if (tooltip) {
+          tooltip.remove();
+          tooltip = undefined;
+        }
+      };
+
+      const showTooltip = (link, content) => {
+        hideTooltip();
+        tooltip = document.createElement("div");
+        tooltip.className = "nm-footnote-tooltip";
+        tooltip.textContent = content;
+        document.body.appendChild(tooltip);
+        const rect = link.getBoundingClientRect();
+        const left = Math.min(rect.left, window.innerWidth - tooltip.offsetWidth - 16);
+        tooltip.style.left = `${Math.max(left, 16)}px`;
+        tooltip.style.top = `${rect.bottom + 8}px`;
+      };
+
+      const showToast = () => {
+        if (!toast) return;
+        toast.classList.add("opacity-100");
+        window.clearTimeout(toastTimeout);
+        toastTimeout = window.setTimeout(() => {
+          toast.classList.remove("opacity-100");
+        }, 1400);
+      };
+
+      if (copyButton instanceof HTMLElement) {
+        const onCopyClick = async () => {
+          const value = copyButton.getAttribute("data-copy-value") ?? "";
+          if (!value) return;
+          try {
+            await navigator.clipboard.writeText(value);
+            showToast();
+          } catch {
+            window.prompt("העתק קישור", value);
+          }
+        };
+
+        copyButton.addEventListener("click", onCopyClick);
+        cleanups.push(() => copyButton.removeEventListener("click", onCopyClick));
+      }
+
+      if (contactForm instanceof HTMLFormElement) {
+        const onSubmit = async (event) => {
+          event.preventDefault();
+          const formData = new FormData(contactForm);
+
+          try {
+            const response = await fetch("https://api.web3forms.com/submit", {
+              method: "POST",
+              body: formData,
+            });
+
+            if (response.ok) {
+              contactForm.reset();
+              if (formStatus) {
+                formStatus.textContent = "תודה, ההודעה עברה.";
+                formStatus.classList.add("opacity-100");
+              }
+            } else if (formStatus) {
+              formStatus.textContent = "משהו השתבש, נסה שוב.";
+              formStatus.classList.add("opacity-100");
+            }
+          } catch {
+            if (formStatus) {
+              formStatus.textContent = "משהו השתבש, נסה שוב.";
+              formStatus.classList.add("opacity-100");
+            }
+          }
+        };
+
+        contactForm.addEventListener("submit", onSubmit);
+        cleanups.push(() => contactForm.removeEventListener("submit", onSubmit));
+      }
+
+      if (focusToggle instanceof HTMLButtonElement) {
+        const onFocusClick = () => {
+          setFocusMode(!document.body.classList.contains("is-focus-mode"));
+        };
+
+        focusToggle.addEventListener("click", onFocusClick);
+        cleanups.push(() => focusToggle.removeEventListener("click", onFocusClick));
+      }
+
+      if (article instanceof HTMLElement) {
+        const topicMap = [
+          { term: "חופש", href: "/topics/freedom" },
+          { term: "מחשבות", href: "/topics/thought-mechanics" },
+          { term: "העצמי", href: "/topics/self" },
+        ];
+        const skipSelector = "a, button, code, pre, script, style";
+        const walker = document.createTreeWalker(article, NodeFilter.SHOW_TEXT, {
+          acceptNode(node) {
+            if (!node.nodeValue || !node.nodeValue.trim()) {
+              return NodeFilter.FILTER_REJECT;
+            }
+            if (node.parentElement && node.parentElement.closest(skipSelector)) {
+              return NodeFilter.FILTER_REJECT;
+            }
+            return NodeFilter.FILTER_ACCEPT;
+          },
+        });
+
+        const nodes = [];
+        while (walker.nextNode()) nodes.push(walker.currentNode);
+
+        nodes.forEach((node) => {
+          const text = node.nodeValue;
+          if (!text) return;
+
+          let match = null;
+          topicMap.forEach((item) => {
+            const index = text.indexOf(item.term);
+            if (index !== -1 && (!match || index < match.index)) {
+              match = { index, item };
+            }
+          });
+
+          if (!match) return;
+
+          const before = text.slice(0, match.index);
+          const after = text.slice(match.index + match.item.term.length);
+          const link = document.createElement("a");
+          link.href = match.item.href;
+          link.textContent = match.item.term;
+          link.className = "nm-topic-link";
+
+          const fragment = document.createDocumentFragment();
+          if (before) fragment.append(before);
+          fragment.append(link);
+          if (after) fragment.append(after);
+
+          node.parentNode?.replaceChild(fragment, node);
+        });
+
+        const footnoteLinks = article.querySelectorAll('a[href^="#fn"]');
+        footnoteLinks.forEach((link) => {
+          const onFootnoteClick = (event) => {
+            event.preventDefault();
+            const targetId = link.getAttribute("href");
+            const target = targetId ? document.querySelector(targetId) : null;
+            const content = target?.textContent?.trim();
+            if (content) {
+              showTooltip(link, content);
+            }
+          };
+
+          link.addEventListener("click", onFootnoteClick);
+          cleanups.push(() => link.removeEventListener("click", onFootnoteClick));
+        });
+      }
+
+      const onDocumentClick = (event) => {
+        if (tooltip && !tooltip.contains(event.target)) {
+          hideTooltip();
+        }
+      };
+
+      document.addEventListener("click", onDocumentClick);
+      cleanups.push(() => document.removeEventListener("click", onDocumentClick));
+      document.addEventListener("scroll", onScroll, { passive: true });
+      cleanups.push(() => document.removeEventListener("scroll", onScroll));
+      document.addEventListener("scroll", hideTooltip, { passive: true });
+      cleanups.push(() => document.removeEventListener("scroll", hideTooltip));
+      updateProgress();
+
+      window.__nmArticleCleanup = () => {
+        hideTooltip();
+        document.body.classList.remove("is-focus-mode");
+        cleanups.forEach((cleanup) => cleanup());
+      };
+    });
+  </script>
+</Layout>
+

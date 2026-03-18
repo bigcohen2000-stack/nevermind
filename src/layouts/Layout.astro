@@ -1,0 +1,325 @@
+﻿---
+import "@fontsource-variable/assistant";
+import "../styles/global.css";
+import { ClientRouter } from "astro:transitions";
+import { Moon, Search, Sun } from "lucide-react";
+import SearchModal from "../components/SearchModal";
+import WhatsAppButton from "../components/WhatsAppButton.astro";
+
+const {
+  title,
+  description,
+  frontmatter,
+  hasInquirySection,
+  faqItems,
+  image,
+} = Astro.props;
+const siteTitle = "NeverMind";
+const siteDescription =
+  "׳׳¨׳—׳‘ ׳׳׳¡׳˜׳¨׳§׳׳׳¡ ׳׳׳•׳§׳“ ׳׳”׳§׳©׳‘׳” ׳₪׳ ׳™׳׳™׳×, ׳‘׳”׳™׳¨׳•׳× ׳•׳“׳™׳•׳§ ׳¨׳’׳©׳™.";
+const siteUrl = "https://www.nevermind.co.il";
+const pageTitle = title ? `${title} | ${siteTitle}` : siteTitle;
+const pageDescription = description ?? frontmatter?.description ?? siteDescription;
+const pageUrl = Astro.url
+  ? new URL(Astro.url.pathname, siteUrl).toString()
+  : siteUrl;
+const ogImage =
+  image ||
+  (frontmatter?.image
+    ? new URL(frontmatter.image, siteUrl).toString()
+    : `${siteUrl}/og.jpg`);
+
+const organizationSchema = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "NeverMind",
+  url: siteUrl,
+  description: siteDescription,
+  inLanguage: "he-IL",
+};
+
+const websiteSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "NeverMind",
+  url: siteUrl,
+  inLanguage: "he-IL",
+  publisher: {
+    "@type": "Organization",
+    name: "NeverMind",
+    url: siteUrl,
+  },
+};
+
+const normalizeSegment = (segment: string) => {
+  const map: Record<string, string> = {
+    articles: "מאמרים",
+    topics: "נושאים",
+    now: "מה המצב עכשיו?",
+    training: "הכשרות",
+  };
+
+  return map[segment] ?? segment;
+};
+
+const pathName = Astro.url?.pathname ?? "/";
+const pathSegments = pathName.split("/").filter(Boolean);
+const breadcrumbItems = [{ name: "׳‘׳™׳×", item: siteUrl }];
+let runningUrl = siteUrl.replace(/\/$/, "");
+
+pathSegments.forEach((segment, index) => {
+  runningUrl = `${runningUrl}/${segment}`;
+  const isLast = index === pathSegments.length - 1;
+  const label =
+    isLast && frontmatter?.title ? frontmatter.title : normalizeSegment(segment);
+  breadcrumbItems.push({ name: label, item: runningUrl });
+});
+
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: breadcrumbItems.map((item, index) => ({
+    "@type": "ListItem",
+    position: index + 1,
+    name: item.name,
+    item: item.item,
+  })),
+};
+
+const toIso = (value: string | Date | undefined) => {
+  if (!value) return undefined;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? undefined : date.toISOString();
+};
+
+const imageUrl = ogImage;
+
+const articleSchema = frontmatter
+  ? {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      headline: frontmatter.title ?? pageTitle,
+      description: frontmatter.description ?? pageDescription,
+      author: {
+        "@type": "Person",
+        name: frontmatter.author ?? "׳”׳©׳ ׳׳ ׳׳©׳ ׳”",
+      },
+      datePublished: toIso(frontmatter.pubDate),
+      dateModified: toIso(frontmatter.updatedDate) ?? toIso(frontmatter.pubDate),
+      image: imageUrl,
+      inLanguage: "he-IL",
+      mainEntityOfPage: pageUrl,
+      publisher: {
+        "@type": "Organization",
+        name: siteTitle,
+        url: siteUrl,
+      },
+    }
+  : null;
+
+const normalizedFaqItems = Array.isArray(faqItems) ? faqItems : [];
+const fallbackFaqItems =
+  hasInquirySection && normalizedFaqItems.length === 0 && frontmatter?.description
+    ? [
+        {
+          question: `׳׳” ׳ ׳—׳§׳•׳¨ ׳‘׳׳׳׳¨ "${frontmatter.title ?? pageTitle}"?`,
+          answer: frontmatter.description,
+        },
+      ]
+    : [];
+const faqItemsForSchema =
+  normalizedFaqItems.length > 0 ? normalizedFaqItems : fallbackFaqItems;
+const faqSchema =
+  hasInquirySection && faqItemsForSchema.length > 0
+    ? {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: faqItemsForSchema.map((item) => ({
+          "@type": "Question",
+          name: item.question,
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: item.answer,
+          },
+        })),
+      }
+    : null;
+
+const schemas = [
+  organizationSchema,
+  websiteSchema,
+  breadcrumbSchema,
+  articleSchema,
+  faqSchema,
+].filter(Boolean);
+---
+<!doctype html>
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={pageDescription} />
+    <link rel="canonical" href={pageUrl} />
+
+    <meta property="og:site_name" content={siteTitle} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={pageDescription} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:image" content={ogImage} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <script is:inline>
+      const setTheme = () => {
+        const theme =
+          localStorage.getItem("nm-theme") ||
+          (window.matchMedia("(prefers-color-scheme: dark)").matches
+            ? "dark"
+            : "light");
+        const isDark = theme === "dark";
+        document.documentElement.classList.toggle("dark", isDark);
+        document.documentElement.style.backgroundColor = isDark
+          ? "#050505"
+          : "#F9F8F6";
+      };
+      setTheme();
+      document.addEventListener("astro:after-swap", setTheme);
+    </script>
+
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(schemas)}></script>
+    <ClientRouter />
+
+    <style is:global>
+      :root {
+        --nm-bg: #f9f8f6;
+        --nm-text: #1a1a1a;
+        --nm-grid: rgba(26, 26, 26, 0.45);
+      }
+      .dark {
+        --nm-bg: #050505;
+        --nm-text: #f5f5f5;
+        --nm-grid: rgba(255, 255, 255, 0.1);
+      }
+
+      body {
+        background-color: var(--nm-bg);
+        color: var(--nm-text);
+        font-family: "Assistant Variable", sans-serif;
+        transition: background-color 0.3s ease;
+      }
+
+      /* Focus Mode CSS */
+      body.is-focus-mode [data-nav],
+      body.is-focus-mode [data-footer],
+      body.is-focus-mode [data-whatsapp],
+      body.is-focus-mode [data-scroll-top] {
+        display: none !important;
+      }
+
+      /* Grid Effect */
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background-image: linear-gradient(var(--nm-grid) 0.5px, transparent 0.5px),
+          linear-gradient(90deg, var(--nm-grid) 0.5px, transparent 0.5px);
+        background-size: 36px 36px;
+        opacity: 0.03;
+        pointer-events: none;
+        z-index: 0;
+      }
+    </style>
+  </head>
+  <body class="antialiased min-h-screen selection:bg-neutral-200 dark:selection:bg-neutral-800">
+    <a
+      href="#main-content"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:bg-white focus:text-black focus:px-4 focus:py-2 focus:rounded-md shadow-xl"
+    >
+      ׳“׳™׳׳•׳’ ׳׳×׳•׳›׳ ׳”׳¨׳׳©׳™
+    </a>
+
+    <nav data-nav class="fixed inset-x-0 top-6 z-50 flex justify-center px-4 transition-transform duration-300">
+      <div class="flex items-center gap-4 rounded-full border border-neutral-200/50 dark:border-neutral-800/50 bg-white/80 dark:bg-neutral-900/80 px-6 py-3 shadow-sm backdrop-blur-md">
+        <a href="/" class="text-sm font-medium hover:opacity-70 transition-opacity">׳‘׳™׳×</a>
+        <a href="/articles" class="text-sm font-medium hover:opacity-70 transition-opacity">׳׳׳׳¨׳™׳</a>
+        <div class="w-px h-4 bg-neutral-300 dark:bg-neutral-700 mx-1"></div>
+
+        <button
+          id="theme-toggle"
+          aria-label="׳”׳—׳׳£ ׳׳¦׳‘ ׳×׳¦׳•׳’׳”"
+          class="p-1 hover:text-neutral-500 transition-colors"
+        >
+          <Sun className="w-4 h-4 dark:hidden" />
+          <Moon className="w-4 h-4 hidden dark:block" />
+        </button>
+
+        <button
+          id="search-trigger"
+          data-search-trigger
+          aria-label="׳₪׳×׳— ׳—׳™׳₪׳•׳©"
+          class="p-1 hover:text-neutral-500 transition-colors"
+        >
+          <Search className="w-4 h-4" />
+        </button>
+      </div>
+    </nav>
+
+    <main id="main-content" class="relative z-10 mx-auto w-full max-w-6xl px-6 pt-32 pb-20">
+      <slot />
+    </main>
+
+    <footer data-footer class="mt-20 border-t border-neutral-200 dark:border-neutral-800 py-12 px-6">
+      <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+        <p class="text-sm opacity-60">ֲ© {new Date().getFullYear()} NeverMind | ׳¢.׳. 301773289</p>
+        <div class="flex gap-4">
+           <a href="https://tally.so/r/3N0x0q" class="text-sm hover:underline">׳™׳¦׳™׳¨׳× ׳§׳©׳¨</a>
+        </div>
+      </div>
+    </footer>
+
+    <WhatsAppButton phone="972555634035" />
+    <SearchModal client:idle />
+
+    <script is:inline>
+      document.addEventListener("astro:page-load", () => {
+        if (window.__nmLayoutCleanup) {
+          window.__nmLayoutCleanup();
+        }
+
+        const themeBtn = document.getElementById("theme-toggle");
+        const searchTriggers = Array.from(
+          document.querySelectorAll("[data-search-trigger]")
+        );
+
+        const onThemeClick = () => {
+          const isDark = document.documentElement.classList.toggle("dark");
+          localStorage.setItem("nm-theme", isDark ? "dark" : "light");
+          document.documentElement.style.backgroundColor = isDark
+            ? "#050505"
+            : "#F9F8F6";
+        };
+
+        const onSearchClick = (event) => {
+          event.preventDefault();
+          window.dispatchEvent(new CustomEvent("open-search"));
+        };
+
+        themeBtn?.addEventListener("click", onThemeClick);
+        searchTriggers.forEach((trigger) =>
+          trigger.addEventListener("click", onSearchClick)
+        );
+
+        window.__nmLayoutCleanup = () => {
+          themeBtn?.removeEventListener("click", onThemeClick);
+          searchTriggers.forEach((trigger) =>
+            trigger.removeEventListener("click", onSearchClick)
+          );
+        };
+      });
+    </script>
+  </body>
+</html>
+
+
+

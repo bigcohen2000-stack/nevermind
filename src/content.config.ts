@@ -1,0 +1,31 @@
+﻿import { defineCollection, z } from "astro:content";
+
+const articles = defineCollection({
+  type: "content",
+  schema: z.object({
+    title: z.string(),
+    description: z.string(),
+    pubDate: z.coerce.date(),
+    updatedDate: z.coerce.date().optional(),
+    author: z.string(),
+    tags: z.array(z.string()).default([]),
+    image: z.string().default("/og.jpg"),
+    canonicalUrl: z.string().url().optional(),
+    keywords: z.string().optional(),
+    audioUrl: z.string().optional(),
+    youtubeId: z.string().optional(),
+    tallyUrl: z.string().url().optional(),
+    isPremium: z.boolean().default(false),
+    draft: z.boolean().default(false),
+    faq: z
+      .array(
+        z.object({
+          question: z.string(),
+          answer: z.string(),
+        })
+      )
+      .optional(),
+  }),
+});
+
+export const collections = { articles };

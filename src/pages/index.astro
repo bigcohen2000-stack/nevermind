@@ -1,0 +1,226 @@
+﻿---
+import { getCollection } from "astro:content";
+import Layout from "../layouts/Layout.astro";
+import TruthSlider from "../components/TruthSlider";
+import { Compass, HeartPulse, Star, Sun } from "lucide-react";
+
+const allArticles = await getCollection("articles", ({ data }) => data.draft !== true);
+const sortedArticles = allArticles.sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+const recentArticles = sortedArticles.slice(0, 9);
+const siteUrl = Astro.site?.toString() ?? "https://www.nevermind.co.il";
+
+const cards = [
+  {
+    title: "סובל כרגע?",
+    description: "חרדה, לחץ",
+    href: "/now",
+    ariaLabel: "סובל כרגע?",
+    Icon: HeartPulse,
+  },
+  {
+    title: "אשליית האושר",
+    description: "אושר = לא לפחד לסבול",
+    href: "/articles",
+    ariaLabel: "אשליית האושר",
+    Icon: Sun,
+  },
+  {
+    title: "מתחילים כאן",
+    description: "מכניקה",
+    href: "#articles",
+    ariaLabel: "מתחילים כאן",
+    Icon: Compass,
+  },
+  {
+    title: "הכשרות וליווי",
+    description: "הכשרות וליווי",
+    href: "/articles",
+    ariaLabel: "הכשרות וליווי",
+    Icon: Star,
+  },
+];
+---
+
+<Layout
+  title="NeverMind | הבנה, לא כלים"
+  description="דרך חדשה לראות את עצמך, את הקשיים ואת האפשרויות – בלי מאמץ מיותר."
+>
+  <section
+    aria-labelledby="intent-title"
+    class="space-y-12 max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 pt-20"
+  >
+    <header class="max-w-3xl space-y-5">
+      <h1
+        id="intent-title"
+        class="text-[clamp(2.2rem,1.7rem+2.4vw,3.6rem)] font-semibold leading-[1.1] text-neutral-900 dark:text-white"
+      >
+        גישת NeverMind: להפסיק לתקן, להתחיל לראות.
+      </h1>
+      <p class="text-[clamp(1.05rem,0.98rem+0.5vw,1.4rem)] text-neutral-700 dark:text-neutral-300">
+        דרך חדשה לראות את עצמך, את הקשיים ואת האפשרויות – בלי מאמץ מיותר.
+      </p>
+      <div class="w-full max-w-md pt-4">
+        <button
+          type="button"
+          data-search-trigger
+          class="inline-flex w-full items-center justify-between rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white/80 dark:bg-neutral-900/70 px-4 py-3 text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] text-neutral-700 dark:text-neutral-300 transition-colors hover:bg-white"
+          aria-label="פתח חיפוש"
+        >
+          חיפוש מהיר
+          <span class="text-sm text-neutral-400">⌘K</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="flex gap-6 overflow-x-auto snap-x snap-mandatory pb-4 -mx-4 px-4 md:mx-0 md:px-0 md:grid md:grid-cols-2 lg:grid-cols-4">
+      {cards.map(({ title, description, href, ariaLabel, Icon }) => (
+        <a
+          href={href}
+          aria-label={ariaLabel}
+          data-glow
+          class="glow-card group relative flex min-w-[80%] snap-center flex-col justify-between gap-6 overflow-hidden rounded-3xl border border-neutral-200 dark:border-neutral-800 bg-white/70 dark:bg-neutral-900/70 p-6 shadow-sm backdrop-blur-xl transition-all duration-500 ease-out hover:scale-[1.03] focus-visible:scale-[1.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900 dark:focus-visible:ring-white sm:min-w-[60%] md:min-w-0"
+        >
+          <div class="flex items-center gap-3">
+            <Icon
+              aria-hidden="true"
+              className="h-6 w-6 text-neutral-800 dark:text-neutral-200"
+            />
+            <span class="text-[clamp(1.1rem,1rem+0.5vw,1.5rem)] font-semibold text-neutral-900 dark:text-white">
+              {title}
+            </span>
+          </div>
+          <p class="text-[clamp(0.85rem,0.8rem+0.2vw,0.98rem)] text-neutral-600 dark:text-neutral-400">
+            {description}
+          </p>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <section aria-label="השוואת אמת" class="py-24 md:py-32">
+    <TruthSlider client:visible />
+  </section>
+
+  <section
+    id="articles"
+    class="py-20 md:py-28 max-w-7xl mx-auto px-6 border-t border-neutral-200 dark:border-neutral-800"
+  >
+    <h2 class="text-3xl md:text-4xl font-bold mb-12 md:mb-16 text-neutral-900 dark:text-white">
+      מאמרים אחרונים
+    </h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
+      {recentArticles.map((article) => (
+        <a
+          href={`/articles/${article.slug}`}
+          class="group block p-6 md:p-8 bg-white/70 dark:bg-neutral-900/70 backdrop-blur-md border border-neutral-200 dark:border-neutral-800 rounded-2xl hover:border-neutral-400 dark:hover:border-neutral-500 transition-all duration-300"
+        >
+          <h3 class="text-xl md:text-2xl font-bold mb-4 text-neutral-900 dark:text-white group-hover:underline decoration-neutral-400 underline-offset-4">
+            {article.data.title}
+          </h3>
+          <p class="text-neutral-600 dark:text-neutral-400 text-base line-clamp-3 mb-6">
+            {article.data.description}
+          </p>
+          <span class="inline-block text-sm font-semibold text-neutral-900 dark:text-white border-b border-neutral-900 dark:border-white pb-0.5">
+            אולי שווה לכם לבדוק →
+          </span>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <script type="application/ld+json" is:inline define:vars={{ articles: sortedArticles, siteUrl }}>
+    {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      "itemListElement": articles.map((a, i) => ({
+        "@type": "ListItem",
+        "position": i + 1,
+        "item": {
+          "@type": "BlogPosting",
+          "headline": a.data.title,
+          "url": `${siteUrl}/articles/${a.slug}`,
+          "datePublished": a.data.pubDate,
+          "description": a.data.description
+        }
+      }))
+    }
+  </script>
+
+  <style>
+    .glow-card {
+      --glow-x: 50%;
+      --glow-y: 50%;
+      --nm-glow: rgba(0, 0, 0, 0.05);
+    }
+
+    :global(.dark) .glow-card {
+      --nm-glow: rgba(255, 255, 255, 0.08);
+    }
+
+    .glow-card::after {
+      content: "";
+      position: absolute;
+      inset: -1px;
+      background: radial-gradient(
+        200px circle at var(--glow-x) var(--glow-y),
+        var(--nm-glow),
+        transparent 70%
+      );
+      opacity: 0;
+      transition: opacity 300ms ease;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .glow-card:hover::after,
+    .glow-card:focus-visible::after {
+      opacity: 1;
+    }
+  </style>
+
+  <script is:inline>
+    document.addEventListener("astro:page-load", () => {
+      const prefersReducedMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)"
+      ).matches;
+      if (prefersReducedMotion) {
+        return;
+      }
+
+      if (window.__nmGlowCleanup) {
+        window.__nmGlowCleanup();
+      }
+
+      const glowCards = Array.from(document.querySelectorAll("[data-glow]"));
+      const handlers = [];
+
+      glowCards.forEach((card) => {
+        const onMove = (event) => {
+          const rect = card.getBoundingClientRect();
+          const x = ((event.clientX - rect.left) / rect.width) * 100;
+          const y = ((event.clientY - rect.top) / rect.height) * 100;
+          card.style.setProperty("--glow-x", `${x}%`);
+          card.style.setProperty("--glow-y", `${y}%`);
+        };
+
+        const onLeave = () => {
+          card.style.setProperty("--glow-x", "50%");
+          card.style.setProperty("--glow-y", "50%");
+        };
+
+        card.addEventListener("pointermove", onMove, { passive: true });
+        card.addEventListener("pointerleave", onLeave, { passive: true });
+
+        handlers.push(() => {
+          card.removeEventListener("pointermove", onMove);
+          card.removeEventListener("pointerleave", onLeave);
+        });
+      });
+
+      window.__nmGlowCleanup = () => handlers.forEach((cleanup) => cleanup());
+    });
+  </script>
+</Layout>
+

@@ -1,0 +1,87 @@
+﻿---
+import Layout from "../../layouts/Layout.astro";
+
+const topicMap = {
+  freedom: { label: "חופש", tag: "חופש" },
+  "thought-mechanics": { label: "מכניקת מחשבה", tag: "מכניקת מחשבה" },
+  self: { label: "העצמי", tag: "העצמי" },
+  clarity: { label: "בהירות", tag: "בהירות" },
+  choice: { label: "בחירה", tag: "בחירה" },
+} as const;
+
+type TopicKey = keyof typeof topicMap;
+type ArticleModule = {
+  frontmatter?: {
+    title?: string;
+    description?: string;
+    tags?: string[];
+    draft?: boolean;
+  };
+};
+
+export async function getStaticPaths() {
+  return ["freedom", "thought-mechanics", "self", "clarity", "choice"].map((topic) => ({
+    params: { topic },
+    props: { topic },
+  }));
+}
+
+const { topic } = Astro.props as { topic: TopicKey };
+const topicInfo = topicMap[topic] ?? { label: "נושא", tag: "" };
+
+const articleEntries = import.meta.glob("../../content/articles/**/*.mdx");
+const allArticles = (
+  await Promise.all(
+    Object.entries(articleEntries).map(async ([path, loader]) => {
+      const mod = (await loader()) as ArticleModule;
+      const frontmatter = mod.frontmatter ?? {};
+      if (frontmatter.draft === true) {
+        return null;
+      }
+
+      const slug = path
+        .replace("../../content/articles/", "")
+        .replace(/\.mdx$/, "");
+      const tags = Array.isArray(frontmatter.tags) ? frontmatter.tags : [];
+
+      return {
+        slug: `articles/${slug}`,
+        title: frontmatter.title ?? "מאמר",
+        description: frontmatter.description ?? "",
+        tags,
+      };
+    })
+  )
+).filter((article): article is NonNullable<typeof article> => article !== null);
+
+const articles = topicInfo.tag
+  ? allArticles.filter((article) => article.tags.includes(topicInfo.tag))
+  : [];
+---
+<Layout title={topicInfo.label} description={`מאמרים בנושא ${topicInfo.label}`}>
+  <section class="space-y-8">
+    <header class="space-y-3">
+      <p class="text-[clamp(0.85rem,0.8rem+0.2vw,1rem)] text-[#1A1A1A]/50">נושא</p>
+      <h1 class="text-[clamp(2.1rem,1.6rem+2vw,3.1rem)] font-semibold text-[#1A1A1A]">{topicInfo.label}</h1>
+      <p class="text-[clamp(1rem,0.95rem+0.35vw,1.3rem)] text-[#1A1A1A]/65">מאמרים שמסכמים את המהות בלי רעש.</p>
+    </header>
+
+    {articles.length > 0 ? (
+      <div class="grid gap-6 md:grid-cols-2">
+        {articles.map((article) => (
+          <a href={`/${article.slug}`} class="flex h-full flex-col justify-between rounded-3xl border border-white/70 bg-white/70 p-6 shadow-sm backdrop-blur-md transition-transform duration-300 hover:scale-[1.01] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A]/20">
+            <div class="space-y-3">
+              <h2 class="text-[clamp(1.2rem,1.05rem+0.6vw,1.6rem)] font-semibold text-[#1A1A1A]">{article.title}</h2>
+              {article.description && <p class="text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] text-[#1A1A1A]/65">{article.description}</p>}
+            </div>
+            <span class="mt-6 text-[clamp(0.85rem,0.8rem+0.2vw,1rem)] text-[#1A1A1A]/45">לקריאה שקטה</span>
+          </a>
+        ))}
+      </div>
+    ) : (
+      <div class="rounded-3xl border border-white/70 bg-white/70 p-10 text-center text-[clamp(1rem,0.95rem+0.35vw,1.3rem)] text-[#1A1A1A]/65 shadow-sm backdrop-blur-md">
+        זה נושא שנפתח לאט. בקרוב יופיע כאן שקט חדש.
+      </div>
+    )}
+  </section>
+</Layout>

@@ -1,0 +1,115 @@
+﻿---
+import Layout from "../../layouts/Layout.astro";
+
+type ArticleModule = {
+  frontmatter?: {
+    title?: string;
+    description?: string;
+    tags?: string[];
+    pubDate?: string | Date;
+    draft?: boolean;
+  };
+};
+
+const entries = Object.entries(
+  import.meta.glob("../../content/articles/**/*.mdx", { eager: true })
+) as Array<[string, ArticleModule]>;
+
+const articles = entries
+  .map(([path, mod]) => {
+    const frontmatter = mod.frontmatter ?? {};
+    if (frontmatter.draft === true) {
+      return null;
+    }
+
+    const slug = path
+      .replace("../../content/articles/", "")
+      .replace(/\.mdx$/, "");
+
+    return {
+      slug,
+      title: frontmatter.title ?? "מאמר",
+      description: frontmatter.description ?? "",
+      tags: Array.isArray(frontmatter.tags) ? frontmatter.tags : [],
+      date: frontmatter.pubDate ? new Date(frontmatter.pubDate) : null,
+      transitionId: slug.replace(/[^\w-]+/g, "-"),
+    };
+  })
+  .filter((article): article is NonNullable<typeof article> => article !== null)
+  .sort((a, b) => {
+    if (!a.date || !b.date) return 0;
+    return b.date.getTime() - a.date.getTime();
+  });
+
+const tagSet = new Set<string>();
+articles.forEach((article) => article.tags.forEach((tag) => tagSet.add(tag)));
+const tags = Array.from(tagSet);
+---
+<Layout title="מאמרים">
+  <section class="space-y-10">
+    <header class="space-y-4">
+      <h1 class="text-[clamp(2.2rem,1.7rem+2vw,3.2rem)] font-semibold text-[#1A1A1A]">
+        מאמרים
+      </h1>
+      <p class="text-[clamp(1.05rem,1rem+0.35vw,1.4rem)] text-[#1A1A1A]/70">
+        ספריית עומק חיה, מסודרת לפי חקירה ותנועה.
+      </p>
+    </header>
+
+    <div class="flex flex-wrap gap-3">
+      <button type="button" data-filter="all" aria-pressed="true" class="rounded-full border border-[#1A1A1A]/10 bg-white/70 px-4 py-2 text-[clamp(0.85rem,0.82rem+0.2vw,1rem)] text-[#1A1A1A]/70 transition-colors duration-300 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A]/20">הכל</button>
+      {tags.map((tag) => (
+        <button type="button" data-filter={tag} aria-pressed="false" class="rounded-full border border-[#1A1A1A]/10 bg-white/70 px-4 py-2 text-[clamp(0.85rem,0.82rem+0.2vw,1rem)] text-[#1A1A1A]/70 transition-colors duration-300 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A]/20">{tag}</button>
+      ))}
+    </div>
+
+    <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+      {articles.map((article) => (
+        <a href={`/articles/${article.slug}`} data-article-card data-tags={article.tags.join(",")} class="group flex h-full flex-col justify-between gap-6 rounded-3xl border border-white/70 bg-white/70 p-6 shadow-sm backdrop-blur-md transition-all duration-500 ease-out hover:scale-[1.01] focus-visible:scale-[1.01] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A]/20">
+          <div class="space-y-3">
+            <h2 transition:name={`article-${article.transitionId}`} class="text-[clamp(1.3rem,1.1rem+0.6vw,1.7rem)] font-semibold text-[#1A1A1A]">{article.title}</h2>
+            {article.description && <p class="text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] text-[#1A1A1A]/65">{article.description}</p>}
+          </div>
+          {article.tags.length > 0 && (
+            <div class="flex flex-wrap gap-2 text-[clamp(0.8rem,0.78rem+0.2vw,0.95rem)] text-[#1A1A1A]/55">
+              {article.tags.map((tag) => (
+                <span class="rounded-full border border-[#1A1A1A]/10 bg-white/70 px-3 py-1">{tag}</span>
+              ))}
+            </div>
+          )}
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <script is:inline>
+    document.addEventListener("astro:page-load", () => {
+      const buttons = Array.from(document.querySelectorAll("[data-filter]"));
+      const cards = Array.from(document.querySelectorAll("[data-article-card]"));
+
+      const setActive = (active) => {
+        buttons.forEach((button) => {
+          const isActive = button.dataset.filter === active;
+          button.setAttribute("aria-pressed", String(isActive));
+          button.classList.toggle("bg-white", isActive);
+        });
+      };
+
+      const filterCards = (active) => {
+        cards.forEach((card) => {
+          const cardTags = card.dataset.tags ? card.dataset.tags.split(",") : [];
+          const shouldShow = active === "all" || cardTags.includes(active);
+          card.classList.toggle("hidden", !shouldShow);
+        });
+      };
+
+      buttons.forEach((button) => {
+        button.addEventListener("click", () => {
+          const active = button.dataset.filter || "all";
+          setActive(active);
+          filterCards(active);
+        });
+      });
+    });
+  </script>
+</Layout>

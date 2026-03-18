@@ -1,0 +1,54 @@
+---
+const { phone = "972555634035" } = Astro.props;
+const baseUrl = `https://wa.me/${phone}`;
+---
+<a
+  data-whatsapp
+  data-wa-base={baseUrl}
+  href={baseUrl}
+  target="_blank"
+  rel="noreferrer"
+  aria-label="WhatsApp"
+  class="fixed bottom-6 left-6 z-40 flex h-10 w-10 items-center justify-center rounded-full bg-white/70 shadow-sm backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-500"
+>
+  <span class="block h-2 w-2 rounded-full bg-[#1A1A1A]/45"></span>
+</a>
+<script is:inline>
+  document.addEventListener("astro:page-load", () => {
+    if (window.__nmWhatsappCleanup) {
+      window.__nmWhatsappCleanup();
+    }
+
+    const whatsappButton = document.querySelector("[data-whatsapp]");
+    const base = whatsappButton?.getAttribute("data-wa-base") ?? "";
+
+    const updateWhatsappVisibility = () => {
+      if (!whatsappButton) return;
+      const doc = document.documentElement;
+      const scrollTop = doc.scrollTop || document.body.scrollTop;
+      const scrollHeight = doc.scrollHeight - doc.clientHeight;
+      const progress = scrollHeight > 0 ? scrollTop / scrollHeight : 0;
+      const shouldShow = progress >= 0.5;
+
+      whatsappButton.classList.toggle("opacity-100", shouldShow);
+      whatsappButton.classList.toggle("pointer-events-auto", shouldShow);
+    };
+
+    const updateWhatsappHref = () => {
+      if (!whatsappButton || !base) return;
+      const rawTitle = document.title ? document.title.split("|")[0].trim() : "NeverMind";
+      const pageTitle = rawTitle || "NeverMind";
+      const message = `היי יקיר, הגעתי מהעמוד ${pageTitle}, אשמח להתייעץ.`;
+      const encoded = encodeURIComponent(message);
+      whatsappButton.setAttribute("href", `${base}?text=${encoded}`);
+    };
+
+    updateWhatsappHref();
+    document.addEventListener("scroll", updateWhatsappVisibility, { passive: true });
+    updateWhatsappVisibility();
+
+    window.__nmWhatsappCleanup = () => {
+      document.removeEventListener("scroll", updateWhatsappVisibility);
+    };
+  });
+</script>
