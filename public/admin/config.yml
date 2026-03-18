@@ -1,11 +1,14 @@
-﻿backend:
+backend:
   name: github
   repo: bigcohen2000-stack/nevermind
   branch: main
-  base_url: https://www.nevermind.co.il/api
+  base_url: https://nevermind-9dr.pages.dev/api
   auth_endpoint: auth
   auth_scope: repo
-  site_domain: www.nevermind.co.il
+  site_domain: nevermind-9dr.pages.dev
+
+site_url: https://nevermind-9dr.pages.dev
+
 
 site_url: https://www.nevermind.co.il
 logo_url: /favicon.svg
