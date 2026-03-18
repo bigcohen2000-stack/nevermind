@@ -8,9 +8,6 @@ backend:
   site_domain: nevermind-9dr.pages.dev
 
 site_url: https://nevermind-9dr.pages.dev
-
-
-site_url: https://www.nevermind.co.il
 logo_url: /favicon.svg
 locale: he
 publish_mode: simple
@@ -71,7 +68,7 @@ collections:
       - label: מחבר
         name: author
         widget: string
-        default: השם לא משנה
+        default: "השם לא משנה"
       - label: תגיות
         name: tags
         widget: select
@@ -87,9 +84,6 @@ collections:
         widget: image
         required: false
         default: /og.jpg
-        media_library:
-          config:
-            multiple: false
       - label: Canonical URL
         name: canonicalUrl
         widget: string
