@@ -1,0 +1,38 @@
+﻿{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["DOM", "DOM.Iterable", "ES2022"],
+    "allowJs": false,
+    "skipLibCheck": true,
+    "strict": true,
+    "noImplicitAny": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "types": ["node", "@types/react", "@types/react-dom"],
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": [".astro/types.d.ts", "src/**/*", "astro.config.mjs"],
+  "exclude": [
+    "node_modules",
+    ".next/**/*",
+    "src/app/**/*",
+    "src/components/content/**/*",
+    "src/lib/content.ts",
+    "src/lib/clerkClient.ts",
+    "src/lib/sanity.ts",
+    "middleware.ts",
+    "next-env.d.ts"
+  ]
+}
+
