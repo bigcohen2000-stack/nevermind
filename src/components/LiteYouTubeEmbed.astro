@@ -1,10 +1,10 @@
-﻿---
+---
 interface Props {
   youtubeId: string;
   title?: string;
 }
 
-const { youtubeId, title = "וידאו YouTube" } = Astro.props;
+const { youtubeId, title = "סרטון וידאו" } = Astro.props;
 const thumbnail = `https://i.ytimg.com/vi/${youtubeId}/hqdefault.jpg`;
 const embedUrl = `https://www.youtube-nocookie.com/embed/${youtubeId}?autoplay=1&rel=0`;
 ---
@@ -48,7 +48,7 @@ const embedUrl = `https://www.youtube-nocookie.com/embed/${youtubeId}?autoplay=1
         const iframe = document.createElement("iframe");
         iframe.className = "absolute inset-0 h-full w-full";
         iframe.src = button.dataset.embedUrl || "";
-        iframe.title = button.dataset.title || "וידאו YouTube";
+        iframe.title = button.dataset.title || "סרטון וידאו";
         iframe.loading = "eager";
         iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
         iframe.allowFullscreen = true;

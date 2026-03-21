@@ -8,7 +8,7 @@ const baseUrl = `https://wa.me/${phone}`;
   href={baseUrl}
   target="_blank"
   rel="noreferrer"
-  aria-label="WhatsApp"
+  aria-label="×™×¦×™×¨×ª ×§×©×¨ ×‘×•×•××˜×¡××¤"
   class="fixed bottom-6 left-6 z-40 flex h-10 w-10 items-center justify-center rounded-full bg-white/70 shadow-sm backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-500"
 >
   <span class="block h-2 w-2 rounded-full bg-[#1A1A1A]/45"></span>
@@ -38,7 +38,7 @@ const baseUrl = `https://wa.me/${phone}`;
       if (!whatsappButton || !base) return;
       const rawTitle = document.title ? document.title.split("|")[0].trim() : "NeverMind";
       const pageTitle = rawTitle || "NeverMind";
-      const message = `äéé é÷éø, äâòúé îäòîåã ${pageTitle}, àùîç ìäúééòõ.`;
+      const message = `×”×™×™, ×”×’×¢×ª×™ ××”×¢××•×“ ${pageTitle}, ×•××©××— ×œ×‘×“×•×§ ×™×—×“ ××” × ×›×•×Ÿ ×›××Ÿ.`;
       const encoded = encodeURIComponent(message);
       whatsappButton.setAttribute("href", `${base}?text=${encoded}`);
     };

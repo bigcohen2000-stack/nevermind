@@ -1,1 +1,43 @@
-﻿@import "tailwindcss";
+@import "tailwindcss";
+
+@font-face {
+  font-family: "Assistant Variable";
+  src: url("/fonts/assistant-hebrew-wght-normal.woff2") format("woff2");
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0590-05FF, U+FB1D-FB4F;
+}
+
+@font-face {
+  font-family: "Assistant Variable";
+  src: url("/fonts/assistant-latin-ext-wght-normal.woff2") format("woff2");
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0100-024F, U+1E00-1EFF;
+}
+
+@font-face {
+  font-family: "Assistant Variable";
+  src: url("/fonts/assistant-latin-wght-normal.woff2") format("woff2");
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: "Assistant Variable", system-ui, sans-serif;
+  font-size: 1.125rem;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+:focus-visible {
+  outline: 3px solid #1A1A1A;
+  outline-offset: 2px;
+  border-radius: 2px;
+}

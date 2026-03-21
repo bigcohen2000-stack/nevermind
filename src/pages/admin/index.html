@@ -32,6 +32,34 @@
     </script>
     <script src="https://unpkg.com/decap-cms@^3.6.0/dist/decap-cms.js"></script>
     <script>
+      const AUTH_STORAGE_KEY = "decap-cms-oauth-result";
+
+      function relayStoredAuth() {
+        const message = window.localStorage.getItem(AUTH_STORAGE_KEY);
+        if (!message) return;
+
+        let attempts = 0;
+        const relay = () => {
+          attempts += 1;
+          window.postMessage(message, window.location.origin);
+
+          if (attempts >= 6) {
+            window.localStorage.removeItem(AUTH_STORAGE_KEY);
+            return;
+          }
+
+          window.setTimeout(relay, 250);
+        };
+
+        relay();
+      }
+
+      window.addEventListener("storage", (event) => {
+        if (event.key === AUTH_STORAGE_KEY && event.newValue) {
+          relayStoredAuth();
+        }
+      });
+
       CMS.registerEditorComponent({
         id: "inquiry-box",
         label: "InquiryBox",
@@ -60,6 +88,7 @@
       });
 
       CMS.init();
+      window.setTimeout(relayStoredAuth, 300);
     </script>
   </body>
 </html>

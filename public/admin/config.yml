@@ -1,9 +1,9 @@
-backend:
+﻿backend:
   name: github
   repo: bigcohen2000-stack/nevermind
   branch: main
   base_url: https://nevermind-9dr.pages.dev/api
-  auth_endpoint: auth
+  auth_endpoint: /auth
   auth_scope: repo
   site_domain: nevermind-9dr.pages.dev
 
@@ -13,7 +13,6 @@ locale: he
 publish_mode: simple
 media_folder: public/uploads
 public_folder: /uploads
-
 
 slug:
   encoding: unicode
@@ -80,36 +79,44 @@ collections:
           - העצמי
           - בהירות
           - בחירה
+          - זוגיות
+          - משפחה וחינוך
+          - פילוסופיה וחברה
+          - תודעה ורצון
+          - חשיבה ביקורתית
       - label: תמונה ראשית
         name: image
         widget: image
         required: false
         default: /og.jpg
-      - label: Canonical URL
+        media_library:
+          config:
+            multiple: false
+      - label: כתובת קנונית
         name: canonicalUrl
         widget: string
         required: false
-      - label: Keywords
+      - label: מילות מפתח
         name: keywords
         widget: string
         required: false
-      - label: Audio URL
+      - label: קישור לאודיו
         name: audioUrl
         widget: string
         required: false
-      - label: YouTube ID
+      - label: מזהה יוטיוב
         name: youtubeId
         widget: string
         required: false
-      - label: Tally URL
+      - label: קישור ל-Tally
         name: tallyUrl
         widget: string
         required: false
-      - label: Premium
+      - label: תוכן פרימיום
         name: isPremium
         widget: boolean
         default: false
-      - label: Draft
+      - label: טיוטה
         name: draft
         widget: boolean
         default: true
