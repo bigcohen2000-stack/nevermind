@@ -21,21 +21,21 @@ const cards = [
   },
   {
     title: "אשליית האושר",
-    description: "אושר = לא לפחד לסבול",
+    description: "אושר הוא לא פחד שקט",
     href: "/articles",
     ariaLabel: "אשליית האושר",
     Icon: Sun,
   },
   {
     title: "מתחילים כאן",
-    description: "מכניקה",
+    description: "מכניקת מחשבה",
     href: "#articles",
     ariaLabel: "מתחילים כאן",
     Icon: Compass,
   },
   {
     title: "הכשרות וליווי",
-    description: "הכשרות וליווי",
+    description: "חקירה, הכשרה וליווי",
     href: "/articles",
     ariaLabel: "הכשרות וליווי",
     Icon: Star,
@@ -45,11 +45,11 @@ const cards = [
 
 <Layout
   title="NeverMind | הבנה, לא כלים"
-  description="דרך חדשה לראות את עצמך, את הקשיים ואת האפשרויות – בלי מאמץ מיותר."
+  description="גישה ישירה לראות את עצמך, את הקשיים ואת האפשרויות בלי מאמץ מיותר."
 >
   <section
     aria-labelledby="intent-title"
-    class="space-y-12 max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 pt-20"
+    class="mx-auto max-w-7xl space-y-12 px-5 pt-20 sm:px-8 lg:px-12"
   >
     <header class="max-w-3xl space-y-5">
       <h1
@@ -59,13 +59,13 @@ const cards = [
         גישת NeverMind: להפסיק לתקן, להתחיל לראות.
       </h1>
       <p class="text-[clamp(1.05rem,0.98rem+0.5vw,1.4rem)] text-neutral-700 dark:text-neutral-300">
-        דרך חדשה לראות את עצמך, את הקשיים ואת האפשרויות – בלי מאמץ מיותר.
+        דרך חדה לראות את עצמך, את הקשיים ואת האפשרויות בלי מאמץ מיותר.
       </p>
       <div class="w-full max-w-md pt-4">
         <button
           type="button"
           data-search-trigger
-          class="inline-flex w-full items-center justify-between rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white/80 dark:bg-neutral-900/70 px-4 py-3 text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] text-neutral-700 dark:text-neutral-300 transition-colors hover:bg-white"
+          class="inline-flex w-full items-center justify-between rounded-2xl border border-neutral-200 bg-white/80 px-4 py-3 text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] text-neutral-700 transition-colors hover:bg-white dark:border-neutral-800 dark:bg-neutral-900/70 dark:text-neutral-300"
           aria-label="פתח חיפוש"
         >
           חיפוש מהיר
@@ -74,13 +74,13 @@ const cards = [
       </div>
     </header>
 
-    <div class="flex gap-6 overflow-x-auto snap-x snap-mandatory pb-4 -mx-4 px-4 md:mx-0 md:px-0 md:grid md:grid-cols-2 lg:grid-cols-4">
+    <div class="-mx-4 flex snap-x snap-mandatory gap-6 overflow-x-auto px-4 pb-4 md:mx-0 md:grid md:grid-cols-2 md:px-0 lg:grid-cols-4">
       {cards.map(({ title, description, href, ariaLabel, Icon }) => (
         <a
           href={href}
           aria-label={ariaLabel}
           data-glow
-          class="glow-card group relative flex min-w-[80%] snap-center flex-col justify-between gap-6 overflow-hidden rounded-3xl border border-neutral-200 dark:border-neutral-800 bg-white/70 dark:bg-neutral-900/70 p-6 shadow-sm backdrop-blur-xl transition-all duration-500 ease-out hover:scale-[1.03] focus-visible:scale-[1.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900 dark:focus-visible:ring-white sm:min-w-[60%] md:min-w-0"
+          class="glow-card group relative flex min-w-[80%] snap-center flex-col justify-between gap-6 overflow-hidden rounded-3xl border border-neutral-200 bg-white/70 p-6 shadow-sm backdrop-blur-xl transition-all duration-500 ease-out hover:scale-[1.03] focus-visible:scale-[1.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900 dark:border-neutral-800 dark:bg-neutral-900/70 dark:focus-visible:ring-white sm:min-w-[60%] md:min-w-0"
         >
           <div class="flex items-center gap-3">
             <Icon
@@ -105,24 +105,24 @@ const cards = [
 
   <section
     id="articles"
-    class="py-20 md:py-28 max-w-7xl mx-auto px-6 border-t border-neutral-200 dark:border-neutral-800"
+    class="mx-auto max-w-7xl border-t border-neutral-200 px-6 py-20 dark:border-neutral-800 md:py-28"
   >
-    <h2 class="text-3xl md:text-4xl font-bold mb-12 md:mb-16 text-neutral-900 dark:text-white">
+    <h2 class="mb-12 text-3xl font-bold text-neutral-900 dark:text-white md:mb-16 md:text-4xl">
       מאמרים אחרונים
     </h2>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
+    <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3 lg:gap-10">
       {recentArticles.map((article) => (
         <a
           href={`/articles/${article.slug}`}
-          class="group block p-6 md:p-8 bg-white/70 dark:bg-neutral-900/70 backdrop-blur-md border border-neutral-200 dark:border-neutral-800 rounded-2xl hover:border-neutral-400 dark:hover:border-neutral-500 transition-all duration-300"
+          class="group block rounded-2xl border border-neutral-200 bg-white/70 p-6 backdrop-blur-md transition-all duration-300 hover:border-neutral-400 dark:border-neutral-800 dark:bg-neutral-900/70 dark:hover:border-neutral-500 md:p-8"
         >
-          <h3 class="text-xl md:text-2xl font-bold mb-4 text-neutral-900 dark:text-white group-hover:underline decoration-neutral-400 underline-offset-4">
+          <h3 class="mb-4 text-xl font-bold text-neutral-900 decoration-neutral-400 underline-offset-4 group-hover:underline dark:text-white md:text-2xl">
             {article.data.title}
           </h3>
-          <p class="text-neutral-600 dark:text-neutral-400 text-base line-clamp-3 mb-6">
+          <p class="mb-6 text-base text-neutral-600 dark:text-neutral-400">
             {article.data.description}
           </p>
-          <span class="inline-block text-sm font-semibold text-neutral-900 dark:text-white border-b border-neutral-900 dark:border-white pb-0.5">
+          <span class="inline-block border-b border-neutral-900 pb-0.5 text-sm font-semibold text-neutral-900 dark:border-white dark:text-white">
             לקריאה שקטה →
           </span>
         </a>
@@ -223,4 +223,3 @@ const cards = [
     });
   </script>
 </Layout>
-

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+﻿import { useEffect, useRef, useState } from "react";
 
 type SearchResult = {
   url: string;
@@ -38,8 +38,7 @@ export default function SearchModal() {
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    const open = () => setIsOpen(true);
-    const onOpen = () => open();
+    const onOpen = () => setIsOpen(true);
     window.addEventListener("open-search", onOpen as EventListener);
 
     return () => {
@@ -134,14 +133,14 @@ export default function SearchModal() {
             id="search-title"
             className="text-[clamp(1.2rem,1.05rem+0.6vw,1.6rem)] font-semibold text-[#1A1A1A]"
           >
-            ׳—׳™׳₪׳•׳©
+            חיפוש
           </h2>
           <button
             type="button"
             onClick={() => setIsOpen(false)}
             className="rounded-full border border-[#1A1A1A]/10 bg-white/70 px-3 py-1 text-[clamp(0.8rem,0.75rem+0.2vw,0.95rem)] text-[#1A1A1A]/70 transition-colors duration-300 hover:bg-white"
           >
-            ׳¡׳’׳•׳¨
+            סגור
           </button>
         </div>
 
@@ -150,29 +149,30 @@ export default function SearchModal() {
             ref={inputRef}
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="׳׳” ׳׳×׳” ׳׳—׳₪׳© ׳›׳¨׳’׳¢?"
-            className="w-full rounded-2xl border border-[#1A1A1A]/10 bg-white/80 px-4 py-3 text-right text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] text-[#1A1A1A] outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A]/20" dir="rtl"
-            aria-label="׳©׳“׳” ׳—׳™׳₪׳•׳©"
+            placeholder="מה אתה מחפש כרגע?"
+            className="w-full rounded-2xl border border-[#1A1A1A]/10 bg-white/80 px-4 py-3 text-right text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] text-[#1A1A1A] outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A]/20"
+            dir="rtl"
+            aria-label="שדה חיפוש"
           />
         </div>
 
         <div className="mt-4 space-y-3">
           {isLoading && (
             <p className="text-[clamp(0.85rem,0.8rem+0.2vw,1rem)] text-[#1A1A1A]/60">
-              ׳׳—׳₪׳© ׳¢׳‘׳•׳¨׳...
+              מחפש עבורך...
             </p>
           )}
 
           {!isLoading && query && results.length === 0 && (
             <div className="space-y-3">
               <p className="text-[clamp(0.85rem,0.8rem+0.2vw,1rem)] text-[#1A1A1A]/60">
-                ׳׳•׳׳™ ׳”׳©׳׳׳” ׳”׳™׳ ׳׳—׳¨׳×?
+                אולי השאלה היא לא איפה לחפש, אלא מה באמת מבקש להיראות.
               </p>
               <a
                 href="/articles"
                 className="inline-flex items-center justify-center rounded-full border border-[#1A1A1A]/10 bg-white/70 px-4 py-2 text-[clamp(0.85rem,0.8rem+0.2vw,1rem)] text-[#1A1A1A]/70 transition-colors duration-300 hover:bg-white"
               >
-                ׳׳”׳×׳—׳™׳ ׳׳—׳§׳•׳¨
+                להתחיל לחקור
               </a>
             </div>
           )}
