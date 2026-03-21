@@ -21,7 +21,7 @@ export default defineConfig({
     mdx(),
     react(),
     sitemap({
-      filter: (page) => page !== "/404",
+      filter: (page) => page !== "/404" && !page.startsWith("/admin") && page !== "/intake",
       serialize: (item) => ({ ...item, priority: 0.7 }),
     }),
     pagefind(),
@@ -39,3 +39,4 @@ export default defineConfig({
     },
   },
 });
+

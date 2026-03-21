@@ -13,6 +13,7 @@ const {
   hasInquirySection,
   faqItems,
   image,
+  noIndex = false,
 } = Astro.props;
 
 const siteTitle = "NeverMind";
@@ -145,6 +146,7 @@ const schemas = [organizationSchema, websiteSchema, breadcrumbSchema, articleSch
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{pageTitle}</title>
     <meta name="description" content={pageDescription} />
+    {noIndex && <meta name="robots" content="noindex,nofollow,noarchive" />}
     <link rel="canonical" href={pageUrl} />
 
     <meta property="og:site_name" content={siteTitle} />
@@ -309,4 +311,3 @@ const schemas = [organizationSchema, websiteSchema, breadcrumbSchema, articleSch
     </script>
   </body>
 </html>
-

@@ -1,0 +1,31 @@
+﻿{
+  "services": [
+    {
+      "id": "clarity-session",
+      "title": "שיחת בהירות",
+      "summary": "שיחה ממוקדת למי שכבר רואה את הגרעין ורוצה חיתוך חד בלי עוד סיבוב סביב הבעיה.",
+      "priceLabel": "החל מ-1,500 ש״ח",
+      "href": "/intake/",
+      "visible": true,
+      "featured": true
+    },
+    {
+      "id": "deep-process",
+      "title": "תהליך עומק אישי",
+      "summary": "מסלול למי שלא מחפש הרגעה נקודתית אלא שינוי יציב באופן שבו הוא רואה את עצמו ואת המציאות.",
+      "priceLabel": "מותאם אישית",
+      "href": "/intake/",
+      "visible": true,
+      "featured": false
+    },
+    {
+      "id": "business-clarity",
+      "title": "בהירות עסקית",
+      "summary": "עבודה חדה סביב החלטות, חסמים, מיקוד ומהלך עסקי כשכבר ברור שהבעיה אינה רק טקטית.",
+      "priceLabel": "החל מ-3,000 ש״ח",
+      "href": "/intake/",
+      "visible": false,
+      "featured": false
+    }
+  ]
+}

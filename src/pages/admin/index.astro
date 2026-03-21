@@ -1,420 +1,129 @@
 ﻿---
+import { getCollection } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
 import siteSettings from "../../config/siteSettings.json";
+import servicesConfig from "../../config/services.json";
+import ArticlesTable from "../../components/admin/ArticlesTable.astro";
+import ServicesControlPanel from "../../components/admin/ServicesControlPanel.astro";
 
-const pageTitle = "מרכז שליטה פנימי";
-const pageDescription = "דאשבורד פנימי לניהול זרימת התוכן, המודולים הגלובליים, והרחבות המערכת של NeverMind.";
+const pageTitle = "Creator Dashboard";
+const pageDescription = "מרכז תפעולי פרטי לניהול מאמרים, שירותים, והרחבות המערכת של NeverMind.";
+const githubArticleBase = "https://github.com/bigcohen2000-stack/nevermind/blob/main/src/content/articles/";
+const formatDate = new Intl.DateTimeFormat("he-IL", {
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+});
+
+const articles = (await getCollection("articles"))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .map((article) => ({
+    title: article.data.title,
+    status: article.data.draft ? "טיוטה" : "באוויר",
+    statusTone: article.data.draft ? "bg-[#FFF4F3] text-[#D42B2B] border-[#D42B2B]/12" : "bg-[#F4FAF4] text-[#1A1A1A] border-[#1A1A1A]/10",
+    premium: article.data.isPremium ? "כן" : "לא",
+    premiumTone: article.data.isPremium ? "bg-[#1A1A1A] text-[#FAFAF8] border-[#1A1A1A]" : "bg-white text-[#1A1A1A]/72 border-[#1A1A1A]/10",
+    dateLabel: formatDate.format(article.data.pubDate),
+    editHref: `${githubArticleBase}${article.id}`,
+    slug: article.slug,
+  }));
 
 const quickActions = [
   {
-    title: "מחולל Mega-Prompt",
-    description: "יצירת פרומפט, sandbox ל-MDX, autofix וייצוא קובץ לפני commit.",
-    href: "/admin/generator",
+    title: "מאמר חדש",
+    description: "מחולל prompt, sandbox ל-MDX, autofix וייצוא לקובץ לפני commit.",
+    href: "/admin/generator/",
     cta: "לפתוח את המחולל",
-    status: "פעיל",
   },
   {
-    title: "באנר Whisper",
-    description: "פס עליון גלובלי עם קופי, קישור, וכיבוי ל-24 שעות דרך localStorage.",
-    href: "/",
-    cta: "לראות באתר",
-    status: siteSettings.whisperBanner.enabled ? "מופעל" : "כבוי",
+    title: "טופס intake",
+    description: "לינק פרטי לשליחה ללידים, עם Gatekeeper ו־WhatsApp handoff.",
+    href: "/intake/",
+    cta: "לפתוח את הטופס",
   },
   {
-    title: "Premium Vault",
-    description: "חסימת תוכן אחרי marker, עם כרטיס נעילה ו-preview מטושטש של המשך המאמר.",
-    href: "/articles",
-    cta: "לבדוק מאמרים",
-    status: siteSettings.premiumVault.enabled ? "מופעל" : "כבוי",
-  },
-  {
-    title: "Decap הישן",
-    description: "נשמר בנתיב נפרד. לא מסלול העבודה המומלץ כרגע.",
-    href: "/admin/decap",
-    cta: "לפתוח בכל זאת",
-    status: "ארכיון",
+    title: "בדיקת מאמרים",
+    description: "כניסה מהירה לספריית המאמרים הציבורית כדי לראות מה באמת באוויר.",
+    href: "/articles/",
+    cta: "לצפות באתר",
   },
 ];
 
-const systemFiles = [
-  "src/pages/admin/index.astro",
-  "src/pages/admin/generator.astro",
-  "src/components/WhisperBanner.astro",
-  "src/config/siteSettings.json",
-  "src/pages/[...slug].astro",
-];
+const stats = {
+  totalArticles: articles.length,
+  drafts: articles.filter((article) => article.status === "טיוטה").length,
+  live: articles.filter((article) => article.status === "באוויר").length,
+  activeServices: servicesConfig.services.filter((service) => service.visible).length,
+  featuredServices: servicesConfig.services.filter((service) => service.featured).length,
+};
 ---
 
-<Layout title={pageTitle} description={pageDescription}>
+<Layout title={pageTitle} description={pageDescription} noIndex={true}>
   <section class="mx-auto max-w-7xl space-y-10 px-4 pb-12 text-[#1A1A1A]">
     <header class="max-w-4xl space-y-5 text-right">
-      <p class="text-sm font-semibold uppercase tracking-[0.26em] text-[#D42B2B]">Admin Control</p>
-      <h1 class="text-[clamp(2.4rem,1.8rem+2vw,4rem)] font-semibold leading-[1.05]">מרכז השליטה של המערכת</h1>
+      <p class="text-sm font-semibold uppercase tracking-[0.26em] text-[#D42B2B]">Creator Dashboard</p>
+      <h1 class="text-[clamp(2.4rem,1.8rem+2vw,4rem)] font-semibold leading-[1.05]">מרכז התפעול של התוכן</h1>
       <p class="max-w-3xl text-[clamp(1rem,0.94rem+0.3vw,1.15rem)] leading-8 text-[#1A1A1A]/70">
-        זה לא CMS כללי. זה control center לרכיבים הגלובליים, ללוגיקות תוכן, ולזרימת העבודה של האתר. השינויים כאן
-        נשמרים כ-local override בדפדפן, כדי שתוכל לבדוק ולכוון לפני שאתה מעדכן את קובץ ההגדרות הקנוני.
+        זה המרכז שמרכז את העבודה בפועל: מאמרים, שירותים פעילים, וכלי היצירה של האתר. לא CMS כללי, אלא קוקפיט שמכוון לזרימת העבודה שלך.
       </p>
     </header>
 
-    <section class="grid gap-4 lg:grid-cols-4">
+    <section class="grid gap-4 md:grid-cols-3">
       {quickActions.map((item) => (
         <article class="rounded-[1.8rem] border border-[#1A1A1A]/10 bg-white/82 p-5 shadow-[0_24px_70px_rgba(26,26,26,0.06)]">
-          <div class="flex items-center justify-between gap-3">
-            <h2 class="text-xl font-semibold text-[#1A1A1A]">{item.title}</h2>
-            <span class="rounded-full border border-[#1A1A1A]/10 bg-[#FAFAF8] px-3 py-1 text-xs font-semibold text-[#1A1A1A]/62">{item.status}</span>
-          </div>
+          <h2 class="text-xl font-semibold text-[#1A1A1A]">{item.title}</h2>
           <p class="mt-4 text-sm leading-7 text-[#1A1A1A]/68">{item.description}</p>
           <a href={item.href} class="mt-6 inline-flex items-center rounded-full bg-[#1A1A1A] px-4 py-2 text-sm font-semibold text-[#FAFAF8] transition hover:bg-black">{item.cta}</a>
         </article>
       ))}
     </section>
 
-    <section class="grid gap-8 xl:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
-      <form id="site-settings-form" class="space-y-8 rounded-[2rem] border border-[#1A1A1A]/10 bg-white/82 p-6 shadow-[0_30px_90px_rgba(26,26,26,0.08)] backdrop-blur-md">
-        <div class="space-y-5 rounded-[1.7rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] p-5">
-          <div class="flex items-center justify-between gap-4">
-            <div class="text-right">
-              <p class="text-sm font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">Whisper Banner</p>
-              <h2 class="mt-2 text-2xl font-semibold">שליטה על הפס העליון</h2>
-            </div>
-            <label class="flex items-center gap-2 text-sm font-semibold text-[#1A1A1A]/74">
-              <input id="banner-enabled" type="checkbox" class="h-4 w-4 accent-[#D42B2B]" checked={siteSettings.whisperBanner.enabled} />
-              פעיל
-            </label>
-          </div>
+    <section class="grid gap-4 md:grid-cols-5">
+      <article class="rounded-[1.6rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] p-5 text-right">
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">Articles</p>
+        <p class="mt-3 text-3xl font-semibold text-[#1A1A1A]">{stats.totalArticles}</p>
+      </article>
+      <article class="rounded-[1.6rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] p-5 text-right">
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">Drafts</p>
+        <p class="mt-3 text-3xl font-semibold text-[#1A1A1A]">{stats.drafts}</p>
+      </article>
+      <article class="rounded-[1.6rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] p-5 text-right">
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">Live</p>
+        <p class="mt-3 text-3xl font-semibold text-[#1A1A1A]">{stats.live}</p>
+      </article>
+      <article class="rounded-[1.6rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] p-5 text-right">
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">Active Services</p>
+        <p class="mt-3 text-3xl font-semibold text-[#1A1A1A]">{stats.activeServices}</p>
+      </article>
+      <article class="rounded-[1.6rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] p-5 text-right">
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">Featured</p>
+        <p class="mt-3 text-3xl font-semibold text-[#1A1A1A]">{stats.featuredServices}</p>
+      </article>
+    </section>
 
-          <div class="grid gap-4 md:grid-cols-2">
-            <label class="space-y-2 text-right md:col-span-2">
-              <span class="text-sm font-semibold text-[#1A1A1A]">טקסט הבאנר</span>
-              <textarea id="banner-message" rows="3" class="w-full rounded-[1.2rem] border border-[#1A1A1A]/12 bg-white px-4 py-3 text-right text-sm leading-7 text-[#1A1A1A] outline-none transition focus:border-[#D42B2B]/40 focus:ring-2 focus:ring-[#D42B2B]/15">{siteSettings.whisperBanner.message}</textarea>
-            </label>
-            <label class="space-y-2 text-right">
-              <span class="text-sm font-semibold text-[#1A1A1A]">טקסט CTA</span>
-              <input id="banner-cta-label" type="text" class="w-full rounded-[1.2rem] border border-[#1A1A1A]/12 bg-white px-4 py-3 text-right text-sm text-[#1A1A1A] outline-none transition focus:border-[#D42B2B]/40 focus:ring-2 focus:ring-[#D42B2B]/15" value={siteSettings.whisperBanner.ctaLabel} />
-            </label>
-            <label class="space-y-2 text-right">
-              <span class="text-sm font-semibold text-[#1A1A1A]">נתיב CTA</span>
-              <input id="banner-cta-href" type="text" dir="ltr" class="w-full rounded-[1.2rem] border border-[#1A1A1A]/12 bg-white px-4 py-3 text-left text-sm text-[#1A1A1A] outline-none transition focus:border-[#D42B2B]/40 focus:ring-2 focus:ring-[#D42B2B]/15" value={siteSettings.whisperBanner.ctaHref} />
-            </label>
-            <label class="space-y-2 text-right">
-              <span class="text-sm font-semibold text-[#1A1A1A]">זמן הסתרה</span>
-              <input id="banner-dismiss-hours" type="number" min="1" step="1" class="w-full rounded-[1.2rem] border border-[#1A1A1A]/12 bg-white px-4 py-3 text-right text-sm text-[#1A1A1A] outline-none transition focus:border-[#D42B2B]/40 focus:ring-2 focus:ring-[#D42B2B]/15" value={siteSettings.whisperBanner.dismissHours} />
-            </label>
-          </div>
-        </div>
+    <ArticlesTable articles={articles} />
 
-        <div class="space-y-5 rounded-[1.7rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] p-5">
-          <div class="flex items-center justify-between gap-4">
-            <div class="text-right">
-              <p class="text-sm font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">Premium Vault</p>
-              <h2 class="mt-2 text-2xl font-semibold">שליטה על חסימת התוכן</h2>
-            </div>
-            <label class="flex items-center gap-2 text-sm font-semibold text-[#1A1A1A]/74">
-              <input id="vault-enabled" type="checkbox" class="h-4 w-4 accent-[#D42B2B]" checked={siteSettings.premiumVault.enabled} />
-              פעיל
-            </label>
-          </div>
+    <ServicesControlPanel />
 
-          <div class="grid gap-4 md:grid-cols-2">
-            <label class="space-y-2 text-right">
-              <span class="text-sm font-semibold text-[#1A1A1A]">Cutoff Marker</span>
-              <input id="vault-cutoff-marker" type="text" dir="ltr" class="w-full rounded-[1.2rem] border border-[#1A1A1A]/12 bg-white px-4 py-3 text-left text-sm text-[#1A1A1A] outline-none transition focus:border-[#D42B2B]/40 focus:ring-2 focus:ring-[#D42B2B]/15" value={siteSettings.premiumVault.cutoffMarker} />
-            </label>
-            <label class="space-y-2 text-right md:col-span-2">
-              <span class="text-sm font-semibold text-[#1A1A1A]">כותרת כרטיס הנעילה</span>
-              <input id="vault-title" type="text" class="w-full rounded-[1.2rem] border border-[#1A1A1A]/12 bg-white px-4 py-3 text-right text-sm text-[#1A1A1A] outline-none transition focus:border-[#D42B2B]/40 focus:ring-2 focus:ring-[#D42B2B]/15" value={siteSettings.premiumVault.title} />
-            </label>
-            <label class="space-y-2 text-right md:col-span-2">
-              <span class="text-sm font-semibold text-[#1A1A1A]">תיאור כרטיס הנעילה</span>
-              <textarea id="vault-description" rows="4" class="w-full rounded-[1.2rem] border border-[#1A1A1A]/12 bg-white px-4 py-3 text-right text-sm leading-7 text-[#1A1A1A] outline-none transition focus:border-[#D42B2B]/40 focus:ring-2 focus:ring-[#D42B2B]/15">{siteSettings.premiumVault.description}</textarea>
-            </label>
-            <label class="space-y-2 text-right">
-              <span class="text-sm font-semibold text-[#1A1A1A]">טקסט CTA</span>
-              <input id="vault-cta-label" type="text" class="w-full rounded-[1.2rem] border border-[#1A1A1A]/12 bg-white px-4 py-3 text-right text-sm text-[#1A1A1A] outline-none transition focus:border-[#D42B2B]/40 focus:ring-2 focus:ring-[#D42B2B]/15" value={siteSettings.premiumVault.ctaLabel} />
-            </label>
-            <label class="space-y-2 text-right">
-              <span class="text-sm font-semibold text-[#1A1A1A]">נתיב CTA</span>
-              <input id="vault-cta-href" type="text" dir="ltr" class="w-full rounded-[1.2rem] border border-[#1A1A1A]/12 bg-white px-4 py-3 text-left text-sm text-[#1A1A1A] outline-none transition focus:border-[#D42B2B]/40 focus:ring-2 focus:ring-[#D42B2B]/15" value={siteSettings.premiumVault.ctaHref} />
-            </label>
-          </div>
-        </div>
+    <section class="grid gap-4 md:grid-cols-2">
+      <article class="rounded-[1.8rem] border border-[#1A1A1A]/10 bg-white/82 p-5 shadow-[0_24px_70px_rgba(26,26,26,0.06)] text-right">
+        <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[#D42B2B]">System State</p>
+        <h2 class="mt-3 text-2xl font-semibold text-[#1A1A1A]">מודולים גלובליים</h2>
+        <ul class="mt-5 space-y-3 text-sm leading-7 text-[#1A1A1A]/72">
+          <li class="rounded-[1.2rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] px-4 py-3">Whisper Banner: <strong>{siteSettings.whisperBanner.enabled ? "מופעל" : "כבוי"}</strong></li>
+          <li class="rounded-[1.2rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] px-4 py-3">Premium Vault: <strong>{siteSettings.premiumVault.enabled ? "מופעל" : "כבוי"}</strong></li>
+        </ul>
+      </article>
 
-        <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:justify-end">
-          <button id="pick-settings-file" type="button" class="inline-flex items-center justify-center rounded-full border border-[#1A1A1A]/10 bg-white px-5 py-3 text-sm font-semibold text-[#1A1A1A]/78 transition hover:bg-[#FAFAF8]">בחר siteSettings.json</button>
-          <button id="save-settings-file" type="button" class="inline-flex items-center justify-center rounded-full bg-[#D42B2B] px-5 py-3 text-sm font-semibold text-[#FAFAF8] transition hover:bg-[#b82424]">שמור לקובץ האמיתי</button>
-          <button id="apply-settings" type="button" class="inline-flex items-center justify-center rounded-full bg-[#1A1A1A] px-5 py-3 text-sm font-semibold text-[#FAFAF8] transition hover:bg-black">החל מקומית</button>
-          <button id="copy-settings-json" type="button" class="inline-flex items-center justify-center rounded-full border border-[#1A1A1A]/10 bg-white px-5 py-3 text-sm font-semibold text-[#1A1A1A]/78 transition hover:bg-[#FAFAF8]">העתק JSON</button>
-          <button id="export-settings-json" type="button" class="inline-flex items-center justify-center rounded-full border border-[#1A1A1A]/10 bg-white px-5 py-3 text-sm font-semibold text-[#1A1A1A]/78 transition hover:bg-[#FAFAF8]">הורד siteSettings.json</button>
-          <button id="reset-settings" type="button" class="inline-flex items-center justify-center rounded-full border border-[#D42B2B]/16 bg-[#FFF4F3] px-5 py-3 text-sm font-semibold text-[#D42B2B] transition hover:bg-[#ffe7e5]">נקה override מקומי</button>
-        </div>
-      </form>
-
-      <section class="space-y-5 rounded-[2rem] border border-[#1A1A1A]/10 bg-white/82 p-6 shadow-[0_30px_90px_rgba(26,26,26,0.08)] backdrop-blur-md">
-        <div class="space-y-2 text-right">
-          <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[#D42B2B]">Live State</p>
-          <h2 class="text-2xl font-semibold text-[#1A1A1A]">המצב הפעיל כרגע</h2>
-          <p class="text-sm leading-6 text-[#1A1A1A]/60">זה ה-JSON הפעיל בדפדפן שלך כרגע. אם תעתיק אותו ל-<code>src/config/siteSettings.json</code>, הוא יהפוך למקור האמת הבא של הפרויקט.</p>
-        </div>
-
-        <div class="grid gap-4 sm:grid-cols-2">
-          <div class="rounded-[1.5rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] p-4 text-right">
-            <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">Banner Status</p>
-            <p id="banner-status" class="mt-3 text-lg font-semibold text-[#1A1A1A]">-</p>
-            <p id="banner-summary" class="mt-2 text-sm leading-7 text-[#1A1A1A]/68">-</p>
-          </div>
-          <div class="rounded-[1.5rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] p-4 text-right">
-            <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">Premium Vault Status</p>
-            <p id="vault-status" class="mt-3 text-lg font-semibold text-[#1A1A1A]">-</p>
-            <p id="vault-summary" class="mt-2 text-sm leading-7 text-[#1A1A1A]/68">-</p>
-          </div>
-        </div>
-
-        <pre class="min-h-[24rem] overflow-auto rounded-[1.6rem] bg-[#111111] p-5 text-sm leading-7 text-[#F4F4EF] shadow-inner"><code id="settings-json-output">ה-JSON הפעיל יופיע כאן.</code></pre>
-
-        <div class="rounded-[1.5rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] p-4 text-right">
-          <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">File Sync</p>
-          <p id="settings-file-status" class="mt-3 text-sm leading-7 text-[#1A1A1A]/68">
-            עדיין לא נבחר קובץ יעד. ב-Chrome אפשר לבחור את <code>src/config/siteSettings.json</code> ולשמור אליו ישירות.
-          </p>
-        </div>
-
-        <section class="rounded-[1.5rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] p-5 text-right">
-          <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[#D42B2B]">System Files</p>
-          <ul class="mt-4 space-y-3 text-sm leading-7 text-[#1A1A1A]/72">
-            {systemFiles.map((file) => (
-              <li class="rounded-[1.2rem] border border-[#1A1A1A]/10 bg-white px-4 py-3"><code>{file}</code></li>
-            ))}
-          </ul>
-        </section>
-      </section>
+      <article class="rounded-[1.8rem] border border-[#1A1A1A]/10 bg-white/82 p-5 shadow-[0_24px_70px_rgba(26,26,26,0.06)] text-right">
+        <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[#D42B2B]">Next Step</p>
+        <h2 class="mt-3 text-2xl font-semibold text-[#1A1A1A]">מה עושים מכאן</h2>
+        <ol class="mt-5 space-y-3 text-sm leading-7 text-[#1A1A1A]/72">
+          <li class="rounded-[1.2rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] px-4 py-3">יוצרים מאמר חדש דרך המחולל.</li>
+          <li class="rounded-[1.2rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] px-4 py-3">מגדירים אילו שירותים פתוחים כרגע דרך services.json.</li>
+          <li class="rounded-[1.2rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] px-4 py-3">עושים commit עם הודעה קצרה שמתארת את השינוי.</li>
+        </ol>
+      </article>
     </section>
   </section>
-
-  <script is:inline define:vars={{ defaultSettings: siteSettings }}>
-    document.addEventListener("astro:page-load", () => {
-      const STORAGE_KEY = "nm-site-settings-overrides";
-      const form = document.getElementById("site-settings-form");
-      const output = document.getElementById("settings-json-output");
-      const bannerStatus = document.getElementById("banner-status");
-      const bannerSummary = document.getElementById("banner-summary");
-      const vaultStatus = document.getElementById("vault-status");
-      const vaultSummary = document.getElementById("vault-summary");
-      const applyButton = document.getElementById("apply-settings");
-      const pickFileButton = document.getElementById("pick-settings-file");
-      const saveFileButton = document.getElementById("save-settings-file");
-      const copyButton = document.getElementById("copy-settings-json");
-      const exportButton = document.getElementById("export-settings-json");
-      const resetButton = document.getElementById("reset-settings");
-      const fileStatus = document.getElementById("settings-file-status");
-
-      if (!(form instanceof HTMLFormElement)) return;
-      if (!(output instanceof HTMLElement)) return;
-      if (!(bannerStatus instanceof HTMLElement)) return;
-      if (!(bannerSummary instanceof HTMLElement)) return;
-      if (!(vaultStatus instanceof HTMLElement)) return;
-      if (!(vaultSummary instanceof HTMLElement)) return;
-      if (!(applyButton instanceof HTMLButtonElement)) return;
-      if (!(pickFileButton instanceof HTMLButtonElement)) return;
-      if (!(saveFileButton instanceof HTMLButtonElement)) return;
-      if (!(copyButton instanceof HTMLButtonElement)) return;
-      if (!(exportButton instanceof HTMLButtonElement)) return;
-      if (!(resetButton instanceof HTMLButtonElement)) return;
-      if (!(fileStatus instanceof HTMLElement)) return;
-
-      const fields = {
-        bannerEnabled: document.getElementById("banner-enabled"),
-        bannerMessage: document.getElementById("banner-message"),
-        bannerCtaLabel: document.getElementById("banner-cta-label"),
-        bannerCtaHref: document.getElementById("banner-cta-href"),
-        bannerDismissHours: document.getElementById("banner-dismiss-hours"),
-        vaultEnabled: document.getElementById("vault-enabled"),
-        vaultCutoffMarker: document.getElementById("vault-cutoff-marker"),
-        vaultTitle: document.getElementById("vault-title"),
-        vaultDescription: document.getElementById("vault-description"),
-        vaultCtaLabel: document.getElementById("vault-cta-label"),
-        vaultCtaHref: document.getElementById("vault-cta-href"),
-      };
-
-      const isReady =
-        fields.bannerEnabled instanceof HTMLInputElement &&
-        fields.bannerMessage instanceof HTMLTextAreaElement &&
-        fields.bannerCtaLabel instanceof HTMLInputElement &&
-        fields.bannerCtaHref instanceof HTMLInputElement &&
-        fields.bannerDismissHours instanceof HTMLInputElement &&
-        fields.vaultEnabled instanceof HTMLInputElement &&
-        fields.vaultCutoffMarker instanceof HTMLInputElement &&
-        fields.vaultTitle instanceof HTMLInputElement &&
-        fields.vaultDescription instanceof HTMLTextAreaElement &&
-        fields.vaultCtaLabel instanceof HTMLInputElement &&
-        fields.vaultCtaHref instanceof HTMLInputElement;
-
-      if (!isReady) return;
-
-      let settingsFileHandle = null;
-      const deepClone = (value) => JSON.parse(JSON.stringify(value));
-      const mergeSettings = (base, override) => ({
-        whisperBanner: { ...base.whisperBanner, ...(override?.whisperBanner || {}) },
-        premiumVault: { ...base.premiumVault, ...(override?.premiumVault || {}) },
-      });
-
-      const readOverride = () => {
-        try {
-          return JSON.parse(window.localStorage.getItem(STORAGE_KEY) || "null");
-        } catch {
-          return null;
-        }
-      };
-
-      const writeOverride = (settings) => {
-        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
-        window.dispatchEvent(new CustomEvent("nm-site-settings-updated", { detail: settings }));
-      };
-
-      const getSettingsFromForm = () => ({
-        whisperBanner: {
-          enabled: fields.bannerEnabled.checked,
-          message: fields.bannerMessage.value.trim(),
-          ctaLabel: fields.bannerCtaLabel.value.trim(),
-          ctaHref: fields.bannerCtaHref.value.trim(),
-          dismissHours: Math.max(1, Number(fields.bannerDismissHours.value || 24)),
-        },
-        premiumVault: {
-          enabled: fields.vaultEnabled.checked,
-          cutoffMarker: fields.vaultCutoffMarker.value.trim() || "<!--premium-break-->",
-          title: fields.vaultTitle.value.trim(),
-          description: fields.vaultDescription.value.trim(),
-          ctaLabel: fields.vaultCtaLabel.value.trim(),
-          ctaHref: fields.vaultCtaHref.value.trim(),
-        },
-      });
-
-      const setFormValues = (settings) => {
-        fields.bannerEnabled.checked = settings.whisperBanner.enabled;
-        fields.bannerMessage.value = settings.whisperBanner.message;
-        fields.bannerCtaLabel.value = settings.whisperBanner.ctaLabel;
-        fields.bannerCtaHref.value = settings.whisperBanner.ctaHref;
-        fields.bannerDismissHours.value = String(settings.whisperBanner.dismissHours);
-        fields.vaultEnabled.checked = settings.premiumVault.enabled;
-        fields.vaultCutoffMarker.value = settings.premiumVault.cutoffMarker;
-        fields.vaultTitle.value = settings.premiumVault.title;
-        fields.vaultDescription.value = settings.premiumVault.description;
-        fields.vaultCtaLabel.value = settings.premiumVault.ctaLabel;
-        fields.vaultCtaHref.value = settings.premiumVault.ctaHref;
-      };
-
-      const renderState = (settings) => {
-        output.textContent = JSON.stringify(settings, null, 2);
-        bannerStatus.textContent = settings.whisperBanner.enabled ? "מופעל" : "כבוי";
-        bannerSummary.textContent = `${settings.whisperBanner.ctaLabel} → ${settings.whisperBanner.ctaHref} | ${settings.whisperBanner.dismissHours} שעות`;
-        vaultStatus.textContent = settings.premiumVault.enabled ? "מופעל" : "כבוי";
-        vaultSummary.textContent = `${settings.premiumVault.ctaLabel} → ${settings.premiumVault.ctaHref} | marker: ${settings.premiumVault.cutoffMarker}`;
-      };
-
-      const updateFileStatus = (message) => {
-        fileStatus.textContent = message;
-      };
-
-      const defaults = deepClone(defaultSettings);
-      const initial = mergeSettings(defaults, readOverride());
-      setFormValues(initial);
-      renderState(initial);
-
-      const pulse = (button, successText) => {
-        button.textContent = successText;
-        window.setTimeout(() => {
-          if (button === pickFileButton) button.textContent = "בחר siteSettings.json";
-          if (button === saveFileButton) button.textContent = "שמור לקובץ האמיתי";
-          if (button === applyButton) button.textContent = "החל מקומית";
-          if (button === copyButton) button.textContent = "העתק JSON";
-          if (button === exportButton) button.textContent = "הורד siteSettings.json";
-          if (button === resetButton) button.textContent = "נקה override מקומי";
-        }, 1400);
-      };
-
-      applyButton.addEventListener("click", () => {
-        const next = getSettingsFromForm();
-        writeOverride(next);
-        renderState(next);
-        pulse(applyButton, "הוחל מקומית");
-      });
-
-      pickFileButton.addEventListener("click", async () => {
-        if (typeof window.showOpenFilePicker !== "function") {
-          updateFileStatus("הדפדפן הזה לא תומך בכתיבה ישירה לקובץ. השתמש בהעתקה או בהורדת JSON.");
-          pulse(pickFileButton, "לא נתמך");
-          return;
-        }
-
-        try {
-          const [handle] = await window.showOpenFilePicker({
-            multiple: false,
-            types: [
-              {
-                description: "JSON",
-                accept: { "application/json": [".json"] },
-              },
-            ],
-          });
-
-          if (!handle) return;
-          settingsFileHandle = handle;
-          updateFileStatus(`קובץ יעד נבחר: ${handle.name}. עכשיו אפשר לשמור אליו ישירות מתוך הדף.`);
-          pulse(pickFileButton, "הקובץ נבחר");
-        } catch {
-          updateFileStatus("בחירת הקובץ בוטלה או נכשלה.");
-          pulse(pickFileButton, "הבחירה בוטלה");
-        }
-      });
-
-      saveFileButton.addEventListener("click", async () => {
-        if (!settingsFileHandle) {
-          updateFileStatus("לפני שמירה, בחר קודם את src/config/siteSettings.json דרך הכפתור המתאים.");
-          pulse(saveFileButton, "חסר קובץ יעד");
-          return;
-        }
-
-        try {
-          const writable = await settingsFileHandle.createWritable();
-          await writable.write(`${output.textContent || ""}\n`);
-          await writable.close();
-          updateFileStatus(`הקובץ ${settingsFileHandle.name} עודכן בהצלחה. עכשיו אפשר לבצע commit רגיל לפרויקט.`);
-          pulse(saveFileButton, "נשמר לקובץ");
-        } catch {
-          updateFileStatus("השמירה הישירה נכשלה. ודא שנתת הרשאת כתיבה לקובץ ונסה שוב.");
-          pulse(saveFileButton, "השמירה נכשלה");
-        }
-      });
-
-      copyButton.addEventListener("click", async () => {
-        try {
-          await navigator.clipboard.writeText(output.textContent || "");
-          pulse(copyButton, "JSON הועתק");
-        } catch {
-          pulse(copyButton, "ההעתקה נכשלה");
-        }
-      });
-
-      exportButton.addEventListener("click", () => {
-        const blob = new Blob([`${output.textContent || ""}\n`], { type: "application/json;charset=utf-8" });
-        const href = URL.createObjectURL(blob);
-        const anchor = document.createElement("a");
-        anchor.href = href;
-        anchor.download = "siteSettings.json";
-        document.body.appendChild(anchor);
-        anchor.click();
-        anchor.remove();
-        URL.revokeObjectURL(href);
-        pulse(exportButton, "הקובץ ירד");
-      });
-
-      resetButton.addEventListener("click", () => {
-        window.localStorage.removeItem(STORAGE_KEY);
-        setFormValues(defaults);
-        renderState(defaults);
-        window.dispatchEvent(new CustomEvent("nm-site-settings-updated", { detail: defaults }));
-        updateFileStatus("ה-override המקומי נוקה. הקובץ הקנוני לא שונה.");
-        pulse(resetButton, "ה-reset הושלם");
-      });
-    });
-  </script>
 </Layout>

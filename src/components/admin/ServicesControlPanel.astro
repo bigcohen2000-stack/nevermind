@@ -1,0 +1,247 @@
+﻿---
+import servicesConfig from "../../config/services.json";
+---
+
+<form id="services-form" class="space-y-6 rounded-[2rem] border border-[#1A1A1A]/10 bg-white/82 p-6 shadow-[0_30px_90px_rgba(26,26,26,0.08)] backdrop-blur-md">
+  <div class="space-y-2 text-right">
+    <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[#D42B2B]">Active Services</p>
+    <h2 class="text-2xl font-semibold text-[#1A1A1A]">שליטה על המסלולים הגלויים באתר</h2>
+    <p class="text-sm leading-7 text-[#1A1A1A]/64">הטופס הזה נשען על <code>src/config/services.json</code>. מסלול שמסומן כגלוי יופיע בדף הבית.</p>
+  </div>
+
+  <div class="space-y-4">
+    {servicesConfig.services.map((service, index) => (
+      <article class="rounded-[1.6rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] p-5 text-right" data-service-card data-service-index={index}>
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div class="text-right">
+            <p class="text-lg font-semibold text-[#1A1A1A]">{service.title}</p>
+            <p class="text-xs text-[#1A1A1A]/52">ID: {service.id}</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-4 text-sm font-semibold text-[#1A1A1A]/74">
+            <label class="flex items-center gap-2">
+              <input type="checkbox" class="h-4 w-4 accent-[#D42B2B]" data-service-visible={index} checked={service.visible} />
+              גלוי באתר
+            </label>
+            <label class="flex items-center gap-2">
+              <input type="checkbox" class="h-4 w-4 accent-[#D42B2B]" data-service-featured={index} checked={service.featured} />
+              מסלול מוביל
+            </label>
+          </div>
+        </div>
+
+        <div class="mt-4 grid gap-4 md:grid-cols-2">
+          <label class="space-y-2 text-right md:col-span-2">
+            <span class="text-sm font-semibold text-[#1A1A1A]">כותרת</span>
+            <input type="text" value={service.title} data-service-title={index} class="w-full rounded-[1.2rem] border border-[#1A1A1A]/12 bg-white px-4 py-3 text-right text-sm text-[#1A1A1A] outline-none transition focus:border-[#D42B2B]/40 focus:ring-2 focus:ring-[#D42B2B]/15" />
+          </label>
+          <label class="space-y-2 text-right md:col-span-2">
+            <span class="text-sm font-semibold text-[#1A1A1A]">תיאור</span>
+            <textarea rows="4" data-service-summary={index} class="w-full rounded-[1.2rem] border border-[#1A1A1A]/12 bg-white px-4 py-3 text-right text-sm leading-7 text-[#1A1A1A] outline-none transition focus:border-[#D42B2B]/40 focus:ring-2 focus:ring-[#D42B2B]/15">{service.summary}</textarea>
+          </label>
+          <label class="space-y-2 text-right">
+            <span class="text-sm font-semibold text-[#1A1A1A]">תג מחיר</span>
+            <input type="text" value={service.priceLabel} data-service-price={index} class="w-full rounded-[1.2rem] border border-[#1A1A1A]/12 bg-white px-4 py-3 text-right text-sm text-[#1A1A1A] outline-none transition focus:border-[#D42B2B]/40 focus:ring-2 focus:ring-[#D42B2B]/15" />
+          </label>
+          <label class="space-y-2 text-right">
+            <span class="text-sm font-semibold text-[#1A1A1A]">קישור</span>
+            <input type="text" value={service.href} dir="ltr" data-service-href={index} class="w-full rounded-[1.2rem] border border-[#1A1A1A]/12 bg-white px-4 py-3 text-left text-sm text-[#1A1A1A] outline-none transition focus:border-[#D42B2B]/40 focus:ring-2 focus:ring-[#D42B2B]/15" />
+          </label>
+        </div>
+      </article>
+    ))}
+  </div>
+
+  <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:justify-end">
+    <button id="pick-services-file" type="button" class="inline-flex items-center justify-center rounded-full border border-[#1A1A1A]/10 bg-white px-5 py-3 text-sm font-semibold text-[#1A1A1A]/78 transition hover:bg-[#FAFAF8]">בחר services.json</button>
+    <button id="save-services-file" type="button" class="inline-flex items-center justify-center rounded-full bg-[#D42B2B] px-5 py-3 text-sm font-semibold text-[#FAFAF8] transition hover:bg-[#b82424]">שמור לקובץ האמיתי</button>
+    <button id="apply-services" type="button" class="inline-flex items-center justify-center rounded-full bg-[#1A1A1A] px-5 py-3 text-sm font-semibold text-[#FAFAF8] transition hover:bg-black">החל מקומית</button>
+    <button id="copy-services-json" type="button" class="inline-flex items-center justify-center rounded-full border border-[#1A1A1A]/10 bg-white px-5 py-3 text-sm font-semibold text-[#1A1A1A]/78 transition hover:bg-[#FAFAF8]">העתק JSON</button>
+    <button id="export-services-json" type="button" class="inline-flex items-center justify-center rounded-full border border-[#1A1A1A]/10 bg-white px-5 py-3 text-sm font-semibold text-[#1A1A1A]/78 transition hover:bg-[#FAFAF8]">הורד services.json</button>
+    <button id="reset-services" type="button" class="inline-flex items-center justify-center rounded-full border border-[#D42B2B]/16 bg-[#FFF4F3] px-5 py-3 text-sm font-semibold text-[#D42B2B] transition hover:bg-[#ffe7e5]">נקה override מקומי</button>
+  </div>
+
+  <div class="rounded-[1.5rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] p-4 text-right">
+    <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">Services Sync</p>
+    <p id="services-file-status" class="mt-3 text-sm leading-7 text-[#1A1A1A]/68">עדיין לא נבחר קובץ יעד. אפשר לבחור את <code>src/config/services.json</code> ולשמור אליו ישירות מתוך Chrome.</p>
+  </div>
+
+  <pre class="min-h-[18rem] overflow-auto rounded-[1.6rem] bg-[#111111] p-5 text-sm leading-7 text-[#F4F4EF] shadow-inner"><code id="services-json-output">ה-JSON של השירותים יופיע כאן.</code></pre>
+</form>
+
+<script is:inline define:vars={{ defaultServices: servicesConfig }}>
+  document.addEventListener("astro:page-load", () => {
+    const servicesStorageKey = "nm-services-overrides";
+    const form = document.getElementById("services-form");
+    if (!(form instanceof HTMLFormElement)) return;
+
+    const pickServicesFileButton = document.getElementById("pick-services-file");
+    const saveServicesFileButton = document.getElementById("save-services-file");
+    const applyServicesButton = document.getElementById("apply-services");
+    const copyServicesButton = document.getElementById("copy-services-json");
+    const exportServicesButton = document.getElementById("export-services-json");
+    const resetServicesButton = document.getElementById("reset-services");
+    const servicesFileStatus = document.getElementById("services-file-status");
+    const servicesOutput = document.getElementById("services-json-output");
+
+    if (!(pickServicesFileButton instanceof HTMLButtonElement)) return;
+    if (!(saveServicesFileButton instanceof HTMLButtonElement)) return;
+    if (!(applyServicesButton instanceof HTMLButtonElement)) return;
+    if (!(copyServicesButton instanceof HTMLButtonElement)) return;
+    if (!(exportServicesButton instanceof HTMLButtonElement)) return;
+    if (!(resetServicesButton instanceof HTMLButtonElement)) return;
+    if (!(servicesFileStatus instanceof HTMLElement)) return;
+    if (!(servicesOutput instanceof HTMLElement)) return;
+
+    let servicesFileHandle = null;
+    const serviceCards = Array.from(document.querySelectorAll("[data-service-card]"));
+    const deepClone = (value) => JSON.parse(JSON.stringify(value));
+
+    const pulse = (button, successText, fallbackText) => {
+      button.textContent = successText;
+      window.setTimeout(() => {
+        button.textContent = fallbackText;
+      }, 1400);
+    };
+
+    const readServices = () => {
+      try {
+        return JSON.parse(window.localStorage.getItem(servicesStorageKey) || "null");
+      } catch {
+        return null;
+      }
+    };
+
+    const writeServices = (value) => {
+      window.localStorage.setItem(servicesStorageKey, JSON.stringify(value));
+    };
+
+    const setServicesFormValues = (servicesState) => {
+      serviceCards.forEach((card, index) => {
+        if (!(card instanceof HTMLElement)) return;
+        const current = servicesState.services[index];
+        if (!current) return;
+        const visible = card.querySelector(`[data-service-visible="${index}"]`);
+        const featured = card.querySelector(`[data-service-featured="${index}"]`);
+        const title = card.querySelector(`[data-service-title="${index}"]`);
+        const summary = card.querySelector(`[data-service-summary="${index}"]`);
+        const price = card.querySelector(`[data-service-price="${index}"]`);
+        const href = card.querySelector(`[data-service-href="${index}"]`);
+        if (visible instanceof HTMLInputElement) visible.checked = current.visible;
+        if (featured instanceof HTMLInputElement) featured.checked = current.featured;
+        if (title instanceof HTMLInputElement) title.value = current.title;
+        if (summary instanceof HTMLTextAreaElement) summary.value = current.summary;
+        if (price instanceof HTMLInputElement) price.value = current.priceLabel;
+        if (href instanceof HTMLInputElement) href.value = current.href;
+      });
+    };
+
+    const getServicesFromForm = () => ({
+      services: serviceCards.map((card, index) => {
+        const baseline = defaultServices.services[index];
+        const visible = card.querySelector(`[data-service-visible="${index}"]`);
+        const featured = card.querySelector(`[data-service-featured="${index}"]`);
+        const title = card.querySelector(`[data-service-title="${index}"]`);
+        const summary = card.querySelector(`[data-service-summary="${index}"]`);
+        const price = card.querySelector(`[data-service-price="${index}"]`);
+        const href = card.querySelector(`[data-service-href="${index}"]`);
+        return {
+          id: baseline.id,
+          title: title instanceof HTMLInputElement ? title.value.trim() : baseline.title,
+          summary: summary instanceof HTMLTextAreaElement ? summary.value.trim() : baseline.summary,
+          priceLabel: price instanceof HTMLInputElement ? price.value.trim() : baseline.priceLabel,
+          href: href instanceof HTMLInputElement ? href.value.trim() : baseline.href,
+          visible: visible instanceof HTMLInputElement ? visible.checked : baseline.visible,
+          featured: featured instanceof HTMLInputElement ? featured.checked : baseline.featured,
+        };
+      }),
+    });
+
+    const renderServicesState = (servicesState) => {
+      servicesOutput.textContent = JSON.stringify(servicesState, null, 2);
+    };
+
+    const updateFileStatus = (message) => {
+      servicesFileStatus.textContent = message;
+    };
+
+    const currentServices = readServices() || deepClone(defaultServices);
+    setServicesFormValues(currentServices);
+    renderServicesState(currentServices);
+
+    applyServicesButton.addEventListener("click", () => {
+      const next = getServicesFromForm();
+      writeServices(next);
+      renderServicesState(next);
+      pulse(applyServicesButton, "הוחל מקומית", "החל מקומית");
+    });
+
+    copyServicesButton.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(JSON.stringify(getServicesFromForm(), null, 2));
+        pulse(copyServicesButton, "JSON הועתק", "העתק JSON");
+      } catch {
+        pulse(copyServicesButton, "ההעתקה נכשלה", "העתק JSON");
+      }
+    });
+
+    exportServicesButton.addEventListener("click", () => {
+      const blob = new Blob([`${JSON.stringify(getServicesFromForm(), null, 2)}\n`], { type: "application/json;charset=utf-8" });
+      const href = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = href;
+      anchor.download = "services.json";
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      URL.revokeObjectURL(href);
+      pulse(exportServicesButton, "הקובץ ירד", "הורד services.json");
+    });
+
+    resetServicesButton.addEventListener("click", () => {
+      window.localStorage.removeItem(servicesStorageKey);
+      const resetState = deepClone(defaultServices);
+      setServicesFormValues(resetState);
+      renderServicesState(resetState);
+      updateFileStatus("ה-override של השירותים נוקה. הקובץ הקנוני לא שונה.");
+      pulse(resetServicesButton, "ה-reset הושלם", "נקה override מקומי");
+    });
+
+    pickServicesFileButton.addEventListener("click", async () => {
+      if (typeof window.showOpenFilePicker !== "function") {
+        updateFileStatus("הדפדפן הזה לא תומך בכתיבה ישירה לקובץ. השתמש בהעתקה ידנית.");
+        pulse(pickServicesFileButton, "לא נתמך", "בחר services.json");
+        return;
+      }
+      try {
+        const [handle] = await window.showOpenFilePicker({
+          multiple: false,
+          types: [{ description: "JSON", accept: { "application/json": [".json"] } }],
+        });
+        servicesFileHandle = handle;
+        updateFileStatus(`קובץ יעד נבחר: ${handle.name}.`);
+        pulse(pickServicesFileButton, "הקובץ נבחר", "בחר services.json");
+      } catch {
+        updateFileStatus("בחירת הקובץ בוטלה או נכשלה.");
+        pulse(pickServicesFileButton, "הבחירה בוטלה", "בחר services.json");
+      }
+    });
+
+    saveServicesFileButton.addEventListener("click", async () => {
+      if (!servicesFileHandle) {
+        updateFileStatus("בחר קודם את src/config/services.json ואז שמור.");
+        pulse(saveServicesFileButton, "חסר קובץ יעד", "שמור לקובץ האמיתי");
+        return;
+      }
+      try {
+        const writable = await servicesFileHandle.createWritable();
+        await writable.write(`${JSON.stringify(getServicesFromForm(), null, 2)}\n`);
+        await writable.close();
+        updateFileStatus(`הקובץ ${servicesFileHandle.name} עודכן בהצלחה.`);
+        pulse(saveServicesFileButton, "נשמר לקובץ", "שמור לקובץ האמיתי");
+      } catch {
+        updateFileStatus("השמירה הישירה נכשלה. בדוק הרשאות ונסה שוב.");
+        pulse(saveServicesFileButton, "השמירה נכשלה", "שמור לקובץ האמיתי");
+      }
+    });
+  });
+</script>
