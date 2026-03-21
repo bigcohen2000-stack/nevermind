@@ -12,18 +12,20 @@ function clearStateCookie() {
   return "decap-cms-github-oauth-state=; Path=/api; Max-Age=0; HttpOnly; Secure; SameSite=Lax";
 }
 
-function renderMessage(message, isSuccess) {
-  const statusTitle = isSuccess ? "האישור הושלם" : "ההתחברות נכשלה";
-  const statusText = isSuccess
-    ? "אפשר לסגור את החלון ולחזור למערכת הניהול."
-    : "המערכת לא הצליחה להשלים את ההתחברות. חזורו למסך הניהול ונסו שוב.";
+function renderMessage(status, content) {
+  const payload = `authorization:github:${status}:${JSON.stringify(content)}`;
+  const title = status === "success" ? "האישור הושלם" : "ההתחברות נכשלה";
+  const body =
+    status === "success"
+      ? "האישור התקבל. אפשר לסגור את החלון ולחזור למערכת הניהול."
+      : "המערכת לא הצליחה להשלים את ההתחברות. חזרו למערכת הניהול ונסו שוב.";
 
   return `<!doctype html>
 <html lang="he" dir="rtl">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>${statusTitle}</title>
+    <title>${title}</title>
     <style>
       body {
         margin: 0;
@@ -68,29 +70,50 @@ function renderMessage(message, isSuccess) {
   </head>
   <body>
     <main>
-      <h1>${statusTitle}</h1>
-      <p>${statusText}</p>
+      <h1>${title}</h1>
+      <p>${body}</p>
       <a href="/admin/">חזרה למערכת הניהול</a>
     </main>
     <script>
       (function () {
-        const message = ${JSON.stringify(message)};
+        const authPayload = ${JSON.stringify(payload)};
 
-        try {
-          localStorage.setItem("decap-cms-oauth-result", message);
-        } catch {}
+        const storeFallback = () => {
+          try {
+            localStorage.setItem("decap-cms-oauth-result", authPayload);
+          } catch {}
+        };
 
-        try {
-          if (window.opener && !window.opener.closed) {
-            window.opener.postMessage(message, window.location.origin);
-            setTimeout(() => window.close(), 150);
-            return;
+        const finishWithoutPopup = () => {
+          storeFallback();
+          setTimeout(() => {
+            window.location.replace("/admin/");
+          }, 400);
+        };
+
+        if (!window.opener || window.opener.closed) {
+          finishWithoutPopup();
+          return;
+        }
+
+        function receiveMessage(event) {
+          try {
+            window.opener.postMessage(authPayload, event.origin);
+          } catch {
+            storeFallback();
           }
-        } catch {}
 
-        setTimeout(() => {
-          window.location.replace("/admin/");
-        }, 600);
+          window.removeEventListener("message", receiveMessage, false);
+          setTimeout(() => window.close(), 150);
+        }
+
+        window.addEventListener("message", receiveMessage, false);
+
+        try {
+          window.opener.postMessage("authorizing:github", "*");
+        } catch {
+          finishWithoutPopup();
+        }
       })();
     </script>
   </body>
@@ -103,7 +126,7 @@ export async function onRequestGet(context) {
 
   const error = url.searchParams.get("error");
   if (error) {
-    return new Response(renderMessage(`authorization:github:error:${JSON.stringify({ error })}`, false), {
+    return new Response(renderMessage("error", { error }), {
       status: 200,
       headers: {
         "Content-Type": "text/html; charset=utf-8",
@@ -117,16 +140,13 @@ export async function onRequestGet(context) {
   const storedState = getCookie(request, "decap-cms-github-oauth-state");
 
   if (!code || !state || !storedState || state !== storedState) {
-    return new Response(
-      renderMessage(`authorization:github:error:${JSON.stringify({ error: "Invalid OAuth state" })}`, false),
-      {
-        status: 400,
-        headers: {
-          "Content-Type": "text/html; charset=utf-8",
-          "Set-Cookie": clearStateCookie(),
-        },
-      }
-    );
+    return new Response(renderMessage("error", { error: "Invalid OAuth state" }), {
+      status: 400,
+      headers: {
+        "Content-Type": "text/html; charset=utf-8",
+        "Set-Cookie": clearStateCookie(),
+      },
+    });
   }
 
   const redirectUri = `${url.origin}/api/callback`;
@@ -149,10 +169,7 @@ export async function onRequestGet(context) {
 
   if (!tokenResponse.ok || tokenData.error || !tokenData.access_token) {
     return new Response(
-      renderMessage(
-        `authorization:github:error:${JSON.stringify({ error: tokenData.error || "OAuth token exchange failed" })}`,
-        false
-      ),
+      renderMessage("error", { error: tokenData.error || "OAuth token exchange failed" }),
       {
         status: 400,
         headers: {
@@ -163,16 +180,17 @@ export async function onRequestGet(context) {
     );
   }
 
-  const successPayload = {
-    token: tokenData.access_token,
-    provider: "github",
-  };
-
-  return new Response(renderMessage(`authorization:github:success:${JSON.stringify(successPayload)}`, true), {
-    status: 200,
-    headers: {
-      "Content-Type": "text/html; charset=utf-8",
-      "Set-Cookie": clearStateCookie(),
-    },
-  });
+  return new Response(
+    renderMessage("success", {
+      token: tokenData.access_token,
+      provider: "github",
+    }),
+    {
+      status: 200,
+      headers: {
+        "Content-Type": "text/html; charset=utf-8",
+        "Set-Cookie": clearStateCookie(),
+      },
+    }
+  );
 }
