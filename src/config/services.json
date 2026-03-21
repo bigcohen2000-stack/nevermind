@@ -1,31 +1,55 @@
 ﻿{
+  "currency": "₪",
+  "tax_label": "כולל מע\"מ",
+  "payment_methods": [
+    { "name": "Apple Pay", "icon": "🍎" },
+    { "name": "Google Pay", "icon": "💳" },
+    { "name": "PayPal", "icon": "🅿️" },
+    { "name": "Bit / PayBox", "icon": "📱" }
+  ],
   "services": [
     {
-      "id": "clarity-session",
-      "title": "שיחת בהירות",
-      "summary": "שיחה ממוקדת למי שכבר רואה את הגרעין ורוצה חיתוך חד בלי עוד סיבוב סביב הבעיה.",
-      "priceLabel": "החל מ-1,500 ש״ח",
-      "href": "/intake/",
-      "visible": true,
-      "featured": true
+      "id": "podcast-view",
+      "title": "צפייה בפודקאסט מרפסת",
+      "description": "כניסה למרחב, הקשבה וספיגת ידע בזמן אמת. תוכנית שמדברת על הכל.",
+      "price_per_unit": 680,
+      "unit_label": "שעה וחצי",
+      "upsell": "הוסף מיקרופון וצילום ב-2,270 ₪ נוספים",
+      "visible": true
     },
     {
-      "id": "deep-process",
-      "title": "תהליך עומק אישי",
-      "summary": "מסלול למי שלא מחפש הרגעה נקודתית אלא שינוי יציב באופן שבו הוא רואה את עצמו ואת המציאות.",
-      "priceLabel": "מותאם אישית",
-      "href": "/intake/",
-      "visible": true,
-      "featured": false
+      "id": "podcast-mic",
+      "title": "פודקאסט + מיקרופון (ייעוץ מצולם)",
+      "description": "ייעוץ אסטרטגי שמוקלט ומתועד עבור העסק שלך. כולל עריכת סאונד וזוויות צילום.",
+      "price_per_unit": 2950,
+      "unit_label": "סשן מלא",
+      "features": [
+        "אפשרות לאנונימיות מלאה",
+        "זכויות שימוש ברשתות",
+        "עריכת פרימיום כלולה"
+      ],
+      "visible": true
     },
     {
-      "id": "business-clarity",
-      "title": "בהירות עסקית",
-      "summary": "עבודה חדה סביב החלטות, חסמים, מיקוד ומהלך עסקי כשכבר ברור שהבעיה אינה רק טקטית.",
-      "priceLabel": "החל מ-3,000 ש״ח",
-      "href": "/intake/",
-      "visible": false,
-      "featured": false
+      "id": "learning-group",
+      "title": "קבוצת למידה שבועית",
+      "description": "ליווי אינטנסיבי בקבוצות בוטיק של עד 5 משתתפים.",
+      "price_per_unit": 6380,
+      "unit_label": "חודש (4 מפגשים)",
+      "badge": "הכי משתלם",
+      "visible": true
+    },
+    {
+      "id": "flexible-meeting",
+      "title": "פגישה אישית / וידאו",
+      "description": "זמן איכות ממוקד לפתרון בעיות בוערות. אתה קובע את אורך המפגש.",
+      "base_price_30min": 590,
+      "base_price_20min_phone": 540,
+      "addons": [
+        { "name": "הגעה למקום נייטרלי", "price": 350 },
+        { "name": "הקלטה וסיכום AI", "price": 120 }
+      ],
+      "visible": true
     }
   ]
 }

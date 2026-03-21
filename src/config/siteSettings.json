@@ -3,8 +3,16 @@
     "enabled": true,
     "message": "כרגע האתר פתוח לחקירה שקטה. אם משהו נוגע, אפשר להמשיך משם לשיחה או ליווי.",
     "ctaLabel": "לבדוק את המסלול",
-    "ctaHref": "/now",
-    "dismissHours": 24
+    "ctaHref": "/services/",
+    "dismissHours": 24,
+    "contextualOffers": [
+      {
+        "serviceId": "podcast-view",
+        "message": "אם כבר הגעת לייעוץ סאונד, חבל לעצור בלי התיעוד המצולם. אפשר לשדרג מיד למסלול פודקאסט + מיקרופון.",
+        "ctaLabel": "לראות את השדרוג",
+        "ctaHref": "/services/?service=podcast-view#podcast-mic"
+      }
+    ]
   },
   "premiumVault": {
     "enabled": true,
@@ -12,6 +20,6 @@
     "title": "This professional method is reserved for premium members",
     "description": "המשך השיטה המלא נשמר כרגע לגישה עמוקה יותר. אפשר לפתוח את זה דרך עמוד השירותים והליווי.",
     "ctaLabel": "לשירותים ומחירים",
-    "ctaHref": "/now"
+    "ctaHref": "/services/"
   }
 }

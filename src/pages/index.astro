@@ -11,9 +11,21 @@ const sortedArticles = allArticles.sort(
 );
 const recentArticles = sortedArticles.slice(0, 9);
 const siteUrl = Astro.site?.toString() ?? "https://www.nevermind.co.il";
+const formatMoney = (value: number) => `${value.toLocaleString("he-IL")} ${servicesConfig.currency}`;
 const activeServices = [...servicesConfig.services]
-  .filter((service) => service.visible)
-  .sort((a, b) => Number(b.featured) - Number(a.featured));
+  .filter((service) => service.visible !== false)
+  .sort((a, b) => Number(Boolean(b.badge)) - Number(Boolean(a.badge)))
+  .slice(0, 3)
+  .map((service) => ({
+    ...service,
+    summary: service.description,
+    priceLabel:
+      "price_per_unit" in service
+        ? `${formatMoney(Number(service.price_per_unit))} / ${service.unit_label}`
+        : `${formatMoney(service.base_price_30min)} ל-30 דקות`,
+    featured: Boolean(service.badge),
+    href: `/services/?service=${service.id}#${service.id}`,
+  }));
 
 const cards = [
   {
@@ -38,10 +50,10 @@ const cards = [
     Icon: Compass,
   },
   {
-    title: "הכשרות וליווי",
-    description: "חקירה, הכשרה וליווי",
-    href: "#services",
-    ariaLabel: "הכשרות וליווי",
+    title: "שירותים ומחירים",
+    description: "ליווי, פודקאסט ומפגשים",
+    href: "/services/",
+    ariaLabel: "שירותים ומחירים",
     Icon: Star,
   },
 ];
@@ -110,17 +122,17 @@ const cards = [
     >
       <div class="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
         <div class="space-y-3 text-right">
-          <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[#D42B2B]">Active Services</p>
+          <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[#D42B2B]">Services</p>
           <h2 class="text-3xl font-bold text-neutral-900 dark:text-white md:text-4xl">מסלולי עבודה פעילים</h2>
           <p class="max-w-2xl text-base leading-8 text-neutral-600 dark:text-neutral-400">
-            לא כל מסלול פתוח כל הזמן. כאן מופיעים רק המסלולים שאתה בוחר להשאיר פעילים באתר כרגע.
+            כאן רואים את המסלולים המרכזיים, אבל את כל המשחק במחיר, משך ותוספים פותחים בעמוד השירותים המלא.
           </p>
         </div>
         <a
-          href="/intake/"
+          href="/services/"
           class="inline-flex items-center justify-center rounded-full bg-[#1A1A1A] px-5 py-3 text-sm font-semibold text-[#FAFAF8] transition hover:bg-black"
         >
-          לבדוק התאמה לפני שיחה
+          לפתוח את עמוד השירותים
         </a>
       </div>
 
@@ -133,7 +145,7 @@ const cards = [
                 <p class="mt-4 text-base leading-8 text-neutral-600 dark:text-neutral-400">{service.summary}</p>
               </div>
               {service.featured && (
-                <span class="rounded-full bg-[#D42B2B] px-3 py-1 text-xs font-semibold text-[#FAFAF8]">מוביל</span>
+                <span class="rounded-full bg-[#D42B2B] px-3 py-1 text-xs font-semibold text-[#FAFAF8]">{service.badge || "מוביל"}</span>
               )}
             </div>
             <div class="mt-8 flex items-center justify-between gap-4">
@@ -275,3 +287,5 @@ const cards = [
     });
   </script>
 </Layout>
+
+

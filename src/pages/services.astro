@@ -1,0 +1,264 @@
+﻿---
+import Layout from "../layouts/Layout.astro";
+import servicesConfig from "../config/services.json";
+
+type UnitService = {
+  id: string;
+  title: string;
+  description: string;
+  visible?: boolean;
+  price_per_unit: number;
+  unit_label: string;
+  upsell?: string;
+  features?: string[];
+  badge?: string;
+};
+
+type Addon = {
+  name: string;
+  price: number;
+};
+
+type FlexibleMeetingService = {
+  id: string;
+  title: string;
+  description: string;
+  visible?: boolean;
+  base_price_30min: number;
+  base_price_20min_phone: number;
+  addons: Addon[];
+};
+
+const currency = servicesConfig.currency;
+const taxLabel = servicesConfig.tax_label;
+const paymentMethods = servicesConfig.payment_methods;
+const services = servicesConfig.services.filter((service) => service.visible !== false);
+const podcastView = services.find((service) => service.id === "podcast-view") as UnitService | undefined;
+const podcastMic = services.find((service) => service.id === "podcast-mic") as UnitService | undefined;
+const learningGroup = services.find((service) => service.id === "learning-group") as UnitService | undefined;
+const flexibleMeeting = services.find((service) => service.id === "flexible-meeting") as FlexibleMeetingService | undefined;
+const whatsappNumber = "972555634035";
+const formatMoney = (value: number) => `${value.toLocaleString("he-IL")} ${currency}`;
+---
+
+<Layout
+  title="שירותים ומחירים | השם לא משנה"
+  description="עמוד שירותים חד, ברור ואינטראקטיבי לבחירת מסלול, משך מפגש ותוספים לפני מעבר לוואטסאפ."
+>
+  <section class="mx-auto max-w-7xl space-y-16 px-4 pb-20 text-[#1A1A1A]">
+    <header class="max-w-4xl space-y-5 text-right">
+      <p class="text-sm font-semibold uppercase tracking-[0.26em] text-[#D42B2B]">Masterclass Services</p>
+      <h1 class="text-[clamp(2.6rem,2rem+2.3vw,4.6rem)] font-semibold leading-[1.04]">שירותים ומחירים בלי ערפל</h1>
+      <p class="max-w-3xl text-[clamp(1rem,0.95rem+0.3vw,1.2rem)] leading-8 text-[#1A1A1A]/72">
+        במקום הודעות הלוך ושוב, כל המסלולים במקום אחד. אתה רואה את המבנה, משחק עם האפשרויות, ומגיע לוואטסאפ כבר עם מחיר, משך והקשר ברור.
+      </p>
+    </header>
+
+    <section class="grid gap-6 xl:grid-cols-2">
+      {podcastView && (
+        <article id={podcastView.id} class="rounded-[2rem] border border-[#1A1A1A]/10 bg-white/85 p-7 shadow-[0_24px_80px_rgba(26,26,26,0.06)]">
+          <div class="space-y-3 text-right">
+            <h2 class="text-3xl font-semibold text-[#1A1A1A]">{podcastView.title}</h2>
+            <p class="text-base leading-8 text-[#1A1A1A]/70">{podcastView.description}</p>
+          </div>
+          <div class="mt-8 flex flex-wrap items-end justify-between gap-4">
+            <div class="text-right">
+              <p class="text-sm font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">{podcastView.unit_label}</p>
+              <p class="mt-2 text-4xl font-semibold text-[#1A1A1A]">{formatMoney(podcastView.price_per_unit)}</p>
+            </div>
+            <a
+              href={`/services/?service=${podcastView.id}#${podcastView.id}`}
+              class="inline-flex items-center rounded-full bg-[#D42B2B] px-5 py-3 text-sm font-semibold text-[#FAFAF8] transition hover:bg-[#b82424]"
+            >
+              לראות ולשריין
+            </a>
+          </div>
+          {podcastView.upsell && (
+            <p class="mt-8 rounded-[1.4rem] border border-[#D42B2B]/14 bg-[#FFF4F3] px-5 py-4 text-sm leading-7 text-[#1A1A1A]/74">
+              {podcastView.upsell}
+            </p>
+          )}
+        </article>
+      )}
+
+      {podcastMic && (
+        <article id={podcastMic.id} class="rounded-[2rem] border border-[#1A1A1A]/10 bg-white/85 p-7 shadow-[0_24px_80px_rgba(26,26,26,0.06)]">
+          <div class="space-y-3 text-right">
+            <h2 class="text-3xl font-semibold text-[#1A1A1A]">{podcastMic.title}</h2>
+            <p class="text-base leading-8 text-[#1A1A1A]/70">{podcastMic.description}</p>
+          </div>
+          <div class="mt-8 flex flex-wrap items-end justify-between gap-4">
+            <div class="text-right">
+              <p class="text-sm font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">{podcastMic.unit_label}</p>
+              <p class="mt-2 text-4xl font-semibold text-[#1A1A1A]">{formatMoney(podcastMic.price_per_unit)}</p>
+            </div>
+            <a
+              href={`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(`היי, אני רוצה לקבוע ${podcastMic.title} במחיר ${formatMoney(podcastMic.price_per_unit)}.`)}`}
+              class="inline-flex items-center rounded-full bg-[#D42B2B] px-5 py-3 text-sm font-semibold text-[#FAFAF8] transition hover:bg-[#b82424]"
+            >
+              Book Now
+            </a>
+          </div>
+          {podcastMic.features && (
+            <ul class="mt-8 space-y-3 text-right text-sm leading-7 text-[#1A1A1A]/72">
+              {podcastMic.features.map((feature) => (
+                <li class="rounded-[1.3rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] px-4 py-3">{feature}</li>
+              ))}
+            </ul>
+          )}
+        </article>
+      )}
+
+      {learningGroup && (
+        <article id={learningGroup.id} class="rounded-[2rem] border border-[#1A1A1A]/10 bg-white/85 p-7 shadow-[0_24px_80px_rgba(26,26,26,0.06)]">
+          <div class="flex items-start justify-between gap-4">
+            <div class="space-y-3 text-right">
+              <h2 class="text-3xl font-semibold text-[#1A1A1A]">{learningGroup.title}</h2>
+              <p class="text-base leading-8 text-[#1A1A1A]/70">{learningGroup.description}</p>
+            </div>
+            {learningGroup.badge && (
+              <span class="rounded-full border border-[#D42B2B]/12 bg-[#FFF4F3] px-3 py-1 text-xs font-semibold text-[#D42B2B]">{learningGroup.badge}</span>
+            )}
+          </div>
+          <div class="mt-8 flex flex-wrap items-end justify-between gap-4">
+            <div class="text-right">
+              <p class="text-sm font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">{learningGroup.unit_label}</p>
+              <p class="mt-2 text-4xl font-semibold text-[#1A1A1A]">{formatMoney(learningGroup.price_per_unit)}</p>
+            </div>
+            <a
+              href={`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(`היי, אני רוצה להצטרף ל-${learningGroup.title} במחיר ${formatMoney(learningGroup.price_per_unit)}.`)}`}
+              class="inline-flex items-center rounded-full bg-[#D42B2B] px-5 py-3 text-sm font-semibold text-[#FAFAF8] transition hover:bg-[#b82424]"
+            >
+              Book Now
+            </a>
+          </div>
+          <p class="mt-8 text-sm leading-7 text-[#1A1A1A]/64">נותרו 2 מקומות לסבב הקרוב.</p>
+        </article>
+      )}
+
+      {flexibleMeeting && (
+        <article id={flexibleMeeting.id} class="rounded-[2rem] border border-[#1A1A1A]/10 bg-white/85 p-7 shadow-[0_24px_80px_rgba(26,26,26,0.06)] xl:col-span-2">
+          <div class="grid gap-10 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
+            <div class="space-y-5 text-right">
+              <div class="space-y-3">
+                <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[#D42B2B]">Interactive Pricing</p>
+                <h2 class="text-3xl font-semibold text-[#1A1A1A]">{flexibleMeeting.title}</h2>
+                <p class="text-base leading-8 text-[#1A1A1A]/70">{flexibleMeeting.description}</p>
+              </div>
+
+              <label class="block space-y-4">
+                <span class="text-sm font-semibold text-[#1A1A1A]">משך המפגש</span>
+                <input
+                  id="meeting-duration"
+                  type="range"
+                  min="30"
+                  max="180"
+                  step="30"
+                  value="60"
+                  class="h-2 w-full cursor-pointer appearance-none rounded-full bg-[#1A1A1A]/10 accent-[#D42B2B]"
+                />
+              </label>
+
+              <div class="rounded-[1.6rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] px-5 py-4 text-right">
+                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">משך נבחר</p>
+                <p id="meeting-duration-label" class="mt-2 text-2xl font-semibold text-[#1A1A1A]">60 דקות</p>
+                <p class="mt-2 text-sm leading-7 text-[#1A1A1A]/64">אפשר להישאר קצר ומדויק, או לפתוח חלון עמוק יותר לפי מה שבוער עכשיו.</p>
+              </div>
+            </div>
+
+            <div class="space-y-5">
+              <div class="rounded-[1.6rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] p-5 text-right">
+                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">Base Price</p>
+                <p id="meeting-total" class="mt-3 text-4xl font-semibold text-[#1A1A1A]">{formatMoney(flexibleMeeting.base_price_30min * 2)}</p>
+                <p class="mt-2 text-sm leading-7 text-[#1A1A1A]/64">20 דקות טלפון: {formatMoney(flexibleMeeting.base_price_20min_phone)}</p>
+              </div>
+
+              <div class="space-y-3 rounded-[1.6rem] border border-[#1A1A1A]/10 bg-white p-5 text-right">
+                <p class="text-sm font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">Add-ons</p>
+                {flexibleMeeting.addons.map((addon, index) => (
+                  <label class="flex items-center justify-between gap-4 rounded-[1.2rem] border border-[#1A1A1A]/10 px-4 py-3">
+                    <span class="text-sm leading-7 text-[#1A1A1A]/74">{addon.name}</span>
+                    <span class="flex items-center gap-3">
+                      <span class="text-sm font-semibold text-[#1A1A1A]">{formatMoney(addon.price)}</span>
+                      <input type="checkbox" data-addon-index={index} class="h-4 w-4 accent-[#D42B2B]" />
+                    </span>
+                  </label>
+                ))}
+              </div>
+
+              <a
+                id="meeting-book-link"
+                href={`https://wa.me/${whatsappNumber}`}
+                target="_blank"
+                rel="noreferrer"
+                class="inline-flex w-full items-center justify-center rounded-full bg-[#D42B2B] px-5 py-4 text-sm font-semibold text-[#FAFAF8] transition hover:bg-[#b82424]"
+              >
+                Book Now
+              </a>
+            </div>
+          </div>
+        </article>
+      )}
+    </section>
+
+    <section class="rounded-[2rem] border border-[#1A1A1A]/10 bg-white/82 px-6 py-10 shadow-[0_24px_80px_rgba(26,26,26,0.05)]">
+      <div class="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+        <div class="space-y-3 text-right">
+          <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[#D42B2B]">Payment</p>
+          <h2 class="text-2xl font-semibold text-[#1A1A1A]">תשלום, חשבונית וסגירה נקייה</h2>
+          <p class="text-sm leading-7 text-[#1A1A1A]/68">כל המחירים {taxLabel}. התשלום גמיש, והחשבונית יוצאת אוטומטית בלי לרדוף אחרי שום דבר.</p>
+        </div>
+        <div class="flex flex-wrap justify-end gap-3 text-sm font-semibold text-[#1A1A1A]">
+          {paymentMethods.map((method) => (
+            <span class="rounded-full border border-[#1A1A1A]/10 bg-[#FAFAF8] px-4 py-2">
+              {method.icon} {method.name}
+            </span>
+          ))}
+        </div>
+      </div>
+    </section>
+  </section>
+
+  <script is:inline define:vars={{ flexibleMeeting, whatsappNumber, currency }}>
+    document.addEventListener("astro:page-load", () => {
+      const slider = document.getElementById("meeting-duration");
+      const durationLabel = document.getElementById("meeting-duration-label");
+      const totalLabel = document.getElementById("meeting-total");
+      const bookLink = document.getElementById("meeting-book-link");
+      if (!(slider instanceof HTMLInputElement)) return;
+      if (!(durationLabel instanceof HTMLElement)) return;
+      if (!(totalLabel instanceof HTMLElement)) return;
+      if (!(bookLink instanceof HTMLAnchorElement)) return;
+
+      const addonInputs = Array.from(document.querySelectorAll("[data-addon-index]"));
+      const addonCatalog = flexibleMeeting?.addons || [];
+      const money = (value) => `${Number(value).toLocaleString("he-IL")} ${currency}`;
+
+      const buildMessage = (duration, total, addons) => {
+        const addonText = addons.length ? ` כולל ${addons.join(", ")}` : "";
+        return `היי, אני רוצה לקבוע ${flexibleMeeting.title}. בחרתי ${duration} דקות במחיר ${money(total)}${addonText}.`;
+      };
+
+      const render = () => {
+        const duration = Number(slider.value || 30);
+        const units = duration / 30;
+        const base = (flexibleMeeting?.base_price_30min || 0) * units;
+        const selectedAddons = addonInputs
+          .filter((input) => input instanceof HTMLInputElement && input.checked)
+          .map((input) => addonCatalog[Number(input.dataset.addonIndex)]);
+        const addonsTotal = selectedAddons.reduce((sum, addon) => sum + (addon?.price || 0), 0);
+        const total = base + addonsTotal;
+
+        durationLabel.textContent = `${duration} דקות`;
+        totalLabel.textContent = money(total);
+        bookLink.href = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
+          buildMessage(duration, total, selectedAddons.map((addon) => addon.name))
+        )}`;
+      };
+
+      slider.addEventListener("input", render);
+      addonInputs.forEach((input) => input.addEventListener("change", render));
+      render();
+    });
+  </script>
+</Layout>

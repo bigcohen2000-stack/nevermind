@@ -13,6 +13,7 @@ const dismissKey = "nm-whisper-banner-dismissed-at";
   data-banner-cta-label={banner.ctaLabel}
   data-banner-cta-href={banner.ctaHref}
   data-banner-dismiss-hours={String(banner.dismissHours || 24)}
+  data-banner-contextual-offers={JSON.stringify(banner.contextualOffers || [])}
   class="fixed inset-x-0 top-0 z-[70] hidden border-b border-white/10 bg-[#1A1A1A] text-[#FAFAF8]"
 >
   <div class="mx-auto flex min-h-11 max-w-7xl items-center justify-center gap-3 px-4 py-2 text-center text-sm leading-6">
@@ -41,7 +42,7 @@ const dismissKey = "nm-whisper-banner-dismissed-at";
     const banner = document.querySelector("[data-whisper-banner]");
     const body = document.body;
     if (!(banner instanceof HTMLElement) || !body) {
-      if (body) body.dataset.whisperBanner = "hidden";
+      if (body) body.dataset.whisperBannerState = "hidden";
       return;
     }
 
@@ -49,7 +50,7 @@ const dismissKey = "nm-whisper-banner-dismissed-at";
     const ctaNode = banner.querySelector("[data-whisper-cta]");
     const closeButton = banner.querySelector("[data-whisper-close]");
     if (!(messageNode instanceof HTMLElement) || !(ctaNode instanceof HTMLAnchorElement)) {
-      body.dataset.whisperBanner = "hidden";
+      body.dataset.whisperBannerState = "hidden";
       return;
     }
 
@@ -69,11 +70,18 @@ const dismissKey = "nm-whisper-banner-dismissed-at";
       ctaLabel: banner.dataset.bannerCtaLabel || "",
       ctaHref: banner.dataset.bannerCtaHref || "/",
       dismissHours: Math.max(1, Number(banner.dataset.bannerDismissHours || 24)),
+      contextualOffers: (() => {
+        try {
+          return JSON.parse(banner.dataset.bannerContextualOffers || "[]");
+        } catch {
+          return [];
+        }
+      })(),
     };
 
     const hideBanner = (persist, dismissWindowMs) => {
       banner.style.display = "none";
-      body.dataset.whisperBanner = "hidden";
+      body.dataset.whisperBannerState = "hidden";
       if (persist) {
         window.localStorage.setItem(dismissKey, String(Date.now()));
       }
@@ -82,19 +90,28 @@ const dismissKey = "nm-whisper-banner-dismissed-at";
       }
     };
 
+    const findContextualOffer = () => {
+      const params = new URLSearchParams(window.location.search);
+      const hash = window.location.hash.replace(/^#/, "");
+      const serviceId = params.get("service") || hash;
+      if (!serviceId) return null;
+      return defaults.contextualOffers.find((offer) => offer.serviceId === serviceId) || null;
+    };
+
     const applyBannerSettings = () => {
       const override = readOverrides()?.whisperBanner || {};
       const current = {
         ...defaults,
         ...override,
       };
+      const contextualOffer = findContextualOffer();
 
       const dismissHours = Math.max(1, Number(current.dismissHours || 24));
       const dismissWindowMs = dismissHours * 60 * 60 * 1000;
       banner.dataset.dismissWindow = String(dismissWindowMs);
-      messageNode.textContent = current.message || defaults.message;
-      ctaNode.textContent = current.ctaLabel || defaults.ctaLabel;
-      ctaNode.href = current.ctaHref || defaults.ctaHref || "/";
+      messageNode.textContent = contextualOffer?.message || current.message || defaults.message;
+      ctaNode.textContent = contextualOffer?.ctaLabel || current.ctaLabel || defaults.ctaLabel;
+      ctaNode.href = contextualOffer?.ctaHref || current.ctaHref || defaults.ctaHref || "/";
 
       if (!current.enabled) {
         hideBanner(false, dismissWindowMs);
@@ -108,7 +125,7 @@ const dismissKey = "nm-whisper-banner-dismissed-at";
       }
 
       banner.style.display = "block";
-      body.dataset.whisperBanner = "shown";
+      body.dataset.whisperBannerState = "shown";
     };
 
     applyBannerSettings();
@@ -129,3 +146,4 @@ const dismissKey = "nm-whisper-banner-dismissed-at";
     window.addEventListener("nm-site-settings-updated", onSettingsUpdated);
   });
 </script>
+

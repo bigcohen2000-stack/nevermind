@@ -36,16 +36,16 @@ const quickActions = [
     cta: "לפתוח את המחולל",
   },
   {
+    title: "עמוד השירותים",
+    description: "מסטרקלאס מחירים, טווחי מפגש, תוספים, וואטסאפ ו-WhatsApp handoff.",
+    href: "/services/",
+    cta: "לבדוק את העמוד",
+  },
+  {
     title: "טופס intake",
     description: "לינק פרטי לשליחה ללידים, עם Gatekeeper ו־WhatsApp handoff.",
     href: "/intake/",
     cta: "לפתוח את הטופס",
-  },
-  {
-    title: "בדיקת מאמרים",
-    description: "כניסה מהירה לספריית המאמרים הציבורית כדי לראות מה באמת באוויר.",
-    href: "/articles/",
-    cta: "לצפות באתר",
   },
 ];
 
@@ -53,8 +53,8 @@ const stats = {
   totalArticles: articles.length,
   drafts: articles.filter((article) => article.status === "טיוטה").length,
   live: articles.filter((article) => article.status === "באוויר").length,
-  activeServices: servicesConfig.services.filter((service) => service.visible).length,
-  featuredServices: servicesConfig.services.filter((service) => service.featured).length,
+  activeServices: servicesConfig.services.filter((service) => service.visible !== false).length,
+  featuredServices: servicesConfig.services.filter((service) => Boolean(service.badge) || Boolean(service.upsell)).length,
 };
 ---
 
@@ -96,7 +96,7 @@ const stats = {
         <p class="mt-3 text-3xl font-semibold text-[#1A1A1A]">{stats.activeServices}</p>
       </article>
       <article class="rounded-[1.6rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] p-5 text-right">
-        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">Featured</p>
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">Upsells / Scarcity</p>
         <p class="mt-3 text-3xl font-semibold text-[#1A1A1A]">{stats.featuredServices}</p>
       </article>
     </section>
@@ -120,7 +120,7 @@ const stats = {
         <h2 class="mt-3 text-2xl font-semibold text-[#1A1A1A]">מה עושים מכאן</h2>
         <ol class="mt-5 space-y-3 text-sm leading-7 text-[#1A1A1A]/72">
           <li class="rounded-[1.2rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] px-4 py-3">יוצרים מאמר חדש דרך המחולל.</li>
-          <li class="rounded-[1.2rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] px-4 py-3">מגדירים אילו שירותים פתוחים כרגע דרך services.json.</li>
+          <li class="rounded-[1.2rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] px-4 py-3">מעדכנים מחירים, חבילות ותוספים מתוך services.json.</li>
           <li class="rounded-[1.2rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] px-4 py-3">עושים commit עם הודעה קצרה שמתארת את השינוי.</li>
         </ol>
       </article>
