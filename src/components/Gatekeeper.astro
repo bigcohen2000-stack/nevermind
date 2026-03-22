@@ -1,0 +1,356 @@
+---
+import appConfig from "../config/appConfig.json";
+
+interface Props {
+  phone?: string;
+  fallbackHref?: string;
+  fallbackLabel?: string;
+}
+
+const {
+  phone = appConfig.contact.whatsAppNumber,
+  fallbackHref = "/articles/",
+  fallbackLabel = "לקרוא מאמר פתוח לפני שיחה",
+} = Astro.props;
+
+const goals = [
+  { id: "clarity", label: "בירור אישי מדויק", hint: "משהו תקוע ואני רוצה לראות אותו נקי", score: 24, reason: "המטרה מספיק חדה כדי ששיחה תוכל להתמקד בגרעין עצמו." },
+  { id: "decision", label: "קבלת החלטה", hint: "יש צומת ואני לא רוצה להמשיך להסתובב סביבו", score: 22, reason: "יש כאן מוקד ברור יחסית, גם אם הוא עדיין לא פתור." },
+  { id: "business", label: "כיוון עסקי / מקצועי", hint: "אני צריך חדות סביב מהלך, מיקוד או חסם", score: 26, reason: "כיוון עסקי הוא בדרך כלל נושא שאפשר למדוד עליו בהירות ישירה." },
+  { id: "not-sure", label: "אני עדיין לא בטוח", hint: "יש עניין, אבל עוד לא ברור לי מה באמת הנושא", score: 6, reason: "כשהנושא עוד לא ברור, שיחה נוטה להתבזבז על ניסוח במקום על מהות." },
+];
+
+const budgets = [
+  { id: "under-500", label: "עד 500 ש״ח", score: 2, reason: "הטווח הזה לא מתאים כרגע למסלולים האישיים שהאתר מכוון אליהם." },
+  { id: "500-1500", label: "500–1,500 ש״ח", score: 12, reason: "יש כאן התאמה חלקית בלבד, תלוי במידת הדיוק של הנושא." },
+  { id: "1500-3000", label: "1,500–3,000 ש״ח", score: 24, reason: "הטווח הזה כבר מתאים למסלולים שבהם שיחה יכולה להיות מדויקת ושימושית." },
+  { id: "3000-plus", label: "3,000+ ש״ח", score: 28, reason: "יש כאן גמישות שמאפשרת התאמה אמיתית למסלול עבודה רציני." },
+];
+
+const stages = [
+  { id: "browsing", label: "רק בודק כרגע", score: 4, reason: "כשאין עדיין החלטה פנימית, עדיף להתחיל מחקירה שקטה ולא משיחה." },
+  { id: "active", label: "מבין את העניין ורוצה לדבר", score: 20, reason: "יש כאן מוכנות מספקת כדי ששיחה תוכל לייצר תנועה." },
+  { id: "urgent", label: "יש משהו דחוף ואני צריך בהירות קרובה", score: 24, reason: "דחיפות עם מודעות לצורך בבהירות היא אינדיקציה טובה להתאמה." },
+];
+
+const maxScore =
+  Math.max(...goals.map((goal) => goal.score)) +
+  Math.max(...budgets.map((budget) => budget.score)) +
+  Math.max(...stages.map((stage) => stage.score));
+---
+
+<section
+  data-gatekeeper
+  data-phone={phone}
+  data-fallback-href={fallbackHref}
+  data-fallback-label={fallbackLabel}
+  data-max-score={maxScore}
+  class="mx-auto max-w-3xl rounded-[2.5rem] border border-[#1A1A1A]/10 bg-white/86 p-6 shadow-[0_30px_90px_rgba(26,26,26,0.08)] backdrop-blur-md md:p-8"
+>
+  <header class="space-y-4 text-right">
+    <p class="text-sm font-semibold uppercase tracking-[0.24em] text-[#D42B2B]">Gatekeeper</p>
+    <h1 class="text-[clamp(2rem,1.4rem+2vw,3.3rem)] font-semibold leading-[1.05] text-[#1A1A1A]">לפני שיחה, נחדד על מה באמת מדובר.</h1>
+    <p class="max-w-2xl text-[1rem] leading-8 text-[#1A1A1A]/70">
+      זה לא שאלון ארוך. זה סינון קצר שמבהיר אם נכון לדבר עכשיו, ועל מה נכון לדבר. אם אין התאמה,
+      עדיף לגלות את זה כאן ולא אחרי שיחה לא מדויקת.
+    </p>
+  </header>
+
+  <div class="mt-8 flex gap-2" aria-hidden="true">
+    <span data-step-dot="1" class="h-1 flex-1 rounded-full bg-[#D42B2B]"></span>
+    <span data-step-dot="2" class="h-1 flex-1 rounded-full bg-[#1A1A1A]/10"></span>
+    <span data-step-dot="3" class="h-1 flex-1 rounded-full bg-[#1A1A1A]/10"></span>
+  </div>
+
+  <div class="mt-8 space-y-8">
+    <section data-step-panel="1" class="space-y-6">
+      <div class="space-y-2 text-right">
+        <p class="text-sm font-semibold text-[#D42B2B]">שלב 1 מתוך 3</p>
+        <h2 class="text-2xl font-semibold text-[#1A1A1A]">מי אתה, ועל מה אתה רוצה לדבר?</h2>
+      </div>
+
+      <label class="block space-y-2 text-right">
+        <span class="text-sm font-semibold text-[#1A1A1A]">שם</span>
+        <input data-name-input type="text" placeholder="איך לקרוא לך?" class="w-full rounded-[1.4rem] border border-[#1A1A1A]/12 bg-[#FAFAF8] px-5 py-4 text-right text-base text-[#1A1A1A] outline-none transition focus:border-[#D42B2B]/40 focus:ring-2 focus:ring-[#D42B2B]/15" />
+      </label>
+
+      <div class="space-y-3 text-right">
+        <p class="text-sm font-semibold text-[#1A1A1A]">מטרה</p>
+        <div class="grid gap-3">
+          {goals.map((goal) => (
+            <button
+              type="button"
+              data-goal={goal.label}
+              data-goal-id={goal.id}
+              data-goal-score={goal.score}
+              data-goal-reason={goal.reason}
+              class="gate-option rounded-[1.5rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] px-5 py-4 text-right transition hover:border-[#D42B2B]/25 hover:bg-white"
+            >
+              <span class="block text-base font-semibold text-[#1A1A1A]">{goal.label}</span>
+              <span class="mt-1 block text-sm leading-7 text-[#1A1A1A]/62">{goal.hint}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section data-step-panel="2" class="hidden space-y-6">
+      <div class="space-y-2 text-right">
+        <p class="text-sm font-semibold text-[#D42B2B]">שלב 2 מתוך 3</p>
+        <h2 class="text-2xl font-semibold text-[#1A1A1A]">מה טווח ההשקעה שנכון לך כרגע?</h2>
+      </div>
+      <div class="grid gap-3 text-right">
+        {budgets.map((budget) => (
+          <button
+            type="button"
+            data-budget={budget.label}
+            data-budget-id={budget.id}
+            data-budget-score={budget.score}
+            data-budget-reason={budget.reason}
+            class="gate-option rounded-[1.5rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] px-5 py-4 text-right transition hover:border-[#D42B2B]/25 hover:bg-white"
+          >
+            <span class="block text-base font-semibold text-[#1A1A1A]">{budget.label}</span>
+          </button>
+        ))}
+      </div>
+      <button type="button" data-back-step="1" class="text-sm font-semibold text-[#1A1A1A]/60 transition hover:text-[#1A1A1A]">חזרה לשלב הקודם</button>
+    </section>
+
+    <section data-step-panel="3" class="hidden space-y-6">
+      <div class="space-y-2 text-right">
+        <p class="text-sm font-semibold text-[#D42B2B]">שלב 3 מתוך 3</p>
+        <h2 class="text-2xl font-semibold text-[#1A1A1A]">באיזה שלב אתה נמצא עכשיו?</h2>
+      </div>
+      <div class="grid gap-3 text-right">
+        {stages.map((stage) => (
+          <button
+            type="button"
+            data-stage={stage.label}
+            data-stage-id={stage.id}
+            data-stage-score={stage.score}
+            data-stage-reason={stage.reason}
+            class="gate-option rounded-[1.5rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] px-5 py-4 text-right transition hover:border-[#D42B2B]/25 hover:bg-white"
+          >
+            <span class="block text-base font-semibold text-[#1A1A1A]">{stage.label}</span>
+          </button>
+        ))}
+      </div>
+      <button type="button" data-back-step="2" class="text-sm font-semibold text-[#1A1A1A]/60 transition hover:text-[#1A1A1A]">חזרה לשלב הקודם</button>
+    </section>
+
+    <section data-result-panel class="hidden rounded-[1.8rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] p-6 text-right">
+      <p data-result-badge class="text-sm font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">תוצאה</p>
+      <div class="mt-4 overflow-hidden rounded-full bg-[#1A1A1A]/8">
+        <div data-score-bar class="h-2 w-0 rounded-full bg-[#D42B2B] transition-all duration-500"></div>
+      </div>
+      <p data-score-text class="mt-3 text-sm font-semibold text-[#1A1A1A]/70"></p>
+      <h2 data-result-title class="mt-3 text-2xl font-semibold text-[#1A1A1A]"></h2>
+      <p data-result-text class="mt-3 max-w-2xl text-base leading-8 text-[#1A1A1A]/70"></p>
+      <ul data-reasons-list class="mt-5 space-y-2 text-sm leading-7 text-[#1A1A1A]/68"></ul>
+      <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
+        <a data-whatsapp-link target="_blank" rel="noreferrer" class="hidden items-center justify-center rounded-full bg-[#1A1A1A] px-6 py-3 text-sm font-semibold text-[#FAFAF8] transition hover:bg-black">לעבור לוואטסאפ</a>
+        <a data-fallback-link class="hidden items-center justify-center rounded-full border border-[#1A1A1A]/10 bg-white px-6 py-3 text-sm font-semibold text-[#1A1A1A] transition hover:bg-[#ffffff]">לקריאה שקטה במקום זה</a>
+        <button type="button" data-reset-gatekeeper class="rounded-full border border-[#1A1A1A]/10 bg-white px-6 py-3 text-sm font-semibold text-[#1A1A1A]/70 transition hover:bg-[#ffffff]">להתחיל מחדש</button>
+      </div>
+    </section>
+  </div>
+</section>
+
+<script is:inline>
+  document.addEventListener("astro:page-load", () => {
+    const root = document.querySelector("[data-gatekeeper]");
+    if (!(root instanceof HTMLElement)) return;
+
+    const state = {
+      step: 1,
+      name: "",
+      goal: "",
+      goalId: "",
+      goalScore: 0,
+      goalReason: "",
+      budget: "",
+      budgetId: "",
+      budgetScore: 0,
+      budgetReason: "",
+      stage: "",
+      stageId: "",
+      stageScore: 0,
+      stageReason: "",
+    };
+
+    const phone = root.dataset.phone || "972555634035";
+    const fallbackHref = root.dataset.fallbackHref || "/articles/";
+    const fallbackLabel = root.dataset.fallbackLabel || "לעבור למאמר פתוח במקום שיחה";
+    const maxScore = Number(root.dataset.maxScore || 78);
+    const nameInput = root.querySelector("[data-name-input]");
+    const panels = Array.from(root.querySelectorAll("[data-step-panel]"));
+    const dots = Array.from(root.querySelectorAll("[data-step-dot]"));
+    const resultPanel = root.querySelector("[data-result-panel]");
+    const resultBadge = root.querySelector("[data-result-badge]");
+    const scoreBar = root.querySelector("[data-score-bar]");
+    const scoreText = root.querySelector("[data-score-text]");
+    const resultTitle = root.querySelector("[data-result-title]");
+    const resultText = root.querySelector("[data-result-text]");
+    const reasonsList = root.querySelector("[data-reasons-list]");
+    const whatsappLink = root.querySelector("[data-whatsapp-link]");
+    const fallbackLink = root.querySelector("[data-fallback-link]");
+    const resetButton = root.querySelector("[data-reset-gatekeeper]");
+
+    const setStep = (step) => {
+      state.step = step;
+      panels.forEach((panel) => {
+        if (!(panel instanceof HTMLElement)) return;
+        panel.classList.toggle("hidden", panel.dataset.stepPanel !== String(step));
+      });
+      dots.forEach((dot, index) => {
+        if (!(dot instanceof HTMLElement)) return;
+        dot.classList.toggle("bg-[#D42B2B]", index < step);
+        dot.classList.toggle("bg-[#1A1A1A]/10", index >= step);
+      });
+      if (resultPanel instanceof HTMLElement) resultPanel.classList.add("hidden");
+    };
+
+    const getScore = () => state.goalScore + state.budgetScore + state.stageScore;
+
+    const getTier = () => {
+      const score = getScore();
+      if (score >= 52) return "fit";
+      if (score >= 35) return "partial";
+      return "not-fit";
+    };
+
+    const buildWhatsAppHref = () => {
+      const safeName = state.name || "ללא שם";
+      const text = `Hi, I'm ${safeName}, I'm interested in ${state.goal} and I'm at the ${state.stage} stage.`;
+      return `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
+    };
+
+    const renderReasons = () => {
+      if (!(reasonsList instanceof HTMLElement)) return;
+      const reasons = [state.goalReason, state.budgetReason, state.stageReason].filter(Boolean);
+      reasonsList.innerHTML = reasons
+        .map((reason) => `<li class="rounded-2xl border border-[#1A1A1A]/8 bg-white/70 px-4 py-3">${reason}</li>`)
+        .join("");
+    };
+
+    const showResult = () => {
+      panels.forEach((panel) => panel instanceof HTMLElement && panel.classList.add("hidden"));
+      dots.forEach((dot) => {
+        if (!(dot instanceof HTMLElement)) return;
+        dot.classList.remove("bg-[#D42B2B]");
+        dot.classList.add("bg-[#1A1A1A]/10");
+      });
+
+      if (!(resultPanel instanceof HTMLElement) || !(resultBadge instanceof HTMLElement) || !(scoreBar instanceof HTMLElement) || !(scoreText instanceof HTMLElement) || !(resultTitle instanceof HTMLElement) || !(resultText instanceof HTMLElement) || !(whatsappLink instanceof HTMLAnchorElement) || !(fallbackLink instanceof HTMLAnchorElement)) {
+        return;
+      }
+
+      resultPanel.classList.remove("hidden");
+      const score = getScore();
+      const tier = getTier();
+      const scorePercent = Math.max(0, Math.min(100, (score / maxScore) * 100));
+      scoreBar.style.width = `${scorePercent}%`;
+      scoreText.textContent = `ציון התאמה: ${score} / ${maxScore}`;
+      renderReasons();
+
+      if (tier === "fit") {
+        resultBadge.textContent = "התאמה גבוהה";
+        resultTitle.textContent = "זה נראה כמו שיחה שכדאי לקיים.";
+        resultText.textContent = "המטרה, התקציב והשלב שלך מספיק ברורים כדי לעבור לשיחה קצרה ומדויקת בלי לבזבז זמן על ניסוח מחדש של הבעיה.";
+        whatsappLink.href = buildWhatsAppHref();
+        whatsappLink.classList.remove("hidden");
+        whatsappLink.classList.add("inline-flex");
+        fallbackLink.classList.add("hidden");
+        fallbackLink.classList.remove("inline-flex");
+        return;
+      }
+
+      if (tier === "partial") {
+        resultBadge.textContent = "התאמה חלקית";
+        resultTitle.textContent = "יש עניין, אבל עדיף לחדד עוד קצת לפני שיחה.";
+        resultText.textContent = "כרגע יש התאמה חלקית בלבד. עדיף לעבור קודם דרך מאמר פתוח, ואז אם יהיה צורך, לחזור לשיחה ממקום חד יותר.";
+        fallbackLink.href = fallbackHref;
+        fallbackLink.textContent = fallbackLabel;
+        fallbackLink.classList.remove("hidden");
+        fallbackLink.classList.add("inline-flex");
+        whatsappLink.classList.add("hidden");
+        whatsappLink.classList.remove("inline-flex");
+        return;
+      }
+
+      resultBadge.textContent = "לא מתאים כרגע";
+      resultTitle.textContent = "כרגע זה לא נראה כמו התאמה לשיחה.";
+      resultText.textContent = "זה לא אומר שאין עניין. זה רק אומר שנכון יותר להתחיל מקריאה שקטה או מחידוד עצמי לפני מעבר לשיחה ישירה.";
+      fallbackLink.href = fallbackHref;
+      fallbackLink.textContent = fallbackLabel;
+      fallbackLink.classList.remove("hidden");
+      fallbackLink.classList.add("inline-flex");
+      whatsappLink.classList.add("hidden");
+      whatsappLink.classList.remove("inline-flex");
+    };
+
+    root.querySelectorAll("[data-goal-id]").forEach((button) => {
+      button.addEventListener("click", () => {
+        if (!(button instanceof HTMLElement)) return;
+        state.name = nameInput instanceof HTMLInputElement ? nameInput.value.trim() : "";
+        state.goal = button.dataset.goal || "";
+        state.goalId = button.dataset.goalId || "";
+        state.goalScore = Number(button.dataset.goalScore || 0);
+        state.goalReason = button.dataset.goalReason || "";
+        setStep(2);
+      });
+    });
+
+    root.querySelectorAll("[data-budget-id]").forEach((button) => {
+      button.addEventListener("click", () => {
+        if (!(button instanceof HTMLElement)) return;
+        state.budget = button.dataset.budget || "";
+        state.budgetId = button.dataset.budgetId || "";
+        state.budgetScore = Number(button.dataset.budgetScore || 0);
+        state.budgetReason = button.dataset.budgetReason || "";
+        setStep(3);
+      });
+    });
+
+    root.querySelectorAll("[data-stage-id]").forEach((button) => {
+      button.addEventListener("click", () => {
+        if (!(button instanceof HTMLElement)) return;
+        state.stage = button.dataset.stage || "";
+        state.stageId = button.dataset.stageId || "";
+        state.stageScore = Number(button.dataset.stageScore || 0);
+        state.stageReason = button.dataset.stageReason || "";
+        showResult();
+      });
+    });
+
+    root.querySelectorAll("[data-back-step]").forEach((button) => {
+      button.addEventListener("click", () => {
+        if (!(button instanceof HTMLElement)) return;
+        const target = Number(button.dataset.backStep || 1);
+        setStep(target);
+      });
+    });
+
+    resetButton?.addEventListener("click", () => {
+      state.step = 1;
+      state.name = "";
+      state.goal = "";
+      state.goalId = "";
+      state.goalScore = 0;
+      state.goalReason = "";
+      state.budget = "";
+      state.budgetId = "";
+      state.budgetScore = 0;
+      state.budgetReason = "";
+      state.stage = "";
+      state.stageId = "";
+      state.stageScore = 0;
+      state.stageReason = "";
+      if (nameInput instanceof HTMLInputElement) nameInput.value = "";
+      if (reasonsList instanceof HTMLElement) reasonsList.innerHTML = "";
+      if (scoreBar instanceof HTMLElement) scoreBar.style.width = "0%";
+      setStep(1);
+    });
+  });
+</script>
+

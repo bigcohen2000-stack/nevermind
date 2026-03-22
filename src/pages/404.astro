@@ -1,0 +1,202 @@
+﻿---
+import Layout from "../layouts/Layout.astro";
+import SubscribeBanner from "../components/SubscribeBanner.astro";
+
+type ArticleModule = {
+  frontmatter?: {
+    title?: string;
+    description?: string;
+    draft?: boolean;
+  };
+};
+
+const articleEntries = import.meta.glob("../content/articles/**/*.mdx");
+const recommended = (
+  await Promise.all(
+    Object.entries(articleEntries).map(async ([path, loader]) => {
+      const mod = (await loader()) as ArticleModule;
+      const frontmatter = mod.frontmatter ?? {};
+      if (frontmatter.draft === true) {
+        return null;
+      }
+      const slug = path
+        .replace("../content/articles/", "")
+        .replace(/\.mdx$/, "");
+      return {
+        slug: `articles/${slug}`,
+        title: frontmatter.title ?? "מאמר",
+        description: frontmatter.description ?? "",
+      };
+    })
+  )
+)
+  .filter((article): article is { slug: string; title: string; description: string } => article !== null)
+  .slice(0, 4);
+---
+<Layout title="עמוד לא נמצא" description="חיפשת בחוץ, אבל הכול נמצא כאן">
+  <section class="space-y-12">
+    <header class="space-y-4 text-center">
+      <h1 class="text-[clamp(2.3rem,1.8rem+2.2vw,3.4rem)] font-semibold text-[#1A1A1A]">
+        חיפשת בחוץ, אבל הכול לא נמצא כאן
+      </h1>
+      <p
+        data-404-message
+        class="text-[clamp(1rem,0.95rem+0.35vw,1.3rem)] text-[#1A1A1A]/65"
+      >
+        כנראה שהכתובת השתנתה. נוכל לעזור לך למצוא את מה שחיפשת.
+      </p>
+    </header>
+
+    <div class="mx-auto w-full max-w-2xl">
+      <div class="rounded-3xl border border-[#1A1A1A]/10 bg-white/70 p-4">
+        <input
+          data-pagefind-input
+          type="search"
+          placeholder="מה לחפש עכשיו?"
+          autofocus
+          class="w-full rounded-2xl border border-[#1A1A1A]/10 bg-white/80 px-4 py-3 text-right text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] text-[#1A1A1A] outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A]/20"
+          dir="rtl"
+          aria-label="חיפוש באתר"
+        />
+      </div>
+      <div data-pagefind-results class="mt-4 space-y-3"></div>
+    </div>
+
+    <div class="flex justify-center">
+      <a
+        href="/articles"
+        class="inline-flex items-center justify-center rounded-full border border-[#1A1A1A]/10 bg-white/70 px-6 py-3 text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] text-[#1A1A1A]/80 transition-colors duration-300 hover:bg-white"
+      >
+        מרכז החקירה
+      </a>
+    </div>
+
+    <section class="space-y-4">
+      <h2 class="text-[clamp(1.4rem,1.2rem+0.9vw,2rem)] font-semibold text-[#1A1A1A]">
+        נקודות התחלה מומלצות
+      </h2>
+      <div class="grid gap-6 md:grid-cols-2">
+        {recommended.map((article) => (
+          <a
+            href={`/${article.slug}`}
+            class="flex h-full flex-col justify-between rounded-3xl border border-white/70 bg-white/70 p-6 shadow-sm backdrop-blur-md transition-transform duration-300 hover:translate-y-[-2px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A]/20"
+          >
+            <div class="space-y-3">
+              <h3 class="text-[clamp(1.1rem,1rem+0.4vw,1.4rem)] font-semibold text-[#1A1A1A]">
+                {article.title}
+              </h3>
+              {article.description && (
+                <p class="text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] text-[#1A1A1A]/65">
+                  {article.description}
+                </p>
+              )}
+            </div>
+            <span class="mt-6 text-[clamp(0.85rem,0.8rem+0.2vw,1rem)] text-[#1A1A1A]/45">
+              להתחיל מכאן
+            </span>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <SubscribeBanner />
+  </section>
+
+  <script is:inline>
+    document.addEventListener("astro:page-load", () => {
+      if (window.__nm404Cleanup) {
+        window.__nm404Cleanup();
+      }
+
+      const message = document.querySelector("[data-404-message]");
+      const input = document.querySelector("[data-pagefind-input]");
+      const resultsContainer = document.querySelector("[data-pagefind-results]");
+      let timeoutId;
+      let cancelled = false;
+
+      const personalize = () => {
+        if (!message) return;
+        const path = window.location.pathname.split("/").filter(Boolean);
+        const last = decodeURIComponent(path[path.length - 1] ?? "");
+        const keywords = [
+          { match: /חופש/i, label: "חופש" },
+          { match: /שקט/i, label: "שקט" },
+          { match: /חקירה/i, label: "חקירה" },
+        ];
+        const hit = keywords.find((item) => item.match.test(last));
+        if (hit) {
+          message.textContent = `נראה שחיפשת משהו בנושא ${hit.label}. אולי זה בדיוק הזמן לעצור ולבדוק מה כאן מחפש אותך.`;
+        }
+      };
+
+      const ensurePagefind = async () => {
+        if (window.pagefind) return;
+        await new Promise((resolve, reject) => {
+          const script = document.createElement("script");
+          script.src = "/pagefind/pagefind.js";
+          script.onload = resolve;
+          script.onerror = reject;
+          document.head.appendChild(script);
+        });
+      };
+
+      const renderResults = (items) => {
+        if (!resultsContainer) return;
+        resultsContainer.innerHTML = "";
+        if (!items.length) {
+          resultsContainer.innerHTML =
+            '<p class="text-[clamp(0.9rem,0.85rem+0.2vw,1.05rem)] text-[#1A1A1A]/55">אין תוצאות כרגע.</p>';
+          return;
+        }
+
+        items.forEach((item) => {
+          const wrapper = document.createElement("a");
+          wrapper.href = item.url;
+          wrapper.className =
+            "block rounded-2xl border border-[#1A1A1A]/10 bg-white/70 px-4 py-3 transition-colors duration-300 hover:bg-white";
+          wrapper.innerHTML =
+            `<p class="text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] font-semibold text-[#1A1A1A]">${item.title}</p>` +
+            `<p class="mt-1 text-[clamp(0.85rem,0.8rem+0.2vw,1rem)] text-[#1A1A1A]/60">${item.excerpt}</p>`;
+          resultsContainer.appendChild(wrapper);
+        });
+      };
+
+      const runSearch = async (value) => {
+        if (!value.trim()) {
+          renderResults([]);
+          return;
+        }
+
+        await ensurePagefind();
+        const search = await window.pagefind?.search(value);
+        const data = await Promise.all(
+          (search?.results ?? []).slice(0, 6).map((result) => result.data())
+        );
+
+        if (!cancelled) {
+          renderResults(
+            data.map((item) => ({
+              url: item.url,
+              title: item.meta?.title ?? "",
+              excerpt: item.excerpt ?? "",
+            }))
+          );
+        }
+      };
+
+      const onInput = (event) => {
+        const value = event.target.value;
+        window.clearTimeout(timeoutId);
+        timeoutId = window.setTimeout(() => runSearch(value), 200);
+      };
+
+      personalize();
+      input?.addEventListener("input", onInput);
+
+      window.__nm404Cleanup = () => {
+        cancelled = true;
+        input?.removeEventListener("input", onInput);
+      };
+    });
+  </script>
+</Layout>

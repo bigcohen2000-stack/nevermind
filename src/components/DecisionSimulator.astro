@@ -1,0 +1,129 @@
+﻿---
+import appConfig from "../config/appConfig.json";
+
+interface Props {
+  phone?: string;
+  ctaLabel?: string;
+}
+
+const {
+  phone = appConfig.contact.whatsAppNumber,
+  ctaLabel = "אני רוצה לפרק את ההחלטה הזו בשיחה",
+} = Astro.props;
+
+const baseMessage = "היי, אני רוצה לפרק החלטה שאני דוחה כבר יותר מדי זמן.";
+const defaultHref = `https://wa.me/${phone}?text=${encodeURIComponent(baseMessage)}`;
+---
+
+<section
+  data-decision-simulator
+  data-phone={phone}
+  data-base-message={baseMessage}
+  class="not-prose rounded-[2.2rem] border border-[#1A1A1A]/10 bg-white/90 p-6 text-right text-[#1A1A1A] shadow-[0_26px_70px_rgba(26,26,26,0.08)] backdrop-blur-sm md:p-8"
+  aria-label="סימולטור החלטה"
+>
+  <div class="space-y-3">
+    <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">סימולטור החלטה</p>
+    <h2 class="text-[clamp(1.8rem,1.4rem+1vw,2.6rem)] font-semibold leading-[1.08]">מה באמת יקרה אם תבחר?</h2>
+    <p class="max-w-3xl text-sm leading-7 text-[#1A1A1A]/68">
+      רוב ההתלבטות לא בנויה על עובדות, אלא על דמיון לא מבוקר. תכתוב את ההחלטה שאתה דוחה, ותראה את שני הקצוות בצורה נקייה.
+    </p>
+  </div>
+
+  <div class="mt-8 grid gap-6 lg:grid-cols-[minmax(0,22rem)_minmax(0,1fr)] lg:items-start">
+    <div class="space-y-4">
+      <label class="block space-y-3 text-right">
+        <span class="text-sm font-semibold">איזו החלטה אתה דוחה עכשיו?</span>
+        <input
+          data-decision-input
+          type="text"
+          class="w-full rounded-[1.4rem] border border-[#1A1A1A]/12 bg-[#FAFAF8] px-4 py-4 text-right text-base font-semibold text-[#1A1A1A] outline-none transition duration-300 focus:border-[#D42B2B]/35 focus:ring-2 focus:ring-[#D42B2B]/12"
+          placeholder="למשל: לעזוב עבודה, לפתוח שיחה, להעלות מחיר"
+        />
+      </label>
+
+      <button
+        type="button"
+        data-decision-generate
+        class="inline-flex items-center justify-center rounded-full bg-[#1A1A1A] px-5 py-3 text-sm font-semibold text-[#FAFAF8] transition duration-300 hover:translate-y-[-1px] hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D42B2B]/20"
+      >
+        תמפה לי את שני הקצוות
+      </button>
+    </div>
+
+    <div data-decision-output class="hidden rounded-[1.8rem] border border-[#D42B2B]/12 bg-[#FFF7F6] p-5 md:p-6">
+      <div class="grid gap-4 md:grid-cols-2">
+        <article class="rounded-[1.4rem] border border-[#1A1A1A]/10 bg-white px-4 py-4">
+          <p class="text-xs font-semibold uppercase tracking-[0.16em] text-[#D42B2B]">התרחיש הטוב ביותר</p>
+          <p data-best-case class="mt-3 text-sm leading-7 text-[#1A1A1A]/76"></p>
+        </article>
+
+        <article class="rounded-[1.4rem] border border-[#1A1A1A]/10 bg-white px-4 py-4">
+          <p class="text-xs font-semibold uppercase tracking-[0.16em] text-[#D42B2B]">התרחיש הקשה ביותר</p>
+          <p data-worst-case class="mt-3 text-sm leading-7 text-[#1A1A1A]/76"></p>
+        </article>
+      </div>
+
+      <div class="mt-4 rounded-[1.4rem] border border-[#1A1A1A]/10 bg-white px-4 py-4">
+        <p class="text-xs font-semibold uppercase tracking-[0.16em] text-[#D42B2B]">ההיגיון הפשוט</p>
+        <p data-decision-insight class="mt-3 text-base font-semibold leading-8 text-[#1A1A1A]"></p>
+      </div>
+
+      <a
+        data-decision-whatsapp
+        href={defaultHref}
+        target="_blank"
+        rel="noreferrer"
+        class="mt-6 inline-flex items-center justify-center rounded-full bg-[#D42B2B] px-6 py-3 text-sm font-semibold text-[#FAFAF8] transition duration-300 hover:translate-y-[-1px] hover:bg-[#bc2727] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D42B2B]/20"
+      >
+        {ctaLabel}
+      </a>
+    </div>
+  </div>
+</section>
+
+<script is:inline>
+  document.addEventListener("astro:page-load", () => {
+    const root = document.querySelector("[data-decision-simulator]");
+    if (!(root instanceof HTMLElement)) return;
+
+    const input = root.querySelector("[data-decision-input]");
+    const button = root.querySelector("[data-decision-generate]");
+    const output = root.querySelector("[data-decision-output]");
+    const bestCaseNode = root.querySelector("[data-best-case]");
+    const worstCaseNode = root.querySelector("[data-worst-case]");
+    const insightNode = root.querySelector("[data-decision-insight]");
+    const whatsappLink = root.querySelector("[data-decision-whatsapp]");
+
+    if (!(input instanceof HTMLInputElement) || !(button instanceof HTMLButtonElement) || !(output instanceof HTMLElement) || !(bestCaseNode instanceof HTMLElement) || !(worstCaseNode instanceof HTMLElement) || !(insightNode instanceof HTMLElement) || !(whatsappLink instanceof HTMLAnchorElement)) {
+      return;
+    }
+
+    const baseMessage = root.dataset.baseMessage || "היי, אני רוצה לפרק החלטה שאני דוחה כבר יותר מדי זמן.";
+    const phone = root.dataset.phone || "972555634035";
+
+    const render = () => {
+      const decision = input.value.trim();
+      if (!decision) {
+        output.classList.add("hidden");
+        return;
+      }
+
+      bestCaseNode.textContent = `אתה בוחר ב־${decision}, פוגש חוסר ודאות זמני, אבל מפסיק להסתובב סביב עצמך ומקבל תנועה, בהירות ונתונים אמיתיים מהמציאות.`;
+      worstCaseNode.textContent = `אתה בוחר ב־${decision}, מגלה שזה לא היה מדויק כמו שדמיינת, אבל לפחות אתה מפסיק לבזבז חודשים על ספק ומבין מהר יותר מה לא נכון.`;
+      insightNode.textContent = `ברוב המקרים, המחיר של בחירה לא מושלמת קטן יותר מהמחיר של חוסר בחירה מתמשך.`;
+
+      const message = `${baseMessage}\nההחלטה שאני דוחה: ${decision}`;
+      whatsappLink.href = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+      output.classList.remove("hidden");
+    };
+
+    button.addEventListener("click", render);
+    input.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        render();
+      }
+    });
+  });
+</script>

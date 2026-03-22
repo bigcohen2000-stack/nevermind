@@ -1,0 +1,143 @@
+---
+interface Props {
+  youtubeId: string;
+  title?: string;
+  videoSummaryPoints?: string[];
+}
+
+const { youtubeId, title = "סרטון וידאו", videoSummaryPoints = [] } = Astro.props;
+const points = videoSummaryPoints.map((point) => String(point).trim()).filter(Boolean);
+const playLabel = `הפעלת וידאו: ${title}`;
+const embedUrl = `https://www.youtube-nocookie.com/embed/${youtubeId}?rel=0&modestbranding=1&autoplay=1`;
+const posterUrl = `https://i.ytimg.com/vi/${youtubeId}/hqdefault.jpg`;
+---
+
+<div class="nm-video-player text-right" dir="rtl">
+  <div class="overflow-hidden rounded-2xl border border-[#1A1A1A]/10 bg-black shadow-sm">
+    <div class="nm-video-shell" data-video-shell>
+      <button
+        type="button"
+        class="nm-video-trigger"
+        data-video-trigger
+        data-embed-url={embedUrl}
+        aria-label={playLabel}
+      >
+        <img src={posterUrl} alt={title} loading="lazy" class="nm-video-poster" />
+        <span class="nm-video-overlay" aria-hidden="true">
+          <span class="nm-video-play">▶</span>
+          <span class="nm-video-title">{title}</span>
+        </span>
+      </button>
+    </div>
+  </div>
+
+  {
+    points.length > 0 && (
+      <details class="group mt-4 rounded-2xl border border-[#1A1A1A]/10 bg-white/80 text-right shadow-sm open:border-[#1A1A1A]/18">
+        <summary class="cursor-pointer list-none rounded-2xl px-4 py-3 text-[clamp(1rem,0.95rem+0.25vw,1.15rem)] font-semibold leading-[1.8] text-[#1A1A1A] transition-colors marker:content-none [&::-webkit-details-marker]:hidden">
+          <span class="inline-flex w-full items-center justify-between gap-3">
+            <span>סיכום מהיר: עיקרי הדברים מתוך הווידאו</span>
+            <span class="text-sm font-normal text-[#1A1A1A]/50 transition group-open:rotate-180" aria-hidden="true">⌃</span>
+          </span>
+        </summary>
+        <div class="border-t border-[#1A1A1A]/10 px-4 pb-4 pt-2">
+          <ul class="list-disc space-y-2 pr-5 text-[clamp(1rem,0.95rem+0.2vw,1.12rem)] leading-[1.8] text-[#1A1A1A]/88">
+            {points.map((point) => (
+              <li>{point}</li>
+            ))}
+          </ul>
+        </div>
+      </details>
+    )
+  }
+</div>
+
+<style is:global>
+  .nm-video-shell {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+  }
+
+  .nm-video-trigger {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  .nm-video-poster,
+  .nm-video-shell iframe {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .nm-video-shell iframe {
+    border: 0;
+  }
+
+  .nm-video-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.9rem;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.54), rgba(0, 0, 0, 0.2));
+    color: #fafaf8;
+    transition: background-color 160ms ease;
+  }
+
+  .nm-video-trigger:hover .nm-video-overlay,
+  .nm-video-trigger:focus-visible .nm-video-overlay {
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.62), rgba(0, 0, 0, 0.24));
+  }
+
+  .nm-video-play {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 4rem;
+    height: 4rem;
+    border-radius: 999px;
+    background: rgba(212, 43, 43, 0.92);
+    font-size: 1.5rem;
+    line-height: 1;
+    box-shadow: 0 18px 35px rgba(212, 43, 43, 0.28);
+  }
+
+  .nm-video-title {
+    font-size: clamp(1rem, 0.92rem + 0.3vw, 1.15rem);
+    font-weight: 600;
+    text-align: center;
+    padding-inline: 1.2rem;
+  }
+</style>
+
+<script is:inline>
+  const setupVideoPlayers = () => {
+    document.querySelectorAll('[data-video-trigger]').forEach((trigger) => {
+      if (trigger.dataset.bound === 'true') return;
+      trigger.dataset.bound = 'true';
+
+      trigger.addEventListener('click', () => {
+        const shell = trigger.closest('[data-video-shell]');
+        const embedUrl = trigger.getAttribute('data-embed-url');
+        const label = trigger.getAttribute('aria-label') || '';
+        if (!shell || !embedUrl) return;
+
+        shell.innerHTML = `<iframe src="${embedUrl}" title="${label}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>`;
+      });
+    });
+  };
+
+  setupVideoPlayers();
+  document.addEventListener('astro:after-swap', setupVideoPlayers);
+</script>

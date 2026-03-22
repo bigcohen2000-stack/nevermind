@@ -1,0 +1,183 @@
+﻿---
+import Layout from "../layouts/Layout.astro";
+import { problemRootNodes } from "../data/problemTree";
+
+const pageTitle = "עץ שורש הבעיה";
+const pageDescription = "מפת שורשים אינטראקטיבית של NeverMind: לוחצים על הבעיה החיצונית, ורואים אילו שורשים תודעתיים מחזיקים אותה במקום.";
+const defaultNode = problemRootNodes[0];
+---
+
+<Layout title={pageTitle} description={pageDescription}>
+  <section class="mx-auto max-w-7xl space-y-10 px-4 pb-20 text-right text-[#1A1A1A]">
+    <header class="max-w-4xl space-y-4">
+      <p class="text-sm font-semibold uppercase tracking-[0.24em] text-[#D42B2B]">עץ שורש הבעיה</p>
+      <h1 class="text-[clamp(2.2rem,1.7rem+2vw,3.6rem)] font-semibold leading-[1.05]">עץ שורש הבעיה</h1>
+      <p class="text-[clamp(1rem,0.95rem+0.35vw,1.15rem)] leading-8 text-[#1A1A1A]/68">
+        בוחרים את הבעיה החיצונית, ורואים איך היא מסתעפת לשורשים תודעתיים עמוקים יותר. זה לא תרשים אבחוני. זו דרך מהירה להבין איפה לעצור את הרעש ולהתחיל לראות מנגנון.
+      </p>
+    </header>
+
+    <div class="grid gap-8 xl:grid-cols-[320px_minmax(0,1fr)]">
+      <aside class="space-y-4 xl:sticky xl:top-28">
+        <section class="rounded-[2rem] border border-[#1A1A1A]/10 bg-white/88 p-5 shadow-[0_20px_60px_rgba(26,26,26,0.06)]">
+          <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">בחר בעיה</p>
+          <div class="mt-4 grid gap-3">
+            {problemRootNodes.map((node, index) => (
+              <button
+                type="button"
+                data-problem-trigger
+                data-problem-id={node.id}
+                data-selected={index === 0 ? "true" : "false"}
+                class="rounded-[1.35rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] px-4 py-4 text-right transition duration-300 hover:border-[#D42B2B]/24 hover:bg-white data-[selected=true]:border-[#D42B2B]/28 data-[selected=true]:bg-[#FFF7F6]"
+              >
+                <span class="block text-base font-semibold text-[#1A1A1A]">{node.title}</span>
+                <span class="mt-2 block text-sm leading-7 text-[#1A1A1A]/60">{node.summary}</span>
+              </button>
+            ))}
+          </div>
+        </section>
+      </aside>
+
+      <div class="space-y-6">
+        <section class="overflow-hidden rounded-[2.2rem] border border-[#1A1A1A]/10 bg-white/92 p-4 shadow-[0_26px_80px_rgba(26,26,26,0.06)] md:p-8">
+          <div class="mb-6 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+            <div class="space-y-2">
+              <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">מפת שורשים אינטראקטיבית</p>
+              <h2 data-problem-title class="text-[clamp(1.6rem,1.3rem+0.9vw,2.2rem)] font-semibold text-[#1A1A1A]">{defaultNode.title}</h2>
+            </div>
+            <p data-problem-summary class="max-w-2xl text-sm leading-7 text-[#1A1A1A]/62">{defaultNode.summary}</p>
+          </div>
+
+          <div class="overflow-hidden rounded-[1.8rem] border border-[#1A1A1A]/8 bg-[#FCFCFA]">
+            <svg viewBox="0 0 1100 760" class="h-auto w-full" role="img" aria-labelledby="problem-tree-title problem-tree-desc">
+              <title id="problem-tree-title">עץ שורש הבעיה</title>
+              <desc id="problem-tree-desc">בעיה חיצונית בראש, ושלושה שורשים תודעתיים שמחזיקים אותה מתחת.</desc>
+
+              <defs>
+                <linearGradient id="problemCard" x1="0" x2="1">
+                  <stop offset="0%" stop-color="#ffffff" />
+                  <stop offset="100%" stop-color="#fff8f7" />
+                </linearGradient>
+              </defs>
+
+              <line x1="550" y1="190" x2="250" y2="420" stroke="rgba(26,26,26,0.14)" stroke-width="3" />
+              <line x1="550" y1="190" x2="550" y2="420" stroke="rgba(26,26,26,0.14)" stroke-width="3" />
+              <line x1="550" y1="190" x2="850" y2="420" stroke="rgba(26,26,26,0.14)" stroke-width="3" />
+
+              <g>
+                <rect x="320" y="70" rx="34" ry="34" width="460" height="140" fill="url(#problemCard)" stroke="rgba(212,43,43,0.22)" stroke-width="3" />
+                <text x="550" y="130" text-anchor="middle" font-size="20" font-weight="600" fill="#D42B2B">הבעיה הגלויה</text>
+                <text data-svg-problem-label x="550" y="172" text-anchor="middle" font-size="38" font-weight="700" fill="#1A1A1A">{defaultNode.shortLabel}</text>
+              </g>
+
+              <g data-svg-root-card="0">
+                <rect x="70" y="420" rx="30" ry="30" width="360" height="210" fill="#ffffff" stroke="rgba(26,26,26,0.1)" stroke-width="2" />
+                <text data-svg-root-title="0" x="250" y="485" text-anchor="middle" font-size="27" font-weight="700" fill="#1A1A1A">{defaultNode.roots[0].title}</text>
+                <text data-svg-root-description="0" x="250" y="535" text-anchor="middle" font-size="18" fill="rgba(26,26,26,0.66)"><tspan x="250" dy="0">{defaultNode.roots[0].description}</tspan></text>
+              </g>
+
+              <g data-svg-root-card="1">
+                <rect x="370" y="420" rx="30" ry="30" width="360" height="210" fill="#ffffff" stroke="rgba(26,26,26,0.1)" stroke-width="2" />
+                <text data-svg-root-title="1" x="550" y="485" text-anchor="middle" font-size="27" font-weight="700" fill="#1A1A1A">{defaultNode.roots[1].title}</text>
+                <text data-svg-root-description="1" x="550" y="535" text-anchor="middle" font-size="18" fill="rgba(26,26,26,0.66)"><tspan x="550" dy="0">{defaultNode.roots[1].description}</tspan></text>
+              </g>
+
+              <g data-svg-root-card="2">
+                <rect x="670" y="420" rx="30" ry="30" width="360" height="210" fill="#ffffff" stroke="rgba(26,26,26,0.1)" stroke-width="2" />
+                <text data-svg-root-title="2" x="850" y="485" text-anchor="middle" font-size="27" font-weight="700" fill="#1A1A1A">{defaultNode.roots[2].title}</text>
+                <text data-svg-root-description="2" x="850" y="535" text-anchor="middle" font-size="18" fill="rgba(26,26,26,0.66)"><tspan x="850" dy="0">{defaultNode.roots[2].description}</tspan></text>
+              </g>
+            </svg>
+          </div>
+        </section>
+
+        <section class="grid gap-4 md:grid-cols-3" data-root-cards>
+          {defaultNode.roots.map((root, index) => (
+            <article class="rounded-[1.8rem] border border-[#1A1A1A]/10 bg-white/86 p-5 shadow-[0_18px_50px_rgba(26,26,26,0.05)]" data-root-card={index}>
+              <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">שורש {index + 1}</p>
+              <h3 class="mt-3 text-xl font-semibold text-[#1A1A1A]" data-root-title={index}>{root.title}</h3>
+              <p class="mt-3 text-sm leading-7 text-[#1A1A1A]/68" data-root-description={index}>{root.description}</p>
+              {root.relatedHref && root.relatedLabel && (
+                <a href={root.relatedHref} class="mt-4 inline-flex text-sm font-semibold text-[#D42B2B] transition hover:opacity-75" data-root-link={index}>
+                  {root.relatedLabel}
+                </a>
+              )}
+            </article>
+          ))}
+        </section>
+      </div>
+    </div>
+
+    <script is:inline define:vars={{ problemRootNodes }}>
+      document.addEventListener("astro:page-load", () => {
+        const triggers = Array.from(document.querySelectorAll("[data-problem-trigger]"));
+        const titleNode = document.querySelector("[data-problem-title]");
+        const summaryNode = document.querySelector("[data-problem-summary]");
+        const svgProblemLabel = document.querySelector("[data-svg-problem-label]");
+        const svgRootCards = Array.from(document.querySelectorAll("[data-svg-root-card]"));
+        const rootCards = Array.from(document.querySelectorAll("[data-root-card]"));
+
+        const renderNode = (nodeId) => {
+          const current = problemRootNodes.find((item) => item.id === nodeId) || problemRootNodes[0];
+          if (!current) return;
+
+          if (titleNode) titleNode.textContent = current.title;
+          if (summaryNode) summaryNode.textContent = current.summary;
+          if (svgProblemLabel) svgProblemLabel.textContent = current.shortLabel;
+
+          triggers.forEach((trigger) => {
+            const isActive = trigger.getAttribute("data-problem-id") === current.id;
+            trigger.setAttribute("data-selected", isActive ? "true" : "false");
+          });
+
+          current.roots.forEach((root, index) => {
+            const rootTitle = document.querySelector(`[data-root-title="${index}"]`);
+            const rootDescription = document.querySelector(`[data-root-description="${index}"]`);
+            const rootLink = document.querySelector(`[data-root-link="${index}"]`);
+            const svgRootTitle = document.querySelector(`[data-svg-root-title="${index}"]`);
+            const svgRootDescription = document.querySelector(`[data-svg-root-description="${index}"]`);
+            const svgRootCard = svgRootCards[index];
+            const card = rootCards[index];
+
+            if (rootTitle) rootTitle.textContent = root.title;
+            if (rootDescription) rootDescription.textContent = root.description;
+            if (svgRootTitle) svgRootTitle.textContent = root.title;
+            if (svgRootDescription) svgRootDescription.textContent = root.description;
+            if (rootLink instanceof HTMLAnchorElement) {
+              if (root.relatedHref && root.relatedLabel) {
+                rootLink.href = root.relatedHref;
+                rootLink.textContent = root.relatedLabel;
+                rootLink.style.display = "inline-flex";
+              } else {
+                rootLink.removeAttribute("href");
+                rootLink.textContent = "";
+                rootLink.style.display = "none";
+              }
+            }
+
+            if (svgRootCard instanceof SVGGElement) {
+              const rect = svgRootCard.querySelector("rect");
+              if (rect) {
+                rect.setAttribute("stroke", index === 1 ? "rgba(212,43,43,0.22)" : "rgba(26,26,26,0.1)");
+              }
+            }
+
+            if (card instanceof HTMLElement) {
+              card.style.background = index === 1 ? "#FFF7F6" : "rgba(255,255,255,0.86)";
+              card.style.borderColor = index === 1 ? "rgba(212,43,43,0.16)" : "rgba(26,26,26,0.1)";
+            }
+          });
+        };
+
+        triggers.forEach((trigger) => {
+          trigger.addEventListener("click", () => {
+            const nodeId = trigger.getAttribute("data-problem-id") || problemRootNodes[0]?.id;
+            renderNode(nodeId);
+          });
+        });
+
+        renderNode(problemRootNodes[0]?.id);
+      });
+    </script>
+  </section>
+</Layout>

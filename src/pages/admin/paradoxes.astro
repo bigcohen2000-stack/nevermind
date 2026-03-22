@@ -1,0 +1,253 @@
+﻿---
+import Layout from "../../layouts/Layout.astro";
+
+const pageTitle = "Viral Paradox Generator";
+const pageDescription = "כלי פנימי ליצירת 20 פרדוקסים חדים לשיתוף, על בסיס רעיון, כאב או טקסט גולמי.";
+---
+
+<Layout title={pageTitle} description={pageDescription} noIndex={true}>
+  <section class="mx-auto max-w-7xl space-y-10 px-4 pb-12 text-[#1A1A1A]">
+    <header class="max-w-4xl space-y-5 text-right">
+      <p class="text-sm font-semibold uppercase tracking-[0.26em] text-[#D42B2B]">Viral Paradoxes</p>
+      <h1 class="text-[clamp(2.4rem,1.8rem+2vw,4rem)] font-semibold leading-[1.05]">מחולל 20 פרדוקסים לשיתוף</h1>
+      <p class="max-w-3xl text-[clamp(1rem,0.94rem+0.3vw,1.15rem)] leading-8 text-[#1A1A1A]/70">
+        מזינים רעיון, כאב או טקסט גולמי. הכלי מפרק את החומר לציר מרכזי ומייצר 20 משפטים קצרים, חדים וניידים לרשתות,
+        פתיחים למאמרים, כותרות משנה או סטוריז.
+      </p>
+    </header>
+
+    <div class="grid gap-8 xl:grid-cols-[minmax(0,30rem)_minmax(0,1fr)]">
+      <section class="space-y-6 rounded-[2rem] border border-[#1A1A1A]/10 bg-white/82 p-6 shadow-[0_30px_90px_rgba(26,26,26,0.08)] backdrop-blur-md">
+        <div class="space-y-2 text-right">
+          <label for="paradox-raw-text" class="block text-sm font-semibold text-[#1A1A1A]">רעיון / טקסט גולמי</label>
+          <p class="text-sm leading-6 text-[#1A1A1A]/60">תיאור של נושא, מתח פנימי, כאב, טענה או תמלול קצר. לא צריך להיות מסודר.</p>
+          <textarea id="paradox-raw-text" rows="14" dir="rtl" class="w-full rounded-[1.6rem] border border-[#1A1A1A]/12 bg-[#FAFAF8] px-5 py-4 text-right text-base leading-7 text-[#1A1A1A] outline-none transition focus:border-[#D42B2B]/40 focus:ring-2 focus:ring-[#D42B2B]/15" placeholder="למשל: אנשים מחפשים שליטה, אבל ככל שהם מנסים לשלוט יותר, הם נהיים יותר חרדים."></textarea>
+        </div>
+
+        <div class="grid gap-4 sm:grid-cols-2">
+          <div class="space-y-2 text-right">
+            <label for="paradox-core-topic" class="block text-sm font-semibold text-[#1A1A1A]">ציר מרכזי</label>
+            <input id="paradox-core-topic" type="text" dir="rtl" class="w-full rounded-[1.2rem] border border-[#1A1A1A]/12 bg-[#FAFAF8] px-4 py-3 text-right text-base text-[#1A1A1A] outline-none transition focus:border-[#D42B2B]/40 focus:ring-2 focus:ring-[#D42B2B]/15" placeholder="למשל: שליטה" />
+          </div>
+          <div class="space-y-2 text-right">
+            <label for="paradox-tone" class="block text-sm font-semibold text-[#1A1A1A]">טון</label>
+            <select id="paradox-tone" class="w-full rounded-[1.2rem] border border-[#1A1A1A]/12 bg-[#FAFAF8] px-4 py-3 text-right text-base text-[#1A1A1A] outline-none transition focus:border-[#D42B2B]/40 focus:ring-2 focus:ring-[#D42B2B]/15">
+              <option value="direct">ישיר</option>
+              <option value="cold">קר וחותך</option>
+              <option value="reflective">מהורהר</option>
+              <option value="provocative">פרובוקטיבי</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid gap-3 sm:grid-cols-2">
+          <button id="generate-paradoxes" type="button" class="inline-flex items-center justify-center rounded-full bg-[#D42B2B] px-6 py-4 text-base font-semibold text-white transition hover:bg-[#ba2424] focus:outline-none focus:ring-2 focus:ring-[#D42B2B]/30">Generate 20 Paradoxes</button>
+          <button id="copy-all-paradoxes" type="button" disabled class="inline-flex items-center justify-center rounded-full border border-[#1A1A1A]/10 bg-[#FAFAF8] px-6 py-4 text-base font-semibold text-[#1A1A1A]/72 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-50">העתק הכול</button>
+        </div>
+
+        <div class="rounded-[1.5rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] p-4 text-right">
+          <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">איך לעבוד עם זה</p>
+          <ol class="mt-3 space-y-2 text-sm leading-7 text-[#1A1A1A]/68">
+            <li>1. מתחילים ברעיון גולמי ולא מנסים ללטש אותו.</li>
+            <li>2. בוחרים טון אחד, כדי שכל ה־20 יצאו בקו עקבי.</li>
+            <li>3. מעתיקים את הטובים ביותר לסטוריז, פתיחים, כותרות משנה או hook למאמר.</li>
+          </ol>
+        </div>
+      </section>
+
+      <section class="space-y-5 rounded-[2rem] border border-[#1A1A1A]/10 bg-white/82 p-6 shadow-[0_30px_90px_rgba(26,26,26,0.08)] backdrop-blur-md">
+        <div class="flex flex-col gap-3 border-b border-[#1A1A1A]/10 pb-4 sm:flex-row sm:items-center sm:justify-between">
+          <div class="space-y-1 text-right">
+            <h2 class="text-2xl font-semibold text-[#1A1A1A]">פלט</h2>
+            <p id="paradox-status" class="text-sm leading-6 text-[#1A1A1A]/60">ממתין לחומר גלם.</p>
+          </div>
+          <button id="copy-social-block" type="button" disabled class="inline-flex items-center justify-center rounded-full border border-[#1A1A1A]/10 bg-white px-4 py-2 text-sm font-semibold text-[#1A1A1A]/78 transition hover:bg-[#FAFAF8] disabled:cursor-not-allowed disabled:opacity-50">העתק בלוק שיתופי</button>
+        </div>
+
+        <div id="paradox-meta" class="grid gap-3 rounded-[1.5rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] p-4 text-right sm:grid-cols-3">
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">ציר</p>
+            <p id="paradox-topic-label" class="mt-2 text-sm leading-6 text-[#1A1A1A]/72">עדיין לא זוהה ציר.</p>
+          </div>
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">טון</p>
+            <p id="paradox-tone-label" class="mt-2 text-sm leading-6 text-[#1A1A1A]/72">לא נבחר עדיין.</p>
+          </div>
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">שימוש מהיר</p>
+            <p class="mt-2 text-sm leading-6 text-[#1A1A1A]/72">כותרות, סטוריז, hooks, ציטוטי קרוסלה או פתיח לפוסט.</p>
+          </div>
+        </div>
+
+        <div id="paradox-list" class="grid gap-3"></div>
+      </section>
+    </div>
+  </section>
+
+  <script is:inline>
+    document.addEventListener("astro:page-load", () => {
+      const rawTextInput = document.getElementById("paradox-raw-text");
+      const coreTopicInput = document.getElementById("paradox-core-topic");
+      const toneSelect = document.getElementById("paradox-tone");
+      const generateButton = document.getElementById("generate-paradoxes");
+      const copyAllButton = document.getElementById("copy-all-paradoxes");
+      const copySocialButton = document.getElementById("copy-social-block");
+      const paradoxList = document.getElementById("paradox-list");
+      const status = document.getElementById("paradox-status");
+      const topicLabel = document.getElementById("paradox-topic-label");
+      const toneLabel = document.getElementById("paradox-tone-label");
+
+      if (!(rawTextInput instanceof HTMLTextAreaElement) ||
+          !(coreTopicInput instanceof HTMLInputElement) ||
+          !(toneSelect instanceof HTMLSelectElement) ||
+          !(generateButton instanceof HTMLButtonElement) ||
+          !(copyAllButton instanceof HTMLButtonElement) ||
+          !(copySocialButton instanceof HTMLButtonElement) ||
+          !(paradoxList instanceof HTMLElement) ||
+          !(status instanceof HTMLElement) ||
+          !(topicLabel instanceof HTMLElement) ||
+          !(toneLabel instanceof HTMLElement)) {
+        return;
+      }
+
+      const STOPWORDS = new Set(["אני","אתה","את","הוא","היא","אנחנו","אתם","אתן","הם","הן","זה","זאת","הזה","הזאת","של","על","עם","בלי","אבל","אם","או","כי","כדי","ככל","יותר","פחות","גם","כבר","עוד","רק","לא","כן","מה","איך","למה","מול","בתוך","אחרי","לפני","דרך","כאילו","פשוט","מאוד","הכי","הכל","כולם","כלום","מישהו","משהו","שם","כאן","עכשיו","אדם","אנשים"]);
+      const toneLabels = {
+        direct: "ישיר",
+        cold: "קר וחותך",
+        reflective: "מהורהר",
+        provocative: "פרובוקטיבי",
+      };
+      let latestParadoxes = [];
+
+      const safeCopy = async (value) => {
+        try {
+          await navigator.clipboard.writeText(value);
+        } catch {
+          window.prompt("העתק", value);
+        }
+      };
+
+      const normalizeWord = (value) => value.replace(/[^\p{L}\p{N}\s-]/gu, " ").replace(/\s+/g, " ").trim();
+
+      const extractKeywords = (text) => {
+        const normalized = normalizeWord(text);
+        return normalized
+          .split(" ")
+          .map((word) => word.trim())
+          .filter((word) => word.length >= 3)
+          .filter((word) => !STOPWORDS.has(word))
+          .filter((word, index, array) => array.indexOf(word) === index)
+          .slice(0, 8);
+      };
+
+      const pick = (items, index, fallback) => items[index % items.length] || fallback;
+
+      const buildTemplates = (topic, words, tone) => {
+        const w1 = pick(words, 0, topic);
+        const w2 = pick(words, 1, "שליטה");
+        const w3 = pick(words, 2, "בהירות");
+        const w4 = pick(words, 3, "פחד");
+        const w5 = pick(words, 4, "חופש");
+        const w6 = pick(words, 5, "אמת");
+        const w7 = pick(words, 6, "קרבה");
+        const w8 = pick(words, 7, "שקט");
+
+        const base = [
+          `ככל שאנשים רודפים יותר אחרי ${w1}, כך הם מתרחקים יותר מ-${w3}.`,
+          `מה שנראה כמו ${w2}, הוא לפעמים רק פחד עמוק מ-${w6}.`,
+          `אנשים לא נשברים מ-${w4}. הם נשברים מהמאמץ להסתיר אותו.`,
+          `הבעיה ב-${w1} היא לא המחיר שלו, אלא הסיפור שבונים סביבו.`,
+          `ככל שיותר חשוב להיראות ${w3}, כך קשה יותר לפגוש את ${w6}.`,
+          `הרצון ב-${w5} הופך מהר מאוד לעוד צורה של ${w2}.`,
+          `מה שנחווה כ-${w4}, הוא לפעמים רק התנגדות לראות ${w1} כמו שהוא.`,
+          `אנשים מבקשים ${w8}, אבל לא מוכנים לוותר על הרעש שמחזיק להם זהות.`,
+          `ככל שמנסים לשלוט יותר ב-${w7}, כך הוא נעשה פחות אמיתי.`,
+          `הדרך המהירה ל-${w5} עוברת דווקא דרך ויתור על ${w2}.`,
+          `המאבק ב-${w4} מזין אותו יותר מכל דבר אחר.`,
+          `מי שמחפש ${w6} רק כשנוח לו, מחפש בעצם אישור ולא אמת.`,
+          `הצורך להיות צודק הוא לעיתים רק צורה מנומסת של ${w4}.`,
+          `הניסיון לשמור על ${w1} בכל מחיר, הוא מה שמפרק אותו מבפנים.`,
+          `הבטחה ל-${w3} נהיית מסוכנת כשהיא לא כוללת מפגש עם ${w4}.`,
+          `אנשים לא מחפשים תמיד פתרון. לפעמים הם מחפשים דרך לשמור על ${w2}.`,
+          `מה שנראה כמו בחירה חופשית הוא לפעמים רק נאמנות ישנה ל-${w1}.`,
+          `ככל שהדימוי של ${w7} חשוב יותר, כך פחות מרגישים את הקרבה עצמה.`,
+          `הרבה פעמים ${w8} מפחיד יותר מהרעש, כי בו כבר אין את מי להאשים.`,
+          `הפרדוקס ב-${topic}: מה שאמור להציל אותך, הוא בדיוק מה שמחזיק אותך תקוע.`,
+        ];
+
+        const toneTweaks = {
+          direct: (value) => value,
+          cold: (value) => value.replace(/\.$/, " — וזה כל הסיפור."),
+          reflective: (value) => value.replace(/\.$/, ", ורק אחר כך מבינים למה."),
+          provocative: (value) => value.replace(/\.$/, ". רוב האנשים יעדיפו לא לראות את זה."),
+        };
+
+        return base.map((item) => toneTweaks[tone](item));
+      };
+
+      const renderParadoxes = (topic, tone, paradoxes) => {
+        paradoxList.innerHTML = "";
+        const fragment = document.createDocumentFragment();
+
+        paradoxes.forEach((text, index) => {
+          const article = document.createElement("article");
+          article.className = "rounded-[1.4rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] p-4 shadow-sm";
+          article.innerHTML = `
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div class="space-y-2 text-right">
+                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">Paradox ${index + 1}</p>
+                <p class="text-[1rem] leading-8 text-[#1A1A1A]">${text}</p>
+              </div>
+              <button type="button" data-copy-item="${index}" class="inline-flex items-center justify-center rounded-full border border-[#1A1A1A]/10 bg-white px-4 py-2 text-sm font-semibold text-[#1A1A1A]/78 transition hover:bg-[#FAFAF8]">העתק</button>
+            </div>
+          `;
+          fragment.appendChild(article);
+        });
+
+        paradoxList.appendChild(fragment);
+        paradoxList.querySelectorAll("[data-copy-item]").forEach((button) => {
+          button.addEventListener("click", () => {
+            const index = Number(button.getAttribute("data-copy-item"));
+            safeCopy(paradoxes[index] || "");
+          });
+        });
+
+        status.textContent = `נוצרו ${paradoxes.length} פרדוקסים סביב ${topic}.`;
+        topicLabel.textContent = topic;
+        toneLabel.textContent = toneLabels[tone] || tone;
+        copyAllButton.disabled = paradoxes.length === 0;
+        copySocialButton.disabled = paradoxes.length === 0;
+      };
+
+      generateButton.addEventListener("click", () => {
+        const rawText = rawTextInput.value.trim();
+        const manualTopic = coreTopicInput.value.trim();
+        const tone = toneSelect.value;
+        const words = extractKeywords(`${manualTopic} ${rawText}`);
+        const topic = manualTopic || words[0] || "המתח המרכזי";
+
+        if (!rawText && !manualTopic) {
+          status.textContent = "צריך להזין לפחות רעיון אחד או ציר מרכזי כדי לייצר פרדוקסים.";
+          paradoxList.innerHTML = "";
+          copyAllButton.disabled = true;
+          copySocialButton.disabled = true;
+          return;
+        }
+
+        latestParadoxes = buildTemplates(topic, words, tone);
+        renderParadoxes(topic, tone, latestParadoxes);
+      });
+
+      copyAllButton.addEventListener("click", () => {
+        if (!latestParadoxes.length) return;
+        safeCopy(latestParadoxes.map((item, index) => `${index + 1}. ${item}`).join("\n"));
+      });
+
+      copySocialButton.addEventListener("click", () => {
+        if (!latestParadoxes.length) return;
+        const socialBlock = latestParadoxes.slice(0, 5).map((item) => `• ${item}`).join("\n");
+        safeCopy(socialBlock);
+      });
+    });
+  </script>
+</Layout>

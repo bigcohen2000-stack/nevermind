@@ -1,0 +1,74 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: "Assistant Variable";
+  src: url("/fonts/assistant-hebrew-wght-normal.woff2") format("woff2");
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0590-05FF, U+FB1D-FB4F;
+}
+
+@font-face {
+  font-family: "Assistant Variable";
+  src: url("/fonts/assistant-latin-ext-wght-normal.woff2") format("woff2");
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0100-024F, U+1E00-1EFF;
+}
+
+@font-face {
+  font-family: "Assistant Variable";
+  src: url("/fonts/assistant-latin-wght-normal.woff2") format("woff2");
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* עברית: ללא letter-spacing — קריאות ו"יוקרה שקטה" (לא מרווחי אותיות מלאכותיים) */
+html[lang="he"] {
+  letter-spacing: 0;
+  word-spacing: normal;
+}
+
+body {
+  font-family: "Assistant Variable", system-ui, sans-serif;
+  font-size: 1.125rem;
+  line-height: 1.7;
+  letter-spacing: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* מרווח אנכי נדיב בין פסקאות במאמרים (תחושת בוטיק, לא עמוס) */
+main article :where(p) {
+  margin-block: 0;
+  letter-spacing: 0;
+}
+
+main article :where(p + p) {
+  margin-block-start: clamp(2rem, 4.5vw, 3.75rem);
+}
+
+main article :where(h2),
+main article :where(h3) {
+  letter-spacing: 0;
+}
+
+main article :where(p + h2),
+main article :where(p + h3),
+main article :where(ul + h2),
+main article :where(ul + h3),
+main article :where(ol + h2),
+main article :where(ol + h3) {
+  margin-block-start: clamp(2.5rem, 5vw, 4.25rem);
+}
+
+:focus-visible {
+  outline: 3px solid #1A1A1A;
+  outline-offset: 2px;
+  border-radius: 2px;
+}

@@ -1,0 +1,154 @@
+---
+import clarityPaths from "../../config/clarityPaths.json";
+const pathCount = clarityPaths.paths?.length ?? 0;
+---
+
+<form id="clarity-paths-form" class="space-y-6 rounded-[2rem] border border-[#1A1A1A]/10 bg-white/82 p-6 shadow-[0_30px_90px_rgba(26,26,26,0.08)] backdrop-blur-md">
+  <div class="space-y-2 text-right">
+    <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[#D42B2B]">Clarity Paths</p>
+    <h2 class="text-2xl font-semibold text-[#1A1A1A]">מסלולי Journey</h2>
+    <p class="text-sm leading-7 text-[#1A1A1A]/64">
+      לכל מסלול בדיוק 3 <code class="rounded bg-[#FAFAF8] px-1">articleSlugs</code> (מאמרים שאינם draft). שינוי כאן משפיע על דף הבית ועל <code>/journey/…</code>.
+    </p>
+  </div>
+
+  <div class="grid gap-4 md:grid-cols-2">
+    <article class="rounded-[1.5rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] p-4 text-right">
+      <p class="text-base font-semibold text-[#1A1A1A]">מסלולים</p>
+      <p class="mt-2 text-sm leading-7 text-[#1A1A1A]/64">{pathCount} מוגדרים</p>
+    </article>
+    <article class="rounded-[1.5rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] p-4 text-right">
+      <p class="text-base font-semibold text-[#1A1A1A]">מזהים</p>
+      <p class="mt-2 text-sm leading-7 text-[#1A1A1A]/64">
+        {clarityPaths.paths?.map((p) => p.id).join(", ") || "—"}
+      </p>
+    </article>
+  </div>
+
+  <label class="block space-y-2 text-right">
+    <span class="text-sm font-semibold text-[#1A1A1A]">clarityPaths.json</span>
+    <textarea
+      id="clarity-paths-input"
+      rows="26"
+      spellcheck="false"
+      dir="ltr"
+      class="w-full rounded-[1.6rem] border border-[#1A1A1A]/12 bg-[#111111] px-5 py-4 text-left text-sm leading-7 text-[#F4F4EF] outline-none transition focus:border-[#D42B2B]/40 focus:ring-2 focus:ring-[#D42B2B]/15"
+    >{JSON.stringify(clarityPaths, null, 2)}</textarea>
+  </label>
+
+  <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:justify-end">
+    <button id="pick-clarity-paths-file" type="button" class="inline-flex items-center justify-center rounded-full border border-[#1A1A1A]/10 bg-white px-5 py-3 text-sm font-semibold text-[#1A1A1A]/78 transition hover:bg-[#FAFAF8]">בחר clarityPaths.json</button>
+    <button id="save-clarity-paths-file" type="button" class="inline-flex items-center justify-center rounded-full bg-[#D42B2B] px-5 py-3 text-sm font-semibold text-[#FAFAF8] transition hover:bg-[#b82424]">שמור לקובץ האמיתי</button>
+    <button id="copy-clarity-paths-json" type="button" class="inline-flex items-center justify-center rounded-full border border-[#1A1A1A]/10 bg-white px-5 py-3 text-sm font-semibold text-[#1A1A1A]/78 transition hover:bg-[#FAFAF8]">העתק JSON</button>
+    <button id="export-clarity-paths-json" type="button" class="inline-flex items-center justify-center rounded-full border border-[#1A1A1A]/10 bg-white px-5 py-3 text-sm font-semibold text-[#1A1A1A]/78 transition hover:bg-[#FAFAF8]">הורד clarityPaths.json</button>
+  </div>
+
+  <div class="rounded-[1.5rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] p-4 text-right">
+    <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">Config Sync</p>
+    <p id="clarity-paths-file-status" class="mt-3 text-sm leading-7 text-[#1A1A1A]/68">
+      עדיין לא נבחר קובץ יעד. אפשר לבחור את <code>src/config/clarityPaths.json</code> ולשמור אליו ישירות מתוך Chrome.
+    </p>
+  </div>
+</form>
+
+<script is:inline>
+  document.addEventListener("astro:page-load", () => {
+    const input = document.getElementById("clarity-paths-input");
+    const pickButton = document.getElementById("pick-clarity-paths-file");
+    const saveButton = document.getElementById("save-clarity-paths-file");
+    const copyButton = document.getElementById("copy-clarity-paths-json");
+    const exportButton = document.getElementById("export-clarity-paths-json");
+    const status = document.getElementById("clarity-paths-file-status");
+
+    if (!(input instanceof HTMLTextAreaElement)) return;
+    if (!(pickButton instanceof HTMLButtonElement)) return;
+    if (!(saveButton instanceof HTMLButtonElement)) return;
+    if (!(copyButton instanceof HTMLButtonElement)) return;
+    if (!(exportButton instanceof HTMLButtonElement)) return;
+    if (!(status instanceof HTMLElement)) return;
+
+    let fileHandle = null;
+
+    const pulse = (button, successText, fallbackText) => {
+      button.textContent = successText;
+      window.setTimeout(() => {
+        button.textContent = fallbackText;
+      }, 1400);
+    };
+
+    const validate = () => {
+      const parsed = JSON.parse(input.value);
+      if (!parsed || typeof parsed !== "object") throw new Error("clarityPaths.json לא אובייקט תקין.");
+      if (!Array.isArray(parsed.paths)) throw new Error("חסר מערך paths.");
+      parsed.paths.forEach((p, i) => {
+        if (!p || typeof p !== "object") throw new Error(`paths[${i}] לא תקין.`);
+        if (!p.id || typeof p.id !== "string") throw new Error(`paths[${i}].id חסר.`);
+        if (!Array.isArray(p.articleSlugs) || p.articleSlugs.length !== 3) {
+          throw new Error(`paths[${i}]: נדרשות בדיוק 3 articleSlugs.`);
+        }
+      });
+      return parsed;
+    };
+
+    copyButton.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(input.value);
+        pulse(copyButton, "JSON הועתק", "העתק JSON");
+      } catch {
+        pulse(copyButton, "ההעתקה נכשלה", "העתק JSON");
+      }
+    });
+
+    exportButton.addEventListener("click", () => {
+      const blob = new Blob([`${input.value.trim()}\n`], { type: "application/json;charset=utf-8" });
+      const href = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = href;
+      anchor.download = "clarityPaths.json";
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      URL.revokeObjectURL(href);
+      pulse(exportButton, "הקובץ ירד", "הורד clarityPaths.json");
+    });
+
+    pickButton.addEventListener("click", async () => {
+      if (typeof window.showOpenFilePicker !== "function") {
+        status.textContent = "הדפדפן הזה לא תומך בכתיבה ישירה לקובץ. השתמש בהעתקה ידנית.";
+        pulse(pickButton, "לא נתמך", "בחר clarityPaths.json");
+        return;
+      }
+      try {
+        const [handle] = await window.showOpenFilePicker({
+          multiple: false,
+          types: [{ description: "JSON", accept: { "application/json": [".json"] } }],
+        });
+        fileHandle = handle;
+        status.textContent = `קובץ יעד נבחר: ${handle.name}.`;
+        pulse(pickButton, "הקובץ נבחר", "בחר clarityPaths.json");
+      } catch {
+        status.textContent = "בחירת הקובץ בוטלה או נכשלה.";
+        pulse(pickButton, "הבחירה בוטלה", "בחר clarityPaths.json");
+      }
+    });
+
+    saveButton.addEventListener("click", async () => {
+      if (!fileHandle) {
+        status.textContent = "בחר קודם את src/config/clarityPaths.json ואז שמור.";
+        pulse(saveButton, "חסר קובץ יעד", "שמור לקובץ האמיתי");
+        return;
+      }
+      try {
+        validate();
+        const writable = await fileHandle.createWritable();
+        await writable.write(`${input.value.trim()}\n`);
+        await writable.close();
+        status.textContent = `הקובץ ${fileHandle.name} עודכן בהצלחה.`;
+        pulse(saveButton, "נשמר לקובץ", "שמור לקובץ האמיתי");
+      } catch (error) {
+        status.textContent = error instanceof Error ? error.message : "השמירה הישירה נכשלה.";
+        pulse(saveButton, "השמירה נכשלה", "שמור לקובץ האמיתי");
+      }
+    });
+  });
+</script>

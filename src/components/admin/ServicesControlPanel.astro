@@ -1,0 +1,202 @@
+﻿---
+import servicesConfig from "../../config/services.json";
+import { flattenVisibleServices, formatMoney, servicesTrust } from "../../lib/services";
+
+const services = flattenVisibleServices();
+---
+
+<form id="services-form" class="space-y-6 rounded-[2rem] border border-[#1A1A1A]/10 bg-white/82 p-6 shadow-[0_30px_90px_rgba(26,26,26,0.08)] backdrop-blur-md">
+  <div class="space-y-2 text-right">
+    <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[#D42B2B]">שירותים פעילים</p>
+    <h2 class="text-2xl font-semibold text-[#1A1A1A]">מקור האמת של שלבי השירות</h2>
+    <p class="text-sm leading-7 text-[#1A1A1A]/64">הקובץ נשען על <code>src/config/services.json</code>. משנים כאן שלבים, טקסטים, מחירים ותצורות פעולה במקום אחד.</p>
+  </div>
+
+  <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+    {services.map((service) => (
+      <article class="rounded-[1.5rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] p-4 text-right">
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">{service.stageName}</p>
+        <p class="mt-2 text-base font-semibold text-[#1A1A1A]">{service.title}</p>
+        <p class="mt-2 text-sm leading-7 text-[#1A1A1A]/64">{service.subtitle}</p>
+        <p class="mt-4 text-sm font-semibold text-[#1A1A1A]">{formatMoney(service.price_full)} כולל מע״מ</p>
+        <p class="mt-1 text-xs leading-6 text-[#1A1A1A]/58">{service.action_type} · {service.id}</p>
+      </article>
+    ))}
+  </div>
+
+  <div class="rounded-[1.4rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] px-4 py-3 text-right text-sm leading-7 text-[#1A1A1A]/64">
+    גילוי נאות פעיל: {servicesTrust.disclaimer}
+  </div>
+
+  <label class="block space-y-2 text-right">
+    <span class="text-sm font-semibold text-[#1A1A1A]">services.json</span>
+    <textarea
+      id="services-json-input"
+      rows="34"
+      spellcheck="false"
+      dir="ltr"
+      class="w-full rounded-[1.6rem] border border-[#1A1A1A]/12 bg-[#111111] px-5 py-4 text-left text-sm leading-7 text-[#F4F4EF] outline-none transition focus:border-[#D42B2B]/40 focus:ring-2 focus:ring-[#D42B2B]/15"
+    >{JSON.stringify(servicesConfig, null, 2)}</textarea>
+  </label>
+
+  <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:justify-end">
+    <button id="pick-services-file" type="button" class="inline-flex items-center justify-center rounded-full border border-[#1A1A1A]/10 bg-white px-5 py-3 text-sm font-semibold text-[#1A1A1A]/78 transition hover:bg-[#FAFAF8]">בחר services.json</button>
+    <button id="save-services-file" type="button" class="inline-flex items-center justify-center rounded-full bg-[#D42B2B] px-5 py-3 text-sm font-semibold text-[#FAFAF8] transition hover:bg-[#b82424]">שמור לקובץ האמיתי</button>
+    <button id="apply-services" type="button" class="inline-flex items-center justify-center rounded-full bg-[#1A1A1A] px-5 py-3 text-sm font-semibold text-[#FAFAF8] transition hover:bg-black">החל מקומית</button>
+    <button id="copy-services-json" type="button" class="inline-flex items-center justify-center rounded-full border border-[#1A1A1A]/10 bg-white px-5 py-3 text-sm font-semibold text-[#1A1A1A]/78 transition hover:bg-[#FAFAF8]">העתק JSON</button>
+    <button id="export-services-json" type="button" class="inline-flex items-center justify-center rounded-full border border-[#1A1A1A]/10 bg-white px-5 py-3 text-sm font-semibold text-[#1A1A1A]/78 transition hover:bg-[#FAFAF8]">הורד services.json</button>
+    <button id="reset-services" type="button" class="inline-flex items-center justify-center rounded-full border border-[#D42B2B]/16 bg-[#FFF4F3] px-5 py-3 text-sm font-semibold text-[#D42B2B] transition hover:bg-[#ffe7e5]">נקה override מקומי</button>
+  </div>
+
+  <div class="rounded-[1.5rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] p-4 text-right">
+    <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">סנכרון שירותים</p>
+    <p id="services-file-status" class="mt-3 text-sm leading-7 text-[#1A1A1A]/68">עדיין לא נבחר קובץ יעד. אפשר לבחור את <code>src/config/services.json</code> ולשמור אליו ישירות מתוך Chrome.</p>
+  </div>
+
+  <pre class="min-h-[10rem] overflow-auto rounded-[1.6rem] bg-[#111111] p-5 text-sm leading-7 text-[#F4F4EF] shadow-inner"><code id="services-json-output">ה-JSON המעובד יופיע כאן.</code></pre>
+</form>
+
+<script is:inline define:vars={{ defaultServices: servicesConfig }}>
+  document.addEventListener("astro:page-load", () => {
+    const servicesStorageKey = "nm-services-overrides";
+    const input = document.getElementById("services-json-input");
+    const pickServicesFileButton = document.getElementById("pick-services-file");
+    const saveServicesFileButton = document.getElementById("save-services-file");
+    const applyServicesButton = document.getElementById("apply-services");
+    const copyServicesButton = document.getElementById("copy-services-json");
+    const exportServicesButton = document.getElementById("export-services-json");
+    const resetServicesButton = document.getElementById("reset-services");
+    const servicesFileStatus = document.getElementById("services-file-status");
+    const servicesOutput = document.getElementById("services-json-output");
+
+    if (!(input instanceof HTMLTextAreaElement) ||
+        !(pickServicesFileButton instanceof HTMLButtonElement) ||
+        !(saveServicesFileButton instanceof HTMLButtonElement) ||
+        !(applyServicesButton instanceof HTMLButtonElement) ||
+        !(copyServicesButton instanceof HTMLButtonElement) ||
+        !(exportServicesButton instanceof HTMLButtonElement) ||
+        !(resetServicesButton instanceof HTMLButtonElement) ||
+        !(servicesFileStatus instanceof HTMLElement) ||
+        !(servicesOutput instanceof HTMLElement)) return;
+
+    let servicesFileHandle = null;
+
+    const pulse = (button, successText, fallbackText) => {
+      button.textContent = successText;
+      window.setTimeout(() => {
+        button.textContent = fallbackText;
+      }, 1400);
+    };
+
+    const readServices = () => {
+      try {
+        return JSON.parse(window.localStorage.getItem(servicesStorageKey) || "null");
+      } catch {
+        return null;
+      }
+    };
+
+    const parseInput = () => {
+      const parsed = JSON.parse(input.value);
+      if (!parsed || !Array.isArray(parsed.stages) || !parsed.hero || !parsed.trust_elements) {
+        throw new Error("מבנה services.json לא תקין");
+      }
+      return parsed;
+    };
+
+    const renderServicesState = (state) => {
+      servicesOutput.textContent = JSON.stringify(state, null, 2);
+    };
+
+    const updateFileStatus = (message) => {
+      servicesFileStatus.textContent = message;
+    };
+
+    const current = readServices() || defaultServices;
+    input.value = JSON.stringify(current, null, 2);
+    renderServicesState(current);
+
+    applyServicesButton.addEventListener("click", () => {
+      try {
+        const next = parseInput();
+        window.localStorage.setItem(servicesStorageKey, JSON.stringify(next));
+        renderServicesState(next);
+        updateFileStatus("השינויים הוחלו מקומית. עמוד הבית, השירותים והמחולל יקראו את ה-override בדפדפן הזה.");
+        pulse(applyServicesButton, "הוחל מקומית", "החל מקומית");
+      } catch (error) {
+        updateFileStatus(error instanceof Error ? error.message : "JSON לא תקין.");
+        pulse(applyServicesButton, "JSON לא תקין", "החל מקומית");
+      }
+    });
+
+    copyServicesButton.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(input.value);
+        pulse(copyServicesButton, "JSON הועתק", "העתק JSON");
+      } catch {
+        pulse(copyServicesButton, "ההעתקה נכשלה", "העתק JSON");
+      }
+    });
+
+    exportServicesButton.addEventListener("click", () => {
+      const blob = new Blob([`${input.value.trim()}\n`], { type: "application/json;charset=utf-8" });
+      const href = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = href;
+      anchor.download = "services.json";
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      URL.revokeObjectURL(href);
+      pulse(exportServicesButton, "הקובץ ירד", "הורד services.json");
+    });
+
+    resetServicesButton.addEventListener("click", () => {
+      window.localStorage.removeItem(servicesStorageKey);
+      input.value = JSON.stringify(defaultServices, null, 2);
+      renderServicesState(defaultServices);
+      updateFileStatus("השכבה המקומית של השירותים נוקתה. הקובץ הקנוני לא שונה.");
+      pulse(resetServicesButton, "ה-reset הושלם", "נקה override מקומי");
+    });
+
+    pickServicesFileButton.addEventListener("click", async () => {
+      if (typeof window.showOpenFilePicker !== "function") {
+        updateFileStatus("הדפדפן הזה לא תומך בכתיבה ישירה לקובץ. השתמש בהעתקה ידנית.");
+        pulse(pickServicesFileButton, "לא נתמך", "בחר services.json");
+        return;
+      }
+      try {
+        const [handle] = await window.showOpenFilePicker({
+          multiple: false,
+          types: [{ description: "JSON", accept: { "application/json": [".json"] } }],
+        });
+        servicesFileHandle = handle;
+        updateFileStatus(`קובץ יעד נבחר: ${handle.name}.`);
+        pulse(pickServicesFileButton, "הקובץ נבחר", "בחר services.json");
+      } catch {
+        updateFileStatus("בחירת הקובץ בוטלה או נכשלה.");
+        pulse(pickServicesFileButton, "הבחירה בוטלה", "בחר services.json");
+      }
+    });
+
+    saveServicesFileButton.addEventListener("click", async () => {
+      if (!servicesFileHandle) {
+        updateFileStatus("בחר קודם את src/config/services.json ואז שמור.");
+        pulse(saveServicesFileButton, "חסר קובץ יעד", "שמור לקובץ האמיתי");
+        return;
+      }
+      try {
+        parseInput();
+        const writable = await servicesFileHandle.createWritable();
+        await writable.write(`${input.value.trim()}\n`);
+        await writable.close();
+        updateFileStatus(`הקובץ ${servicesFileHandle.name} עודכן בהצלחה.`);
+        pulse(saveServicesFileButton, "נשמר לקובץ", "שמור לקובץ האמיתי");
+      } catch (error) {
+        updateFileStatus(error instanceof Error ? error.message : "השמירה הישירה נכשלה.");
+        pulse(saveServicesFileButton, "השמירה נכשלה", "שמור לקובץ האמיתי");
+      }
+    });
+  });
+</script>
+

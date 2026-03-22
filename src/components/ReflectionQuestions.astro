@@ -1,0 +1,41 @@
+﻿---
+interface Props {
+  title: string;
+  questions: string[];
+  whatsappHref: string;
+}
+
+const { title, questions, whatsappHref } = Astro.props as Props;
+---
+
+<section class="rounded-[2rem] border border-[#1A1A1A]/10 bg-white/80 p-6 shadow-[0_24px_70px_rgba(26,26,26,0.06)] backdrop-blur-md">
+  <div class="space-y-3 text-right">
+    <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[#D42B2B]">לא לסכם. לעצור ולהסתכל.</p>
+    <h2 class="text-[clamp(1.35rem,1.1rem+1vw,1.95rem)] font-semibold text-[#1A1A1A]">3 שאלות פתוחות להמשך החקירה</h2>
+    <p class="text-[clamp(0.95rem,0.9rem+0.25vw,1.08rem)] leading-7 text-[#1A1A1A]/68">
+      אם {title} פגש משהו חי אצלך, אל תסגור את זה בעוד סיכום. תענה לעצמך בכנות, או תשלח לי את התשובה בוואטסאפ.
+    </p>
+  </div>
+
+  <ol class="mt-6 space-y-3 text-right">
+    {questions.map((question, index) => (
+      <li class="rounded-[1.5rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] px-5 py-4 text-[clamp(1rem,0.95rem+0.25vw,1.12rem)] leading-8 text-[#1A1A1A]/84">
+        <span class="ml-2 inline-flex h-7 min-w-7 items-center justify-center rounded-full bg-[#1A1A1A] px-2 text-sm text-[#FAFAF8]">
+          {index + 1}
+        </span>
+        {question}
+      </li>
+    ))}
+  </ol>
+
+  <div class="mt-6 flex justify-end">
+    <a
+      href={whatsappHref}
+      target="_blank"
+      rel="noreferrer"
+      class="inline-flex items-center justify-center rounded-full bg-[#D42B2B] px-5 py-3 text-[clamp(0.95rem,0.9rem+0.25vw,1.05rem)] font-medium text-[#FAFAF8] transition-transform duration-300 hover:scale-[1.02]"
+    >
+      שלח לי את התשובה שלך בוואטסאפ
+    </a>
+  </div>
+</section>
