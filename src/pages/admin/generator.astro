@@ -1,8 +1,17 @@
 ﻿---
 import Layout from "../../layouts/Layout.astro";
+import servicesConfig from "../../config/services.json";
+import appConfig from "../../config/appConfig.json";
 
 const pageTitle = "מחולל Mega-Prompt";
-const pageDescription = "כלי פנימי ליצירת פרומפטים מורכבים ומדויקים עבור מאמרי MDX מוכנים לפרסום.";
+const pageDescription = "כלי פנימי ליצירת פרומפטים, preview, validation וזרימת publish למאמרי MDX.";
+const githubDraftBase = `https://github.com/${appConfig.github.owner}/${appConfig.github.repo}/new/${appConfig.github.branch}/${appConfig.github.articlesPath}/`;
+const githubRepoLabel = `${appConfig.github.owner}/${appConfig.github.repo}`;
+const documentationService = servicesConfig.services.find((service) => service.id === "memory-documentation");
+const grossPrice = (basePrice: number, taxPercent: number) => Math.round(basePrice * (1 + taxPercent / 100));
+const upsellPreviewText = documentationService
+  ? `${grossPrice(documentationService.basePrice, documentationService.taxPercent).toLocaleString("he-IL")} ${servicesConfig.currency} כולל מע״מ (${documentationService.title})`
+  : `לא הוגדר שירות תיעוד ב-services.json`;
 ---
 
 <Layout title={pageTitle} description={pageDescription}>
@@ -252,12 +261,16 @@ const pageDescription = "כלי פנימי ליצירת פרומפטים מור�
           <span id="preview-status" class="text-sm font-medium text-[#1A1A1A]/55">ממתין ל־MDX</span>
         </div>
 
-        <div id="preview-shell" class="rounded-[1.75rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] p-5">
+        <div id="preview-shell" class="space-y-4 rounded-[1.75rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] p-5">
           <div
             id="article-preview"
-            class="min-h-[46rem] rounded-[1.5rem] border border-dashed border-[#1A1A1A]/12 bg-white/70 p-6 text-right text-[#1A1A1A]/72"
+            class="min-h-[28rem] rounded-[1.5rem] border border-dashed border-[#1A1A1A]/12 bg-white/70 p-6 text-right text-[#1A1A1A]/72"
           >
             הדבק MDX ולחץ על Render Preview כדי לראות את המאמר לפני commit.
+          </div>
+          <div class="space-y-2 text-right">
+            <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">Live Shell Preview</p>
+            <iframe id="article-preview-frame" title="תצוגה חיה של המאמר" class="min-h-[36rem] w-full rounded-[1.5rem] border border-[#1A1A1A]/10 bg-white" loading="lazy"></iframe>
           </div>
         </div>
 
@@ -324,6 +337,83 @@ const pageDescription = "כלי פנימי ליצירת פרומפטים מור�
     </section>
   </section>
 
+
+    <section class="grid gap-8 rounded-[2rem] border border-[#1A1A1A]/10 bg-white/82 p-6 shadow-[0_30px_90px_rgba(26,26,26,0.08)] backdrop-blur-md xl:grid-cols-[minmax(0,1.2fr)_22rem]">
+      <section class="space-y-5 text-right">
+        <div class="space-y-2">
+          <p class="text-sm font-semibold uppercase tracking-[0.26em] text-[#D42B2B]">Quick Composer</p>
+          <h2 class="text-2xl font-semibold text-[#1A1A1A]">מנוע תיקוף וטיוטה מהירה</h2>
+          <p class="text-sm leading-6 text-[#1A1A1A]/60">
+            כאן לא בונים prompt אלא קובץ MDX ישיר. אתה מזין כותרת, slug ותוכן, רואה שגיאות בזמן אמת,
+            ומייצר Draft מוכן להעתקה או לפתיחה ישירה ב־GitHub.
+          </p>
+        </div>
+
+        <div class="grid gap-4 md:grid-cols-2">
+          <label class="space-y-2">
+            <span class="block text-sm font-semibold text-[#1A1A1A]">כותרת המאמר (SEO Friendly)</span>
+            <input id="postTitle" type="text" dir="rtl" placeholder="איך להקליט פודקאסט ב-2026 בלי להישמע מאולץ" class="w-full rounded-[1.4rem] border border-[#1A1A1A]/12 bg-[#FAFAF8] px-5 py-4 text-right text-base leading-7 text-[#1A1A1A] outline-none transition focus:border-[#D42B2B]/40 focus:ring-2 focus:ring-[#D42B2B]/15" />
+          </label>
+          <label class="space-y-2">
+            <span class="block text-sm font-semibold text-[#1A1A1A]">Slug</span>
+            <input id="postSlug" type="text" dir="ltr" placeholder="ego-is-a-defense-not-an-identity" class="w-full rounded-[1.4rem] border border-[#1A1A1A]/12 bg-[#FAFAF8] px-5 py-4 text-left text-base leading-7 text-[#1A1A1A] outline-none transition focus:border-[#D42B2B]/40 focus:ring-2 focus:ring-[#D42B2B]/15" />
+          </label>
+        </div>
+
+        <div class="grid gap-4 md:grid-cols-[minmax(0,1fr)_12rem] xl:grid-cols-[minmax(0,1fr)_12rem_14rem]">
+          <label class="space-y-2">
+            <span class="block text-sm font-semibold text-[#1A1A1A]">תיאור קצר</span>
+            <input id="postDescription" type="text" dir="rtl" placeholder="תיאור קצר, חד ומובן ל-SEO ולוואטסאפ" class="w-full rounded-[1.4rem] border border-[#1A1A1A]/12 bg-[#FAFAF8] px-5 py-4 text-right text-base leading-7 text-[#1A1A1A] outline-none transition focus:border-[#D42B2B]/40 focus:ring-2 focus:ring-[#D42B2B]/15" />
+          </label>
+          <label class="space-y-2">
+            <span class="block text-sm font-semibold text-[#1A1A1A]">תגיות</span>
+            <input id="postTags" type="text" dir="rtl" placeholder="בהירות, מכניקת מחשבה" class="w-full rounded-[1.4rem] border border-[#1A1A1A]/12 bg-[#FAFAF8] px-5 py-4 text-right text-base leading-7 text-[#1A1A1A] outline-none transition focus:border-[#D42B2B]/40 focus:ring-2 focus:ring-[#D42B2B]/15" />
+          </label>
+          <label class="space-y-2">
+            <span class="block text-sm font-semibold text-[#1A1A1A]">תור עבודה</span>
+            <select id="postWorkflowStatus" class="w-full rounded-[1.4rem] border border-[#1A1A1A]/12 bg-[#FAFAF8] px-5 py-[1.1rem] text-right text-base leading-7 text-[#1A1A1A] outline-none transition focus:border-[#D42B2B]/40 focus:ring-2 focus:ring-[#D42B2B]/15">
+              <option value="writing">בכתיבה</option>
+              <option value="review">מוכן לבדיקה</option>
+              <option value="ready">מוכן לפרסום</option>
+              <option value="published">פורסם</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="space-y-2">
+          <span class="block text-sm font-semibold text-[#1A1A1A]">תוכן (Markdown / MDX)</span>
+          <textarea id="postContent" rows="15" dir="rtl" class="w-full rounded-[1.6rem] border border-[#1A1A1A]/12 bg-[#FAFAF8] px-5 py-4 text-right text-base leading-7 text-[#1A1A1A] outline-none transition focus:border-[#D42B2B]/40 focus:ring-2 focus:ring-[#D42B2B]/15" placeholder="הדבק כאן את גוף המאמר. אם זה מאמר פרימיום, הוסף את תג החסימה במקום הנכון."></textarea>
+          <div class="flex flex-wrap justify-end gap-3">
+            <button type="button" data-helper-insert="<!--premium-break-->" class="inline-flex items-center justify-center rounded-full border border-[#1A1A1A]/10 bg-white px-4 py-2 text-sm font-semibold text-[#1A1A1A]/78 transition hover:bg-[#FAFAF8]">+ הוסף חסימת פרימיום</button>
+            <button type="button" data-helper-insert={"<InquiryBox title=\"כאן מתחילה החקירה\" />"} class="inline-flex items-center justify-center rounded-full border border-[#1A1A1A]/10 bg-white px-4 py-2 text-sm font-semibold text-[#1A1A1A]/78 transition hover:bg-[#FAFAF8]">+ הוסף InquiryBox</button>
+            <button type="button" data-helper-insert="<WhatsAppButton />" class="inline-flex items-center justify-center rounded-full border border-[#1A1A1A]/10 bg-white px-4 py-2 text-sm font-semibold text-[#1A1A1A]/78 transition hover:bg-[#FAFAF8]">+ הוסף WhatsAppButton</button>
+          </div>
+        </div>
+      </section>
+
+      <aside class="space-y-4">
+        <div id="validationBox" class="hidden rounded-[1.6rem] border border-[#D42B2B]/14 bg-[#FFF4F3] p-5 text-right">
+          <h3 class="text-lg font-semibold text-[#1A1A1A]">בדיקת איכות (QA)</h3>
+          <ul id="errorList" class="mt-3 space-y-2 text-sm leading-7 text-[#1A1A1A]/78"></ul>
+        </div>
+
+        <div class="rounded-[1.6rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] p-5 text-right">
+          <h3 class="text-lg font-semibold text-[#1A1A1A]">סטטוס פרסום</h3>
+          <p id="publishStatusText" class="mt-3 text-sm leading-7 text-[#1A1A1A]/68">ממתין לתוכן. ברגע שיהיה שלד תקין ותבחר שלב עבודה, תוכל להעתיק MDX או לפתוח קובץ חדש ב-GitHub.</p>
+        </div>
+
+        <div class="space-y-3">
+          <button id="copyMdx" type="button" class="inline-flex w-full items-center justify-center rounded-full border border-[#1A1A1A]/10 bg-white px-5 py-3 text-sm font-semibold text-[#1A1A1A]/78 transition hover:bg-[#FAFAF8]">העתק MDX מוכן</button>
+          <button id="injectIntoSandbox" type="button" class="inline-flex w-full items-center justify-center rounded-full border border-[#1A1A1A]/10 bg-white px-5 py-3 text-sm font-semibold text-[#1A1A1A]/78 transition hover:bg-[#FAFAF8]">העבר לתצוגה מקדימה</button>
+          <button id="publishToGithub" type="button" class="inline-flex w-full items-center justify-center rounded-full bg-[#D42B2B] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#ba2424]">?? פרסם ישירות ל-GitHub</button>
+        </div>
+
+        <div class="rounded-[1.6rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] p-5 text-right">
+          <h4 class="text-base font-semibold text-[#1A1A1A]">תצוגה מקדימה לחבילה מוצעת</h4>
+          <p id="upsellText" class="mt-3 text-sm leading-7 text-[#1A1A1A]/68">${upsellPreviewText} (סנכרון אוטומטי מ־services.json)</p>
+        </div>
+      </aside>
+    </section>
   <script is:inline>
     document.addEventListener("astro:page-load", () => {
       const form = document.getElementById("prompt-generator-form");
@@ -484,6 +574,14 @@ const pageDescription = "כלי פנימי ליצירת פרומפטים מור�
         return fallback ? "true" : "false";
       };
 
+      const formatWorkflowStatus = (value, draftValue) => {
+        const normalized = String(value ?? "").trim().toLowerCase();
+        const allowed = ["writing", "review", "ready", "published"];
+        if (allowed.includes(normalized)) return formatScalar(normalized);
+        const inferred = String(draftValue ?? "true").toLowerCase() === "false" ? "published" : "writing";
+        return formatScalar(inferred);
+      };
+
       const formatTags = (value) => {
         const source = Array.isArray(value)
           ? value
@@ -512,6 +610,7 @@ const pageDescription = "כלי פנימי ליצירת פרומפטים מור�
           `tallyUrl: ${formatScalar(meta.tallyUrl || "")}`,
           `isPremium: ${formatBoolean(meta.isPremium, false)}`,
           `draft: ${formatBoolean(meta.draft, true)}`,
+          `workflowStatus: ${formatWorkflowStatus(meta.workflowStatus, meta.draft)}`,
           existingFaqBlock.trim() || "faq: []",
           "---",
         ];
@@ -621,6 +720,13 @@ const pageDescription = "כלי פנימי ליצירת פרומפטים מור�
             detail: Object.prototype.hasOwnProperty.call(meta, "draft") ? `draft = ${meta.draft}` : "חסר draft",
           },
           {
+            label: "תור עבודה",
+            ok: ["writing", "review", "ready", "published"].includes(String(meta.workflowStatus || "")),
+            detail: ["writing", "review", "ready", "published"].includes(String(meta.workflowStatus || ""))
+              ? `workflowStatus = ${meta.workflowStatus}`
+              : "חסר workflowStatus או שהערך לא תקין",
+          },
+          {
             label: "שאלות FAQ",
             ok: /faq\s*:/m.test(previewInput.value),
             detail: /faq\s*:/m.test(previewInput.value) ? "נמצא מקטע FAQ" : "לא זוהה FAQ",
@@ -669,6 +775,7 @@ const pageDescription = "כלי פנימי ליצירת פרומפטים מור�
         if (!meta.description) suggestions.push('הוסף description עד 160 תווים.');
         if (!meta.pubDate) suggestions.push('הוסף pubDate בפורמט YYYY-MM-DD.');
         if (!Object.prototype.hasOwnProperty.call(meta, "draft")) suggestions.push('הוסף draft: true או draft: false במפורש.');
+        if (!["writing", "review", "ready", "published"].includes(String(meta.workflowStatus || ""))) suggestions.push('הוסף workflowStatus עם אחד הערכים: writing, review, ready, published.');
         if (!/faq\s*:/m.test(previewInput.value)) suggestions.push('הוסף faq עם לפחות 3 שאלות קצרות ל-SEO.');
         if (!body.trim()) suggestions.push('גוף המאמר ריק. הוסף תוכן לפני export.');
         if (selectedPreset.value === "video" && !(meta.youtubeId || extractedVideoId)) {
@@ -691,6 +798,29 @@ const pageDescription = "כלי פנימי ליצירת פרומפטים מור�
         suggestedCommit.textContent = `Commit: ${commitMessage}`;
         suggestedDescription.textContent = `Description seed: ${descriptionSeed}`;
       };
+
+      const buildPreviewDocument = (title, articleHtml) => `<!doctype html>
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>${escapeHtml(title || "Preview")}</title>
+    <style>
+      body { margin: 0; background: #FAFAF8; color: #1A1A1A; font-family: "Assistant Variable", system-ui, sans-serif; }
+      .shell { max-width: 980px; margin: 0 auto; padding: 32px 20px 56px; }
+      .label { font-size: 11px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: #D42B2B; margin-bottom: 16px; }
+      article { max-width: 72ch; margin: 0 auto; }
+      a { color: inherit; text-decoration: none; }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <div class="label">Live Shell Preview</div>
+      ${articleHtml}
+    </div>
+  </body>
+</html>`;
+
       const renderParagraphs = (content) => {
         return content
           .split(/\n{2,}/)
@@ -1087,7 +1217,8 @@ Apply these defaults and constraints:
 - audioUrl: ""
 - youtubeId: ""
 - tallyUrl: ""
-- draft: true
+- draft: true for drafts, false only when the article is already live
+- workflowStatus: use exactly one of writing, review, ready, published
 - faq: exactly 3 objects with keys question and answer
 - each faq answer must be maximum 2 sentences because it will be used for JSON-LD SEO
 - if the source includes a YouTube URL, extract only the video ID and place it in youtubeId
@@ -1194,6 +1325,8 @@ Self-Correction Loop: Before outputting the final response, review your text. If
         const value = getCleanMdx();
         if (!value) {
           articlePreview.innerHTML = "הדבק MDX ולחץ על Render Preview כדי לראות את המאמר לפני commit.";
+        articlePreviewFrame.srcdoc = buildPreviewDocument("Preview", `<article class="mx-auto max-w-3xl rounded-[1.75rem] bg-white p-7"><p style="font-size:1rem;line-height:1.8;color:rgba(26,26,26,.68);text-align:right">הדבק MDX ולחץ על Render Preview כדי לראות את המאמר לפני commit.</p></article>`);
+          articlePreviewFrame.srcdoc = buildPreviewDocument("Preview", `<article class="mx-auto max-w-3xl rounded-[1.75rem] bg-white p-7"><p style="font-size:1rem;line-height:1.8;color:rgba(26,26,26,.68);text-align:right">הדבק MDX ולחץ על Render Preview כדי לראות את המאמר לפני commit.</p></article>`);
           previewStatus.textContent = "ממתין ל־MDX";
           validatorOutput.innerHTML = '<div class="rounded-2xl border border-dashed border-[#1A1A1A]/12 bg-white/70 px-4 py-3">אין עדיין בדיקות. הרץ Preview כדי לקבל סטטוס.</div>';
           autofixOutput.innerHTML = 'אין עדיין הצעות תיקון.';
@@ -1207,13 +1340,16 @@ Self-Correction Loop: Before outputting the final response, review your text. If
         try {
           const { meta, body } = parseFrontmatter(value);
           const checks = validateMdx(meta, body);
-          articlePreview.innerHTML = renderPreviewHtml(value);
+          const renderedHtml = renderPreviewHtml(value);
+          articlePreview.innerHTML = renderedHtml;
+          articlePreviewFrame.srcdoc = buildPreviewDocument(meta.title || "Preview", renderedHtml);
           renderValidator(checks);
           renderAutofixSuggestions(meta, body, checks);
           setMetaHelpers(meta);
           previewStatus.textContent = "Preview מוכן";
         } catch {
           articlePreview.innerHTML = '<div class="rounded-[1.5rem] border border-[#D42B2B]/18 bg-[#FFF4F3] p-5 text-right text-[#1A1A1A]/72">לא הצלחתי לפרש את ה־MDX. בדוק frontmatter, תגיות MDX וסגירת בלוקים.</div>';
+          articlePreviewFrame.srcdoc = buildPreviewDocument("Parsing Error", `<article class="mx-auto max-w-3xl rounded-[1.75rem] bg-white p-7"><div style="border:1px solid rgba(212,43,43,.18);background:#FFF4F3;padding:20px;border-radius:18px;text-align:right;color:rgba(26,26,26,.72)">לא הצלחתי לפרש את ה־MDX. בדוק frontmatter, תגיות MDX וסגירת בלוקים.</div></article>`);
           validatorOutput.innerHTML = '<div class="rounded-2xl border border-[#D42B2B]/18 bg-[#FFF4F3] px-4 py-3 text-[#1A1A1A]/78">לא ניתן היה להריץ בדיקות בגלל שגיאת parsing.</div>';
           autofixOutput.innerHTML = 'לא ניתן היה להפיק הצעות תיקון.';
           githubReadyOutput.innerHTML = 'הקובץ לא מוכן ל-GitHub עד שתתוקן שגיאת ה-parsing.';
@@ -1409,6 +1545,7 @@ Self-Correction Loop: Before outputting the final response, review your text. If
       const handleClearPreview = () => {
         previewInput.value = "";
         articlePreview.innerHTML = "הדבק MDX ולחץ על Render Preview כדי לראות את המאמר לפני commit.";
+        articlePreviewFrame.srcdoc = buildPreviewDocument("Preview", `<article class="mx-auto max-w-3xl rounded-[1.75rem] bg-white p-7"><p style="font-size:1rem;line-height:1.8;color:rgba(26,26,26,.68);text-align:right">הדבק MDX ולחץ על Render Preview כדי לראות את המאמר לפני commit.</p></article>`);
         validatorOutput.innerHTML = '<div class="rounded-2xl border border-dashed border-[#1A1A1A]/12 bg-white/70 px-4 py-3">אין עדיין בדיקות. הרץ Preview כדי לקבל סטטוס.</div>';
         autofixOutput.innerHTML = 'אין עדיין הצעות תיקון.';
         githubReadyOutput.innerHTML = 'סטטוס GitHub-ready יופיע אחרי Preview.';
@@ -1442,7 +1579,294 @@ Self-Correction Loop: Before outputting the final response, review your text. If
       clearPreviewButton.addEventListener("click", handleClearPreview);
     });
   </script>
+
+  <script is:inline define:vars={{ githubDraftBase, githubRepoLabel }}>
+    document.addEventListener("astro:page-load", () => {
+      const postTitle = document.getElementById("postTitle");
+      const postSlug = document.getElementById("postSlug");
+      const postDescription = document.getElementById("postDescription");
+      const postTags = document.getElementById("postTags");
+      const postWorkflowStatus = document.getElementById("postWorkflowStatus");
+      const postContent = document.getElementById("postContent");
+      const generatorPremium = document.getElementById("is-premium");
+      const videoUrlInput = document.getElementById("video-url");
+      const validationBox = document.getElementById("validationBox");
+      const errorList = document.getElementById("errorList");
+      const publishStatusText = document.getElementById("publishStatusText");
+      const copyMdxButton = document.getElementById("copyMdx");
+      const injectIntoSandboxButton = document.getElementById("injectIntoSandbox");
+      const publishToGithubButton = document.getElementById("publishToGithub");
+      const previewInput = document.getElementById("preview-mdx");
+      const renderPreviewButton = document.getElementById("render-preview");
+      const helperButtons = Array.from(document.querySelectorAll("[data-helper-insert]"));
+
+      if (!(postTitle instanceof HTMLInputElement)) return;
+      if (!(postSlug instanceof HTMLInputElement)) return;
+      if (!(postDescription instanceof HTMLInputElement)) return;
+      if (!(postTags instanceof HTMLInputElement)) return;
+      if (!(postWorkflowStatus instanceof HTMLSelectElement)) return;
+      if (!(postContent instanceof HTMLTextAreaElement)) return;
+      if (!(generatorPremium instanceof HTMLInputElement)) return;
+      if (!(videoUrlInput instanceof HTMLInputElement)) return;
+      if (!(validationBox instanceof HTMLElement)) return;
+      if (!(errorList instanceof HTMLElement)) return;
+      if (!(publishStatusText instanceof HTMLElement)) return;
+      if (!(copyMdxButton instanceof HTMLButtonElement)) return;
+      if (!(injectIntoSandboxButton instanceof HTMLButtonElement)) return;
+      if (!(publishToGithubButton instanceof HTMLButtonElement)) return;
+      if (!(previewInput instanceof HTMLTextAreaElement)) return;
+      if (!(renderPreviewButton instanceof HTMLButtonElement)) return;
+
+      const repoNewFileBase = githubDraftBase;
+      const today = new Date().toISOString().slice(0, 10);
+
+      const extractYoutubeId = (value) => {
+        const source = String(value || "").trim();
+        if (!source) return "";
+        if (/^[a-zA-Z0-9_-]{11}$/.test(source)) return source;
+        try {
+          const url = new URL(source);
+          const host = url.hostname.replace(/^www\./, "");
+          if (host === "youtu.be") {
+            return url.pathname.split("/").filter(Boolean)[0] || "";
+          }
+          if (host.endsWith("youtube.com")) {
+            if (url.searchParams.get("v")) return url.searchParams.get("v") || "";
+            const parts = url.pathname.split("/").filter(Boolean);
+            if (parts[0] === "embed" || parts[0] === "shorts") {
+              return parts[1] || "";
+            }
+          }
+        } catch {
+          return "";
+        }
+        return "";
+      };
+
+      const generateSlug = (value) => {
+        const ascii = String(value || "")
+          .toLowerCase()
+          .normalize("NFKD")
+          .replace(/[^\x00-\x7F]/g, "")
+          .replace(/['"`]/g, "")
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/^-+|-+$/g, "");
+        return ascii || "new-article";
+      };
+
+      const buildDescription = () => {
+        const existing = postDescription.value.trim();
+        if (existing) return existing;
+        const title = postTitle.value.trim();
+        if (!title) return "";
+        return `${title} בלי ערפל, עם מבנה חד, ברור ומוכן לפרסום.`.slice(0, 160);
+      };
+
+      const parseTags = () => {
+        const source = postTags.value.trim();
+        if (!source) return ["בהירות"];
+        return source
+          .split(/[\n,]/)
+          .map((tag) => tag.trim())
+          .filter(Boolean);
+      };
+
+      const getWorkflowMeta = () => {
+        const workflowStatus = postWorkflowStatus.value || "writing";
+        return {
+          workflowStatus,
+          draft: workflowStatus === "published" ? "false" : "true",
+          label:
+            workflowStatus === "review"
+              ? "מוכן לבדיקה"
+              : workflowStatus === "ready"
+                ? "מוכן לפרסום"
+                : workflowStatus === "published"
+                  ? "פורסם"
+                  : "בכתיבה",
+        };
+      };
+
+      const generateFullMdx = () => {
+        const title = postTitle.value.trim();
+        const slug = postSlug.value.trim() || generateSlug(title);
+        const description = buildDescription();
+        const tags = parseTags();
+        const content = postContent.value.trim();
+        const youtubeId = extractYoutubeId(videoUrlInput.value);
+        const isPremium = generatorPremium.checked;
+        const workflow = getWorkflowMeta();
+        const frontmatter = [
+          "---",
+          `title: \"${title.replace(/\"/g, '\\\"')}\"`,
+          `description: \"${description.replace(/\"/g, '\\\"')}\"`,
+          `pubDate: ${today}`,
+          'updatedDate: ""',
+          'author: "השם לא משנה"',
+          `tags: [${tags.map((tag) => `\"${tag.replace(/\"/g, '\\\"')}\"`).join(", ")}]`,
+          'image: "/og.jpg"',
+          'canonicalUrl: ""',
+          'keywords: ""',
+          'audioUrl: ""',
+          `youtubeId: "${youtubeId}"`,
+          'tallyUrl: ""',
+          `isPremium: ${isPremium ? "true" : "false"}`,
+          `draft: ${workflow.draft}`,
+          `workflowStatus: "${workflow.workflowStatus}"`,
+          'faq: []',
+          "---",
+          "",
+        ].join("\n");
+
+        return `${frontmatter}${content}\n`;
+      };
+
+      const validateContent = () => {
+        const errors = [];
+        const title = postTitle.value.trim();
+        const slug = postSlug.value.trim() || generateSlug(title);
+        const description = buildDescription();
+        const content = postContent.value.trim();
+        const youtubeId = extractYoutubeId(videoUrlInput.value);
+        const workflow = getWorkflowMeta();
+
+        if (title.length < 10) errors.push("כותרת קצרה מדי (מינימום 10 תווים)");
+        if (!slug.match(/^[a-z0-9-]+$/)) errors.push("Slug חייב להיות באנגלית ומקפים בלבד");
+        if (description.length < 30) errors.push("התיאור קצר מדי. צריך שורת SEO אמיתית ולא placeholder");
+        if (content.length < 120) errors.push("התוכן עדיין קצר מדי כדי להיחשב כטיוטת מאמר רצינית");
+        if (generatorPremium.checked && !content.includes("<!--premium-break-->")) {
+          errors.push("סימנת Premium אבל חסר התג <!--premium-break--> בתוך התוכן");
+        }
+        if (youtubeId && youtubeId.length !== 11) {
+          errors.push("ID של יוטיוב לא תקין (חייב להיות 11 תווים)");
+        }
+        if (!["writing", "review", "ready", "published"].includes(workflow.workflowStatus)) {
+          errors.push("בחר שלב עבודה תקין מתוך הרשימה");
+        }
+
+        return errors;
+      };
+
+      const renderValidation = () => {
+        const errors = validateContent();
+        const title = postTitle.value.trim();
+        const slug = postSlug.value.trim() || generateSlug(title);
+        const workflow = getWorkflowMeta();
+        if (!postSlug.value.trim() && title) {
+          postSlug.value = slug;
+        }
+
+        if (errors.length > 0) {
+          validationBox.classList.remove("hidden");
+          errorList.innerHTML = errors
+            .map((error) => `<li class="rounded-2xl border border-[#D42B2B]/10 bg-white/80 px-4 py-3">${error}</li>`)
+            .join("");
+          publishStatusText.textContent = `המאמר עדיין לא נקי. תקן את החסמים לפני העתקה או פתיחה ב-GitHub. שלב העבודה הנוכחי: ${workflow.label}.`;
+          publishToGithubButton.disabled = true;
+          publishToGithubButton.classList.add("opacity-50", "cursor-not-allowed");
+        } else {
+          validationBox.classList.add("hidden");
+          errorList.innerHTML = "";
+          publishStatusText.textContent = `מוכן לייצוא. ${githubRepoLabel}/${slug}.mdx | שלב עבודה: ${workflow.label} | publish state: ${workflow.draft === "false" ? "באוויר" : "טיוטה"}`;
+          publishToGithubButton.disabled = false;
+          publishToGithubButton.classList.remove("opacity-50", "cursor-not-allowed");
+        }
+      };
+
+      const insertTag = (tag) => {
+        const start = postContent.selectionStart || 0;
+        const end = postContent.selectionEnd || 0;
+        const before = postContent.value.slice(0, start);
+        const after = postContent.value.slice(end);
+        const needsPadding = before && !before.endsWith("\n") ? "\n" : "";
+        const suffixPadding = after && !after.startsWith("\n") ? "\n" : "";
+        postContent.value = `${before}${needsPadding}${tag}${suffixPadding}${after}`;
+        postContent.focus();
+        postContent.selectionStart = postContent.selectionEnd = before.length + needsPadding.length + tag.length;
+        renderValidation();
+      };
+
+      const copyMdx = async () => {
+        renderValidation();
+        const errors = validateContent();
+        if (errors.length > 0) {
+          copyMdxButton.textContent = "תקן קודם את החסמים";
+          window.setTimeout(() => {
+            copyMdxButton.textContent = "העתק MDX מוכן";
+          }, 1500);
+          return;
+        }
+
+        try {
+          await navigator.clipboard.writeText(generateFullMdx());
+          copyMdxButton.textContent = "MDX הועתק";
+        } catch {
+          copyMdxButton.textContent = "ההעתקה נכשלה";
+        }
+        window.setTimeout(() => {
+          copyMdxButton.textContent = "העתק MDX מוכן";
+        }, 1500);
+      };
+
+      const injectIntoSandbox = () => {
+        renderValidation();
+        previewInput.value = generateFullMdx();
+        renderPreviewButton.click();
+      };
+
+      const publishToGithub = () => {
+        renderValidation();
+        const errors = validateContent();
+        if (errors.length > 0) {
+          publishToGithubButton.textContent = "תקן קודם את החסמים";
+          window.setTimeout(() => {
+            publishToGithubButton.textContent = "?? פרסם ישירות ל-GitHub";
+          }, 1500);
+          return;
+        }
+
+        const slug = postSlug.value.trim() || generateSlug(postTitle.value.trim());
+        const content = generateFullMdx();
+        const githubUrl = `${repoNewFileBase}?filename=${encodeURIComponent(`${slug}.mdx`)}&value=${encodeURIComponent(content)}`;
+        window.open(githubUrl, "_blank", "noopener,noreferrer");
+      };
+
+      [postTitle, postSlug, postDescription, postTags, postWorkflowStatus, postContent, generatorPremium, videoUrlInput].forEach((element) => {
+        element.addEventListener("input", renderValidation);
+        element.addEventListener("change", renderValidation);
+      });
+
+      helperButtons.forEach((button) => {
+        if (!(button instanceof HTMLButtonElement)) return;
+        button.addEventListener("click", () => insertTag(button.dataset.helperInsert || ""));
+      });
+
+      copyMdxButton.addEventListener("click", copyMdx);
+      injectIntoSandboxButton.addEventListener("click", injectIntoSandbox);
+      publishToGithubButton.addEventListener("click", publishToGithub);
+      renderValidation();
+    });
+  </script>
 </Layout>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

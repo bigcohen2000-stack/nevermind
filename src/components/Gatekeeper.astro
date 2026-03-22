@@ -1,4 +1,6 @@
-ο»Ώ---
+---
+import appConfig from "../config/appConfig.json";
+
 interface Props {
   phone?: string;
   fallbackHref?: string;
@@ -6,29 +8,29 @@ interface Props {
 }
 
 const {
-  phone = "972555634035",
+  phone = appConfig.contact.whatsAppNumber,
   fallbackHref = "/articles/",
-  fallbackLabel = "ΧΧ§Χ¨Χ•Χ ΧΧΧΧ¨ Χ¤ΧªΧ•Χ— ΧΧ¤Χ Χ™ Χ©Χ™Χ—Χ”",
+  fallbackLabel = "μχψεΰ ξΰξψ τϊεη μτπι ωιηδ",
 } = Astro.props;
 
 const goals = [
-  { id: "clarity", label: "Χ‘Χ™Χ¨Χ•Χ¨ ΧΧ™Χ©Χ™ ΧΧ“Χ•Χ™Χ§", hint: "ΧΧ©Χ”Χ• ΧªΧ§Χ•ΧΆ Χ•ΧΧ Χ™ Χ¨Χ•Χ¦Χ” ΧΧ¨ΧΧ•Χª ΧΧ•ΧªΧ• Χ Χ§Χ™", score: 24, reason: "Χ”ΧΧΧ¨Χ” ΧΧ΅Χ¤Χ™Χ§ Χ—Χ“Χ” Χ›Χ“Χ™ Χ©Χ©Χ™Χ—Χ” ΧªΧ•Χ›Χ ΧΧ”ΧªΧΧ§Χ“ Χ‘Χ’Χ¨ΧΆΧ™Χ ΧΆΧ¦ΧΧ•." },
-  { id: "decision", label: "Χ§Χ‘ΧΧª Χ”Χ—ΧΧΧ”", hint: "Χ™Χ© Χ¦Χ•ΧΧª Χ•ΧΧ Χ™ ΧΧ Χ¨Χ•Χ¦Χ” ΧΧ”ΧΧ©Χ™Χ ΧΧ”Χ΅ΧªΧ•Χ‘Χ‘ Χ΅Χ‘Χ™Χ‘Χ•", score: 22, reason: "Χ™Χ© Χ›ΧΧ ΧΧ•Χ§Χ“ Χ‘Χ¨Χ•Χ¨ Χ™Χ—Χ΅Χ™Χª, Χ’Χ ΧΧ Χ”Χ•Χ ΧΆΧ“Χ™Χ™Χ ΧΧ Χ¤ΧªΧ•Χ¨." },
-  { id: "business", label: "Χ›Χ™Χ•Χ•Χ ΧΆΧ΅Χ§Χ™ / ΧΧ§Χ¦Χ•ΧΆΧ™", hint: "ΧΧ Χ™ Χ¦Χ¨Χ™Χ Χ—Χ“Χ•Χª Χ΅Χ‘Χ™Χ‘ ΧΧ”ΧΧ, ΧΧ™Χ§Χ•Χ“ ΧΧ• Χ—Χ΅Χ", score: 26, reason: "Χ›Χ™Χ•Χ•Χ ΧΆΧ΅Χ§Χ™ Χ”Χ•Χ Χ‘Χ“Χ¨Χ Χ›ΧΧ Χ Χ•Χ©Χ Χ©ΧΧ¤Χ©Χ¨ ΧΧΧ“Χ•Χ“ ΧΆΧΧ™Χ• Χ‘Χ”Χ™Χ¨Χ•Χª Χ™Χ©Χ™Χ¨Χ”." },
-  { id: "not-sure", label: "ΧΧ Χ™ ΧΆΧ“Χ™Χ™Χ ΧΧ Χ‘ΧΧ•Χ—", hint: "Χ™Χ© ΧΆΧ Χ™Χ™Χ, ΧΧ‘Χ ΧΆΧ•Χ“ ΧΧ Χ‘Χ¨Χ•Χ¨ ΧΧ™ ΧΧ” Χ‘ΧΧΧª Χ”Χ Χ•Χ©Χ", score: 6, reason: "Χ›Χ©Χ”Χ Χ•Χ©Χ ΧΆΧ•Χ“ ΧΧ Χ‘Χ¨Χ•Χ¨, Χ©Χ™Χ—Χ” Χ Χ•ΧΧ” ΧΧ”ΧªΧ‘Χ–Χ‘Χ– ΧΆΧ Χ Χ™Χ΅Χ•Χ— Χ‘ΧΧ§Χ•Χ ΧΆΧ ΧΧ”Χ•Χª." },
+  { id: "clarity", label: "αιψεψ ΰιωι ξγειχ", hint: "ξωδε ϊχες εΰπι ψεφδ μψΰεϊ ΰεϊε πχι", score: 24, reason: "δξθψδ ξρτιχ ηγδ λγι ωωιηδ ϊελμ μδϊξχγ αβψςιο ςφξε." },
+  { id: "decision", label: "χαμϊ δημθδ", hint: "ιω φεξϊ εΰπι μΰ ψεφδ μδξωικ μδρϊεαα ραιαε", score: 22, reason: "ιω λΰο ξεχγ αψεψ ιηριϊ, βν ΰν δεΰ ςγιιο μΰ τϊεψ." },
+  { id: "business", label: "λιεεο ςρχι / ξχφεςι", hint: "ΰπι φψικ ηγεϊ ραια ξδμκ, ξιχεγ ΰε ηρν", score: 26, reason: "λιεεο ςρχι δεΰ αγψκ λμμ πεωΰ ωΰτωψ μξγεγ ςμιε αδιψεϊ ιωιψδ." },
+  { id: "not-sure", label: "ΰπι ςγιιο μΰ αθεη", hint: "ιω ςπιιο, ΰαμ ςεγ μΰ αψεψ μι ξδ αΰξϊ δπεωΰ", score: 6, reason: "λωδπεωΰ ςεγ μΰ αψεψ, ωιηδ πεθδ μδϊαζαζ ςμ πιρεη αξχεν ςμ ξδεϊ." },
 ];
 
 const budgets = [
-  { id: "under-500", label: "ΧΆΧ“ 500 Χ©Χ΄Χ—", score: 2, reason: "Χ”ΧΧ•Χ•Χ— Χ”Χ–Χ” ΧΧ ΧΧªΧΧ™Χ Χ›Χ¨Χ’ΧΆ ΧΧΧ΅ΧΧ•ΧΧ™Χ Χ”ΧΧ™Χ©Χ™Χ™Χ Χ©Χ”ΧΧªΧ¨ ΧΧ›Χ•Χ•Χ ΧΧΧ™Χ”Χ." },
-  { id: "500-1500", label: "500β€“1,500 Χ©Χ΄Χ—", score: 12, reason: "Χ™Χ© Χ›ΧΧ Χ”ΧªΧΧΧ” Χ—ΧΧ§Χ™Χª Χ‘ΧΧ‘Χ“, ΧªΧΧ•Χ™ Χ‘ΧΧ™Χ“Χª Χ”Χ“Χ™Χ•Χ§ Χ©Χ Χ”Χ Χ•Χ©Χ." },
-  { id: "1500-3000", label: "1,500β€“3,000 Χ©Χ΄Χ—", score: 24, reason: "Χ”ΧΧ•Χ•Χ— Χ”Χ–Χ” Χ›Χ‘Χ¨ ΧΧªΧΧ™Χ ΧΧΧ΅ΧΧ•ΧΧ™Χ Χ©Χ‘Χ”Χ Χ©Χ™Χ—Χ” Χ™Χ›Χ•ΧΧ” ΧΧ”Χ™Χ•Χª ΧΧ“Χ•Χ™Χ§Χª Χ•Χ©Χ™ΧΧ•Χ©Χ™Χª." },
-  { id: "3000-plus", label: "3,000+ Χ©Χ΄Χ—", score: 28, reason: "Χ™Χ© Χ›ΧΧ Χ’ΧΧ™Χ©Χ•Χª Χ©ΧΧΧ¤Χ©Χ¨Χª Χ”ΧªΧΧΧ” ΧΧΧ™ΧªΧ™Χª ΧΧΧ΅ΧΧ•Χ ΧΆΧ‘Χ•Χ“Χ” Χ¨Χ¦Χ™Χ Χ™." },
+  { id: "under-500", label: "ςγ 500 ωΨη", score: 2, reason: "δθεεη δζδ μΰ ξϊΰιν λψβς μξρμεμιν δΰιωιιν ωδΰϊψ ξλεεο ΰμιδν." },
+  { id: "500-1500", label: "500–1,500 ωΨη", score: 12, reason: "ιω λΰο δϊΰξδ ημχιϊ αμαγ, ϊμει αξιγϊ δγιεχ ωμ δπεωΰ." },
+  { id: "1500-3000", label: "1,500–3,000 ωΨη", score: 24, reason: "δθεεη δζδ λαψ ξϊΰιν μξρμεμιν ωαδν ωιηδ ιλεμδ μδιεϊ ξγειχϊ εωιξεωιϊ." },
+  { id: "3000-plus", label: "3,000+ ωΨη", score: 28, reason: "ιω λΰο βξιωεϊ ωξΰτωψϊ δϊΰξδ ΰξιϊιϊ μξρμεμ ςαεγδ ψφιπι." },
 ];
 
 const stages = [
-  { id: "browsing", label: "Χ¨Χ§ Χ‘Χ•Χ“Χ§ Χ›Χ¨Χ’ΧΆ", score: 4, reason: "Χ›Χ©ΧΧ™Χ ΧΆΧ“Χ™Χ™Χ Χ”Χ—ΧΧΧ” Χ¤Χ Χ™ΧΧ™Χª, ΧΆΧ“Χ™Χ£ ΧΧ”ΧªΧ—Χ™Χ ΧΧ—Χ§Χ™Χ¨Χ” Χ©Χ§ΧΧ” Χ•ΧΧ ΧΧ©Χ™Χ—Χ”." },
-  { id: "active", label: "ΧΧ‘Χ™Χ ΧΧª Χ”ΧΆΧ Χ™Χ™Χ Χ•Χ¨Χ•Χ¦Χ” ΧΧ“Χ‘Χ¨", score: 20, reason: "Χ™Χ© Χ›ΧΧ ΧΧ•Χ›Χ Χ•Χª ΧΧ΅Χ¤Χ§Χª Χ›Χ“Χ™ Χ©Χ©Χ™Χ—Χ” ΧªΧ•Χ›Χ ΧΧ™Χ™Χ¦Χ¨ ΧªΧ Χ•ΧΆΧ”." },
-  { id: "urgent", label: "Χ™Χ© ΧΧ©Χ”Χ• Χ“Χ—Χ•Χ£ Χ•ΧΧ Χ™ Χ¦Χ¨Χ™Χ Χ‘Χ”Χ™Χ¨Χ•Χª Χ§Χ¨Χ•Χ‘Χ”", score: 24, reason: "Χ“Χ—Χ™Χ¤Χ•Χª ΧΆΧ ΧΧ•Χ“ΧΆΧ•Χª ΧΧ¦Χ•Χ¨Χ Χ‘Χ‘Χ”Χ™Χ¨Χ•Χª Χ”Χ™Χ ΧΧ™Χ Χ“Χ™Χ§Χ¦Χ™Χ” ΧΧ•Χ‘Χ” ΧΧ”ΧªΧΧΧ”." },
+  { id: "browsing", label: "ψχ αεγχ λψβς", score: 4, reason: "λωΰιο ςγιιο δημθδ τπιξιϊ, ςγισ μδϊηιμ ξηχιψδ ωχθδ εμΰ ξωιηδ." },
+  { id: "active", label: "ξαιο ΰϊ δςπιιο εψεφδ μγαψ", score: 20, reason: "ιω λΰο ξελπεϊ ξρτχϊ λγι ωωιηδ ϊελμ μιιφψ ϊπεςδ." },
+  { id: "urgent", label: "ιω ξωδε γηεσ εΰπι φψικ αδιψεϊ χψεαδ", score: 24, reason: "γηιτεϊ ςν ξεγςεϊ μφεψκ ααδιψεϊ διΰ ΰιπγιχφιδ θεαδ μδϊΰξδ." },
 ];
 
 const maxScore =
@@ -47,10 +49,10 @@ const maxScore =
 >
   <header class="space-y-4 text-right">
     <p class="text-sm font-semibold uppercase tracking-[0.24em] text-[#D42B2B]">Gatekeeper</p>
-    <h1 class="text-[clamp(2rem,1.4rem+2vw,3.3rem)] font-semibold leading-[1.05] text-[#1A1A1A]">ΧΧ¤Χ Χ™ Χ©Χ™Χ—Χ”, Χ Χ—Χ“Χ“ ΧΆΧ ΧΧ” Χ‘ΧΧΧª ΧΧ“Χ•Χ‘Χ¨.</h1>
+    <h1 class="text-[clamp(2rem,1.4rem+2vw,3.3rem)] font-semibold leading-[1.05] text-[#1A1A1A]">μτπι ωιηδ, πηγγ ςμ ξδ αΰξϊ ξγεαψ.</h1>
     <p class="max-w-2xl text-[1rem] leading-8 text-[#1A1A1A]/70">
-      Χ–Χ” ΧΧ Χ©ΧΧΧ•Χ ΧΧ¨Χ•Χ. Χ–Χ” Χ΅Χ™Χ Χ•Χ Χ§Χ¦Χ¨ Χ©ΧΧ‘Χ”Χ™Χ¨ ΧΧ Χ Χ›Χ•Χ ΧΧ“Χ‘Χ¨ ΧΆΧ›Χ©Χ™Χ•, Χ•ΧΆΧ ΧΧ” Χ Χ›Χ•Χ ΧΧ“Χ‘Χ¨. ΧΧ ΧΧ™Χ Χ”ΧªΧΧΧ”,
-      ΧΆΧ“Χ™Χ£ ΧΧ’ΧΧ•Χª ΧΧª Χ–Χ” Χ›ΧΧ Χ•ΧΧ ΧΧ—Χ¨Χ™ Χ©Χ™Χ—Χ” ΧΧ ΧΧ“Χ•Χ™Χ§Χª.
+      ζδ μΰ ωΰμεο ΰψεκ. ζδ ριπεο χφψ ωξαδιψ ΰν πλεο μγαψ ςλωιε, εςμ ξδ πλεο μγαψ. ΰν ΰιο δϊΰξδ,
+      ςγισ μβμεϊ ΰϊ ζδ λΰο εμΰ ΰηψι ωιηδ μΰ ξγειχϊ.
     </p>
   </header>
 
@@ -63,17 +65,17 @@ const maxScore =
   <div class="mt-8 space-y-8">
     <section data-step-panel="1" class="space-y-6">
       <div class="space-y-2 text-right">
-        <p class="text-sm font-semibold text-[#D42B2B]">Χ©ΧΧ‘ 1 ΧΧªΧ•Χ 3</p>
-        <h2 class="text-2xl font-semibold text-[#1A1A1A]">ΧΧ™ ΧΧªΧ”, Χ•ΧΆΧ ΧΧ” ΧΧªΧ” Χ¨Χ•Χ¦Χ” ΧΧ“Χ‘Χ¨?</h2>
+        <p class="text-sm font-semibold text-[#D42B2B]">ωμα 1 ξϊεκ 3</p>
+        <h2 class="text-2xl font-semibold text-[#1A1A1A]">ξι ΰϊδ, εςμ ξδ ΰϊδ ψεφδ μγαψ?</h2>
       </div>
 
       <label class="block space-y-2 text-right">
-        <span class="text-sm font-semibold text-[#1A1A1A]">Χ©Χ</span>
-        <input data-name-input type="text" placeholder="ΧΧ™Χ ΧΧ§Χ¨Χ•Χ ΧΧ?" class="w-full rounded-[1.4rem] border border-[#1A1A1A]/12 bg-[#FAFAF8] px-5 py-4 text-right text-base text-[#1A1A1A] outline-none transition focus:border-[#D42B2B]/40 focus:ring-2 focus:ring-[#D42B2B]/15" />
+        <span class="text-sm font-semibold text-[#1A1A1A]">ων</span>
+        <input data-name-input type="text" placeholder="ΰικ μχψεΰ μκ?" class="w-full rounded-[1.4rem] border border-[#1A1A1A]/12 bg-[#FAFAF8] px-5 py-4 text-right text-base text-[#1A1A1A] outline-none transition focus:border-[#D42B2B]/40 focus:ring-2 focus:ring-[#D42B2B]/15" />
       </label>
 
       <div class="space-y-3 text-right">
-        <p class="text-sm font-semibold text-[#1A1A1A]">ΧΧΧ¨Χ”</p>
+        <p class="text-sm font-semibold text-[#1A1A1A]">ξθψδ</p>
         <div class="grid gap-3">
           {goals.map((goal) => (
             <button
@@ -94,8 +96,8 @@ const maxScore =
 
     <section data-step-panel="2" class="hidden space-y-6">
       <div class="space-y-2 text-right">
-        <p class="text-sm font-semibold text-[#D42B2B]">Χ©ΧΧ‘ 2 ΧΧªΧ•Χ 3</p>
-        <h2 class="text-2xl font-semibold text-[#1A1A1A]">ΧΧ” ΧΧ•Χ•Χ— Χ”Χ”Χ©Χ§ΧΆΧ” Χ©Χ Χ›Χ•Χ ΧΧ Χ›Χ¨Χ’ΧΆ?</h2>
+        <p class="text-sm font-semibold text-[#D42B2B]">ωμα 2 ξϊεκ 3</p>
+        <h2 class="text-2xl font-semibold text-[#1A1A1A]">ξδ θεεη δδωχςδ ωπλεο μκ λψβς?</h2>
       </div>
       <div class="grid gap-3 text-right">
         {budgets.map((budget) => (
@@ -111,13 +113,13 @@ const maxScore =
           </button>
         ))}
       </div>
-      <button type="button" data-back-step="1" class="text-sm font-semibold text-[#1A1A1A]/60 transition hover:text-[#1A1A1A]">Χ—Χ–Χ¨Χ” ΧΧ©ΧΧ‘ Χ”Χ§Χ•Χ“Χ</button>
+      <button type="button" data-back-step="1" class="text-sm font-semibold text-[#1A1A1A]/60 transition hover:text-[#1A1A1A]">ηζψδ μωμα δχεγν</button>
     </section>
 
     <section data-step-panel="3" class="hidden space-y-6">
       <div class="space-y-2 text-right">
-        <p class="text-sm font-semibold text-[#D42B2B]">Χ©ΧΧ‘ 3 ΧΧªΧ•Χ 3</p>
-        <h2 class="text-2xl font-semibold text-[#1A1A1A]">Χ‘ΧΧ™Χ–Χ” Χ©ΧΧ‘ ΧΧªΧ” Χ ΧΧ¦Χ ΧΆΧ›Χ©Χ™Χ•?</h2>
+        <p class="text-sm font-semibold text-[#D42B2B]">ωμα 3 ξϊεκ 3</p>
+        <h2 class="text-2xl font-semibold text-[#1A1A1A]">αΰιζδ ωμα ΰϊδ πξφΰ ςλωιε?</h2>
       </div>
       <div class="grid gap-3 text-right">
         {stages.map((stage) => (
@@ -133,11 +135,11 @@ const maxScore =
           </button>
         ))}
       </div>
-      <button type="button" data-back-step="2" class="text-sm font-semibold text-[#1A1A1A]/60 transition hover:text-[#1A1A1A]">Χ—Χ–Χ¨Χ” ΧΧ©ΧΧ‘ Χ”Χ§Χ•Χ“Χ</button>
+      <button type="button" data-back-step="2" class="text-sm font-semibold text-[#1A1A1A]/60 transition hover:text-[#1A1A1A]">ηζψδ μωμα δχεγν</button>
     </section>
 
     <section data-result-panel class="hidden rounded-[1.8rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] p-6 text-right">
-      <p data-result-badge class="text-sm font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">ΧªΧ•Χ¦ΧΧ”</p>
+      <p data-result-badge class="text-sm font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">ϊεφΰδ</p>
       <div class="mt-4 overflow-hidden rounded-full bg-[#1A1A1A]/8">
         <div data-score-bar class="h-2 w-0 rounded-full bg-[#D42B2B] transition-all duration-500"></div>
       </div>
@@ -146,9 +148,9 @@ const maxScore =
       <p data-result-text class="mt-3 max-w-2xl text-base leading-8 text-[#1A1A1A]/70"></p>
       <ul data-reasons-list class="mt-5 space-y-2 text-sm leading-7 text-[#1A1A1A]/68"></ul>
       <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
-        <a data-whatsapp-link target="_blank" rel="noreferrer" class="hidden items-center justify-center rounded-full bg-[#1A1A1A] px-6 py-3 text-sm font-semibold text-[#FAFAF8] transition hover:bg-black">ΧΧΆΧ‘Χ•Χ¨ ΧΧ•Χ•ΧΧΧ΅ΧΧ¤</a>
-        <a data-fallback-link class="hidden items-center justify-center rounded-full border border-[#1A1A1A]/10 bg-white px-6 py-3 text-sm font-semibold text-[#1A1A1A] transition hover:bg-[#ffffff]">ΧΧ§Χ¨Χ™ΧΧ” Χ©Χ§ΧΧ” Χ‘ΧΧ§Χ•Χ Χ–Χ”</a>
-        <button type="button" data-reset-gatekeeper class="rounded-full border border-[#1A1A1A]/10 bg-white px-6 py-3 text-sm font-semibold text-[#1A1A1A]/70 transition hover:bg-[#ffffff]">ΧΧ”ΧªΧ—Χ™Χ ΧΧ—Χ“Χ©</button>
+        <a data-whatsapp-link target="_blank" rel="noreferrer" class="hidden items-center justify-center rounded-full bg-[#1A1A1A] px-6 py-3 text-sm font-semibold text-[#FAFAF8] transition hover:bg-black">μςαεψ μεεΰθρΰτ</a>
+        <a data-fallback-link class="hidden items-center justify-center rounded-full border border-[#1A1A1A]/10 bg-white px-6 py-3 text-sm font-semibold text-[#1A1A1A] transition hover:bg-[#ffffff]">μχψιΰδ ωχθδ αξχεν ζδ</a>
+        <button type="button" data-reset-gatekeeper class="rounded-full border border-[#1A1A1A]/10 bg-white px-6 py-3 text-sm font-semibold text-[#1A1A1A]/70 transition hover:bg-[#ffffff]">μδϊηιμ ξηγω</button>
       </div>
     </section>
   </div>
@@ -178,7 +180,7 @@ const maxScore =
 
     const phone = root.dataset.phone || "972555634035";
     const fallbackHref = root.dataset.fallbackHref || "/articles/";
-    const fallbackLabel = root.dataset.fallbackLabel || "ΧΧΆΧ‘Χ•Χ¨ ΧΧΧΧΧ¨ Χ¤ΧªΧ•Χ— Χ‘ΧΧ§Χ•Χ Χ©Χ™Χ—Χ”";
+    const fallbackLabel = root.dataset.fallbackLabel || "μςαεψ μξΰξψ τϊεη αξχεν ωιηδ";
     const maxScore = Number(root.dataset.maxScore || 78);
     const nameInput = root.querySelector("[data-name-input]");
     const panels = Array.from(root.querySelectorAll("[data-step-panel]"));
@@ -218,7 +220,7 @@ const maxScore =
     };
 
     const buildWhatsAppHref = () => {
-      const safeName = state.name || "ΧΧΧ Χ©Χ";
+      const safeName = state.name || "μμΰ ων";
       const text = `Hi, I'm ${safeName}, I'm interested in ${state.goal} and I'm at the ${state.stage} stage.`;
       return `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
     };
@@ -248,13 +250,13 @@ const maxScore =
       const tier = getTier();
       const scorePercent = Math.max(0, Math.min(100, (score / maxScore) * 100));
       scoreBar.style.width = `${scorePercent}%`;
-      scoreText.textContent = `Χ¦Χ™Χ•Χ Χ”ΧªΧΧΧ”: ${score} / ${maxScore}`;
+      scoreText.textContent = `φιεο δϊΰξδ: ${score} / ${maxScore}`;
       renderReasons();
 
       if (tier === "fit") {
-        resultBadge.textContent = "Χ”ΧªΧΧΧ” Χ’Χ‘Χ•Χ”Χ”";
-        resultTitle.textContent = "Χ–Χ” Χ Χ¨ΧΧ” Χ›ΧΧ• Χ©Χ™Χ—Χ” Χ©Χ›Χ“ΧΧ™ ΧΧ§Χ™Χ™Χ.";
-        resultText.textContent = "Χ”ΧΧΧ¨Χ”, Χ”ΧªΧ§Χ¦Χ™Χ‘ Χ•Χ”Χ©ΧΧ‘ Χ©ΧΧ ΧΧ΅Χ¤Χ™Χ§ Χ‘Χ¨Χ•Χ¨Χ™Χ Χ›Χ“Χ™ ΧΧΆΧ‘Χ•Χ¨ ΧΧ©Χ™Χ—Χ” Χ§Χ¦Χ¨Χ” Χ•ΧΧ“Χ•Χ™Χ§Χª Χ‘ΧΧ™ ΧΧ‘Χ–Χ‘Χ– Χ–ΧΧ ΧΆΧ Χ Χ™Χ΅Χ•Χ— ΧΧ—Χ“Χ© Χ©Χ Χ”Χ‘ΧΆΧ™Χ”.";
+        resultBadge.textContent = "δϊΰξδ βαεδδ";
+        resultTitle.textContent = "ζδ πψΰδ λξε ωιηδ ωλγΰι μχιιν.";
+        resultText.textContent = "δξθψδ, δϊχφια εδωμα ωμκ ξρτιχ αψεψιν λγι μςαεψ μωιηδ χφψδ εξγειχϊ αμι μαζαζ ζξο ςμ πιρεη ξηγω ωμ δαςιδ.";
         whatsappLink.href = buildWhatsAppHref();
         whatsappLink.classList.remove("hidden");
         whatsappLink.classList.add("inline-flex");
@@ -264,9 +266,9 @@ const maxScore =
       }
 
       if (tier === "partial") {
-        resultBadge.textContent = "Χ”ΧªΧΧΧ” Χ—ΧΧ§Χ™Χª";
-        resultTitle.textContent = "Χ™Χ© ΧΆΧ Χ™Χ™Χ, ΧΧ‘Χ ΧΆΧ“Χ™Χ£ ΧΧ—Χ“Χ“ ΧΆΧ•Χ“ Χ§Χ¦Χª ΧΧ¤Χ Χ™ Χ©Χ™Χ—Χ”.";
-        resultText.textContent = "Χ›Χ¨Χ’ΧΆ Χ™Χ© Χ”ΧªΧΧΧ” Χ—ΧΧ§Χ™Χª Χ‘ΧΧ‘Χ“. ΧΆΧ“Χ™Χ£ ΧΧΆΧ‘Χ•Χ¨ Χ§Χ•Χ“Χ Χ“Χ¨Χ ΧΧΧΧ¨ Χ¤ΧªΧ•Χ—, Χ•ΧΧ– ΧΧ Χ™Χ”Χ™Χ” Χ¦Χ•Χ¨Χ, ΧΧ—Χ–Χ•Χ¨ ΧΧ©Χ™Χ—Χ” ΧΧΧ§Χ•Χ Χ—Χ“ Χ™Χ•ΧªΧ¨.";
+        resultBadge.textContent = "δϊΰξδ ημχιϊ";
+        resultTitle.textContent = "ιω ςπιιο, ΰαμ ςγισ μηγγ ςεγ χφϊ μτπι ωιηδ.";
+        resultText.textContent = "λψβς ιω δϊΰξδ ημχιϊ αμαγ. ςγισ μςαεψ χεγν γψκ ξΰξψ τϊεη, εΰζ ΰν ιδιδ φεψκ, μηζεψ μωιηδ ξξχεν ηγ ιεϊψ.";
         fallbackLink.href = fallbackHref;
         fallbackLink.textContent = fallbackLabel;
         fallbackLink.classList.remove("hidden");
@@ -276,9 +278,9 @@ const maxScore =
         return;
       }
 
-      resultBadge.textContent = "ΧΧ ΧΧªΧΧ™Χ Χ›Χ¨Χ’ΧΆ";
-      resultTitle.textContent = "Χ›Χ¨Χ’ΧΆ Χ–Χ” ΧΧ Χ Χ¨ΧΧ” Χ›ΧΧ• Χ”ΧªΧΧΧ” ΧΧ©Χ™Χ—Χ”.";
-      resultText.textContent = "Χ–Χ” ΧΧ ΧΧ•ΧΧ¨ Χ©ΧΧ™Χ ΧΆΧ Χ™Χ™Χ. Χ–Χ” Χ¨Χ§ ΧΧ•ΧΧ¨ Χ©Χ Χ›Χ•Χ Χ™Χ•ΧªΧ¨ ΧΧ”ΧªΧ—Χ™Χ ΧΧ§Χ¨Χ™ΧΧ” Χ©Χ§ΧΧ” ΧΧ• ΧΧ—Χ™Χ“Χ•Χ“ ΧΆΧ¦ΧΧ™ ΧΧ¤Χ Χ™ ΧΧΆΧ‘Χ¨ ΧΧ©Χ™Χ—Χ” Χ™Χ©Χ™Χ¨Χ”.";
+      resultBadge.textContent = "μΰ ξϊΰιν λψβς";
+      resultTitle.textContent = "λψβς ζδ μΰ πψΰδ λξε δϊΰξδ μωιηδ.";
+      resultText.textContent = "ζδ μΰ ΰεξψ ωΰιο ςπιιο. ζδ ψχ ΰεξψ ωπλεο ιεϊψ μδϊηιμ ξχψιΰδ ωχθδ ΰε ξηιγεγ ςφξι μτπι ξςαψ μωιηδ ιωιψδ.";
       fallbackLink.href = fallbackHref;
       fallbackLink.textContent = fallbackLabel;
       fallbackLink.classList.remove("hidden");
@@ -351,3 +353,4 @@ const maxScore =
     });
   });
 </script>
+

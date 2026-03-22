@@ -1,6 +1,6 @@
 ﻿{
   "currency": "₪",
-  "tax_label": "כולל מע\"מ",
+  "tax_label": "לפני מע\"מ",
   "payment_methods": [
     { "name": "Apple Pay", "icon": "🍎" },
     { "name": "Google Pay", "icon": "💳" },
@@ -10,46 +10,61 @@
   "services": [
     {
       "id": "podcast-view",
-      "title": "צפייה בפודקאסט מרפסת",
-      "description": "כניסה למרחב, הקשבה וספיגת ידע בזמן אמת. תוכנית שמדברת על הכל.",
-      "price_per_unit": 680,
-      "unit_label": "שעה וחצי",
-      "upsell": "הוסף מיקרופון וצילום ב-2,270 ₪ נוספים",
-      "visible": true
-    },
-    {
-      "id": "podcast-mic",
-      "title": "פודקאסט + מיקרופון (ייעוץ מצולם)",
-      "description": "ייעוץ אסטרטגי שמוקלט ומתועד עבור העסק שלך. כולל עריכת סאונד וזוויות צילום.",
-      "price_per_unit": 2950,
-      "unit_label": "סשן מלא",
-      "features": [
-        "אפשרות לאנונימיות מלאה",
-        "זכויות שימוש ברשתות",
-        "עריכת פרימיום כלולה"
-      ],
-      "visible": true
+      "title": "הגעה לפודקאסט מרפסת",
+      "description": "להגיע פיזית, לשבת באולפן ולהיות חלק מהתוכנית בזמן אמת, בלי פילטרים ובלי תיווך.",
+      "basePrice": 580,
+      "taxPercent": 18,
+      "upsell": {
+        "title": "הפעלת מיקרופון ועריכה (ייעוץ מצולם לעסק)",
+        "price": 2500
+      },
+      "actionType": "whatsapp",
+      "actionLink": "https://wa.me/972555634035"
     },
     {
       "id": "learning-group",
-      "title": "קבוצת למידה שבועית",
-      "description": "ליווי אינטנסיבי בקבוצות בוטיק של עד 5 משתתפים.",
-      "price_per_unit": 6380,
-      "unit_label": "חודש (4 מפגשים)",
-      "badge": "הכי משתלם",
-      "visible": true
+      "title": "קבוצות למידה שבועיות",
+      "description": "קבוצה קטנה של עד 5 תלמידים, עם 4 מפגשים בחודש, למי שרוצה עומק עקבי ולא רק שיחת השראה אחת.",
+      "basePrice": 5400,
+      "taxPercent": 18,
+      "actionType": "whatsapp",
+      "actionLink": "https://wa.me/972555634035"
     },
     {
-      "id": "flexible-meeting",
-      "title": "פגישה אישית / וידאו",
-      "description": "זמן איכות ממוקד לפתרון בעיות בוערות. אתה קובע את אורך המפגש.",
-      "base_price_30min": 590,
-      "base_price_20min_phone": 540,
-      "addons": [
-        { "name": "הגעה למקום נייטרלי", "price": 350 },
-        { "name": "הקלטה וסיכום AI", "price": 120 }
-      ],
-      "visible": true
+      "id": "phone-20min",
+      "title": "שיחה טלפונית (20 דקות)",
+      "description": "שיחה קצרה, ממוקדת וחדה, כשצריך לפרק נקודה בוערת בלי לפתוח תהליך מלא.",
+      "basePrice": 450,
+      "taxPercent": 18,
+      "actionType": "whatsapp",
+      "actionLink": "https://wa.me/972555634035"
+    },
+    {
+      "id": "meeting-30min",
+      "title": "פגישה אישית / וידאו (חצי שעה)",
+      "description": "זמן ישיר וממוקד לשאלה אחת, קושי אחד או צומת אחד, בלי מריחה ובלי עודף רעש.",
+      "basePrice": 500,
+      "taxPercent": 18,
+      "actionType": "whatsapp",
+      "actionLink": "https://wa.me/972555634035"
+    },
+    {
+      "id": "terrace-subscription",
+      "title": "מנוי ליווי מרפסת",
+      "description": "הגעה פעם בשבועיים עם ליווי וואטסאפ שוטף ביניהם, למי שרוצה מסגרת חיה ולא רק מפגש נקודתי.",
+      "basePrice": 1800,
+      "taxPercent": 18,
+      "actionType": "whatsapp",
+      "actionLink": "https://wa.me/972555634035"
+    },
+    {
+      "id": "memory-documentation",
+      "title": "תיעוד למזכרת",
+      "description": "סיכום AI מסודר והקלטה ערוכה של הפגישה, כדי שלא תצא עם תובנה ותאבד אותה אחרי יומיים.",
+      "basePrice": 350,
+      "taxPercent": 18,
+      "actionType": "whatsapp",
+      "actionLink": "https://wa.me/972555634035"
     }
   ]
 }

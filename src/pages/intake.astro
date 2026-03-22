@@ -1,21 +1,22 @@
-ο»Ώ---
+---
 import Layout from "../layouts/Layout.astro";
 import Gatekeeper from "../components/Gatekeeper.astro";
+import appConfig from "../config/appConfig.json";
 
-const pageTitle = "ΧΧ•Χ¤Χ΅ Χ”Χ›Χ Χ” ΧΧ©Χ™Χ—Χ”";
-const pageDescription = "ΧΧ•Χ¤Χ΅ Χ¤Χ¨ΧΧ™ Χ•Χ§Χ¦Χ¨ ΧΧΧ™ Χ©Χ©Χ•Χ§Χ Χ©Χ™Χ—Χ” ΧΧ• Χ¤Χ’Χ™Χ©Χ”. Χ”Χ§Χ™Χ©Χ•Χ¨ Χ”Χ–Χ” ΧΧ ΧΧ™Χ•ΧΆΧ“ ΧΧ—Χ™Χ¤Χ•Χ© Χ¦Χ™Χ‘Χ•Χ¨Χ™.";
+const pageTitle = "θετρ δλπδ μωιηδ";
+const pageDescription = "θετρ τψθι εχφψ μξι ωωεχμ ωιηδ ΰε τβιωδ. δχιωεψ δζδ μΰ ξιεςγ μηιτεω φιαεψι.";
 ---
 
 <Layout title={pageTitle} description={pageDescription} noIndex={true}>
   <section class="mx-auto max-w-5xl space-y-10 px-4 pb-16">
     <header class="max-w-3xl space-y-4 text-right">
       <p class="text-sm font-semibold uppercase tracking-[0.24em] text-[#D42B2B]">Private Intake</p>
-      <h1 class="text-[clamp(2.2rem,1.5rem+2.2vw,3.6rem)] font-semibold leading-[1.05] text-[#1A1A1A]">ΧΧ¤Χ Χ™ Χ©Χ™Χ—Χ” ΧΧ• Χ¤Χ’Χ™Χ©Χ”, Χ ΧΆΧ‘Χ•Χ¨ Χ“Χ¨Χ ΧΧ•Χ¤Χ΅ Χ§Χ¦Χ¨.</h1>
+      <h1 class="text-[clamp(2.2rem,1.5rem+2.2vw,3.6rem)] font-semibold leading-[1.05] text-[#1A1A1A]">μτπι ωιηδ ΰε τβιωδ, πςαεψ γψκ θετρ χφψ.</h1>
       <p class="text-[1rem] leading-8 text-[#1A1A1A]/68">
-        Χ–Χ” Χ§Χ™Χ©Χ•Χ¨ Χ¤Χ¨ΧΧ™. Χ”ΧΧΧ¨Χ” Χ©ΧΧ• Χ”Χ™Χ ΧΧΧ΅Χ•Χ£ Χ‘Χ”Χ™Χ¨Χ•Χª Χ‘Χ΅Χ™Χ΅Χ™Χª ΧΧ¤Χ Χ™ Χ©Χ™Χ—Χ”, Χ›Χ“Χ™ ΧΧ”Χ‘Χ™Χ ΧΧ Χ Χ›Χ•Χ ΧΧ“Χ‘Χ¨ ΧΆΧ›Χ©Χ™Χ•, Χ•ΧΧ Χ›Χ, ΧΆΧ ΧΧ” Χ Χ›Χ•Χ ΧΧ“Χ‘Χ¨.
+        ζδ χιωεψ τψθι. δξθψδ ωμε διΰ μΰρεσ αδιψεϊ αριριϊ μτπι ωιηδ, λγι μδαιο ΰν πλεο μγαψ ςλωιε, εΰν λο, ςμ ξδ πλεο μγαψ.
       </p>
     </header>
 
-    <Gatekeeper phone="972555634035" fallbackHref="/articles/" fallbackLabel="ΧΧ§Χ¨Χ•Χ ΧΧΧΧ¨ Χ¤ΧªΧ•Χ— ΧΧ¤Χ Χ™ Χ©Χ™Χ—Χ”" />
+    <Gatekeeper phone={appConfig.contact.whatsAppNumber} fallbackHref="/articles/" fallbackLabel="μχψεΰ ξΰξψ τϊεη μτπι ωιηδ" />
   </section>
 </Layout>

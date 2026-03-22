@@ -1,0 +1,74 @@
+﻿---
+interface Props {
+  title?: string;
+}
+
+const { title = "לחץ לחשיפת התובנה" } = Astro.props;
+const panelId = `reveal-insight-${Math.random().toString(36).slice(2, 10)}`;
+---
+
+<section class="not-prose my-10 rounded-[2rem] border border-[#1A1A1A]/10 bg-white/88 p-5 shadow-[0_20px_60px_rgba(26,26,26,0.06)]">
+  <button
+    type="button"
+    data-reveal-insight-trigger
+    aria-expanded="false"
+    aria-controls={panelId}
+    class="flex w-full items-center justify-between gap-4 rounded-[1.4rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] px-5 py-4 text-right transition hover:border-[#D42B2B]/30 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D42B2B]/20"
+  >
+    <span>
+      <span class="block text-xs font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">Reveal Insight</span>
+      <span class="mt-2 block text-lg font-semibold text-[#1A1A1A]">{title}</span>
+    </span>
+    <span data-reveal-insight-icon class="text-[#D42B2B] transition-transform duration-300">+</span>
+  </button>
+
+  <div
+    id={panelId}
+    data-reveal-insight-panel
+    hidden
+    class="grid grid-rows-[0fr] transition-all duration-500 ease-out"
+  >
+    <div class="overflow-hidden">
+      <div class="px-2 pt-4 text-right text-[1rem] leading-8 text-[#1A1A1A]/76">
+        <slot />
+      </div>
+    </div>
+  </div>
+</section>
+
+<script is:inline>
+  document.addEventListener("astro:page-load", () => {
+    const triggers = Array.from(document.querySelectorAll("[data-reveal-insight-trigger]"));
+    triggers.forEach((trigger) => {
+      if (!(trigger instanceof HTMLButtonElement)) return;
+      if (trigger.dataset.revealBound === "true") return;
+
+      const panelId = trigger.getAttribute("aria-controls");
+      const panel = panelId ? document.getElementById(panelId) : null;
+      const icon = trigger.querySelector("[data-reveal-insight-icon]");
+      if (!(panel instanceof HTMLElement)) return;
+
+      const toggle = () => {
+        const expanded = trigger.getAttribute("aria-expanded") === "true";
+        const next = !expanded;
+        trigger.setAttribute("aria-expanded", String(next));
+        panel.hidden = false;
+        panel.style.gridTemplateRows = next ? "1fr" : "0fr";
+        if (icon instanceof HTMLElement) {
+          icon.textContent = next ? "−" : "+";
+          icon.style.transform = next ? "rotate(180deg)" : "rotate(0deg)";
+        }
+        if (!next) {
+          window.setTimeout(() => {
+            if (trigger.getAttribute("aria-expanded") !== "true") {
+              panel.hidden = true;
+            }
+          }, 500);
+        }
+      };
+
+      trigger.addEventListener("click", toggle);
+      trigger.dataset.revealBound = "true";
+    });
+  });
+</script>

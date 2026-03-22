@@ -5,28 +5,67 @@ import siteSettings from "../../config/siteSettings.json";
 import servicesConfig from "../../config/services.json";
 import ArticlesTable from "../../components/admin/ArticlesTable.astro";
 import ServicesControlPanel from "../../components/admin/ServicesControlPanel.astro";
+import AppConfigControlPanel from "../../components/admin/AppConfigControlPanel.astro";
+import appConfig from "../../config/appConfig.json";
 
 const pageTitle = "Creator Dashboard";
 const pageDescription = "מרכז תפעולי פרטי לניהול מאמרים, שירותים, והרחבות המערכת של NeverMind.";
-const githubArticleBase = "https://github.com/bigcohen2000-stack/nevermind/blob/main/src/content/articles/";
+const githubArticleBase = `https://github.com/${appConfig.github.owner}/${appConfig.github.repo}/blob/${appConfig.github.branch}/${appConfig.github.articlesPath}/`;
 const formatDate = new Intl.DateTimeFormat("he-IL", {
   year: "numeric",
   month: "2-digit",
   day: "2-digit",
 });
 
+const workflowConfig = {
+  writing: {
+    label: "בכתיבה",
+    tone: "bg-[#FFF7ED] text-[#9A3412] border-[#FDBA74]/60",
+  },
+  review: {
+    label: "מוכן לבדיקה",
+    tone: "bg-[#EFF6FF] text-[#1D4ED8] border-[#BFDBFE]/70",
+  },
+  ready: {
+    label: "מוכן לפרסום",
+    tone: "bg-[#F4FAF4] text-[#166534] border-[#BBF7D0]/70",
+  },
+  published: {
+    label: "פורסם",
+    tone: "bg-[#1A1A1A] text-[#FAFAF8] border-[#1A1A1A]",
+  },
+} as const;
+
+type WorkflowKey = keyof typeof workflowConfig;
+
+const resolveWorkflowStatus = (workflowStatus: WorkflowKey | undefined, draft: boolean): WorkflowKey => {
+  if (workflowStatus && workflowStatus in workflowConfig) {
+    return workflowStatus;
+  }
+
+  return draft ? "writing" : "published";
+};
+
 const articles = (await getCollection("articles"))
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
-  .map((article) => ({
-    title: article.data.title,
-    status: article.data.draft ? "טיוטה" : "באוויר",
-    statusTone: article.data.draft ? "bg-[#FFF4F3] text-[#D42B2B] border-[#D42B2B]/12" : "bg-[#F4FAF4] text-[#1A1A1A] border-[#1A1A1A]/10",
-    premium: article.data.isPremium ? "כן" : "לא",
-    premiumTone: article.data.isPremium ? "bg-[#1A1A1A] text-[#FAFAF8] border-[#1A1A1A]" : "bg-white text-[#1A1A1A]/72 border-[#1A1A1A]/10",
-    dateLabel: formatDate.format(article.data.pubDate),
-    editHref: `${githubArticleBase}${article.id}`,
-    slug: article.slug,
-  }));
+  .map((article) => {
+    const workflowKey = resolveWorkflowStatus(article.data.workflowStatus as WorkflowKey | undefined, article.data.draft);
+    const workflowMeta = workflowConfig[workflowKey];
+
+    return {
+      title: article.data.title,
+      workflowStatus: workflowMeta.label,
+      workflowTone: workflowMeta.tone,
+      status: article.data.draft ? "טיוטה" : "באוויר",
+      statusTone: article.data.draft ? "bg-[#FFF4F3] text-[#D42B2B] border-[#D42B2B]/12" : "bg-[#F4FAF4] text-[#1A1A1A] border-[#1A1A1A]/10",
+      premium: article.data.isPremium ? "כן" : "לא",
+      premiumTone: article.data.isPremium ? "bg-[#1A1A1A] text-[#FAFAF8] border-[#1A1A1A]" : "bg-white text-[#1A1A1A]/72 border-[#1A1A1A]/10",
+      dateLabel: formatDate.format(article.data.pubDate),
+      editHref: `${githubArticleBase}${article.id}`,
+      slug: article.slug,
+      workflowKey,
+    };
+  });
 
 const quickActions = [
   {
@@ -47,14 +86,24 @@ const quickActions = [
     href: "/intake/",
     cta: "לפתוח את הטופס",
   },
+  {
+    title: "Viral Paradox Generator",
+    description: "כלי מהיר ליצירת 20 פרדוקסים חדים לסטוריז, הוקים, כותרות משנה ופוסטים.",
+    href: "/admin/paradoxes/",
+    cta: "לייצר פרדוקסים",
+  },
 ];
 
 const stats = {
   totalArticles: articles.length,
   drafts: articles.filter((article) => article.status === "טיוטה").length,
   live: articles.filter((article) => article.status === "באוויר").length,
-  activeServices: servicesConfig.services.filter((service) => service.visible !== false).length,
-  featuredServices: servicesConfig.services.filter((service) => Boolean(service.badge) || Boolean(service.upsell)).length,
+  writing: articles.filter((article) => article.workflowKey === "writing").length,
+  review: articles.filter((article) => article.workflowKey === "review").length,
+  ready: articles.filter((article) => article.workflowKey === "ready").length,
+  published: articles.filter((article) => article.workflowKey === "published").length,
+  activeServices: servicesConfig.services.length,
+  featuredServices: servicesConfig.services.filter((service) => Boolean(service.upsell)).length,
 };
 ---
 
@@ -78,7 +127,7 @@ const stats = {
       ))}
     </section>
 
-    <section class="grid gap-4 md:grid-cols-5">
+    <section class="grid gap-4 md:grid-cols-4 xl:grid-cols-8">
       <article class="rounded-[1.6rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] p-5 text-right">
         <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">Articles</p>
         <p class="mt-3 text-3xl font-semibold text-[#1A1A1A]">{stats.totalArticles}</p>
@@ -92,18 +141,33 @@ const stats = {
         <p class="mt-3 text-3xl font-semibold text-[#1A1A1A]">{stats.live}</p>
       </article>
       <article class="rounded-[1.6rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] p-5 text-right">
-        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">Active Services</p>
-        <p class="mt-3 text-3xl font-semibold text-[#1A1A1A]">{stats.activeServices}</p>
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">בכתיבה</p>
+        <p class="mt-3 text-3xl font-semibold text-[#1A1A1A]">{stats.writing}</p>
       </article>
       <article class="rounded-[1.6rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] p-5 text-right">
-        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">Upsells / Scarcity</p>
-        <p class="mt-3 text-3xl font-semibold text-[#1A1A1A]">{stats.featuredServices}</p>
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">לבדיקה</p>
+        <p class="mt-3 text-3xl font-semibold text-[#1A1A1A]">{stats.review}</p>
+      </article>
+      <article class="rounded-[1.6rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] p-5 text-right">
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">מוכן לפרסום</p>
+        <p class="mt-3 text-3xl font-semibold text-[#1A1A1A]">{stats.ready}</p>
+      </article>
+      <article class="rounded-[1.6rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] p-5 text-right">
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">פורסם</p>
+        <p class="mt-3 text-3xl font-semibold text-[#1A1A1A]">{stats.published}</p>
+      </article>
+      <article class="rounded-[1.6rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] p-5 text-right">
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">Active Services</p>
+        <p class="mt-3 text-3xl font-semibold text-[#1A1A1A]">{stats.activeServices}</p>
       </article>
     </section>
 
     <ArticlesTable articles={articles} />
 
-    <ServicesControlPanel />
+    <div class="grid gap-8 xl:grid-cols-2">
+      <ServicesControlPanel />
+      <AppConfigControlPanel />
+    </div>
 
     <section class="grid gap-4 md:grid-cols-2">
       <article class="rounded-[1.8rem] border border-[#1A1A1A]/10 bg-white/82 p-5 shadow-[0_24px_70px_rgba(26,26,26,0.06)] text-right">
@@ -120,10 +184,13 @@ const stats = {
         <h2 class="mt-3 text-2xl font-semibold text-[#1A1A1A]">מה עושים מכאן</h2>
         <ol class="mt-5 space-y-3 text-sm leading-7 text-[#1A1A1A]/72">
           <li class="rounded-[1.2rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] px-4 py-3">יוצרים מאמר חדש דרך המחולל.</li>
-          <li class="rounded-[1.2rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] px-4 py-3">מעדכנים מחירים, חבילות ותוספים מתוך services.json.</li>
+          <li class="rounded-[1.2rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] px-4 py-3">מקדמים כל מאמר דרך התור: בכתיבה, לבדיקה, מוכן לפרסום, ואז פורסם.</li>
           <li class="rounded-[1.2rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] px-4 py-3">עושים commit עם הודעה קצרה שמתארת את השינוי.</li>
         </ol>
       </article>
     </section>
   </section>
 </Layout>
+
+
+

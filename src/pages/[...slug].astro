@@ -8,10 +8,52 @@ import SubscribeBanner from "../components/SubscribeBanner.astro";
 import LiteYouTubeEmbed from "../components/LiteYouTubeEmbed.astro";
 import SkepticBox from "../components/SkepticBox.astro";
 import ConceptCallout from "../components/ConceptCallout.astro";
+import PremiumLock from "../components/PremiumLock.astro";
+import RevealInsight from "../components/RevealInsight.astro";
+import appConfig from "../config/appConfig.json";
 
 type ArticleEntry = CollectionEntry<"articles">;
+type InternalLink = {
+  href: string;
+  title: string;
+  description: string;
+  kind: "article" | "topic" | "page";
+  score?: number;
+};
 
 const toArticleSlug = (entry: ArticleEntry) => entry.id.replace(/\.mdx$/, "");
+const topicMap = {
+  "חופש": {
+    href: "/topics/freedom/",
+    title: "נושא: חופש",
+    description: "ריכוז מאמרים על חופש, אחריות, והמחיר של בחירה אמיתית.",
+  },
+  "מכניקת מחשבה": {
+    href: "/topics/thought-mechanics/",
+    title: "נושא: מכניקת מחשבה",
+    description: "מקום אחד למאמרים שמפרקים איך מחשבה מנהלת התנהגות.",
+  },
+  "העצמי": {
+    href: "/topics/self/",
+    title: "נושא: העצמי",
+    description: "חקירה של זהות, הזדהות, ודמות פנימית שמתעקשת להחזיק מעמד.",
+  },
+  "בהירות": {
+    href: "/topics/clarity/",
+    title: "נושא: בהירות",
+    description: "מאמרים שמנקים רעש ומכריחים לראות מה באמת קורה.",
+  },
+  "בחירה": {
+    href: "/topics/choice/",
+    title: "נושא: בחירה",
+    description: "מאמרים על רצון, החלטה, ושליטה מדומיינת.",
+  },
+} as const;
+const kindLabelMap = {
+  article: "מאמר קשור",
+  topic: "דף נושא",
+  page: "עמוד ליבה",
+} as const;
 
 export async function getStaticPaths() {
   const entries = await getCollection("articles", ({ data }) => data.draft !== true);
@@ -33,7 +75,7 @@ const audioUrl = frontmatter.audioUrl;
 const tags = Array.isArray(frontmatter.tags) ? frontmatter.tags : [];
 const faqItems = Array.isArray(frontmatter.faq) ? frontmatter.faq : [];
 const hasInquirySection = rawContent.includes("InquirySection") || rawContent.includes("InquiryBox");
-const siteUrl = Astro.site?.toString() ?? "https://www.nevermind.co.il";
+const siteUrl = Astro.site?.toString() ?? appConfig.site.url;
 const shareUrl = Astro.url ? new URL(Astro.url.pathname, siteUrl).toString() : siteUrl;
 const whatsappShareUrl = `https://wa.me/?text=${encodeURIComponent(`מצאתי תובנה מעניינת ב-NeverMind: ${title} - ${shareUrl}`)}`;
 const web3formsKey = "94b32b6c-7590-4ac6-b8b4-1bc73dd2e5c8";
@@ -42,10 +84,85 @@ const wordCount = rawContent.replace(/<[^>]*>/g, " ").split(/\s+/).filter(Boolea
 const readingMinutes = Math.max(1, Math.round(wordCount / 200));
 const depth = wordCount > 1400 ? "עמוק מאוד" : wordCount > 900 ? "עמוק" : "נגיש";
 const premiumVault = siteSettings.premiumVault;
+const premiumAccess = appConfig.premiumAccess;
 const relatedArticles = allEntries
   .filter((item) => `articles/${toArticleSlug(item)}` !== currentSlug)
-  .filter((item) => (item.data.tags ?? []).some((tag) => tags.includes(tag)))
-  .slice(0, 2);
+  .map((item) => {
+    const itemTags = Array.isArray(item.data.tags) ? item.data.tags : [];
+    const overlap = itemTags.filter((tag) => tags.includes(tag)).length;
+    return { item, overlap };
+  })
+  .filter(({ overlap }) => overlap > 0)
+  .sort((left, right) => {
+    if (right.overlap !== left.overlap) return right.overlap - left.overlap;
+    return right.item.data.pubDate.getTime() - left.item.data.pubDate.getTime();
+  })
+  .slice(0, 3);
+
+const internalLinks: InternalLink[] = [];
+const seenLinks = new Set<string>([shareUrl, `/${currentSlug}`]);
+
+const pushInternalLink = (link: InternalLink) => {
+  if (seenLinks.has(link.href)) return;
+  seenLinks.add(link.href);
+  internalLinks.push(link);
+};
+
+for (const { item, overlap } of relatedArticles) {
+  pushInternalLink({
+    href: `/articles/${toArticleSlug(item)}`,
+    title: item.data.title,
+    description: item.data.description,
+    kind: "article",
+    score: overlap,
+  });
+}
+
+for (const tag of tags) {
+  const topicLink = topicMap[tag as keyof typeof topicMap];
+  if (!topicLink) continue;
+  pushInternalLink({
+    ...topicLink,
+    kind: "topic",
+  });
+}
+
+[
+  {
+    href: "/articles/",
+    title: "כל המאמרים",
+    description: "ספריית התוכן המלאה, למעבר בין חקירות לפי כיוון ולא לפי רעש.",
+    kind: "page" as const,
+  },
+  {
+    href: "/services/",
+    title: "עבודה משותפת",
+    description: "אם המאמר פגש נקודה חיה, אפשר להפוך אותה לעבודה ממוקדת ולא לעוד מחשבה.",
+    kind: "page" as const,
+  },
+  {
+    href: "/now/",
+    title: "מה המצב עכשיו",
+    description: "עדכון קצר על הכיוון הנוכחי של NeverMind, בלי מסכות ובלי יחסי ציבור.",
+    kind: "page" as const,
+  },
+].forEach(pushInternalLink);
+
+const curatedInternalLinks = internalLinks.slice(0, 5);
+while (curatedInternalLinks.length < 3) {
+  const fallbackArticle = allEntries.find(
+    (item) =>
+      `articles/${toArticleSlug(item)}` !== currentSlug &&
+      !curatedInternalLinks.some((link) => link.href === `/articles/${toArticleSlug(item)}`)
+  );
+  if (!fallbackArticle) break;
+  curatedInternalLinks.push({
+    href: `/articles/${toArticleSlug(fallbackArticle)}`,
+    title: fallbackArticle.data.title,
+    description: fallbackArticle.data.description,
+    kind: "article",
+  });
+}
 
 const components = {
   InquiryBox,
@@ -53,6 +170,8 @@ const components = {
   SubscribeBanner,
   SkepticBox,
   ConceptCallout,
+  PremiumLock,
+  RevealInsight,
 };
 ---
 
@@ -112,6 +231,10 @@ const components = {
       data-premium-description={premiumVault.description}
       data-premium-cta-label={premiumVault.ctaLabel}
       data-premium-cta-href={premiumVault.ctaHref}
+      data-premium-access-enabled={premiumAccess.enabled ? "true" : "false"}
+      data-premium-access-route={premiumAccess.unlockRoute}
+      data-premium-access-session-hours={String(premiumAccess.sessionHours || 168)}
+      data-premium-access-helper={premiumAccess.helperText}
       class="space-y-6"
     >
       <Content components={components} />
@@ -145,18 +268,23 @@ const components = {
     </div>
   </section>
 
-  {relatedArticles.length > 0 && (
+  {curatedInternalLinks.length > 0 && (
     <section class="mx-auto mt-[clamp(3rem,5vw,4rem)] max-w-[72ch] space-y-4">
-      <h2 class="text-[clamp(1.4rem,1.15rem+1vw,2rem)] font-semibold text-[#1A1A1A]">חקירה משלימה</h2>
-      <div class={`grid gap-4 ${relatedArticles.length > 1 ? "md:grid-cols-2" : ""}`}>
-        {relatedArticles.map((article) => (
+      <div class="space-y-2">
+        <h2 class="text-[clamp(1.4rem,1.15rem+1vw,2rem)] font-semibold text-[#1A1A1A]">ראה גם</h2>
+        <p class="text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] text-[#1A1A1A]/65">
+          כדי להעמיק בלי לשבור רצף, המשך מכאן ל־3–5 עמודים שמרחיבים את אותה חקירה מכיוון אחר.
+        </p>
+      </div>
+      <div class={`grid gap-4 ${curatedInternalLinks.length > 1 ? "md:grid-cols-2" : ""}`}>
+        {curatedInternalLinks.map((link) => (
           <a
-            href={`/articles/${toArticleSlug(article)}`}
+            href={link.href}
             class="flex h-full flex-col justify-between gap-3 rounded-3xl border border-[#1A1A1A]/10 bg-white/70 px-5 py-4 text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] text-[#1A1A1A]/80 shadow-sm transition-all duration-500 hover:translate-y-[-2px] hover:bg-white"
           >
-            <span class="text-[clamp(0.8rem,0.78rem+0.2vw,0.95rem)] text-[#1A1A1A]/55">חקירה משלימה</span>
-            <span class="font-semibold text-[#1A1A1A]">{article.data.title}</span>
-            <span class="text-[clamp(0.85rem,0.82rem+0.2vw,1rem)] text-[#1A1A1A]/60">{article.data.description}</span>
+            <span class="text-[clamp(0.8rem,0.78rem+0.2vw,0.95rem)] text-[#1A1A1A]/55">{kindLabelMap[link.kind]}</span>
+            <span class="font-semibold text-[#1A1A1A]">{link.title}</span>
+            <span class="text-[clamp(0.85rem,0.82rem+0.2vw,1rem)] text-[#1A1A1A]/60">{link.description}</span>
           </a>
         ))}
       </div>
@@ -356,12 +484,30 @@ const components = {
         if (!(premiumBody instanceof HTMLElement)) return;
         if (premiumBody.dataset.premiumInitialized === "true") return;
 
-        const STORAGE_KEY = "nm-site-settings-overrides";
+        const SETTINGS_STORAGE_KEY = "nm-site-settings-overrides";
+        const ACCESS_STORAGE_KEY = "nm-premium-access";
         const readOverrides = () => {
           try {
-            return JSON.parse(window.localStorage.getItem(STORAGE_KEY) || "null");
+            return JSON.parse(window.localStorage.getItem(SETTINGS_STORAGE_KEY) || "null");
           } catch {
             return null;
+          }
+        };
+
+        const hasActivePremiumSession = () => {
+          try {
+            const raw = window.localStorage.getItem(ACCESS_STORAGE_KEY);
+            if (!raw) return false;
+            const parsed = JSON.parse(raw);
+            const expiresAt = Date.parse(parsed?.expiresAt || "");
+            if (!Number.isFinite(expiresAt) || expiresAt <= Date.now()) {
+              window.localStorage.removeItem(ACCESS_STORAGE_KEY);
+              return false;
+            }
+            return true;
+          } catch {
+            window.localStorage.removeItem(ACCESS_STORAGE_KEY);
+            return false;
           }
         };
 
@@ -386,10 +532,38 @@ const components = {
           }
         }
 
+        if (!markerNode) {
+          premiumBody.dataset.premiumPending = "false";
+          premiumBody.dataset.premiumInitialized = "true";
+          return;
+        }
+
+        markerNode.parentNode?.removeChild(markerNode);
+
+        if (hasActivePremiumSession()) {
+          premiumBody.dataset.premiumPending = "false";
+          premiumBody.dataset.premiumInitialized = "true";
+          return;
+        }
+
         const title = overrides.title || premiumBody.dataset.premiumTitle || "This professional method is reserved for premium members";
         const description = overrides.description || premiumBody.dataset.premiumDescription || "המשך התוכן המלא שמור כרגע לחברי פרימיום.";
-        const ctaLabel = overrides.ctaLabel || premiumBody.dataset.premiumCtaLabel || "לשירותים ומחירים";
-        const ctaHref = overrides.ctaHref || premiumBody.dataset.premiumCtaHref || "/now";
+        const fallbackCtaLabel = overrides.ctaLabel || premiumBody.dataset.premiumCtaLabel || "לשירותים ומחירים";
+        const fallbackCtaHref = overrides.ctaHref || premiumBody.dataset.premiumCtaHref || "/now";
+        const accessEnabled = premiumBody.dataset.premiumAccessEnabled === "true";
+        const accessRoute = premiumBody.dataset.premiumAccessRoute || "/premium-access/";
+        const helperText = premiumBody.dataset.premiumAccessHelper || "גישה לתוכן פרימיום נפתחת כרגע דרך קוד גישה מתחלף.";
+        const returnTo = encodeURIComponent(window.location.pathname);
+        const primaryHref = accessEnabled ? `${accessRoute}?returnTo=${returnTo}` : fallbackCtaHref;
+        const primaryLabel = accessEnabled ? "להזין קוד גישה" : fallbackCtaLabel;
+
+        const range = document.createRange();
+        range.setStartAfter(markerNode);
+        range.setEndAfter(premiumBody.lastChild);
+        const hiddenContent = range.extractContents();
+
+        const previewShell = document.createElement("section");
+        previewShell.className = "nm-premium-shell";
 
         const card = document.createElement("section");
         card.className = "nm-premium-card";
@@ -397,35 +571,26 @@ const components = {
           <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">Premium Vault</p>
           <h2 class="mt-3 text-[clamp(1.4rem,1.1rem+0.8vw,1.9rem)] font-semibold text-[#1A1A1A]">${title}</h2>
           <p class="mt-3 text-[1rem] leading-8 text-[#1A1A1A]/68">${description}</p>
-          <a href="${ctaHref}" class="mt-5 inline-flex items-center rounded-full bg-[#1A1A1A] px-5 py-3 text-sm font-semibold text-[#FAFAF8] no-underline transition hover:bg-black">${ctaLabel}</a>
+          <p class="mt-3 text-sm leading-7 text-[#1A1A1A]/56">${helperText}</p>
+          <div class="mt-5 flex flex-wrap gap-3">
+            <a href="${primaryHref}" class="inline-flex items-center rounded-full bg-[#1A1A1A] px-5 py-3 text-sm font-semibold text-[#FAFAF8] no-underline transition hover:bg-black">${primaryLabel}</a>
+            <a href="${fallbackCtaHref}" class="inline-flex items-center rounded-full border border-[#1A1A1A]/10 bg-white px-5 py-3 text-sm font-semibold text-[#1A1A1A] no-underline transition hover:bg-[#FAFAF8]">${fallbackCtaLabel}</a>
+          </div>
         `;
 
-        if (markerNode && premiumBody.lastChild) {
-          const range = document.createRange();
-          range.setStartAfter(markerNode);
-          range.setEndAfter(premiumBody.lastChild);
-          const hiddenContent = range.extractContents();
-          markerNode.parentNode?.removeChild(markerNode);
+        const preview = document.createElement("div");
+        preview.className = "nm-premium-preview";
+        const inner = document.createElement("div");
+        inner.className = "nm-premium-preview__inner";
+        inner.appendChild(hiddenContent);
+        const fade = document.createElement("div");
+        fade.className = "nm-premium-preview__fade";
+        preview.appendChild(inner);
+        preview.appendChild(fade);
 
-          const previewShell = document.createElement("section");
-          previewShell.className = "nm-premium-shell";
-
-          const preview = document.createElement("div");
-          preview.className = "nm-premium-preview";
-          const inner = document.createElement("div");
-          inner.className = "nm-premium-preview__inner";
-          inner.appendChild(hiddenContent);
-          const fade = document.createElement("div");
-          fade.className = "nm-premium-preview__fade";
-          preview.appendChild(inner);
-          preview.appendChild(fade);
-
-          previewShell.appendChild(card);
-          previewShell.appendChild(preview);
-          premiumBody.appendChild(previewShell);
-        } else {
-          premiumBody.appendChild(card);
-        }
+        previewShell.appendChild(card);
+        previewShell.appendChild(preview);
+        premiumBody.appendChild(previewShell);
 
         premiumBody.dataset.premiumPending = "false";
         premiumBody.dataset.premiumInitialized = "true";
@@ -493,6 +658,3 @@ const components = {
     });
   </script>
 </Layout>
-
-
-

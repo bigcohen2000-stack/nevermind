@@ -17,6 +17,7 @@ const articles = defineCollection({
     tallyUrl: z.string().url().optional(),
     isPremium: z.boolean().default(false),
     draft: z.boolean().default(false),
+    workflowStatus: z.enum(["writing", "review", "ready", "published"]).optional(),
     faq: z
       .array(
         z.object({

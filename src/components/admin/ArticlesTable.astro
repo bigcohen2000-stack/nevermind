@@ -1,6 +1,8 @@
 ﻿---
 interface ArticleRow {
   title: string;
+  workflowStatus: string;
+  workflowTone: string;
   status: string;
   statusTone: string;
   premium: string;
@@ -31,6 +33,7 @@ const { articles } = Astro.props;
       <thead class="bg-[#FAFAF8]">
         <tr>
           <th class="px-4 py-4 text-sm font-semibold text-[#1A1A1A]">כותרת</th>
+          <th class="px-4 py-4 text-sm font-semibold text-[#1A1A1A]">תור עבודה</th>
           <th class="px-4 py-4 text-sm font-semibold text-[#1A1A1A]">סטטוס</th>
           <th class="px-4 py-4 text-sm font-semibold text-[#1A1A1A]">פרימיום</th>
           <th class="px-4 py-4 text-sm font-semibold text-[#1A1A1A]">תאריך</th>
@@ -45,6 +48,9 @@ const { articles } = Astro.props;
                 <p class="font-semibold text-[#1A1A1A]">{article.title}</p>
                 <p class="text-xs text-[#1A1A1A]/54">/{article.slug}</p>
               </div>
+            </td>
+            <td class="px-4 py-4 align-top">
+              <span class={`inline-flex rounded-full border px-3 py-1 text-xs font-semibold ${article.workflowTone}`}>{article.workflowStatus}</span>
             </td>
             <td class="px-4 py-4 align-top">
               <span class={`inline-flex rounded-full border px-3 py-1 text-xs font-semibold ${article.statusTone}`}>{article.status}</span>

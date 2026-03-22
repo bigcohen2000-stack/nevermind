@@ -11,19 +11,25 @@ const sortedArticles = allArticles.sort(
 );
 const recentArticles = sortedArticles.slice(0, 9);
 const siteUrl = Astro.site?.toString() ?? "https://www.nevermind.co.il";
-const formatMoney = (value: number) => `${value.toLocaleString("he-IL")} ${servicesConfig.currency}`;
+const formatMoney = (value: number) => `${Math.round(value).toLocaleString("he-IL")} ${servicesConfig.currency}`;
+const grossPrice = (service: (typeof servicesConfig.services)[number]) => Math.round(service.basePrice * (1 + service.taxPercent / 100));
+const serviceBadgeMap: Record<string, string | undefined> = {
+  "learning-group": "הכי מבוקש",
+  "podcast-view": "כולל שדרוג",
+  "terrace-subscription": "ליווי רציף",
+};
 const activeServices = [...servicesConfig.services]
-  .filter((service) => service.visible !== false)
-  .sort((a, b) => Number(Boolean(b.badge)) - Number(Boolean(a.badge)))
+  .sort((a, b) => Number(Boolean(b.upsell)) - Number(Boolean(a.upsell)))
   .slice(0, 3)
   .map((service) => ({
     ...service,
     summary: service.description,
     priceLabel:
-      "price_per_unit" in service
-        ? `${formatMoney(Number(service.price_per_unit))} / ${service.unit_label}`
-        : `${formatMoney(service.base_price_30min)} ל-30 דקות`,
-    featured: Boolean(service.badge),
+      service.id === "terrace-subscription"
+        ? `${formatMoney(grossPrice(service))} / חודש`
+        : `${formatMoney(grossPrice(service))} כולל מע״מ`,
+    featured: Boolean(service.upsell) || service.id === "learning-group",
+    badge: serviceBadgeMap[service.id],
     href: `/services/?service=${service.id}#${service.id}`,
   }));
 
@@ -287,5 +293,6 @@ const cards = [
     });
   </script>
 </Layout>
+
 
 

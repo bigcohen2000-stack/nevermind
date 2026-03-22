@@ -10,7 +10,7 @@
         "serviceId": "podcast-view",
         "message": "אם כבר הגעת לייעוץ סאונד, חבל לעצור בלי התיעוד המצולם. אפשר לשדרג מיד למסלול פודקאסט + מיקרופון.",
         "ctaLabel": "לראות את השדרוג",
-        "ctaHref": "/services/?service=podcast-view#podcast-mic"
+        "ctaHref": "/services/?service=podcast-view#podcast-view"
       }
     ]
   },
@@ -23,3 +23,4 @@
     "ctaHref": "/services/"
   }
 }
+

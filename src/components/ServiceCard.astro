@@ -1,0 +1,93 @@
+---
+type Service = {
+  id: string;
+  title: string;
+  description: string;
+  basePrice: number;
+  taxPercent: number;
+  upsell?: {
+    title: string;
+    price: number;
+  };
+  actionType: string;
+  actionLink: string;
+};
+
+interface Props {
+  service: Service;
+  currency?: string;
+  taxLabel?: string;
+  badge?: string;
+  note?: string;
+  ctaMessage?: string;
+}
+
+const {
+  service,
+  currency = "₪",
+  taxLabel = "לפני מע״מ",
+  badge,
+  note,
+  ctaMessage,
+} = Astro.props;
+
+const formatMoney = (value: number) => `${Math.round(value).toLocaleString("he-IL")} ${currency}`;
+const grossPrice = Math.round(service.basePrice * (1 + service.taxPercent / 100));
+const vatAmount = Math.round(service.basePrice * (service.taxPercent / 100));
+const defaultMessage = `היי, אני רוצה לבדוק את ${service.title}. המחיר הבסיסי הוא ${formatMoney(service.basePrice)} ${taxLabel}.`;
+const href =
+  service.actionType === "invoice"
+    ? service.actionLink
+    : `${service.actionLink}?text=${encodeURIComponent(ctaMessage || defaultMessage)}`;
+const ctaLabel = service.actionType === "invoice" ? "לתשלום ישיר" : "לתיאום בוואטסאפ";
+---
+
+<article
+  id={service.id}
+  data-service-card={service.id}
+  class="rounded-[2rem] border border-[#1A1A1A]/10 bg-white/88 p-7 shadow-[0_24px_80px_rgba(26,26,26,0.06)] transition"
+>
+  <div class="space-y-3 text-right">
+    <div class="flex items-start justify-between gap-4">
+      <h2 class="text-3xl font-semibold text-[#1A1A1A]">{service.title}</h2>
+      {badge && (
+        <span class="rounded-full border border-[#D42B2B]/14 bg-[#FFF4F3] px-3 py-1 text-xs font-semibold text-[#D42B2B]">
+          {badge}
+        </span>
+      )}
+    </div>
+    <p class="text-base leading-8 text-[#1A1A1A]/70">{service.description}</p>
+  </div>
+
+  <div class="mt-8 grid gap-4 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
+    <div class="text-right">
+      <p class="text-sm font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">כולל מע״מ</p>
+      <p class="mt-2 text-4xl font-semibold text-[#1A1A1A]">{formatMoney(grossPrice)}</p>
+      <p class="mt-2 text-sm leading-7 text-[#1A1A1A]/64">
+        {formatMoney(service.basePrice)} {taxLabel} + {formatMoney(vatAmount)} מע״מ
+      </p>
+    </div>
+
+    <a
+      href={href}
+      target={service.actionType === "invoice" ? "_blank" : undefined}
+      rel={service.actionType === "invoice" ? "noreferrer" : undefined}
+      class="inline-flex items-center justify-center rounded-full bg-[#D42B2B] px-5 py-3 text-sm font-semibold text-[#FAFAF8] transition hover:bg-[#b82424]"
+    >
+      {ctaLabel}
+    </a>
+  </div>
+
+  {service.upsell && (
+    <div class="mt-8 rounded-[1.4rem] border border-[#D42B2B]/14 bg-[#FFF4F3] px-5 py-4 text-right">
+      <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">שדרוג</p>
+      <h3 class="mt-2 text-lg font-semibold text-[#1A1A1A]">{service.upsell.title}</h3>
+      <p class="mt-2 text-sm leading-7 text-[#1A1A1A]/68">
+        {formatMoney(service.upsell.price)} לפני מע״מ, או{" "}
+        {formatMoney(Math.round(service.upsell.price * (1 + service.taxPercent / 100)))} כולל מע״מ.
+      </p>
+    </div>
+  )}
+
+  {note && <p class="mt-8 text-sm leading-7 text-[#1A1A1A]/64">{note}</p>}
+</article>
