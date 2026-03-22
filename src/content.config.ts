@@ -14,6 +14,11 @@ const articles = defineCollection({
     canonicalUrl: z.string().url().optional(),
     keywords: z.string().optional(),
     audioUrl: z.string().optional(),
+    /** קובץ מקומי תחת public/audio/articles/ (ללא נתיב) */
+    audioFile: z
+      .string()
+      .regex(/^[a-zA-Z0-9._-]+\.(mp3|m4a|ogg|wav)$/)
+      .optional(),
     youtubeId: z.string().optional(),
     /** נקודות מרכזיות מהתמלול — מוצגות ב"סיכום מהיר" מתחת לנגן + SEO */
     videoSummaryPoints: z.array(z.string()).optional(),

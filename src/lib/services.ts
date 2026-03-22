@@ -1,4 +1,4 @@
-﻿import servicesConfig from "../config/services.json";
+import servicesConfig from "../config/services.json";
 import appConfig from "../config/appConfig.json";
 
 type ServicesConfig = typeof servicesConfig;
@@ -45,6 +45,11 @@ export const findServiceById = (id: string) => flattenVisibleServices().find((se
 
 export const buildWhatsAppHref = (message: string) =>
   `https://wa.me/${appConfig.contact.whatsAppNumber}?text=${encodeURIComponent(message)}`;
+
+/** הודעת וואטסאפ אחידה לתיאום פגישה ממאמר */
+export function buildArticleMeetingWhatsAppMessage(params: { title: string; slug: string }): string {
+  return `היי, הגעתי מהמאמר "${params.title}" (${params.slug}) ואני רוצה לתאם פגישה.`;
+}
 
 /** טקסט ליד קונטקסטואלי לפי תגית ראשונה מה-frontmatter (או נושא/כותרת גיבוי) */
 export const buildArticleContextLeadMessage = (opts: {

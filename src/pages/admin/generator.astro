@@ -1,4 +1,4 @@
-﻿---
+---
 import Layout from "../../layouts/Layout.astro";
 import appConfig from "../../config/appConfig.json";
 import { formatMoney, servicesAddOns } from "../../lib/services";
@@ -44,6 +44,227 @@ const upsellPreviewText = documentationService
         ואז מאפשר להדביק את ה־MDX שחזר מהמודל ולבדוק תצוגה לפני commit ל־GitHub.
       </p>
     </header>
+
+    <!-- Phase 1 (nevermind-cursor-spec): SRT → MDX pipeline — section בלבד, ללא שינוי schema/routing -->
+    <section
+      class="space-y-6 rounded-[2rem] border border-[#1A1A1A]/10 bg-white/82 p-6 shadow-[0_30px_90px_rgba(26,26,26,0.08)] backdrop-blur-md"
+      aria-labelledby="srt-pipeline-heading"
+    >
+      <div class="space-y-2 text-right">
+        <p class="text-sm font-semibold uppercase tracking-[0.26em] text-[#D42B2B]">ממיר תמלול</p>
+        <h2 id="srt-pipeline-heading" class="text-2xl font-semibold text-[#1A1A1A]">
+          ממיר תמלול SRT למאמר
+        </h2>
+        <p class="max-w-3xl text-sm leading-7 text-[#1A1A1A]/60">
+          קלט: קובץ <code dir="ltr">.srt</code> + מזהה YouTube + נושא מנחה (אופציונלי). פלט: שלד MDX עם frontmatter תקין, תמלול ב־RevealInsight, ונקודות לווידאו — מוכן להעברה ל־AI לשיפור ניסוח.
+        </p>
+      </div>
+
+      <div class="space-y-2 text-right">
+        <label for="srt-file-input" class="block text-sm font-semibold text-[#1A1A1A]">קובץ תמלול (.srt)</label>
+        <input
+          id="srt-file-input"
+          type="file"
+          accept=".srt,text/plain"
+          class="block w-full cursor-pointer rounded-[1.6rem] border border-dashed border-[#1A1A1A]/20 bg-[#FAFAF8] px-4 py-6 text-sm text-[#1A1A1A]/72 file:me-4 file:cursor-pointer file:rounded-full file:border-0 file:bg-[#1A1A1A] file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white"
+        />
+        <p id="srt-file-label" class="text-xs text-[#1A1A1A]/50">לא נבחר קובץ</p>
+      </div>
+
+      <div class="grid gap-4 sm:grid-cols-2">
+        <div class="space-y-2 text-right">
+          <label for="srt-youtube-id" class="block text-sm font-semibold text-[#1A1A1A]">youtubeId (11 תווים)</label>
+          <input
+            id="srt-youtube-id"
+            type="text"
+            dir="ltr"
+            maxlength="11"
+            class="w-full rounded-[1.6rem] border border-[#1A1A1A]/12 bg-[#FAFAF8] px-5 py-3 text-left font-mono text-sm text-[#1A1A1A] outline-none transition focus:border-[#D42B2B]/40 focus:ring-2 focus:ring-[#D42B2B]/15"
+            placeholder="dQw4w9WgXcQ"
+          />
+        </div>
+        <div class="space-y-2 text-right sm:col-span-2">
+          <label for="srt-guide-topic" class="block text-sm font-semibold text-[#1A1A1A]">כותרת / נושא מנחה (אופציונלי)</label>
+          <textarea
+            id="srt-guide-topic"
+            rows="3"
+            class="w-full rounded-[1.6rem] border border-[#1A1A1A]/12 bg-[#FAFAF8] px-5 py-4 text-right text-base leading-7 text-[#1A1A1A] outline-none transition focus:border-[#D42B2B]/40 focus:ring-2 focus:ring-[#D42B2B]/15"
+            dir="rtl"
+            placeholder="אם ריק — ייגזר טקסט מהתמלול"
+          ></textarea>
+        </div>
+      </div>
+
+      <div class="grid gap-4 sm:grid-cols-2">
+        <label class="flex items-start gap-3 rounded-[1.35rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] px-4 py-4 text-right">
+          <input id="srt-is-premium" type="checkbox" class="mt-1 h-4 w-4 accent-[#D42B2B]" />
+          <span>
+            <span class="block text-sm font-semibold text-[#1A1A1A]">מאמר פרימיום (isPremium)</span>
+            <span class="mt-1 block text-sm leading-6 text-[#1A1A1A]/60">מסמן את המאמר כפרימיום ב־frontmatter.</span>
+          </span>
+        </label>
+        <div class="grid gap-3 sm:grid-cols-2">
+          <div class="space-y-2 text-right">
+            <label for="srt-difficulty" class="block text-sm font-semibold text-[#1A1A1A]">difficultyLevel</label>
+            <select
+              id="srt-difficulty"
+              class="w-full rounded-[1.35rem] border border-[#1A1A1A]/12 bg-white px-4 py-3 text-sm font-medium text-[#1A1A1A] outline-none"
+            >
+              <option value="beginner">beginner</option>
+              <option value="advanced" selected>advanced</option>
+              <option value="deep">deep</option>
+            </select>
+          </div>
+          <div class="space-y-2 text-right">
+            <label for="srt-workflow" class="block text-sm font-semibold text-[#1A1A1A]">workflowStatus</label>
+            <select
+              id="srt-workflow"
+              class="w-full rounded-[1.35rem] border border-[#1A1A1A]/12 bg-white px-4 py-3 text-sm font-medium text-[#1A1A1A] outline-none"
+            >
+              <option value="writing" selected>writing</option>
+              <option value="review">review</option>
+              <option value="ready">ready</option>
+              <option value="published">published</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <p id="srt-status" class="rounded-[1.2rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] px-4 py-3 text-right text-sm text-[#1A1A1A]/68" role="status">
+        מוכן לטעינת SRT.
+      </p>
+
+      <button
+        id="srt-build-mdx"
+        type="button"
+        class="inline-flex w-full items-center justify-center rounded-full bg-[#1A1A1A] px-6 py-4 text-base font-semibold text-[#FAFAF8] transition hover:bg-black focus:outline-none focus:ring-2 focus:ring-[#1A1A1A]/25 sm:w-auto"
+      >
+        צור MDX מהתמלול
+      </button>
+
+      <div class="space-y-2 text-right">
+        <label for="srt-mdx-output" class="block text-sm font-semibold text-[#1A1A1A]">פלט MDX</label>
+        <textarea
+          id="srt-mdx-output"
+          rows="22"
+          dir="ltr"
+          readonly
+          class="w-full rounded-[1.6rem] border border-[#1A1A1A]/12 bg-[#111111] px-5 py-4 text-left text-sm leading-7 text-[#F4F4EF] outline-none"
+          placeholder="הפלט יופיע כאן אחרי לחיצה על «צור MDX מהתמלול»"
+        ></textarea>
+        <div id="srt-qa-panel" class="hidden space-y-2 rounded-[1.2rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] p-4 text-right">
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-[#1A1A1A]/08 pb-2">
+            <h3 class="text-sm font-semibold text-[#1A1A1A]">בדיקת QA לפני פרסום</h3>
+            <button
+              type="button"
+              id="srt-run-qa"
+              class="rounded-full border border-[#1A1A1A]/12 bg-white px-3 py-1 text-xs font-semibold text-[#1A1A1A]/78 transition hover:bg-[#FAFAF8]"
+            >
+              רענן בדיקה
+            </button>
+          </div>
+          <ul id="srt-qa-list" class="space-y-1.5 text-xs leading-6 text-[#1A1A1A]/82"></ul>
+        </div>
+        <div class="flex flex-wrap justify-end gap-3">
+          <button
+            id="srt-handoff-composer"
+            type="button"
+            disabled
+            class="inline-flex items-center justify-center rounded-full bg-[#D42B2B] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#ba2424] disabled:cursor-not-allowed disabled:opacity-45"
+          >
+            שלב הבא — מלא עורך המאמר
+          </button>
+          <button
+            id="srt-copy-mdx"
+            type="button"
+            class="inline-flex items-center justify-center rounded-full border border-[#1A1A1A]/10 bg-[#FAFAF8] px-5 py-3 text-sm font-semibold text-[#1A1A1A]/78 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-50"
+            disabled
+          >
+            העתק MDX
+          </button>
+          <button
+            id="srt-export-mdx"
+            type="button"
+            class="inline-flex items-center justify-center rounded-full border border-[#1A1A1A]/10 bg-white px-5 py-3 text-sm font-semibold text-[#1A1A1A]/78 transition hover:bg-[#FAFAF8] disabled:cursor-not-allowed disabled:opacity-50"
+            disabled
+          >
+            ייצא קובץ .mdx
+          </button>
+          <button
+            id="srt-copy-ai-prompt"
+            type="button"
+            disabled
+            class="inline-flex items-center justify-center rounded-full border border-[#D42B2B]/35 bg-white px-5 py-3 text-sm font-semibold text-[#D42B2B] transition hover:bg-[#FFF4F3] disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            העתק פרומפט ל-AI
+          </button>
+        </div>
+        <p class="text-right text-xs leading-6 text-[#1A1A1A]/55">
+          אחרי יצירת MDX: לחיצה על «שלב הבא» ממלאת כותרת, תיאור, יוטיוב וגוף המאמר בעורך — משם אפשר «העתק MDX מוכן» או GitHub.
+        </p>
+      </div>
+    </section>
+
+    <section
+      class="space-y-6 rounded-[2rem] border border-[#1A1A1A]/10 bg-white/82 p-6 shadow-[0_30px_90px_rgba(26,26,26,0.08)] backdrop-blur-md"
+      aria-labelledby="image-prompt-heading"
+    >
+      <div class="space-y-2 text-right">
+        <p class="text-sm font-semibold uppercase tracking-[0.26em] text-[#D42B2B]">תמונת שער</p>
+        <h2 id="image-prompt-heading" class="text-2xl font-semibold text-[#1A1A1A]">פרומפט לתמונת שער</h2>
+        <p class="max-w-3xl text-sm leading-7 text-[#1A1A1A]/60">
+          נושא המאמר + סוג ויזואל — מייצר טקסט אחד מוכן להדבקה ב־Midjourney / DALL-E (לפי המסמך nevermind-cursor-spec, Phase 6).
+        </p>
+      </div>
+      <div class="space-y-2 text-right">
+        <label for="img-prompt-topic" class="block text-sm font-semibold text-[#1A1A1A]">נושא המאמר</label>
+        <textarea
+          id="img-prompt-topic"
+          rows="2"
+          class="w-full rounded-[1.6rem] border border-[#1A1A1A]/12 bg-[#FAFAF8] px-5 py-4 text-right text-base leading-7 text-[#1A1A1A] outline-none transition focus:border-[#D42B2B]/40 focus:ring-2 focus:ring-[#D42B2B]/15"
+          dir="rtl"
+          placeholder="למשל: אמונה מול ידיעה, אגו, בחירה קשה…"
+        ></textarea>
+      </div>
+      <div class="space-y-2 text-right">
+        <label for="img-prompt-type" class="block text-sm font-semibold text-[#1A1A1A]">סוג ויזואל</label>
+        <select
+          id="img-prompt-type"
+          class="w-full max-w-md rounded-[1.35rem] border border-[#1A1A1A]/12 bg-white px-4 py-3 text-sm font-medium text-[#1A1A1A] outline-none"
+        >
+          <option value="object">אובייקט</option>
+          <option value="abstract">מושג מופשט</option>
+          <option value="landscape">נוף מינימליסטי</option>
+          <option value="minimal">מינימליסטי טהור</option>
+        </select>
+      </div>
+      <button
+        id="img-prompt-build"
+        type="button"
+        class="inline-flex items-center justify-center rounded-full bg-[#D42B2B] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#ba2424]"
+      >
+        צור פרומפט
+      </button>
+      <div class="space-y-2 text-right">
+        <label for="img-prompt-output" class="block text-sm font-semibold text-[#1A1A1A]">פלט</label>
+        <textarea
+          id="img-prompt-output"
+          rows="12"
+          dir="ltr"
+          readonly
+          class="w-full rounded-[1.6rem] border border-[#1A1A1A]/12 bg-[#111111] px-5 py-4 text-left text-sm leading-7 text-[#F4F4EF] outline-none"
+          placeholder="לחץ «צור פרומפט»"
+        ></textarea>
+        <button
+          id="img-prompt-copy"
+          type="button"
+          class="inline-flex items-center justify-center rounded-full border border-[#1A1A1A]/10 bg-[#FAFAF8] px-5 py-3 text-sm font-semibold text-[#1A1A1A]/78 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-50"
+          disabled
+        >
+          העתק פרומפט
+        </button>
+      </div>
+    </section>
 
     <div class="grid gap-8 xl:grid-cols-[minmax(0,34rem)_minmax(0,1fr)]">
       <form
@@ -419,6 +640,28 @@ const upsellPreviewText = documentationService
         <div id="validationBox" class="hidden rounded-[1.6rem] border border-[#D42B2B]/14 bg-[#FFF4F3] p-5 text-right">
           <h3 class="text-lg font-semibold text-[#1A1A1A]">בדיקת איכות (QA)</h3>
           <ul id="errorList" class="mt-3 space-y-2 text-sm leading-7 text-[#1A1A1A]/78"></ul>
+        </div>
+
+        <div id="composer-qa-panel" class="hidden rounded-[1.6rem] border border-[#1A1A1A]/10 bg-white p-5 text-right shadow-[0_12px_40px_rgba(26,26,26,0.06)]">
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-[#1A1A1A]/08 pb-3">
+            <h3 class="text-base font-semibold text-[#1A1A1A]">בדיקת MDX מלא מהעורך</h3>
+            <button
+              type="button"
+              id="composer-run-qa"
+              class="rounded-full border border-[#1A1A1A]/12 bg-[#FAFAF8] px-3 py-1.5 text-xs font-semibold text-[#1A1A1A]/78 transition hover:bg-white"
+            >
+              הרץ על «MDX מוכן»
+            </button>
+          </div>
+          <p id="composer-qa-summary" class="mt-2 text-xs font-medium text-[#1A1A1A]/65"></p>
+          <ul id="composer-qa-list" class="mt-2 max-h-64 space-y-1.5 overflow-y-auto text-xs leading-6"></ul>
+          <button
+            type="button"
+            id="composer-copy-ai-prompt"
+            class="mt-4 inline-flex w-full items-center justify-center rounded-full border border-[#D42B2B]/35 bg-white px-4 py-2.5 text-xs font-semibold text-[#D42B2B] transition hover:bg-[#FFF4F3] sm:w-auto"
+          >
+            העתק פרומפט ל-AI (עורך)
+          </button>
         </div>
 
         <div class="rounded-[1.6rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] p-5 text-right">
@@ -1654,6 +1897,107 @@ Self-Correction Loop: Before outputting the final response, review your text. If
     });
   </script>
 
+  <script is:inline>
+    (function () {
+      function splitFmBody(raw) {
+        const m = String(raw || "").match(/^---\r?\n([\s\S]*?)\r?\n---\s*\r?\n([\s\S]*)$/);
+        if (!m) return { fm: "", body: String(raw || "") };
+        return { fm: m[1], body: m[2] };
+      }
+      function unescapeYamlString(s) {
+        return String(s || "")
+          .replace(/\\"/g, '"')
+          .replace(/\\\\/g, "\\");
+      }
+      function extractYamlQuoted(fm, key) {
+        const re = new RegExp(`^${key}:\\s*"((?:\\\\.|[^"\\\\])*)"`, "m");
+        const x = fm.match(re);
+        return x ? unescapeYamlString(x[1]) : "";
+      }
+      function extractYoutubeFromFm(fm) {
+        const q = extractYamlQuoted(fm, "youtubeId");
+        if (q) return q;
+        const m = fm.match(/^youtubeId:\s*([a-zA-Z0-9_-]{11})\s*$/m);
+        return m ? m[1] : "";
+      }
+
+      window.__nmBuildMdxQaRows = function (mdxText, opts) {
+        const profile = (opts && opts.profile) || "srt";
+        const raw = String(mdxText || "").trim();
+        if (!raw) return [];
+        const { fm, body } = splitFmBody(raw);
+        const title = extractYamlQuoted(fm, "title");
+        const description = extractYamlQuoted(fm, "description");
+        const yt = extractYoutubeFromFm(fm);
+        const bottomLine = extractYamlQuoted(fm, "bottomLine");
+        const refMatch = fm.match(/reflectionQuestions:\s*\n((?:\s+-\s[^\n]*\n)+)/);
+        const refCount = refMatch ? (refMatch[1].match(/^\s+-\s/gm) || []).length : 0;
+        const faqCount = (fm.match(/^\s+-\s+question:/gm) || []).length;
+        const h2Count = (body.match(/^##\s+/gm) || []).length;
+        const plain = body.replace(/<[^>]+>/g, " ");
+        const wordish = plain.split(/\s+/).filter(Boolean).length;
+        const clicheHits = ["תהליך רוחני", "מסע של", "צמיחה רוחנית"].filter((c) => body.includes(c));
+
+        /** @type {{ ok: boolean; label: string }[]} */
+        const rows = [];
+        const row = (ok, label) => rows.push({ ok, label });
+
+        row(title.length >= 20, `כותרת: מינימום 20 תווים (עכשיו ${title.length})`);
+        row(description.length >= 80 && description.length <= 170, `תיאור: בערך 80–160 תווים (עכשיו ${description.length})`);
+
+        if (profile === "composer") {
+          row(!yt || /^[a-zA-Z0-9_-]{11}$/.test(yt), yt ? "youtubeId: 11 תווים תקינים" : "youtubeId: ריק (מאמר ללא וידאו)");
+          row(refCount === 0 || refCount === 3, `reflectionQuestions: 0 או 3 (עכשיו ${refCount})`);
+          row(faqCount === 0 || faqCount === 3, `faq: ריק או 3 שאלות (עכשיו ${faqCount})`);
+        } else {
+          row(/^[a-zA-Z0-9_-]{11}$/.test(yt), "youtubeId: 11 תווים תקינים");
+          row(refCount === 3, `reflectionQuestions: בדיוק 3 (עכשיו ${refCount})`);
+          row(faqCount === 3, `faq: בדיוק 3 שאלות (עכשיו ${faqCount})`);
+        }
+
+        row(h2Count >= 2, `לפחות 2 כותרות ## (עכשיו ${h2Count})`);
+        row(/<SkepticBox\b/i.test(body), "גוף: SkepticBox");
+        row(/<ConceptCallout\b/i.test(body), "גוף: ConceptCallout");
+        row(/<WhatsAppButton\b/i.test(body) || /<InquiryBox\b/i.test(body), "גוף: WhatsAppButton או InquiryBox");
+
+        if (profile === "srt") {
+          row(/<RevealInsight\b/i.test(body), "גוף: RevealInsight (תמלול)");
+          row(/<VideoPlayer\b/i.test(body), "גוף: VideoPlayer");
+        } else if (yt) {
+          row(/<VideoPlayer\b/i.test(body), "גוף: VideoPlayer (נדרש כשיש youtubeId)");
+        }
+
+        row(clicheHits.length === 0, clicheHits.length ? `שפה: ערוך קלישאות — ${clicheHits.join(", ")}` : "שפה: ללא קלישאות נבדקות");
+        row(wordish < 900 || bottomLine.trim().length >= 20, `bottomLine: ${wordish >= 900 ? `מומלץ למאמר ארוך (~${wordish} מילים)` : "לא חובה בטיוטה קצרה"}`);
+
+        return rows;
+      };
+
+      window.__nmRenderMdxQaToDom = function (mdxText, listEl, panelEl, opts) {
+        const raw = String(mdxText || "").trim();
+        if (!listEl || !panelEl) return { allOk: true, total: 0, passed: 0 };
+        if (!raw) {
+          panelEl.classList.add("hidden");
+          listEl.innerHTML = "";
+          return { allOk: true, total: 0, passed: 0 };
+        }
+        const rows = window.__nmBuildMdxQaRows(raw, opts || { profile: "srt" });
+        listEl.innerHTML = "";
+        let passed = 0;
+        for (const { ok, label } of rows) {
+          if (ok) passed += 1;
+          const li = document.createElement("li");
+          li.textContent = `${ok ? "✓" : "✗"} ${label}`;
+          li.className = ok ? "text-[#166534]" : "text-[#b91c1c]";
+          listEl.appendChild(li);
+        }
+        panelEl.classList.remove("hidden");
+        const allOk = passed === rows.length && rows.length > 0;
+        return { allOk, total: rows.length, passed };
+      };
+    })();
+  </script>
+
   <script is:inline define:vars={{ githubDraftBase, githubRepoLabel }}>
     document.addEventListener("astro:page-load", () => {
       const postTitle = document.getElementById("postTitle");
@@ -1783,6 +2127,20 @@ Self-Correction Loop: Before outputting the final response, review your text. If
         const youtubeId = extractYoutubeId(videoUrlInput.value);
         const isPremium = generatorPremium.checked;
         const workflow = getWorkflowMeta();
+
+        const srtBundle = window.__nmSrtComposerBundle;
+        if (srtBundle && typeof srtBundle.fullMdx === "string") {
+          const descField = postDescription.value.trim();
+          if (
+            content === srtBundle.bodySnapshot &&
+            title === srtBundle.titleSnapshot &&
+            descField === srtBundle.descriptionSnapshot &&
+            youtubeId === srtBundle.youtubeSnapshot
+          ) {
+            return cleanHumanTouch(String(srtBundle.fullMdx).trim() + "\n");
+          }
+        }
+
         const frontmatter = [
           "---",
           `title: \"${title.replace(/\"/g, '\\\"')}\"`,
@@ -2029,7 +2387,546 @@ Self-Correction Loop: Before outputting the final response, review your text. If
       copyMdxButton.addEventListener("click", copyMdx);
       injectIntoSandboxButton.addEventListener("click", injectIntoSandbox);
       publishToGithubButton.addEventListener("click", publishToGithub);
+
+      const srtHandoffComposerBtn = document.getElementById("srt-handoff-composer");
+      if (srtHandoffComposerBtn instanceof HTMLButtonElement) {
+        const srtHandoffDefaultLabel = srtHandoffComposerBtn.textContent || "שלב הבא — מלא עורך המאמר";
+        srtHandoffComposerBtn.addEventListener("click", () => {
+          const p = window.__nmSrtHandoff;
+          if (!p || typeof p.body !== "string" || !p.body.trim()) return;
+          postTitle.value = String(p.title || "");
+          postDescription.value = String(p.description || "");
+          const yid = String(p.youtubeId || "").trim();
+          if (/^[a-zA-Z0-9_-]{11}$/.test(yid)) {
+            videoUrlInput.value = `https://www.youtube.com/watch?v=${yid}`;
+          }
+          postSlug.value = generateSlug(postTitle.value.trim());
+          postContent.value = p.body;
+          window.__nmSrtComposerBundle = {
+            fullMdx: String(p.fullMdx || ""),
+            bodySnapshot: String(p.body || "").trim(),
+            titleSnapshot: String(p.title || "").trim(),
+            descriptionSnapshot: String(p.description || "").trim(),
+            youtubeSnapshot: yid,
+          };
+          postTitle.scrollIntoView({ behavior: "smooth", block: "center" });
+          renderValidation();
+          srtHandoffComposerBtn.textContent = "הועבר לעורך ✓";
+          window.setTimeout(() => {
+            srtHandoffComposerBtn.textContent = srtHandoffDefaultLabel;
+          }, 2000);
+          runComposerArticleQa();
+        });
+      }
+
+      const composerQaPanel = document.getElementById("composer-qa-panel");
+      const composerQaList = document.getElementById("composer-qa-list");
+      const composerQaSummary = document.getElementById("composer-qa-summary");
+      const composerRunQa = document.getElementById("composer-run-qa");
+      const composerCopyAi = document.getElementById("composer-copy-ai-prompt");
+
+      function buildComposerAiPrompt(mdxFull) {
+        return [
+          "אתה עורך תוכן לאתר NeverMind (עברית). להלן MDX של מאמר מהעורך הפנימי.",
+          "משימה: שפר ניסוח, חדד היררכיית H2, חיזוק SkepticBox ו-ConceptCallout, description בערך 80–160 תווים וכותרת 20+ תווים.",
+          "אל תמחק שדות frontmatter קיימים. אם reflectionQuestions או faq ריקים — אפשר להשלים אחרי חידוד הגוף.",
+          "שמור רכיבי MDX. הוסף דוגמה ישראלית יומיומית אחת לפחות אם חסרה.",
+          "החזר את קובץ ה-MDX המלא בלבד, בלי טקסט נלווה.",
+          "",
+          "---",
+          String(mdxFull || "").trim(),
+        ].join("\n");
+      }
+
+      function runComposerArticleQa() {
+        if (!composerQaPanel || !composerQaList) return;
+        const mdx = generateFullMdx();
+        const r = window.__nmRenderMdxQaToDom?.(mdx, composerQaList, composerQaPanel, { profile: "composer" }) || {
+          allOk: false,
+          total: 0,
+          passed: 0,
+        };
+        if (composerQaSummary instanceof HTMLElement) {
+          if (!mdx.trim()) {
+            composerQaSummary.textContent = "";
+            composerQaPanel.classList.add("hidden");
+          } else if (r.total > 0) {
+            composerQaSummary.textContent = r.allOk
+              ? `סיכום: ${r.passed}/${r.total} — כל הבדיקות ירוקות (פרופיל עורך).`
+              : `סיכום: ${r.passed}/${r.total} — יש לתקן לפני פרסום.`;
+          }
+        }
+      }
+
+      if (composerRunQa instanceof HTMLButtonElement) {
+        composerRunQa.addEventListener("click", () => runComposerArticleQa());
+      }
+      if (composerCopyAi instanceof HTMLButtonElement) {
+        composerCopyAi.addEventListener("click", async () => {
+          const mdx = generateFullMdx().trim();
+          if (!mdx) return;
+          try {
+            await navigator.clipboard.writeText(buildComposerAiPrompt(mdx));
+            if (publishStatusText instanceof HTMLElement) {
+              publishStatusText.textContent = "פרומפט ל-AI מהעורך הועתק ללוח.";
+            }
+          } catch {
+            if (publishStatusText instanceof HTMLElement) {
+              publishStatusText.textContent = "העתקה נכשלה.";
+            }
+          }
+        });
+      }
+
       renderValidation();
+    });
+  </script>
+
+  <script is:inline>
+    document.addEventListener("astro:page-load", () => {
+      const fileInput = document.getElementById("srt-file-input");
+      const fileLabel = document.getElementById("srt-file-label");
+      const ytInput = document.getElementById("srt-youtube-id");
+      const topicInput = document.getElementById("srt-guide-topic");
+      const prem = document.getElementById("srt-is-premium");
+      const diff = document.getElementById("srt-difficulty");
+      const wf = document.getElementById("srt-workflow");
+      const buildBtn = document.getElementById("srt-build-mdx");
+      const out = document.getElementById("srt-mdx-output");
+      const copyBtn = document.getElementById("srt-copy-mdx");
+      const exportBtn = document.getElementById("srt-export-mdx");
+      const statusEl = document.getElementById("srt-status");
+      const handoffBtn = document.getElementById("srt-handoff-composer");
+      const qaPanel = document.getElementById("srt-qa-panel");
+      const qaList = document.getElementById("srt-qa-list");
+      const runQaBtn = document.getElementById("srt-run-qa");
+      const copyAiBtn = document.getElementById("srt-copy-ai-prompt");
+
+      if (!fileInput || !buildBtn || !out || !copyBtn || !exportBtn) return;
+
+      let srtTextCache = "";
+
+      function renderSrtQa(mdxText) {
+        if (!qaPanel || !qaList) return;
+        const raw = String(mdxText || "").trim();
+        if (!raw) {
+          qaPanel.classList.add("hidden");
+          if (copyAiBtn instanceof HTMLButtonElement) copyAiBtn.disabled = true;
+          return;
+        }
+        window.__nmRenderMdxQaToDom?.(raw, qaList, qaPanel, { profile: "srt" });
+        if (copyAiBtn instanceof HTMLButtonElement) copyAiBtn.disabled = false;
+      }
+
+      function buildSrtAiPrompt(mdxFull) {
+        return [
+          "אתה עורך תוכן לאתר NeverMind (עברית). להלן קובץ MDX שלד שנבנה מתמלול וידאו.",
+          "משימה: שפר ניסוח, חדד כותרות H2, מלא SkepticBox ו-ConceptCallout בתוכן אמיתי (לא placeholder), ודא description בין 80 ל-160 תווים וכותרת 20+ תווים.",
+          "שמור: מבנה frontmatter, שמות שדות, youtubeId, רשימות reflectionQuestions (3) ו-faq (3) — אפשר לנסח מחדש רק את הטקסטים בתוך המרכאות.",
+          "שמור את כל רכיבי ה-MDX הקיימים (VideoPlayer, RevealInsight, וכו'). הוסף דוגמה ישראלית יומיומית אחת לפחות בגוף.",
+          "החזר את קובץ ה-MDX המלא בלבד, בלי הסבר לפני או אחרי.",
+          "",
+          "---",
+          String(mdxFull || "").trim(),
+        ].join("\n");
+      }
+
+      if (runQaBtn instanceof HTMLButtonElement) {
+        runQaBtn.addEventListener("click", () => renderSrtQa(out instanceof HTMLTextAreaElement ? out.value : ""));
+      }
+
+      if (copyAiBtn instanceof HTMLButtonElement) {
+        copyAiBtn.addEventListener("click", async () => {
+          const v = out instanceof HTMLTextAreaElement ? out.value.trim() : "";
+          if (!v) return;
+          try {
+            await navigator.clipboard.writeText(buildSrtAiPrompt(v));
+            if (statusEl) statusEl.textContent = "פרומפט ל-AI הועתק ללוח.";
+          } catch {
+            if (statusEl) statusEl.textContent = "ההעתקה נכשלה.";
+          }
+        });
+      }
+
+      fileInput.addEventListener("change", () => {
+        const f = fileInput.files && fileInput.files[0];
+        if (!f) {
+          srtTextCache = "";
+          if (fileLabel) fileLabel.textContent = "לא נבחר קובץ";
+          if (handoffBtn instanceof HTMLButtonElement) handoffBtn.disabled = true;
+          return;
+        }
+        if (handoffBtn instanceof HTMLButtonElement) handoffBtn.disabled = true;
+        if (fileLabel) fileLabel.textContent = f.name;
+        const reader = new FileReader();
+        reader.onload = () => {
+          srtTextCache = String(reader.result || "");
+        };
+        reader.readAsText(f, "UTF-8");
+      });
+
+      function parseSRT(srtText) {
+        const blocks = srtText.trim().replace(/\r\n/g, "\n").split(/\n\n+/);
+        return blocks
+          .map((block) => {
+            const lines = block
+              .trim()
+              .split("\n")
+              .map((l) => l.trim())
+              .filter(Boolean);
+            if (lines.length < 2) return null;
+            let i = 0;
+            if (/^\d+$/.test(lines[0])) i = 1;
+            const timeLine = lines[i];
+            if (!timeLine || !timeLine.includes("-->")) return null;
+            const parts = timeLine.split("-->").map((s) => s.trim());
+            const start = parts[0] || "";
+            const endPart = parts[1] || "";
+            const end = endPart.split(/\s+/)[0] || endPart;
+            const text = lines
+              .slice(i + 1)
+              .join(" ")
+              .replace(/<[^>]+>/g, "")
+              .trim();
+            const index = i > 0 ? parseInt(lines[0], 10) : 0;
+            return { index, start, end, text };
+          })
+          .filter((b) => b && b.text);
+      }
+
+      function srtTimeToSeconds(t) {
+        const s = String(t).replace(",", ".").trim();
+        const m = s.match(/^(\d+):(\d+):(\d+)(?:\.(\d+))?$/);
+        if (!m) return 0;
+        const h = +m[1];
+        const mn = +m[2];
+        const sec = +m[3];
+        const frac = m[4] ? Number(`0.${m[4]}`) : 0;
+        return h * 3600 + mn * 60 + sec + frac;
+      }
+
+      function extractChapters(entries) {
+        if (!entries.length) return [];
+        const chapters = [];
+        const interval = 300;
+        let nextMark = 0;
+        for (const e of entries) {
+          const t = srtTimeToSeconds(e.start);
+          if (t >= nextMark) {
+            const sum = e.text.slice(0, 80) + (e.text.length > 80 ? "…" : "");
+            chapters.push({ timestamp: e.start, summary: sum });
+            nextMark += interval;
+          }
+        }
+        if (chapters.length === 0 && entries[0]) {
+          chapters.push({
+            timestamp: entries[0].start,
+            summary: entries[0].text.slice(0, 80) + (entries[0].text.length > 80 ? "…" : ""),
+          });
+        }
+        return chapters;
+      }
+
+      function extractVideoSummaryPoints(entries) {
+        const substantial = entries.filter((e) => e.text.length >= 25);
+        const pool = substantial.length ? substantial : entries;
+        if (!pool.length) {
+          return [
+            "נקודה ראשונה מהתמלול — להשלים לפי AI",
+            "נקודה שנייה — להשלים",
+            "נקודה שלישית — להשלים",
+          ];
+        }
+        const n = Math.min(5, Math.max(3, pool.length >= 3 ? 4 : pool.length));
+        const acc = [];
+        const step = Math.max(1, Math.floor(pool.length / n));
+        for (let i = 0; i < n && acc.length < 5; i += 1) {
+          const idx = Math.min(pool.length - 1, i * step);
+          const raw = pool[idx].text.replace(/\s+/g, " ").trim();
+          acc.push(raw.length > 220 ? `${raw.slice(0, 217)}…` : raw);
+        }
+        return [...new Set(acc)].slice(0, 5);
+      }
+
+      function transcriptParagraphs(entries) {
+        const paras = [];
+        let buf = [];
+        let prevEnd = -999;
+        for (const e of entries) {
+          const startSec = srtTimeToSeconds(e.start);
+          if (buf.length && startSec - prevEnd > 3) {
+            paras.push(buf.join(" "));
+            buf = [];
+          }
+          buf.push(e.text);
+          prevEnd = srtTimeToSeconds(e.end);
+        }
+        if (buf.length) paras.push(buf.join(" "));
+        return paras.filter(Boolean);
+      }
+
+      function escapeYamlScalar(s) {
+        const t = String(s ?? "").trim();
+        if (!t) return '""';
+        return `"${t.replace(/\\/g, "\\\\").replace(/"/g, '\\"')}"`;
+      }
+
+      function oneLineHeading(s) {
+        return String(s || "")
+          .replace(/\s+/g, " ")
+          .replace(/^#+\s*/, "")
+          .trim()
+          .slice(0, 90) || "כותרת ביניים מהתמלול";
+      }
+
+      function buildMDXFromTranscript(params) {
+        const {
+          youtubeId,
+          title,
+          description,
+          isPremium,
+          difficultyLevel,
+          workflowStatus,
+          points,
+          paras,
+          chapters,
+          entries,
+        } = params;
+        const today = new Date().toISOString().slice(0, 10);
+        const vidPointsJsx = `[${points.map((p) => JSON.stringify(p)).join(", ")}]`;
+        const openPara = paras[0] || entries[0]?.text || "פסקת פתיחה — להשלים מהתמלול.";
+        const midStart = Math.floor(paras.length * 0.35);
+        const mid2 = Math.floor(paras.length * 0.65);
+        const body1 = paras[midStart] || openPara;
+        const body2 = paras[mid2] || body1;
+        const revealBody = paras.join("\n\n");
+        const h2a = oneLineHeading(chapters[1]?.summary ? `המשך: ${chapters[1].summary}` : "כותרת ביניים ראשונה — נגזר מהתמלול");
+        const h2b = oneLineHeading(chapters[2]?.summary ? `המשך: ${chapters[2].summary}` : "כותרת ביניים שנייה — נגזר מהתמלול");
+
+        const reflectYaml = `reflectionQuestions:
+  - ${escapeYamlScalar(`מה מתוך "${title}" נוגע בך הכי ישירות עכשיו?`)}
+  - ${escapeYamlScalar("איזו התנגדות עולה בך כשאתה קורא את זה?")}
+  - ${escapeYamlScalar("מה צעד קטן אחד אפשרי היום — בלי הבטחות מיותרות?")}`;
+
+        const faqYaml = `faq:
+  - question: ${escapeYamlScalar("שאלה נפוצה ראשונה — להתאים לתוכן")}
+    answer: ${escapeYamlScalar("תשובה קצרה — להשלים לפי המאמר.")}
+  - question: ${escapeYamlScalar("שאלה נפוצה שנייה — להתאים לתוכן")}
+    answer: ${escapeYamlScalar("תשובה קצרה — להשלים.")}
+  - question: ${escapeYamlScalar("שאלה נפוצה שלישית — להתאים לתוכן")}
+    answer: ${escapeYamlScalar("תשובה קצרה — להשלים.")}`;
+
+        return `---
+title: ${escapeYamlScalar(title)}
+description: ${escapeYamlScalar(description)}
+bottomLine: ""
+pubDate: ${today}
+author: ${escapeYamlScalar("השם לא משנה")}
+tags: []
+image: "/og.jpg"
+youtubeId: ${escapeYamlScalar(youtubeId)}
+videoSummaryPoints:
+${points.map((p) => `  - ${escapeYamlScalar(p)}`).join("\n")}
+isPremium: ${isPremium ? "true" : "false"}
+draft: true
+workflowStatus: ${workflowStatus}
+difficultyLevel: ${difficultyLevel}
+${reflectYaml}
+${faqYaml}
+forbiddenLibrary: false
+relatedConcepts: []
+---
+
+${openPara}
+
+<VideoPlayer youtubeId={${JSON.stringify(youtubeId)}} title={${JSON.stringify(title)}} videoSummaryPoints={${vidPointsJsx}} />
+
+<RevealInsight title="תמלול מלא">
+${revealBody}
+</RevealInsight>
+
+## ${h2a}
+
+${body1}
+
+<SkepticBox title="ההתנגדות המרכזית — להשלים לפי AI">
+כאן תשובה ישירה להתנגדות — טיוטה להרחבה ב־Claude/ChatGPT.
+</SkepticBox>
+
+## ${h2b}
+
+${body2}
+
+<ConceptCallout term="המושג הכי קשה — להשלים">
+הסבר פשוט — טיוטה להרחבה ב־AI.
+</ConceptCallout>
+
+<InquiryBox title="שאלה שמכריחה לעצור — להתאים לתוכן ולתמלול" />
+
+<WhatsAppButton />
+`;
+      }
+
+      buildBtn.addEventListener("click", async () => {
+        if (handoffBtn instanceof HTMLButtonElement) handoffBtn.disabled = true;
+        const yt = (ytInput && ytInput.value ? ytInput.value : "").trim();
+        if (!/^[a-zA-Z0-9_-]{11}$/.test(yt)) {
+          if (statusEl) statusEl.textContent = "youtubeId חייב להיות בדיוק 11 תווים (אותיות באנגלית, מספרים, _ או -).";
+          return;
+        }
+        let text = srtTextCache;
+        const f = fileInput.files && fileInput.files[0];
+        if (!text.trim() && f) {
+          try {
+            text = await f.text();
+            srtTextCache = text;
+          } catch {
+            if (statusEl) statusEl.textContent = "לא ניתן לקרוא את הקובץ.";
+            return;
+          }
+        }
+        if (!text.trim()) {
+          if (statusEl) statusEl.textContent = "בחר קובץ .srt תקין.";
+          return;
+        }
+        const entries = parseSRT(text);
+        if (!entries.length) {
+          if (statusEl) statusEl.textContent = "לא נמצאו כתוביות בקובץ. ודא פורמט SRT.";
+          return;
+        }
+        const topic = (topicInput && topicInput.value ? topicInput.value : "").trim();
+        const merged = entries
+          .map((e) => e.text)
+          .join(" ")
+          .replace(/\s+/g, " ")
+          .trim();
+        const title =
+          topic ||
+          (merged.slice(0, 72) + (merged.length > 72 ? "…" : "")) ||
+          `מאמר וידאו ${yt}`;
+        const description =
+          (merged.slice(0, 155) + (merged.length > 155 ? "…" : "")) || "תיאור קצר מהתמלול — להשלים לפי AI.";
+        const points = extractVideoSummaryPoints(entries);
+        const chapters = extractChapters(entries);
+        const paras = transcriptParagraphs(entries);
+        const mdx = buildMDXFromTranscript({
+          entries,
+          youtubeId: yt,
+          title,
+          description,
+          isPremium: !!(prem && prem.checked),
+          difficultyLevel: (diff && diff.value) || "advanced",
+          workflowStatus: (wf && wf.value) || "writing",
+          points,
+          paras,
+          chapters,
+        });
+        out.value = mdx;
+        copyBtn.disabled = false;
+        exportBtn.disabled = false;
+        if (handoffBtn instanceof HTMLButtonElement) handoffBtn.disabled = false;
+        const splitMdx = mdx.match(/^---\r?\n[\s\S]*?\r?\n---\r?\n([\s\S]*)$/);
+        const bodyOnly = splitMdx ? String(splitMdx[1] || "").replace(/^\r?\n/, "") : "";
+        window.__nmSrtHandoff = {
+          title,
+          description,
+          youtubeId: yt,
+          body: bodyOnly,
+          fullMdx: mdx,
+        };
+        let statusMsg = `נוצר MDX מתוך ${entries.length} כתוביות.`;
+        if (description.length < 80) {
+          statusMsg += " שקול להאריך את התיאור ל־80+ תווים לפני פרסום (לפי QA).";
+        }
+        if (title.length < 20) {
+          statusMsg += " הכותרת קצרה — מומלץ לחדד ל־20+ תווים.";
+        }
+        if (statusEl) statusEl.textContent = statusMsg;
+        renderSrtQa(mdx);
+      });
+
+      copyBtn.addEventListener("click", async () => {
+        const v = out.value.trim();
+        if (!v) return;
+        try {
+          await navigator.clipboard.writeText(v);
+          if (statusEl) statusEl.textContent = "MDX הועתק ללוח.";
+        } catch {
+          if (statusEl) statusEl.textContent = "ההעתקה נכשלה.";
+        }
+      });
+
+      exportBtn.addEventListener("click", () => {
+        const v = out.value.trim();
+        if (!v) return;
+        const yt = (ytInput && ytInput.value ? ytInput.value : "article").trim() || "article";
+        const blob = new Blob([`${v}\n`], { type: "text/markdown;charset=utf-8" });
+        const href = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = href;
+        a.download = `transcript-${yt}.mdx`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(href);
+        if (statusEl) statusEl.textContent = "הקובץ ירד.";
+      });
+    });
+  </script>
+
+  <script is:inline>
+    document.addEventListener("astro:page-load", () => {
+      function buildImagePrompt(opts) {
+        const topic = opts.topic || "the article theme";
+        const type = opts.type || "minimal";
+        const base = [
+          "Minimalist 3D render, pure white background #FAFAF8,",
+          "studio lighting, sharp shadows.",
+          "Brand colors: deep red #D42B2B as accent,",
+          "near-black #1A1A1A for shadows, off-white #FAFAF8 background.",
+          "No text. No humans. No logos. No clutter.",
+          "Aspect ratio 16:9. Ultra clean, architectural.",
+        ].join("\n");
+        const typeMap = {
+          object: `Single object that metaphorically represents: ${topic}`,
+          abstract: `Abstract geometric form suggesting: ${topic}`,
+          landscape: `Minimal landscape metaphor for: ${topic}`,
+          minimal: `Single pure shape representing: ${topic}`,
+        };
+        const head = typeMap[type] || typeMap.minimal;
+        return `${head}\n${base}`;
+      }
+
+      const topicEl = document.getElementById("img-prompt-topic");
+      const typeEl = document.getElementById("img-prompt-type");
+      const buildBtn = document.getElementById("img-prompt-build");
+      const outEl = document.getElementById("img-prompt-output");
+      const copyBtn = document.getElementById("img-prompt-copy");
+      if (!topicEl || !typeEl || !buildBtn || !outEl || !copyBtn) return;
+
+      buildBtn.addEventListener("click", () => {
+        const topic = topicEl.value.trim() || "the article theme";
+        const type = typeEl.value || "minimal";
+        outEl.value = buildImagePrompt({ topic, type });
+        copyBtn.disabled = false;
+      });
+
+      copyBtn.addEventListener("click", async () => {
+        const v = outEl.value.trim();
+        if (!v) return;
+        try {
+          await navigator.clipboard.writeText(v);
+          copyBtn.textContent = "הועתק";
+          window.setTimeout(() => {
+            copyBtn.textContent = "העתק פרומפט";
+          }, 1200);
+        } catch {
+          copyBtn.textContent = "ההעתקה נכשלה";
+          window.setTimeout(() => {
+            copyBtn.textContent = "העתק פרומפט";
+          }, 1200);
+        }
+      });
     });
   </script>
 </Layout>

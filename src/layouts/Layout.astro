@@ -1,4 +1,4 @@
-﻿---
+---
 import "../styles/global.css";
 import { getCollection } from "astro:content";
 import { ClientRouter } from "astro:transitions";
@@ -16,10 +16,12 @@ const {
   faqItems,
   image,
   noIndex = false,
+  waArticleSlug = "",
 } = Astro.props;
 
 const waTags = Array.isArray(frontmatter?.tags) ? frontmatter.tags : [];
 const waArticleTitle = typeof title === "string" ? title : "";
+const waSlug = typeof waArticleSlug === "string" ? waArticleSlug.trim() : "";
 
 const siteTitle = appConfig.site.name;
 const siteDescription = "מרחב חקירה שקט לבהירות, דיוק רגשי והבנה בגובה העיניים.";
@@ -332,7 +334,13 @@ const navItems = [
       </div>
     </footer>
 
-    <WhatsAppButton phone={appConfig.contact.whatsAppNumber} tags={waTags} articleTitle={waArticleTitle} />
+    <WhatsAppButton
+      phone={appConfig.contact.whatsAppNumber}
+      tags={waTags}
+      articleTitle={waArticleTitle}
+      articleSlug={waSlug}
+      meetingIntent={Boolean(waSlug && waArticleTitle)}
+    />
     <SearchModal client:idle />
 
     <script is:inline define:vars={{ randomArticlePaths }}>

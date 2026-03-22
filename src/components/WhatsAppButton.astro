@@ -1,19 +1,15 @@
 ---
 import appConfig from "../config/appConfig.json";
-import { buildArticleContextLeadMessage } from "../lib/services";
+import { buildArticleContextLeadMessage, buildArticleMeetingWhatsAppMessage } from "../lib/services";
 
 export interface Props {
-  /** מזהה וואטסאפ בלי + (למשל 9725...) */
   phone?: string;
-  /** מתוך frontmatter — תג ראשון לטקסט הליד */
   tags?: string[];
-  /** אופציונלי ב-MDX: נושא במקום מערך tags */
   topic?: string;
-  /** כותרת מאמר לגיבוי */
   articleTitle?: string;
-  /** fab = צף; inline = בתוך התוכן */
+  articleSlug?: string;
+  meetingIntent?: boolean;
   variant?: "fab" | "inline";
-  /** טקסט לכפתור ב-inline */
   label?: string;
 }
 
@@ -22,11 +18,20 @@ const {
   tags = [],
   topic = "",
   articleTitle = "",
+  articleSlug = "",
+  meetingIntent = false,
   variant = "fab",
-  label = "שלח הודעה ליקיר בוואטסאפ",
+  label = "׳©׳׳— ׳”׳•׳“׳¢׳” ׳‘׳•׳•׳׳˜׳¡׳׳₪",
 } = Astro.props;
 
-const leadMessage = buildArticleContextLeadMessage({ tags, topic, articleTitle });
+const slugTrim = String(articleSlug ?? "").trim();
+const titleTrim = String(articleTitle ?? "").trim();
+const useMeeting =
+  meetingIntent && Boolean(slugTrim) && Boolean(titleTrim);
+
+const leadMessage = useMeeting
+  ? buildArticleMeetingWhatsAppMessage({ title: titleTrim, slug: slugTrim })
+  : buildArticleContextLeadMessage({ tags, topic, articleTitle: titleTrim });
 
 const baseWa = `https://wa.me/${phone}`;
 const hrefWithText = `${baseWa}?text=${encodeURIComponent(leadMessage)}`;
@@ -42,7 +47,7 @@ const prefillEncoded = encodeURIComponent(leadMessage);
       class="inline-flex w-full items-center justify-center gap-2 rounded-full border border-[#128C7E]/30 bg-[#25D366]/15 px-5 py-3 text-sm font-semibold text-[#075E54] transition-colors hover:bg-[#25D366]/25 [letter-spacing:0]"
       aria-label={label}
     >
-      <span aria-hidden="true">??</span>
+      <span aria-hidden="true">נ’¬</span>
       {label}
     </a>
   ) : (
@@ -53,7 +58,7 @@ const prefillEncoded = encodeURIComponent(leadMessage);
       href={hrefWithText}
       target="_blank"
       rel="noreferrer"
-      aria-label="יצירת קשר בוואטסאפ"
+      aria-label="׳₪׳×׳™׳—׳× ׳•׳•׳׳˜׳¡׳׳₪"
       class="fixed bottom-6 left-6 z-40 flex h-10 w-10 items-center justify-center rounded-full bg-white/70 shadow-sm backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-500"
     >
       <span class="block h-2 w-2 rounded-full bg-[#1A1A1A]/45" />
@@ -95,7 +100,7 @@ const prefillEncoded = encodeURIComponent(leadMessage);
         if (!message) {
           const rawTitle = document.title ? document.title.split("|")[0].trim() : "NeverMind";
           const pageTitle = rawTitle || "NeverMind";
-          message = `היי, הגעתי מהעמוד ${pageTitle}, ואשמח לבדוק יחד מה נכון כאן.`;
+          message = `׳”׳™׳™, ׳§׳¨׳׳×׳™ ׳׳× ${pageTitle}, ׳¨׳¦׳™׳×׳™ ׳׳”׳׳©׳™׳ ׳׳× ׳”׳©׳™׳—׳” ׳׳”׳׳×׳¨.`;
         }
         const encoded = encodeURIComponent(message);
         whatsappButton.setAttribute("href", `${base}?text=${encoded}`);

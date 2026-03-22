@@ -1,9 +1,10 @@
-﻿---
+---
 import { getCollection, render, type CollectionEntry } from "astro:content";
 import Layout from "../layouts/Layout.astro";
 import siteSettings from "../config/siteSettings.json";
 import appConfig from "../config/appConfig.json";
 import { glossaryConcepts } from "../data/glossary";
+import { buildArticleMeetingWhatsAppMessage, buildWhatsAppHref } from "../lib/services";
 import InquiryBox from "../components/InquiryBox.astro";
 import InquirySection from "../components/InquirySection.astro";
 import SubscribeBanner from "../components/SubscribeBanner.astro";
@@ -20,6 +21,7 @@ import RefutationBox from "../components/RefutationBox.astro";
 import DeepDiveConcepts from "../components/DeepDiveConcepts.astro";
 import LogicNote from "../components/LogicNote.astro";
 import WhatsAppButton from "../components/WhatsAppButton.astro";
+import AudioNarrative from "../components/AudioNarrative.astro";
 
 type ArticleEntry = CollectionEntry<"articles">;
 type InternalLink = {
@@ -104,6 +106,8 @@ const videoSummaryPoints = Array.isArray(frontmatter.videoSummaryPoints)
   ? frontmatter.videoSummaryPoints.map((point) => String(point).trim()).filter(Boolean)
   : [];
 const audioUrl = frontmatter.audioUrl;
+const audioFile = typeof frontmatter.audioFile === "string" ? frontmatter.audioFile.trim() : "";
+const hasInlineVideoPlayer = /<VideoPlayer\b/i.test(rawContent);
 const tags = Array.isArray(frontmatter.tags) ? frontmatter.tags : [];
 const faqItems = Array.isArray(frontmatter.faq) ? frontmatter.faq : [];
 const hasInquirySection = rawContent.includes("InquirySection") || rawContent.includes("InquiryBox");
@@ -145,9 +149,11 @@ const reflectionQuestions =
   Array.isArray(frontmatter.reflectionQuestions) && frontmatter.reflectionQuestions.length === 3
     ? frontmatter.reflectionQuestions
     : fallbackReflectionQuestions;
-const reflectionWhatsAppUrl = `https://wa.me/${appConfig.contact.whatsAppNumber}?text=${encodeURIComponent(
-  `קראתי את המאמר "${title}" ואני רוצה לענות על השאלות שבסוף:\n1. \n2. \n3. `
-)}`;
+const meetingMessage = buildArticleMeetingWhatsAppMessage({
+  title,
+  slug: currentSlug,
+});
+const reflectionWhatsAppUrl = buildWhatsAppHref(meetingMessage);
 const premiumVault = siteSettings.premiumVault;
 const premiumAccess = appConfig.premiumAccess;
 const manualRelatedConcepts = Array.isArray(frontmatter.relatedConcepts) ? frontmatter.relatedConcepts : [];
@@ -283,6 +289,7 @@ const components = {
   hasInquirySection={hasInquirySection}
   faqItems={faqItems}
   image={frontmatter.image}
+  waArticleSlug={currentSlug}
 >
   <div aria-hidden="true" class="fixed inset-x-0 top-0 z-40 h-px bg-transparent">
     <span id="reading-progress" class="block h-px w-0 bg-[#1A1A1A]"></span>
@@ -323,7 +330,10 @@ const components = {
 
       {showBottomLine && bottomLine && <BottomLineSummary summary={bottomLine} />}
 
-      {audioUrl && (
+      {audioFile && (
+        <AudioNarrative src={`/audio/articles/${audioFile}`} title={title} />
+      )}
+      {!audioFile && audioUrl && (
         <div class="overflow-hidden rounded-2xl border border-[#1A1A1A]/10 bg-white/70 p-4 shadow-sm backdrop-blur-md">
           <audio class="w-full accent-[#1A1A1A] text-[#1A1A1A]" controls src={audioUrl}>
             הדפדפן שלך לא תומך בהשמעת אודיו.
@@ -331,7 +341,7 @@ const components = {
         </div>
       )}
 
-      {youtubeId && (
+      {youtubeId && !hasInlineVideoPlayer && (
         <VideoPlayer youtubeId={youtubeId} title={title} videoSummaryPoints={videoSummaryPoints} />
       )}
 
@@ -394,6 +404,8 @@ const components = {
             variant="inline"
             tags={tags}
             articleTitle={title}
+            articleSlug={currentSlug}
+            meetingIntent={true}
             label="המשך בוואטסאפ עם ההקשר מהמאמר"
           />
         </div>

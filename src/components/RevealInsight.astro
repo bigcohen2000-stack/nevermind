@@ -1,4 +1,4 @@
-﻿---
+---
 interface Props {
   title?: string;
 }
@@ -13,7 +13,7 @@ const panelId = `reveal-insight-${Math.random().toString(36).slice(2, 10)}`;
     data-reveal-insight-trigger
     aria-expanded="false"
     aria-controls={panelId}
-    class="flex w-full items-center justify-between gap-4 rounded-[1.4rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] px-5 py-4 text-right transition hover:border-[#D42B2B]/30 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D42B2B]/20"
+    class="flex w-full items-center justify-between gap-4 rounded-[1.4rem] border border-[#1A1A1A]/12 bg-[#1A1A1A] px-5 py-4 text-right text-[#FAFAF8] transition hover:border-[#1A1A1A]/25 hover:bg-[#111111] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A]/25"
   >
     <span>
       <span class="block text-xs font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">Reveal Insight</span>
@@ -56,7 +56,6 @@ const panelId = `reveal-insight-${Math.random().toString(36).slice(2, 10)}`;
         panel.style.gridTemplateRows = next ? "1fr" : "0fr";
         if (icon instanceof HTMLElement) {
           icon.textContent = next ? "−" : "+";
-          icon.style.transform = next ? "rotate(180deg)" : "rotate(0deg)";
         }
         if (!next) {
           window.setTimeout(() => {
