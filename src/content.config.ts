@@ -39,6 +39,18 @@ const articles = defineCollection({
         })
       )
       .optional(),
+    /** מזהה קונספטואלי באנגלית (מילה–שתיים) — שם קובץ מוצע / מיתוג; נתיב ה-URL נשאר משם קובץ ה-.mdx */
+    slug: z.string().optional(),
+    /** Work order לווידאו (מחבילת AI חלק ג') — אופציונלי */
+    videoContent: z
+      .object({
+        hook: z.string().optional(),
+        questions: z.array(z.string()).max(10).optional(),
+        visualDirection: z.string().optional(),
+        reelScript: z.string().optional(),
+        bridgeLogic: z.string().optional(),
+      })
+      .optional(),
   }),
 });
 

@@ -128,6 +128,20 @@ const upsellPreviewText = documentationService
             </select>
           </div>
         </div>
+        <div class="space-y-2 text-right sm:col-span-2">
+          <label for="srt-reveal-mode" class="block text-sm font-semibold text-[#1A1A1A]">כמה תמלול בתוך RevealInsight</label>
+          <select
+            id="srt-reveal-mode"
+            class="w-full rounded-[1.35rem] border border-[#1A1A1A]/12 bg-white px-4 py-3 text-sm font-medium text-[#1A1A1A] outline-none"
+          >
+            <option value="full" selected>מלא — כל מה שב-SRT (טוב לפני AI / ארכיון)</option>
+            <option value="compact">מקוצר — עד ~4,000 תווים מההתחלה</option>
+            <option value="minimal">מינימלי — 2–3 פסקאות בלבד (מאמר «נקי» יותר)</option>
+          </select>
+          <p class="text-xs leading-6 text-[#1A1A1A]/55">
+            גוף המאמר (פתיחה, כותרות, SkepticBox וכו’) נבנה בכל מקרה מהתמלול; ההבדל הוא רק כמה טקסט נכנס לבלוק הנפתח. לפני פרסום אפשר למחוק או לקצר שם ב-AI.
+          </p>
+        </div>
       </div>
 
       <p id="srt-status" class="rounded-[1.2rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] px-4 py-3 text-right text-sm text-[#1A1A1A]/68" role="status">
@@ -191,16 +205,32 @@ const upsellPreviewText = documentationService
             ייצא קובץ .mdx
           </button>
           <button
-            id="srt-copy-ai-prompt"
+            id="srt-copy-ai-pack"
+            type="button"
+            disabled
+            class="inline-flex items-center justify-center rounded-full border border-[#D42B2B]/45 bg-[#D42B2B] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#ba2424] disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            העתק חבילת AI מלאה
+          </button>
+          <button
+            id="srt-copy-ai-short"
             type="button"
             disabled
             class="inline-flex items-center justify-center rounded-full border border-[#D42B2B]/35 bg-white px-5 py-3 text-sm font-semibold text-[#D42B2B] transition hover:bg-[#FFF4F3] disabled:cursor-not-allowed disabled:opacity-50"
           >
-            העתק פרומפט ל-AI
+            רק פרומפט קצר (מאמר)
           </button>
         </div>
+        <details class="rounded-[1rem] border border-[#1A1A1A]/10 bg-[#FAFAF8]/80 px-4 py-3 text-right text-xs leading-6 text-[#1A1A1A]/70">
+          <summary class="cursor-pointer font-semibold text-[#1A1A1A]/85">איך עובדים עם AI בשלושה שלבים</summary>
+          <ol class="mt-2 list-decimal space-y-1 pe-4">
+            <li><strong>חבילה מלאה</strong> — חלק א' MDX; חלק ב' תמונה; חלק ג' סלאג קונספטואלי, טקסונומיית תגיות, שיתוף, ו־videoContent (רשימת צילום + Reel).</li>
+            <li><strong>קצר</strong> — רק הוראות לשיפור ה-MDX, בלי תמונה ומטא־פרסום.</li>
+            <li>אם ההעתקה נכשלת: HTTPS בדפדפן, או «ייצא קובץ», או Ctrl+A בתיבת הפלט.</li>
+          </ol>
+        </details>
         <p class="text-right text-xs leading-6 text-[#1A1A1A]/55">
-          אחרי יצירת MDX: לחיצה על «שלב הבא» ממלאת כותרת, תיאור, יוטיוב וגוף המאמר בעורך — משם אפשר «העתק MDX מוכן» או GitHub.
+          אחרי יצירת MDX: «שלב הבא» ממלא את העורך. תמלול ארוך: אם העתקה ללוח נכשלת — «ייצא קובץ» או Ctrl+A בתיבה.
         </p>
       </div>
     </section>
@@ -655,13 +685,22 @@ const upsellPreviewText = documentationService
           </div>
           <p id="composer-qa-summary" class="mt-2 text-xs font-medium text-[#1A1A1A]/65"></p>
           <ul id="composer-qa-list" class="mt-2 max-h-64 space-y-1.5 overflow-y-auto text-xs leading-6"></ul>
-          <button
-            type="button"
-            id="composer-copy-ai-prompt"
-            class="mt-4 inline-flex w-full items-center justify-center rounded-full border border-[#D42B2B]/35 bg-white px-4 py-2.5 text-xs font-semibold text-[#D42B2B] transition hover:bg-[#FFF4F3] sm:w-auto"
-          >
-            העתק פרומפט ל-AI (עורך)
-          </button>
+          <div class="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:justify-end">
+            <button
+              type="button"
+              id="composer-copy-ai-pack"
+              class="inline-flex w-full items-center justify-center rounded-full bg-[#D42B2B] px-4 py-2.5 text-xs font-semibold text-white transition hover:bg-[#ba2424] sm:w-auto"
+            >
+              העתק חבילת AI מלאה
+            </button>
+            <button
+              type="button"
+              id="composer-copy-ai-short"
+              class="inline-flex w-full items-center justify-center rounded-full border border-[#D42B2B]/35 bg-white px-4 py-2.5 text-xs font-semibold text-[#D42B2B] transition hover:bg-[#FFF4F3] sm:w-auto"
+            >
+              רק פרומפט קצר
+            </button>
+          </div>
         </div>
 
         <div class="rounded-[1.6rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] p-5 text-right">
@@ -1934,7 +1973,8 @@ Self-Correction Loop: Before outputting the final response, review your text. If
         const refCount = refMatch ? (refMatch[1].match(/^\s+-\s/gm) || []).length : 0;
         const faqCount = (fm.match(/^\s+-\s+question:/gm) || []).length;
         const h2Count = (body.match(/^##\s+/gm) || []).length;
-        const plain = body.replace(/<[^>]+>/g, " ");
+        const bodyForWordCount = body.replace(/<RevealInsight\b[^>]*>[\s\S]*?<\/RevealInsight>/gi, " ");
+        const plain = bodyForWordCount.replace(/<[^>]+>/g, " ");
         const wordish = plain.split(/\s+/).filter(Boolean).length;
         const clicheHits = ["תהליך רוחני", "מסע של", "צמיחה רוחנית"].filter((c) => body.includes(c));
 
@@ -1968,7 +2008,10 @@ Self-Correction Loop: Before outputting the final response, review your text. If
         }
 
         row(clicheHits.length === 0, clicheHits.length ? `שפה: ערוך קלישאות — ${clicheHits.join(", ")}` : "שפה: ללא קלישאות נבדקות");
-        row(wordish < 900 || bottomLine.trim().length >= 20, `bottomLine: ${wordish >= 900 ? `מומלץ למאמר ארוך (~${wordish} מילים)` : "לא חובה בטיוטה קצרה"}`);
+        row(
+          wordish < 900 || bottomLine.trim().length >= 20,
+          `bottomLine: ${wordish >= 900 ? `מומלץ למאמר ארוך (~${wordish} מילים בגוף, בלי תמלול ב-RevealInsight)` : "לא חובה בטיוטה קצרה"}`,
+        );
 
         return rows;
       };
@@ -1994,6 +2037,204 @@ Self-Correction Loop: Before outputting the final response, review your text. If
         panelEl.classList.remove("hidden");
         const allOk = passed === rows.length && rows.length > 0;
         return { allOk, total: rows.length, passed };
+      };
+
+      window.__nmCopyLargeText = function (text) {
+        return new Promise((resolve) => {
+          function fallbackExec() {
+            const t = String(text ?? "");
+            const ta = document.createElement("textarea");
+            ta.value = t;
+            ta.setAttribute("readonly", "");
+            ta.style.position = "fixed";
+            ta.style.opacity = "0";
+            ta.style.left = "-9999px";
+            ta.style.top = "0";
+            document.body.appendChild(ta);
+            ta.focus();
+            ta.select();
+            ta.setSelectionRange(0, t.length);
+            let ok = false;
+            try {
+              ok = document.execCommand("copy");
+            } catch {
+              ok = false;
+            }
+            ta.remove();
+            return ok;
+          }
+          const s = String(text ?? "");
+          if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard
+              .writeText(s)
+              .then(() => resolve(true))
+              .catch(() => resolve(fallbackExec()));
+          } else {
+            resolve(fallbackExec());
+          }
+        });
+      };
+
+      function nmBuildImagePromptForPack(opts) {
+        const topic = opts.topic || "the article theme";
+        const type = opts.type || "minimal";
+        const base = [
+          "Minimalist 3D render, pure white background #FAFAF8,",
+          "studio lighting, sharp shadows.",
+          "Brand colors: deep red #D42B2B as accent,",
+          "near-black #1A1A1A for shadows, off-white #FAFAF8 background.",
+          "No text. No humans. No logos. No clutter.",
+          "Aspect ratio 16:9. Ultra clean, architectural.",
+        ].join("\n");
+        const typeMap = {
+          object: `Single object that metaphorically represents: ${topic}`,
+          abstract: `Abstract geometric form suggesting: ${topic}`,
+          landscape: `Minimal landscape metaphor for: ${topic}`,
+          minimal: `Single pure shape representing: ${topic}`,
+        };
+        const head = typeMap[type] || typeMap.minimal;
+        return `${head}\n${base}`;
+      }
+
+      window.__nmBuildNeverMindShortPrompt = function (mdxFull, opts) {
+        const source = (opts && opts.source) || "srt";
+        const lines =
+          source === "composer"
+            ? [
+                "אתה עורך תוכן לאתר NeverMind (עברית). להלן MDX של מאמר מהעורך הפנימי.",
+                "משימה: שפר ניסוח, חדד היררכיית H2, חיזוק SkepticBox ו-ConceptCallout, description בערך 80–160 תווים וכותרת 20+ תווים.",
+                "אל תמחק שדות frontmatter קיימים. אם reflectionQuestions או faq ריקים — אפשר להשלים אחרי חידוד הגוף.",
+                "שמור רכיבי MDX. הוסף דוגמה ישראלית יומיומית אחת לפחות אם חסרה.",
+                "החזר את קובץ ה-MDX המלא בלבד, בלי טקסט נלווה.",
+              ]
+            : [
+                "אתה עורך תוכן לאתר NeverMind (עברית). להלן קובץ MDX שלד שנבנה מתמלול וידאו.",
+                "משימה: שפר ניסוח, חדד כותרות H2, מלא SkepticBox ו-ConceptCallout בתוכן אמיתי (לא placeholder), ודא description בין 80 ל-160 תווים וכותרת 20+ תווים.",
+                "שמור: מבנה frontmatter, שמות שדות, youtubeId, רשימות reflectionQuestions (3) ו-faq (3) — אפשר לנסח מחדש רק את הטקסטים בתוך המרכאות.",
+                "שמור את כל רכיבי ה-MDX הקיימים (VideoPlayer, RevealInsight, וכו'). הוסף דוגמה ישראלית יומיומית אחת לפחות בגוף.",
+                "החזר את קובץ ה-MDX המלא בלבד, בלי הסבר לפני או אחרי.",
+              ];
+        return [...lines, "", "---", String(mdxFull || "").trim()].join("\n");
+      };
+
+      window.__nmBuildNeverMindMegaPrompt = function (mdxFull, opts) {
+        const source = (opts && opts.source) || "srt";
+        const raw = String(mdxFull || "").trim();
+        const { fm } = splitFmBody(raw);
+        const extractedTitle = extractYamlQuoted(fm, "title");
+        const imgTopic =
+          (opts && opts.imageTopic && String(opts.imageTopic).trim()) || extractedTitle || "נושא המאמר";
+        const imgType = (opts && opts.imageType) || "minimal";
+        const imagePromptEn = nmBuildImagePromptForPack({ topic: imgTopic, type: imgType });
+        const srcLabel = source === "composer" ? "העורך הפנימי" : "ממיר תמלול SRT";
+
+        const partA = `=== חלק א' — MDX סופי לפרסום (NeverMind) ===
+
+אתה עורך בכיר לתוכן עברי בערוץ NeverMind («השם לא משנה»). מקור הקלט: ${srcLabel}.
+
+משימתך בחלק זה: לקבל שלד MDX ולהחזיר קובץ MDX אחד, תקין תחבירית, מוכן לשמירה כ־.mdx ב־Astro Content Collections.
+
+## שדות frontmatter (מבנה)
+- title, description (חובה)
+- bottomLine — מומלץ במיוחד אם גוף המאמר מעל ~900 מילים **ללא** הטקסט שבתוך RevealInsight (רק טקסט מאמר רגיל)
+- pubDate, author, tags (מערך)
+- image (ברירת מחדל "/og.jpg" אלא אם יש סיבה)
+- youtubeId אופציונלי — אם קיים: בדיוק 11 תווים [a-zA-Z0-9_-]
+- videoSummaryPoints — מערך נקודות לווידאו/SEO
+- isPremium, draft, workflowStatus ∈ writing | review | ready | published
+- difficultyLevel ∈ beginner | advanced | deep
+- reflectionQuestions — בדיוק 3 מחרוזות
+- faq — בדיוק 3 פריטים (question + answer)
+- relatedConcepts, forbiddenLibrary — אל תמחק מפתחות קיימים
+- אופציונלי: updatedDate, canonicalUrl, keywords, audioUrl, audioFile, tallyUrl
+- אופציונלי (אחרי חלק ג' בחבילת AI): **slug** — מילה אחת או שתיים באנגלית lowercase (קונספט, לא תיאור ליטרלי)
+- אופציונלי: **videoContent** — אובייקט עם hook, questions (מערך), visualDirection, reelScript, bridgeLogic (תסריט/לוגיקה להמשך צפייה)
+
+## רכיבי MDX
+אל תמחק ואל תשנה **שמות** רכיבים: VideoPlayer, RevealInsight, SkepticBox, ConceptCallout, InquiryBox, WhatsAppButton וכו'. מותר למלא תוכן במקום placeholders ולשפר ניסוח.
+שמור על props תקינים (למשל youtubeId={...}, videoSummaryPoints={...}).
+
+## מבנה גוף מומלץ
+1. פתיחה קצרה — מה כואב לקורא (לא קלישאת «מסע»).
+2. ## H2 ראשון — הכאב / הבעיה
+3. ## H2 שני — פירוק הרעיון
+4. ## H2 שלישי — אם חסר, הוסף — סגירה בהירה
+5. SkepticBox (התנגדות + תשובה), ConceptCallout (מושג קשה + דוגמה ישראלית)
+6. InquiryBox ו/או WhatsAppButton
+
+## QA (אימות אחרי עריכה)
+כותרת ≥20 תווים; תיאור ~80–160 תווים; 3 reflection; 3 faq; לפחות 2 ##; הימנע מ«תהליך רוחני» / «מסע של» / «צמיחה רוחנית» כסיסמה ריקה.
+
+## פלט לחלק א'
+החזר **רק** את קובץ ה-MDX המלא (מ־--- ועד סוף הגוף), בלי הסבר לפני או אחרי.
+
+<<<NEVERMIND_MDX_INPUT_START>>>
+${raw}
+<<<NEVERMIND_MDX_INPUT_END>>>`;
+
+        const partB = `=== חלק ב' — פרומפט תמונת שער (לא חלק מה-MDX) ===
+הטקסט הבא באנגלית — להדבקה ב־Midjourney / DALL-E / כלי תמונה. **אין לשלב אותו בתוך קובץ ה-MDX.**
+ללא טקסט בתמונה, ללא לוגואים, ללא אנשים — לפי ההנחיות.
+
+${imagePromptEn}`;
+
+        const partC = `=== חלק ג' — אופטימיזציה ואסטרטגיית תוכן (אחרי MDX) ===
+
+לאחר שחלק א' (MDX) מוכן, הפק **בלוק אחד ברור** שניתן למזג ל-frontmatter של אותו מאמר (או לשמור כהערת עבודה). השתמש בעברית איפה שצריך (תגיות, שאלות, תסריט), ובאנגלית רק בסלאג ובמונחים קונספטואליים כנדרש.
+
+## 1. מנוע ה-Slug (מזהה קונספטואלי)
+- חלץ **מילה אחת**, לכל היותר **שתיים**, באנגלית — מתוך ה-title או מגוף המאמר.
+- **אל** תתאר "מה כתוב"; תאר **על מה זה** (הרעיון המרכזי).
+- העדף מונחים מעולם הפילוסופיה, הלוגיקה או היצירה (דוגמאות לסגנון: paradox, rhythm, friction, clarity, choice).
+- פורמט במענה: שורה אחת בדיוק: \`slug: conceptword\` (או שתי מילים מחוברות במקף אם חייב: \`slug: word1-word2\`) — **lowercase בלבד**, ללא רווחים, ללא תווים מיוחדים.
+
+## 2. בקרת תגיות (Consistent Taxonomy) — "פיתוח הדרגתי"
+**תגיות ליבה קיימות** (חובה לבדוק התאמה לפני שממציאים חדשות):
+\`פילוסופיה\`, \`תודעה\`, \`לוגיקה\`, \`יצירה\`, \`טכנולוגיה\`.
+
+כללים:
+- בחר **בדיוק 2** תגיות מהרשימה למעלה שמתאימות למאמר.
+- הוסף **לכל היותר תגית אחת חדשה**, ורק אם יש תת-נושא ספציפי שמתפתח במאמר (פורמט מומלץ עם קו תחתון למונחים מורכבים, למשל: \`פירוק_המובן_מאליו\`).
+- אל תיצור תגיות נרדפות לקיימות; שמור על עקביות מול מאמרים קודמים באתר.
+
+## 3. מחולל תוכן משלים — רשימת צילום (Shot List) ווידאו
+בהתבסס על המאמר ועל לוגיקת NeverMind, צור:
+
+**א. שאלות להעמקה (Q&A לסרטוני "תשובה קצרה")**  
+נסח **בדיוק 2** שאלות נוקבות שעולות אצל הקורא **בסוף** המאמר — מתאימות לצילום תשובה קצרה באתר.
+
+**ב. תסריט Reel / Short (~45 שניות)**  
+- **Hook**: משפט פתיחה חד, unapologetic (עוצר גלילה).  
+- **הוויזואליה**: הצעת קומפוזיציה (למשל: "סטודיו תקריב, תאורה דרמטית, רקע נקי, פלטת לבן-אדום-שחור").  
+- **reelScript**: תיאור קצר של מה קורה ב-45 השניות (בעברית).  
+- **bridgeLogic**: למה הסרטון הזה הוא המשך טבעי אחרי הקריאה (חיבור קריאה→צפייה).
+
+## 4. פלט נדרש ממך (פורמט YAML אחד)
+החזר **רק** את הבלוק הבא (בלי הסבר מסביב), כדי שיהיה קל להדביק/למזג:
+
+\`\`\`yaml
+# חבילת פרסום + אסטרטגיית וידאו (למזג ל-frontmatter או לשמור לצד)
+slug: "concept-word"
+tags: ["תגית_מליבה_1", "תגית_מליבה_2", "תגית_חדשה_אופציונלית"]
+keywords: "מילה1, מילה2, מילה3"
+share_line: "שורת וואטסאפ אחת לשיתוף"
+bottomLine_suggestion: "משפט סיכום אחד אם חסר bottomLine במאמר ארוך"
+videoContent:
+  hook: "משפט שיעצור את הגלילה"
+  questions:
+    - "שאלה 1 לצילום Q&A"
+    - "שאלה 2 לצילום Q&A"
+  visualDirection: "תיאור פריים / סטודיו / תאורה"
+  reelScript: "מה קורה ב-45 שניות"
+  bridgeLogic: "למה זה המשך למאמר"
+\`\`\`
+
+הערות:
+- אם אין צורך בתגית שלישית — השאר רק 2 פריטים ב-\`tags\`.
+- \`slug\` בקובץ ה-MDX הוא **אופציונלי**; שם קובץ ה-\`.mdx\` באנגלית עדיין מגדיר את הנתיב בפועל — יישור קו ביניהם מומלץ.
+- לאחר המיזוג ל-MDX, ודא שאין כפילויות בין \`tags\` לשדות אחרים ושה-frontmatter תקין ל-YAML.`;
+
+        return [partA, "", partB, "", partC].join("\n");
       };
     })();
   </script>
@@ -2340,12 +2581,9 @@ Self-Correction Loop: Before outputting the final response, review your text. If
           return;
         }
 
-        try {
-          await navigator.clipboard.writeText(generateFullMdx());
-          copyMdxButton.textContent = "MDX הועתק";
-        } catch {
-          copyMdxButton.textContent = "ההעתקה נכשלה";
-        }
+        const mdxOut = generateFullMdx();
+        const ok = window.__nmCopyLargeText ? await window.__nmCopyLargeText(mdxOut) : false;
+        copyMdxButton.textContent = ok ? "MDX הועתק" : "ההעתקה נכשלה";
         window.setTimeout(() => {
           copyMdxButton.textContent = "העתק MDX מוכן";
         }, 1500);
@@ -2423,19 +2661,15 @@ Self-Correction Loop: Before outputting the final response, review your text. If
       const composerQaList = document.getElementById("composer-qa-list");
       const composerQaSummary = document.getElementById("composer-qa-summary");
       const composerRunQa = document.getElementById("composer-run-qa");
-      const composerCopyAi = document.getElementById("composer-copy-ai-prompt");
+      const composerCopyAiPack = document.getElementById("composer-copy-ai-pack");
+      const composerCopyAiShort = document.getElementById("composer-copy-ai-short");
+      const imgTopicForPack = document.getElementById("img-prompt-topic");
+      const imgTypeForPack = document.getElementById("img-prompt-type");
 
-      function buildComposerAiPrompt(mdxFull) {
-        return [
-          "אתה עורך תוכן לאתר NeverMind (עברית). להלן MDX של מאמר מהעורך הפנימי.",
-          "משימה: שפר ניסוח, חדד היררכיית H2, חיזוק SkepticBox ו-ConceptCallout, description בערך 80–160 תווים וכותרת 20+ תווים.",
-          "אל תמחק שדות frontmatter קיימים. אם reflectionQuestions או faq ריקים — אפשר להשלים אחרי חידוד הגוף.",
-          "שמור רכיבי MDX. הוסף דוגמה ישראלית יומיומית אחת לפחות אם חסרה.",
-          "החזר את קובץ ה-MDX המלא בלבד, בלי טקסט נלווה.",
-          "",
-          "---",
-          String(mdxFull || "").trim(),
-        ].join("\n");
+      function readImageOptsForComposerPack() {
+        const imageTopic = imgTopicForPack instanceof HTMLTextAreaElement ? imgTopicForPack.value.trim() : "";
+        const imageType = imgTypeForPack instanceof HTMLSelectElement ? imgTypeForPack.value || "minimal" : "minimal";
+        return { imageTopic, imageType };
       }
 
       function runComposerArticleQa() {
@@ -2461,19 +2695,34 @@ Self-Correction Loop: Before outputting the final response, review your text. If
       if (composerRunQa instanceof HTMLButtonElement) {
         composerRunQa.addEventListener("click", () => runComposerArticleQa());
       }
-      if (composerCopyAi instanceof HTMLButtonElement) {
-        composerCopyAi.addEventListener("click", async () => {
+      if (composerCopyAiPack instanceof HTMLButtonElement) {
+        composerCopyAiPack.addEventListener("click", async () => {
           const mdx = generateFullMdx().trim();
-          if (!mdx) return;
-          try {
-            await navigator.clipboard.writeText(buildComposerAiPrompt(mdx));
-            if (publishStatusText instanceof HTMLElement) {
-              publishStatusText.textContent = "פרומפט ל-AI מהעורך הועתק ללוח.";
-            }
-          } catch {
-            if (publishStatusText instanceof HTMLElement) {
-              publishStatusText.textContent = "העתקה נכשלה.";
-            }
+          if (!mdx || !window.__nmBuildNeverMindMegaPrompt || !window.__nmCopyLargeText) return;
+          const { imageTopic, imageType } = readImageOptsForComposerPack();
+          const text = window.__nmBuildNeverMindMegaPrompt(mdx, {
+            source: "composer",
+            imageTopic,
+            imageType,
+          });
+          const ok = await window.__nmCopyLargeText(text);
+          if (publishStatusText instanceof HTMLElement) {
+            publishStatusText.textContent = ok
+              ? "חבילת AI מהעורך הועתקה ללוח."
+              : "העתקה נכשלה — בדוק HTTPS או העתק ידנית.";
+          }
+        });
+      }
+      if (composerCopyAiShort instanceof HTMLButtonElement) {
+        composerCopyAiShort.addEventListener("click", async () => {
+          const mdx = generateFullMdx().trim();
+          if (!mdx || !window.__nmBuildNeverMindShortPrompt || !window.__nmCopyLargeText) return;
+          const text = window.__nmBuildNeverMindShortPrompt(mdx, { source: "composer" });
+          const ok = await window.__nmCopyLargeText(text);
+          if (publishStatusText instanceof HTMLElement) {
+            publishStatusText.textContent = ok
+              ? "פרומפט קצר הועתק ללוח."
+              : "העתקה נכשלה.";
           }
         });
       }
@@ -2491,6 +2740,7 @@ Self-Correction Loop: Before outputting the final response, review your text. If
       const prem = document.getElementById("srt-is-premium");
       const diff = document.getElementById("srt-difficulty");
       const wf = document.getElementById("srt-workflow");
+      const revealModeEl = document.getElementById("srt-reveal-mode");
       const buildBtn = document.getElementById("srt-build-mdx");
       const out = document.getElementById("srt-mdx-output");
       const copyBtn = document.getElementById("srt-copy-mdx");
@@ -2500,7 +2750,10 @@ Self-Correction Loop: Before outputting the final response, review your text. If
       const qaPanel = document.getElementById("srt-qa-panel");
       const qaList = document.getElementById("srt-qa-list");
       const runQaBtn = document.getElementById("srt-run-qa");
-      const copyAiBtn = document.getElementById("srt-copy-ai-prompt");
+      const copyAiPackBtn = document.getElementById("srt-copy-ai-pack");
+      const copyAiShortBtn = document.getElementById("srt-copy-ai-short");
+      const imgPromptTopicEl = document.getElementById("img-prompt-topic");
+      const imgPromptTypeEl = document.getElementById("img-prompt-type");
 
       if (!fileInput || !buildBtn || !out || !copyBtn || !exportBtn) return;
 
@@ -2511,39 +2764,56 @@ Self-Correction Loop: Before outputting the final response, review your text. If
         const raw = String(mdxText || "").trim();
         if (!raw) {
           qaPanel.classList.add("hidden");
-          if (copyAiBtn instanceof HTMLButtonElement) copyAiBtn.disabled = true;
+          if (copyAiPackBtn instanceof HTMLButtonElement) copyAiPackBtn.disabled = true;
+          if (copyAiShortBtn instanceof HTMLButtonElement) copyAiShortBtn.disabled = true;
           return;
         }
         window.__nmRenderMdxQaToDom?.(raw, qaList, qaPanel, { profile: "srt" });
-        if (copyAiBtn instanceof HTMLButtonElement) copyAiBtn.disabled = false;
-      }
-
-      function buildSrtAiPrompt(mdxFull) {
-        return [
-          "אתה עורך תוכן לאתר NeverMind (עברית). להלן קובץ MDX שלד שנבנה מתמלול וידאו.",
-          "משימה: שפר ניסוח, חדד כותרות H2, מלא SkepticBox ו-ConceptCallout בתוכן אמיתי (לא placeholder), ודא description בין 80 ל-160 תווים וכותרת 20+ תווים.",
-          "שמור: מבנה frontmatter, שמות שדות, youtubeId, רשימות reflectionQuestions (3) ו-faq (3) — אפשר לנסח מחדש רק את הטקסטים בתוך המרכאות.",
-          "שמור את כל רכיבי ה-MDX הקיימים (VideoPlayer, RevealInsight, וכו'). הוסף דוגמה ישראלית יומיומית אחת לפחות בגוף.",
-          "החזר את קובץ ה-MDX המלא בלבד, בלי הסבר לפני או אחרי.",
-          "",
-          "---",
-          String(mdxFull || "").trim(),
-        ].join("\n");
+        if (copyAiPackBtn instanceof HTMLButtonElement) copyAiPackBtn.disabled = false;
+        if (copyAiShortBtn instanceof HTMLButtonElement) copyAiShortBtn.disabled = false;
       }
 
       if (runQaBtn instanceof HTMLButtonElement) {
         runQaBtn.addEventListener("click", () => renderSrtQa(out instanceof HTMLTextAreaElement ? out.value : ""));
       }
 
-      if (copyAiBtn instanceof HTMLButtonElement) {
-        copyAiBtn.addEventListener("click", async () => {
+      function readImagePackOpts() {
+        const imageTopic =
+          imgPromptTopicEl instanceof HTMLTextAreaElement ? imgPromptTopicEl.value.trim() : "";
+        const imageType =
+          imgPromptTypeEl instanceof HTMLSelectElement ? imgPromptTypeEl.value || "minimal" : "minimal";
+        return { imageTopic, imageType };
+      }
+
+      if (copyAiPackBtn instanceof HTMLButtonElement) {
+        copyAiPackBtn.addEventListener("click", async () => {
           const v = out instanceof HTMLTextAreaElement ? out.value.trim() : "";
-          if (!v) return;
-          try {
-            await navigator.clipboard.writeText(buildSrtAiPrompt(v));
-            if (statusEl) statusEl.textContent = "פרומפט ל-AI הועתק ללוח.";
-          } catch {
-            if (statusEl) statusEl.textContent = "ההעתקה נכשלה.";
+          if (!v || !window.__nmBuildNeverMindMegaPrompt || !window.__nmCopyLargeText) return;
+          const { imageTopic, imageType } = readImagePackOpts();
+          const promptText = window.__nmBuildNeverMindMegaPrompt(v, {
+            source: "srt",
+            imageTopic,
+            imageType,
+          });
+          const ok = await window.__nmCopyLargeText(promptText);
+          if (statusEl) {
+            statusEl.textContent = ok
+              ? "חבילת AI הועתקה (מאמר + תמונה + פרסום)."
+              : "ההעתקה נכשלה — נסה לייצא MDX לקובץ ולהדביק ל-AI מהקובץ.";
+          }
+        });
+      }
+
+      if (copyAiShortBtn instanceof HTMLButtonElement) {
+        copyAiShortBtn.addEventListener("click", async () => {
+          const v = out instanceof HTMLTextAreaElement ? out.value.trim() : "";
+          if (!v || !window.__nmBuildNeverMindShortPrompt || !window.__nmCopyLargeText) return;
+          const promptText = window.__nmBuildNeverMindShortPrompt(v, { source: "srt" });
+          const ok = await window.__nmCopyLargeText(promptText);
+          if (statusEl) {
+            statusEl.textContent = ok
+              ? "פרומפט קצר הועתק ללוח."
+              : "ההעתקה נכשלה — נסה לייצא MDX לקובץ ולהדביק ל-AI מהקובץ.";
           }
         });
       }
@@ -2691,6 +2961,7 @@ Self-Correction Loop: Before outputting the final response, review your text. If
           paras,
           chapters,
           entries,
+          revealMode = "full",
         } = params;
         const today = new Date().toISOString().slice(0, 10);
         const vidPointsJsx = `[${points.map((p) => JSON.stringify(p)).join(", ")}]`;
@@ -2699,7 +2970,27 @@ Self-Correction Loop: Before outputting the final response, review your text. If
         const mid2 = Math.floor(paras.length * 0.65);
         const body1 = paras[midStart] || openPara;
         const body2 = paras[mid2] || body1;
-        const revealBody = paras.join("\n\n");
+        const fullReveal = paras.join("\n\n");
+        const revealNote =
+          "\n\n---\n\n*[שאר התמלול המלא: בקובץ ה-SRT המקורי או דרך «העתק פרומפט ל-AI» — לא חובה לפרסם את כל הטקסט כאן.]*";
+        let revealBody = fullReveal;
+        let revealTitle = "תמלול מלא";
+        if (revealMode === "compact") {
+          const maxChars = 4000;
+          if (fullReveal.length > maxChars) {
+            const cut = fullReveal.slice(0, maxChars);
+            const lastSpace = cut.lastIndexOf(" ");
+            revealBody =
+              (lastSpace > maxChars * 0.85 ? cut.slice(0, lastSpace) : cut) +
+              "\n\n…" +
+              revealNote;
+            revealTitle = "תמלול (מקוצר)";
+          }
+        } else if (revealMode === "minimal") {
+          const few = paras.slice(0, 3).filter(Boolean).join("\n\n");
+          revealBody = (few || fullReveal.slice(0, 800)) + revealNote;
+          revealTitle = "תמלול — תצוגה מקדימה";
+        }
         const h2a = oneLineHeading(chapters[1]?.summary ? `המשך: ${chapters[1].summary}` : "כותרת ביניים ראשונה — נגזר מהתמלול");
         const h2b = oneLineHeading(chapters[2]?.summary ? `המשך: ${chapters[2].summary}` : "כותרת ביניים שנייה — נגזר מהתמלול");
 
@@ -2741,7 +3032,7 @@ ${openPara}
 
 <VideoPlayer youtubeId={${JSON.stringify(youtubeId)}} title={${JSON.stringify(title)}} videoSummaryPoints={${vidPointsJsx}} />
 
-<RevealInsight title="תמלול מלא">
+<RevealInsight title={${JSON.stringify(revealTitle)}}>
 ${revealBody}
 </RevealInsight>
 
@@ -2809,6 +3100,10 @@ ${body2}
         const points = extractVideoSummaryPoints(entries);
         const chapters = extractChapters(entries);
         const paras = transcriptParagraphs(entries);
+        const revealMode =
+          revealModeEl && revealModeEl.value && ["full", "compact", "minimal"].includes(revealModeEl.value)
+            ? revealModeEl.value
+            : "full";
         const mdx = buildMDXFromTranscript({
           entries,
           youtubeId: yt,
@@ -2820,6 +3115,7 @@ ${body2}
           points,
           paras,
           chapters,
+          revealMode,
         });
         out.value = mdx;
         copyBtn.disabled = false;
@@ -2846,30 +3142,35 @@ ${body2}
       });
 
       copyBtn.addEventListener("click", async () => {
-        const v = out.value.trim();
+        const v = out instanceof HTMLTextAreaElement ? out.value.trim() : "";
         if (!v) return;
-        try {
-          await navigator.clipboard.writeText(v);
-          if (statusEl) statusEl.textContent = "MDX הועתק ללוח.";
-        } catch {
-          if (statusEl) statusEl.textContent = "ההעתקה נכשלה.";
+        const ok = window.__nmCopyLargeText ? await window.__nmCopyLargeText(v) : false;
+        if (statusEl) {
+          statusEl.textContent = ok
+            ? "MDX הועתק ללוח."
+            : "ההעתקה נכשלה — לחץ «ייצא קובץ» או Ctrl+A בתיבת הפלט והעתק ידנית.";
         }
       });
 
       exportBtn.addEventListener("click", () => {
-        const v = out.value.trim();
+        const v = out instanceof HTMLTextAreaElement ? out.value.trim() : "";
         if (!v) return;
         const yt = (ytInput && ytInput.value ? ytInput.value : "article").trim() || "article";
-        const blob = new Blob([`${v}\n`], { type: "text/markdown;charset=utf-8" });
-        const href = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = href;
-        a.download = `transcript-${yt}.mdx`;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        URL.revokeObjectURL(href);
-        if (statusEl) statusEl.textContent = "הקובץ ירד.";
+        try {
+          const blob = new Blob([`${v}\n`], { type: "text/markdown;charset=utf-8" });
+          const href = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = href;
+          a.download = `transcript-${yt}.mdx`;
+          a.rel = "noopener";
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          URL.revokeObjectURL(href);
+          if (statusEl) statusEl.textContent = "הקובץ ירד. אם לא נפתח חלון — בדוק חסימת הורדות בדפדפן.";
+        } catch {
+          if (statusEl) statusEl.textContent = "ייצוא נכשל — נסה דפדפן אחר או העתקה ידנית מהתיבה.";
+        }
       });
     });
   </script>
@@ -2914,18 +3215,11 @@ ${body2}
       copyBtn.addEventListener("click", async () => {
         const v = outEl.value.trim();
         if (!v) return;
-        try {
-          await navigator.clipboard.writeText(v);
-          copyBtn.textContent = "הועתק";
-          window.setTimeout(() => {
-            copyBtn.textContent = "העתק פרומפט";
-          }, 1200);
-        } catch {
-          copyBtn.textContent = "ההעתקה נכשלה";
-          window.setTimeout(() => {
-            copyBtn.textContent = "העתק פרומפט";
-          }, 1200);
-        }
+        const ok = window.__nmCopyLargeText ? await window.__nmCopyLargeText(v) : false;
+        copyBtn.textContent = ok ? "הועתק" : "ההעתקה נכשלה";
+        window.setTimeout(() => {
+          copyBtn.textContent = "העתק פרומפט";
+        }, 1200);
       });
     });
   </script>
