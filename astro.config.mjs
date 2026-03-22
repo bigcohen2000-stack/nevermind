@@ -1,4 +1,4 @@
-﻿import { defineConfig } from "astro/config";
+import { defineConfig } from "astro/config";
 import mdx from "@astrojs/mdx";
 import react from "@astrojs/react";
 import sitemap from "@astrojs/sitemap";
@@ -21,7 +21,7 @@ export default defineConfig({
     mdx(),
     react(),
     sitemap({
-      filter: (page) => page !== "/404" && !page.startsWith("/admin") && page !== "/intake",
+      filter: (page) => page !== "/404" && !page.startsWith("/admin") && page !== "/intake" && page !== "/premium-access",
       serialize: (item) => ({ ...item, priority: 0.7 }),
     }),
     pagefind(),
@@ -39,4 +39,5 @@ export default defineConfig({
     },
   },
 });
+
 
