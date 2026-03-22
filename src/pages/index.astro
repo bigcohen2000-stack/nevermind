@@ -1,9 +1,10 @@
-﻿---
+---
 import { getCollection } from "astro:content";
 import Layout from "../layouts/Layout.astro";
 import TruthSlider from "../components/TruthSlider";
 import { Star } from "lucide-react";
 import ThoughtShiftProof from "../components/ThoughtShiftProof.astro";
+import LogicCanvas from "../components/LogicCanvas.astro";
 import { resolveServiceAction, servicesHero, servicesStages, servicesThoughtShifts } from "../lib/services";
 
 const allArticles = await getCollection("articles", ({ data }) => data.draft !== true);
@@ -22,7 +23,9 @@ const stageCards = servicesStages
   title="NeverMind | הבנה, לא כלים"
   description="סולם ערך ברור: משיחת מיקוד קצרה ועד למנוי מרפסת ולמסלולי עומק מתמשכים."
 >
-  <section aria-labelledby="intent-title" class="mx-auto max-w-7xl space-y-12 px-5 pt-20 sm:px-8 lg:px-12">
+  <LogicCanvas />
+
+  <section aria-labelledby="intent-title" class="mx-auto max-w-7xl space-y-12 border-t border-neutral-200 px-5 pt-16 dark:border-neutral-800 sm:px-8 lg:px-12">
     <header class="max-w-4xl space-y-5 text-right">
       <p class="text-sm font-semibold uppercase tracking-[0.26em] text-[#D42B2B]">NeverMind</p>
       <h1 id="intent-title" class="text-[clamp(2.2rem,1.7rem+2.4vw,3.8rem)] font-semibold leading-[1.08] text-neutral-900 dark:text-white">

@@ -1,4 +1,4 @@
-﻿import servicesConfig from "../config/services.json";
+import servicesConfig from "../config/services.json";
 import appConfig from "../config/appConfig.json";
 
 type ServicesConfig = typeof servicesConfig;
@@ -41,6 +41,48 @@ export const findServiceById = (id: string) => flattenVisibleServices().find((se
 
 export const buildWhatsAppHref = (message: string) =>
   `https://wa.me/${appConfig.contact.whatsAppNumber}?text=${encodeURIComponent(message)}`;
+
+/** טקסט ליד קונטקסטואלי לפי תגית ראשונה מ-frontmatter (או נושא/כותרת גיבוי) */
+export const buildArticleContextLeadMessage = (opts: {
+  tags?: string[];
+  topic?: string;
+  articleTitle?: string;
+}): string => {
+  const tagList = opts.tags ?? [];
+  const firstFromTags = tagList.map((t) => String(t).trim()).find(Boolean) ?? "";
+  const topicTrim = (opts.topic ?? "").trim();
+  const subjectLabel = topicTrim || firstFromTags;
+  if (subjectLabel) {
+    return `היי יקיר, קראתי את המאמר בנושא ${subjectLabel} ורציתי להתייעץ...`;
+  }
+  const titleTrim = (opts.articleTitle ?? "").trim();
+  if (titleTrim) {
+    return `היי יקיר, קראתי את המאמר "${titleTrim}" ורציתי להתייעץ...`;
+  }
+  return "היי יקיר, קראתי מאמר באתר NeverMind ורציתי להתייעץ...";
+};
+
+export const buildArticleContextWhatsAppHref = (
+  opts: Parameters<typeof buildArticleContextLeadMessage>[0]
+) => buildWhatsAppHref(buildArticleContextLeadMessage(opts));
+
+/** שורת הקשר קצרה בלי פתיח — לשילוב בהודעות ארוכות (מילוי שדות וכו׳) */
+export const buildArticleReadContextLine = (
+  opts: Parameters<typeof buildArticleContextLeadMessage>[0]
+): string => {
+  const tagList = opts.tags ?? [];
+  const firstFromTags = tagList.map((t) => String(t).trim()).find(Boolean) ?? "";
+  const topicTrim = (opts.topic ?? "").trim();
+  const subjectLabel = topicTrim || firstFromTags;
+  if (subjectLabel) {
+    return `קראתי את המאמר בנושא ${subjectLabel}.`;
+  }
+  const titleTrim = (opts.articleTitle ?? "").trim();
+  if (titleTrim) {
+    return `קראתי את המאמר "${titleTrim}".`;
+  }
+  return "קראתי מאמר באתר NeverMind.";
+};
 
 export const resolveServiceAction = (service: StageService | FlatService) => {
   const actionText = service.action_text || `אני רוצה להתקדם עם ${service.title}`;

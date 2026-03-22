@@ -5,7 +5,11 @@ import siteSettings from "../../config/siteSettings.json";
 import ArticlesTable from "../../components/admin/ArticlesTable.astro";
 import ServicesControlPanel from "../../components/admin/ServicesControlPanel.astro";
 import AppConfigControlPanel from "../../components/admin/AppConfigControlPanel.astro";
+import HomeCanvasControlPanel from "../../components/admin/HomeCanvasControlPanel.astro";
+import ClarityPathsControlPanel from "../../components/admin/ClarityPathsControlPanel.astro";
 import appConfig from "../../config/appConfig.json";
+import homeCanvas from "../../config/homeCanvas.json";
+import clarityPathsFile from "../../config/clarityPaths.json";
 import { flattenVisibleServices } from "../../lib/services";
 
 const pageTitle = "Creator Dashboard";
@@ -190,6 +194,11 @@ const stats = {
       <AppConfigControlPanel />
     </div>
 
+    <div class="grid gap-8 xl:grid-cols-2">
+      <HomeCanvasControlPanel />
+      <ClarityPathsControlPanel />
+    </div>
+
     <section class="grid gap-4 md:grid-cols-2">
       <article class="rounded-[1.8rem] border border-[#1A1A1A]/10 bg-white/82 p-5 shadow-[0_24px_70px_rgba(26,26,26,0.06)] text-right">
         <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[#D42B2B]">System State</p>
@@ -197,6 +206,12 @@ const stats = {
         <ul class="mt-5 space-y-3 text-sm leading-7 text-[#1A1A1A]/72">
           <li class="rounded-[1.2rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] px-4 py-3">Whisper Banner: <strong>{siteSettings.whisperBanner.enabled ? "מופעל" : "כבוי"}</strong></li>
           <li class="rounded-[1.2rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] px-4 py-3">Premium Vault: <strong>{siteSettings.premiumVault.enabled ? "מופעל" : "כבוי"}</strong></li>
+          <li class="rounded-[1.2rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] px-4 py-3">
+            Logic Canvas / TrendGraph: <strong>{stats.homeCanvasTrend}</strong>
+          </li>
+          <li class="rounded-[1.2rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] px-4 py-3">
+            Clarity Journeys: <strong>{stats.clarityJourneys} מסלולים</strong>
+          </li>
         </ul>
       </article>
 

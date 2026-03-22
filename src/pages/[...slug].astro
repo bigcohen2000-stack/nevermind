@@ -5,7 +5,7 @@ import siteSettings from "../config/siteSettings.json";
 import InquiryBox from "../components/InquiryBox.astro";
 import InquirySection from "../components/InquirySection.astro";
 import SubscribeBanner from "../components/SubscribeBanner.astro";
-import LiteYouTubeEmbed from "../components/LiteYouTubeEmbed.astro";
+import VideoPlayer from "../components/VideoPlayer.astro";
 import SkepticBox from "../components/SkepticBox.astro";
 import ConceptCallout from "../components/ConceptCallout.astro";
 import BottomLineSummary from "../components/BottomLineSummary.astro";
@@ -13,9 +13,11 @@ import PremiumLock from "../components/PremiumLock.astro";
 import RevealInsight from "../components/RevealInsight.astro";
 import ReflectionQuestions from "../components/ReflectionQuestions.astro";
 import LogicalQuestionBox from "../components/LogicalQuestionBox.astro";
+import PerspectiveToggle from "../components/PerspectiveToggle.astro";
 import RefutationBox from "../components/RefutationBox.astro";
 import DeepDiveConcepts from "../components/DeepDiveConcepts.astro";
 import LogicNote from "../components/LogicNote.astro";
+import WhatsAppButton from "../components/WhatsAppButton.astro";
 import appConfig from "../config/appConfig.json";
 import { glossaryConcepts } from "../data/glossary";
 
@@ -30,15 +32,15 @@ type InternalLink = {
 
 const difficultyConfig = {
   beginner: {
-    label: "׳׳×׳—׳™׳׳™׳",
+    label: "מתחילים",
     tone: "bg-[#F4FAF4] text-[#166534] border-[#BBF7D0]/70",
   },
   advanced: {
-    label: "׳׳×׳§׳“׳׳™׳",
+    label: "מתקדמים",
     tone: "bg-[#FFF7ED] text-[#9A3412] border-[#FDBA74]/60",
   },
   deep: {
-    label: "׳—׳§׳™׳¨׳” ׳¢׳׳•׳§׳”",
+    label: "חקירה עמוקה",
     tone: "bg-[#1A1A1A] text-[#FAFAF8] border-[#1A1A1A]",
   },
 } as const;
@@ -46,36 +48,36 @@ type DifficultyKey = keyof typeof difficultyConfig;
 
 const toArticleSlug = (entry: ArticleEntry) => entry.id.replace(/\.mdx$/, "");
 const topicMap = {
-  "׳—׳•׳₪׳©": {
+  חופש: {
     href: "/topics/freedom/",
-    title: "׳ ׳•׳©׳: ׳—׳•׳₪׳©",
-    description: "׳¨׳™׳›׳•׳– ׳׳׳׳¨׳™׳ ׳¢׳ ׳—׳•׳₪׳©, ׳׳—׳¨׳™׳•׳×, ׳•׳”׳׳—׳™׳¨ ׳©׳ ׳‘׳—׳™׳¨׳” ׳׳׳™׳×׳™׳×.",
+    title: "נושא: חופש",
+    description: "ריכוז מאמרים על חופש, אחריות, והמחיר של בחירה אמיתית.",
   },
-  "׳׳›׳ ׳™׳§׳× ׳׳—׳©׳‘׳”": {
+  "מכניקת מחשבה": {
     href: "/topics/thought-mechanics/",
-    title: "׳ ׳•׳©׳: ׳׳›׳ ׳™׳§׳× ׳׳—׳©׳‘׳”",
-    description: "׳׳§׳•׳ ׳׳—׳“ ׳׳׳׳׳¨׳™׳ ׳©׳׳₪׳¨׳§׳™׳ ׳׳™׳ ׳׳—׳©׳‘׳” ׳׳ ׳”׳׳× ׳”׳×׳ ׳”׳’׳•׳×.",
+    title: "נושא: מכניקת מחשבה",
+    description: "מקום אחד למאמרים שמפרקים איך מחשבה מנהלת התנגדות.",
   },
-  "׳”׳¢׳¦׳׳™": {
+  העצמי: {
     href: "/topics/self/",
-    title: "׳ ׳•׳©׳: ׳”׳¢׳¦׳׳™",
-    description: "׳—׳§׳™׳¨׳” ׳©׳ ׳–׳”׳•׳×, ׳”׳–׳“׳”׳•׳×, ׳•׳“׳׳•׳× ׳₪׳ ׳™׳׳™׳× ׳©׳׳×׳¢׳§׳©׳× ׳׳”׳—׳–׳™׳§ ׳׳¢׳׳“.",
+    title: "נושא: העצמי",
+    description: "חקירה של זהות, הזדהות, ודמויות פנימיות שמחזיקות מעמד.",
   },
-  "׳‘׳”׳™׳¨׳•׳×": {
+  בהירות: {
     href: "/topics/clarity/",
-    title: "׳ ׳•׳©׳: ׳‘׳”׳™׳¨׳•׳×",
-    description: "׳׳׳׳¨׳™׳ ׳©׳׳ ׳§׳™׳ ׳¨׳¢׳© ׳•׳׳›׳¨׳™׳—׳™׳ ׳׳¨׳׳•׳× ׳׳” ׳‘׳׳׳× ׳§׳•׳¨׳”.",
+    title: "נושא: בהירות",
+    description: "מאמרים שמנקים רעש ומכריחים לראות מה באמת קורה.",
   },
-  "׳‘׳—׳™׳¨׳”": {
+  בחירה: {
     href: "/topics/choice/",
-    title: "׳ ׳•׳©׳: ׳‘׳—׳™׳¨׳”",
-    description: "׳׳׳׳¨׳™׳ ׳¢׳ ׳¨׳¦׳•׳, ׳”׳—׳׳˜׳”, ׳•׳©׳׳™׳˜׳” ׳׳“׳•׳׳™׳™׳ ׳×.",
+    title: "נושא: בחירה",
+    description: "מאמרים על רצון, החלטה, ושליטה מודעת.",
   },
 } as const;
 const kindLabelMap = {
-  article: "׳׳׳׳¨ ׳§׳©׳•׳¨",
-  topic: "׳“׳£ ׳ ׳•׳©׳",
-  page: "׳¢׳׳•׳“ ׳׳™׳‘׳”",
+  article: "מאמר קשור",
+  topic: "דף נושא",
+  page: "עמוד ליבה",
 } as const;
 
 export async function getStaticPaths() {
@@ -95,6 +97,9 @@ const title = frontmatter.title;
 const description = frontmatter.description;
 const bottomLine = frontmatter.bottomLine ?? frontmatter.description;
 const youtubeId = frontmatter.youtubeId;
+const videoSummaryPoints = Array.isArray(frontmatter.videoSummaryPoints)
+  ? frontmatter.videoSummaryPoints
+  : [];
 const audioUrl = frontmatter.audioUrl;
 const tags = Array.isArray(frontmatter.tags) ? frontmatter.tags : [];
 const faqItems = Array.isArray(frontmatter.faq) ? frontmatter.faq : [];
@@ -117,24 +122,26 @@ const difficultyKey: DifficultyKey = frontmatter.difficultyLevel && frontmatter.
       : "beginner";
 const difficultyMeta = difficultyConfig[difficultyKey];
 const showBottomLine = wordCount >= 900 && Boolean(bottomLine);
-const primaryTag = tags[0] ?? "׳”׳ ׳§׳•׳“׳” ׳”׳–׳׳×";
+const primaryTag = tags[0] ?? "הנקודה הזאת";
 const tagPromptMap: Record<string, string> = {
-  "׳—׳•׳₪׳©": "׳׳™׳₪׳” ׳׳×׳” ׳¢׳“׳™׳™׳ ׳׳•׳•׳×׳¨ ׳¢׳ ׳—׳•׳₪׳© ׳₪׳ ׳™׳׳™ ׳›׳“׳™ ׳׳ ׳׳©׳׳ ׳׳—׳™׳¨ ׳—׳™׳¦׳•׳ ׳™?",
-  "׳׳›׳ ׳™׳§׳× ׳׳—׳©׳‘׳”": "׳׳™׳–׳• ׳׳—׳©׳‘׳” ׳׳¦׳׳ ׳ ׳©׳׳¢׳× ׳›׳׳• ׳׳׳×, ׳׳‘׳ ׳‘׳₪׳•׳¢׳ ׳׳ ׳”׳׳× ׳׳•׳×׳ ׳׳•׳˜׳•׳׳˜׳™׳×?",
-  "׳”׳¢׳¦׳׳™": "׳׳™׳–׳• ׳“׳׳•׳× ׳₪׳ ׳™׳׳™׳× ׳׳×׳” ׳¢׳“׳™׳™׳ ׳׳ ׳¡׳” ׳׳”׳’׳ ׳¢׳׳™׳” ׳’׳ ׳›׳©׳”׳™׳ ׳›׳‘׳¨ ׳׳›׳‘׳™׳“׳” ׳¢׳׳™׳?",
-  "׳‘׳”׳™׳¨׳•׳×": "׳׳™׳₪׳” ׳׳×׳” ׳›׳‘׳¨ ׳™׳•׳“׳¢ ׳׳” ׳ ׳›׳•׳, ׳׳‘׳ ׳¢׳“׳™׳™׳ ׳׳¢׳“׳™׳£ ׳¢׳¨׳₪׳ ׳›׳™ ׳”׳•׳ ׳₪׳—׳•׳× ׳׳—׳™׳™׳‘?",
-  "׳‘׳—׳™׳¨׳”": "׳‘׳׳™׳–׳” ׳׳§׳•׳ ׳‘׳—׳™׳™׳ ׳©׳׳ ׳׳×׳” ׳§׳•׳¨׳ ׳׳–׳” '׳׳™׳ ׳׳™ ׳‘׳¨׳™׳¨׳”', ׳›׳©׳‘׳₪׳•׳¢׳ ׳™׳© ׳‘׳¨׳™׳¨׳” ׳¢׳ ׳׳—׳™׳¨?",
+  חופש: "איפה אתה עדיין מוותר על חופש פנימי כדי לא לשלם מחיר חיצוני?",
+  "מכניקת מחשבה": "איזו מחשבה אצלך נשמעת כמו אמת, אבל בפועל מנהלת אותך אוטומטית?",
+  העצמי: "איזו דמות פנימית אתה עדיין מנסה להגן עליה גם כשהיא כבר מכבידה עליך?",
+  בהירות: "איפה אתה כבר יודע מה נכון, אבל עדיין מעדיף ערפל כי הוא פחות מחייב?",
+  בחירה:
+    "באיזה מקום בחיים שלך אתה קורא לזה 'אין לי ברירה', כשבפועל יש ברירה עם מחיר?",
 };
 const fallbackReflectionQuestions = [
-  `׳׳” ׳׳×׳•׳ "${title}" ׳₪׳’׳© ׳׳•׳×׳ ׳׳ ׳›׳¨׳¢׳™׳•׳, ׳׳׳ ׳›׳׳©׳”׳• ׳©׳׳×׳” ׳׳–׳”׳” ׳¢׳ ׳¢׳¦׳׳ ׳¢׳›׳©׳™׳•?`,
-  tagPromptMap[primaryTag] ?? `׳׳™׳₪׳” ${primaryTag} ׳₪׳•׳’׳© ׳׳•׳×׳ ׳‘׳—׳™׳™׳ ׳”׳׳׳™׳×׳™׳™׳, ׳•׳׳ ׳¨׳§ ׳‘׳¨׳׳× ׳”׳”׳¡׳›׳׳” ׳”׳©׳›׳׳™׳×?`,
-  "׳׳ ׳”׳™׳™׳× ׳¦׳¨׳™׳ ׳׳©׳׳•׳— ׳׳™ ׳¢׳›׳©׳™׳• ׳×׳©׳•׳‘׳” ׳›׳ ׳” ׳‘׳•׳•׳׳˜׳¡׳׳₪ ׳‘׳׳©׳₪׳˜ ׳׳—׳“ ׳‘׳׳‘׳“, ׳׳” ׳”׳™׳™׳× ׳›׳•׳×׳‘?",
+  `מה מתוך "${title}" פוגע בך לא כרעיון, אלא כמשהו שאתה מזהה בעצמך עכשיו?`,
+  tagPromptMap[primaryTag] ??
+    `איך ${primaryTag} פוגש אותך בחיים האמיתיים, ולא רק ברמת ההסכמה הכללית?`,
+  "אם היית צריך לשלוח לי עכשיו תשובה כנה בווטסאפ במשפט אחד בלבד, מה היית כותב?",
 ];
 const reflectionQuestions =
   Array.isArray(frontmatter.reflectionQuestions) && frontmatter.reflectionQuestions.length === 3
     ? frontmatter.reflectionQuestions
     : fallbackReflectionQuestions;
-const reflectionWhatsAppUrl = `https://wa.me/${appConfig.contact.whatsAppNumber}?text=${encodeURIComponent(`׳§׳¨׳׳×׳™ ׳׳× ׳”׳׳׳׳¨ "${title}" ׳•׳׳ ׳™ ׳¨׳•׳¦׳” ׳׳¢׳ ׳•׳× ׳¢׳ ׳”׳©׳׳׳•׳× ׳©׳‘׳¡׳•׳£:\n1. \n2. \n3. `)}`;
+const reflectionWhatsAppUrl = `https://wa.me/${appConfig.contact.whatsAppNumber}?text=${encodeURIComponent(`קראתי את המאמר "${title}" ואני רוצה לענות על השאלות שבסוף:\n1. \n2. \n3. `)}`;
 const premiumVault = siteSettings.premiumVault;
 const premiumAccess = appConfig.premiumAccess;
 const manualRelatedConcepts = Array.isArray(frontmatter.relatedConcepts) ? frontmatter.relatedConcepts : [];
@@ -205,26 +212,26 @@ for (const tag of tags) {
 [
   {
     href: "/articles/",
-    title: "׳›׳ ׳”׳׳׳׳¨׳™׳",
-    description: "׳¡׳₪׳¨׳™׳™׳× ׳”׳×׳•׳›׳ ׳”׳׳׳׳”, ׳׳׳¢׳‘׳¨ ׳‘׳™׳ ׳—׳§׳™׳¨׳•׳× ׳׳₪׳™ ׳›׳™׳•׳•׳ ׳•׳׳ ׳׳₪׳™ ׳¨׳¢׳©.",
+    title: "כל המאמרים",
+    description: "ספריית התוכן המלאה, למעבר בין חקירות לפי כיוון ולא לפי רעש.",
     kind: "page" as const,
   },
   {
     href: "/glossary/",
-    title: "׳׳•׳©׳’׳™ ׳™׳¡׳•׳“",
-    description: "׳׳₪׳× ׳”׳׳•׳©׳’׳™׳ ׳©׳ NeverMind: ׳׳’׳•, ׳‘׳—׳™׳¨׳”, ׳¢׳•׳‘׳“׳” ׳׳•׳ ׳₪׳™׳¨׳•׳©, ׳•׳‘׳”׳™׳¨׳•׳× ׳›׳ ׳§׳•׳“׳× ׳”׳×׳—׳׳” ׳׳¢׳•׳׳§ ׳ ׳•׳¡׳£.",
+    title: "מושגי יסוד",
+    description: "מפת המושגים של NeverMind: אגו, בחירה, עובדה מול פירוש, ובהירות כנקודת התחלה לעומק נוסף.",
     kind: "page" as const,
   },
   {
     href: "/services/",
-    title: "׳¢׳‘׳•׳“׳” ׳׳©׳•׳×׳₪׳×",
-    description: "׳׳ ׳”׳׳׳׳¨ ׳₪׳’׳© ׳ ׳§׳•׳“׳” ׳—׳™׳”, ׳׳₪׳©׳¨ ׳׳”׳₪׳•׳ ׳׳•׳×׳” ׳׳¢׳‘׳•׳“׳” ׳׳׳•׳§׳“׳× ׳•׳׳ ׳׳¢׳•׳“ ׳׳—׳©׳‘׳”.",
+    title: "עבודה משותפת",
+    description: "אם המאמר פגש נקודה חיה, אפשר להפוך אותה לעבודה ממוקדת ולא לעוד מחשבה.",
     kind: "page" as const,
   },
   {
     href: "/now/",
-    title: "׳׳” ׳”׳׳¦׳‘ ׳¢׳›׳©׳™׳•",
-    description: "׳¢׳“׳›׳•׳ ׳§׳¦׳¨ ׳¢׳ ׳”׳›׳™׳•׳•׳ ׳”׳ ׳•׳›׳—׳™ ׳©׳ NeverMind, ׳‘׳׳™ ׳׳¡׳›׳•׳× ׳•׳‘׳׳™ ׳™׳—׳¡׳™ ׳¦׳™׳‘׳•׳¨.",
+    title: "מה המצב עכשיו",
+    description: "עדכון קצר על הכיוון הנוכחי של NeverMind, בלי מסכות ובלי יחסי ציבור.",
     kind: "page" as const,
   },
 ].forEach(pushInternalLink);
@@ -258,6 +265,9 @@ const components = {
   RefutationBox,
   DeepDiveConcepts,
   LogicNote,
+  WhatsAppButton,
+  VideoPlayer,
+  PerspectiveToggle,
 };
 ---
 
@@ -274,13 +284,15 @@ const components = {
 
   <div class="mx-auto max-w-7xl lg:grid lg:grid-cols-[minmax(0,72ch)_minmax(280px,340px)] lg:gap-10">
   <div class="min-w-0">
-    <article class="mx-auto max-w-[72ch] space-y-[clamp(2.5rem,3vw,3.5rem)] leading-[1.8]">
+    <article class="nm-article-prose mx-auto max-w-[72ch] space-y-[clamp(2.5rem,3vw,3.5rem)] leading-[1.8] [letter-spacing:0]">
     <header class="space-y-5">
       <h1 class="text-[clamp(2.2rem,1.7rem+2vw,3.2rem)] font-semibold text-[#1A1A1A]">{title}</h1>
       <p class="text-[clamp(1.05rem,1rem+0.35vw,1.4rem)] text-[#1A1A1A]/70">{description}</p>
       <div class="flex flex-wrap items-center gap-3 text-[clamp(0.85rem,0.82rem+0.2vw,1rem)] text-[#1A1A1A]/60">
-        <span>{readingMinutes} ׳“׳§׳•׳× ׳§׳¨׳™׳׳” ׳©׳™׳—׳¡׳›׳• ׳׳ ׳—׳•׳“׳©׳™׳ ׳©׳ ׳”׳×׳׳‘׳˜׳•׳×</span>
-        <span class={`inline-flex rounded-full border px-3 py-1 text-xs font-semibold ${difficultyMeta.tone}`}>׳¨׳׳× ׳¢׳•׳׳§: {difficultyMeta.label}</span>
+        <span>{readingMinutes} דקות קריאה (בערך)</span>
+        <span class={`inline-flex rounded-full border px-3 py-1 text-xs font-semibold ${difficultyMeta.tone}`}>
+          רמת עומק: {difficultyMeta.label}
+        </span>
       </div>
       <div class="flex flex-wrap items-center gap-3">
         {tags.length > 0 && (
@@ -296,7 +308,7 @@ const components = {
           aria-pressed="false"
           class="rounded-full border border-[#1A1A1A]/10 bg-white/70 px-4 py-2 text-[clamp(0.85rem,0.82rem+0.2vw,1rem)] text-[#1A1A1A]/70 transition-colors duration-300 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A]/20"
         >
-          ׳׳¦׳‘ ׳₪׳•׳§׳•׳¡
+          מצב פוקוס
         </button>
       </div>
     </header>
@@ -306,14 +318,17 @@ const components = {
     {audioUrl && (
       <div class="overflow-hidden rounded-2xl border border-[#1A1A1A]/10 bg-white/70 p-4 shadow-sm backdrop-blur-md">
         <audio class="w-full max-w-[400px] accent-[#1A1A1A] text-[#1A1A1A]" controls src={audioUrl}>
-          ׳”׳“׳₪׳“׳₪׳ ׳©׳׳ ׳׳ ׳×׳•׳׳ ׳‘׳”׳©׳׳¢׳× ׳׳•׳“׳™׳•.
+          הדפדפן שלך לא תומך בהשמעת אודיו.
         </audio>
       </div>
     )}
 
-    {youtubeId && <LiteYouTubeEmbed youtubeId={youtubeId} title={title} />}
+    {youtubeId && (
+      <VideoPlayer youtubeId={youtubeId} title={title} videoSummaryPoints={videoSummaryPoints} />
+    )}
 
     <div
+      class="nm-mdx-flow space-y-6"
       data-premium-body
       data-premium-active={frontmatter.isPremium ? "true" : "false"}
       data-premium-marker={premiumVault.cutoffMarker}
@@ -325,7 +340,6 @@ const components = {
       data-premium-access-route={premiumAccess.unlockRoute}
       data-premium-access-session-hours={String(premiumAccess.sessionHours || 168)}
       data-premium-access-helper={premiumAccess.helperText}
-      class="space-y-6"
     >
       <Content components={components} />
     </div>
@@ -362,12 +376,21 @@ const components = {
     </div>
   </section>
 
+  <section class="mx-auto mt-[clamp(2.5rem,4vw,3.5rem)] max-w-[72ch]" aria-label="המשך בוואטסאפ לפי נושא המאמר">
+    <div class="rounded-[1.35rem] border border-[#128C7E]/20 bg-[#F0FDF4]/80 p-5 text-right shadow-sm dark:border-[#128C7E]/30 dark:bg-[#14532D]/20">
+      <p class="mb-4 text-[clamp(0.95rem,0.9rem+0.25vw,1.05rem)] font-medium text-[#1A1A1A] dark:text-[#FAFAF8]/90">
+        רוצה להמשיך את השיחה? לחיצה כאן פותחת וואטסאפ עם הודעה שמזכירה את <span class="text-[#075E54] dark:text-[#86EFAC]">נושא המאמר שקראת</span>.
+      </p>
+      <WhatsAppButton variant="inline" tags={tags} articleTitle={title} label="המשך בוואטסאפ — עם הקשר מהמאמר" />
+    </div>
+  </section>
+
   {curatedInternalLinks.length > 0 && (
     <section class="mx-auto mt-[clamp(3rem,5vw,4rem)] max-w-[72ch] space-y-4">
       <div class="space-y-2">
-        <h2 class="text-[clamp(1.4rem,1.15rem+1vw,2rem)] font-semibold text-[#1A1A1A]">׳¨׳׳” ׳’׳</h2>
+        <h2 class="text-[clamp(1.4rem,1.15rem+1vw,2rem)] font-semibold text-[#1A1A1A]">ראה גם</h2>
         <p class="text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] text-[#1A1A1A]/65">
-          ׳›׳“׳™ ׳׳”׳¢׳׳™׳§ ׳‘׳׳™ ׳׳©׳‘׳•׳¨ ׳¨׳¦׳£, ׳”׳׳©׳ ׳׳›׳׳ ׳ײ¾3ג€“5 ׳¢׳׳•׳“׳™׳ ׳©׳׳¨׳—׳™׳‘׳™׳ ׳׳× ׳׳•׳×׳” ׳—׳§׳™׳¨׳” ׳׳›׳™׳•׳•׳ ׳׳—׳¨.
+          כדי להעמיק בלי לשבור רצף, המשך מכאן ל־3–5 עמודים שמרחיבים את אותה חקירה מכיוון אחר.
         </p>
       </div>
       <div class={`grid gap-4 ${curatedInternalLinks.length > 1 ? "md:grid-cols-2" : ""}`}>
@@ -386,7 +409,7 @@ const components = {
   )}
 
   <section class="mx-auto mt-[clamp(3rem,6vw,5rem)] max-w-2xl space-y-6">
-    <h2 class="text-center text-[clamp(1.4rem,1.15rem+1vw,2rem)] font-semibold text-[#1A1A1A]">׳׳₪׳©׳¨ ׳׳”׳©׳׳™׳¨ ׳©׳׳׳” ׳׳• ׳₪׳ ׳™׳™׳”</h2>
+    <h2 class="text-center text-[clamp(1.4rem,1.15rem+1vw,2rem)] font-semibold text-[#1A1A1A]">אפשר להשאיר שאלה או פנייה</h2>
     <form
       data-contact-form
       class="space-y-4 rounded-3xl border border-[#1A1A1A]/10 bg-white/70 p-6"
@@ -394,22 +417,22 @@ const components = {
       method="POST"
     >
       <input type="hidden" name="access_key" value={web3formsKey} />
-      <input type="hidden" name="subject" value="׳₪׳ ׳™׳™׳” ׳-NeverMind" />
+      <input type="hidden" name="subject" value="פנייה מ-NeverMind" />
       <input type="hidden" name="page" value={title} />
       <input type="text" name="botcheck" style="display:none" tabindex="-1" autocomplete="off" aria-hidden="true" />
 
       <div class="space-y-2 text-right">
-        <label class="text-[clamp(0.9rem,0.85rem+0.2vw,1.05rem)] text-[#1A1A1A]/70" for="name">׳©׳ ׳׳׳</label>
+        <label class="text-[clamp(0.9rem,0.85rem+0.2vw,1.05rem)] text-[#1A1A1A]/70" for="name">שם מלא</label>
         <input id="name" name="name" type="text" required class="w-full rounded-2xl border border-[#1A1A1A]/20 bg-white/80 px-4 py-3 text-right text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] text-[#1A1A1A] outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A]/20" />
       </div>
 
       <div class="space-y-2 text-right">
-        <label class="text-[clamp(0.9rem,0.85rem+0.2vw,1.05rem)] text-[#1A1A1A]/70" for="email">׳׳™׳׳™׳™׳</label>
+        <label class="text-[clamp(0.9rem,0.85rem+0.2vw,1.05rem)] text-[#1A1A1A]/70" for="email">אימייל</label>
         <input id="email" name="email" type="email" required class="w-full rounded-2xl border border-[#1A1A1A]/20 bg-white/80 px-4 py-3 text-right text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] text-[#1A1A1A] outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A]/20" />
       </div>
 
       <div class="space-y-2 text-right">
-        <label class="text-[clamp(0.9rem,0.85rem+0.2vw,1.05rem)] text-[#1A1A1A]/70" for="message">׳”׳•׳“׳¢׳”</label>
+        <label class="text-[clamp(0.9rem,0.85rem+0.2vw,1.05rem)] text-[#1A1A1A]/70" for="message">הודעה</label>
         <textarea id="message" name="message" rows="4" required class="w-full rounded-2xl border border-[#1A1A1A]/20 bg-white/80 px-4 py-3 text-right text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] text-[#1A1A1A] outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A]/20"></textarea>
       </div>
 
@@ -417,10 +440,10 @@ const components = {
         type="submit"
         class="w-full rounded-full border border-[#1A1A1A]/10 bg-white px-5 py-3 text-[clamp(0.95rem,0.9rem+0.3vw,1.1rem)] text-[#1A1A1A]/80 transition-colors duration-300 hover:bg-white/90"
       >
-        ׳©׳׳™׳—׳”
+        שליחה
       </button>
       <p data-form-status aria-live="polite" class="text-center text-[clamp(0.85rem,0.8rem+0.2vw,1rem)] text-[#1A1A1A]/60 opacity-0 transition-opacity duration-300">
-        ׳×׳•׳“׳”, ׳”׳”׳•׳“׳¢׳” ׳¢׳‘׳¨׳”.
+        תודה, ההודעה עברה.
       </p>
     </form>
   </section>
@@ -432,7 +455,13 @@ const components = {
 
   <div class="mt-10 space-y-5 lg:mt-0">
     <DeepDiveConcepts concepts={relatedConcepts} />
-    <LogicalQuestionBox pageTitle={title} pageUrl={shareUrl} web3formsKey={web3formsKey} />
+    <LogicalQuestionBox
+      pageTitle={title}
+      pageUrl={shareUrl}
+      web3formsKey={web3formsKey}
+      tags={tags}
+      articleTitle={title}
+    />
   </div>
 </div>
 
@@ -454,13 +483,23 @@ const components = {
     article :global(p),
     article :global(li) {
       font-size: clamp(1rem, 0.95rem + 0.35vw, 1.2rem);
+      letter-spacing: 0;
+    }
+
+    /* פסקאות בתוך גוף MDX — ריווח גדול בין פסקה לפסקה */
+    article .nm-mdx-flow :global(p) {
+      margin-block: 0;
+    }
+
+    article .nm-mdx-flow :global(p + p) {
+      margin-block-start: clamp(1.75rem, 3.5vw, 3rem);
     }
 
     article :global(ul),
     article :global(ol) {
       padding-inline-start: 1.4rem;
-      margin-top: 1rem;
-      margin-bottom: 1rem;
+      margin-top: clamp(1.25rem, 2vw, 2rem);
+      margin-bottom: clamp(1.25rem, 2vw, 2rem);
     }
 
     article :global(blockquote) {
@@ -568,7 +607,7 @@ const components = {
         document.body.classList.toggle("is-focus-mode", enabled);
         if (focusToggle instanceof HTMLButtonElement) {
           focusToggle.setAttribute("aria-pressed", String(enabled));
-          focusToggle.textContent = enabled ? "׳™׳¦׳™׳׳” ׳׳׳¦׳‘ ׳₪׳•׳§׳•׳¡" : "׳׳¦׳‘ ׳₪׳•׳§׳•׳¡";
+          focusToggle.textContent = enabled ? "יציאה ממצב פוקוס" : "מצב פוקוס";
         }
       };
 
@@ -639,6 +678,7 @@ const components = {
           return;
         }
 
+        const contentStartRef = markerNode.nextSibling;
         markerNode.parentNode?.removeChild(markerNode);
 
         if (hasActivePremiumSession()) {
@@ -648,18 +688,22 @@ const components = {
         }
 
         const title = overrides.title || premiumBody.dataset.premiumTitle || "This professional method is reserved for premium members";
-        const description = overrides.description || premiumBody.dataset.premiumDescription || "׳”׳׳©׳ ׳”׳×׳•׳›׳ ׳”׳׳׳ ׳©׳׳•׳¨ ׳›׳¨׳’׳¢ ׳׳—׳‘׳¨׳™ ׳₪׳¨׳™׳׳™׳•׳.";
-        const fallbackCtaLabel = overrides.ctaLabel || premiumBody.dataset.premiumCtaLabel || "׳׳©׳™׳¨׳•׳×׳™׳ ׳•׳׳—׳™׳¨׳™׳";
+        const description = overrides.description || premiumBody.dataset.premiumDescription || "המשך התוכן המלא שמור כרגע לחברי פרימיום.";
+        const fallbackCtaLabel = overrides.ctaLabel || premiumBody.dataset.premiumCtaLabel || "לשירותים ומחירים";
         const fallbackCtaHref = overrides.ctaHref || premiumBody.dataset.premiumCtaHref || "/now";
         const accessEnabled = premiumBody.dataset.premiumAccessEnabled === "true";
         const accessRoute = premiumBody.dataset.premiumAccessRoute || "/premium-access/";
-        const helperText = premiumBody.dataset.premiumAccessHelper || "׳’׳™׳©׳” ׳׳×׳•׳›׳ ׳₪׳¨׳™׳׳™׳•׳ ׳ ׳₪׳×׳—׳× ׳›׳¨׳’׳¢ ׳“׳¨׳ ׳§׳•׳“ ׳’׳™׳©׳” ׳׳×׳—׳׳£.";
+        const helperText = premiumBody.dataset.premiumAccessHelper || "גישה לתוכן פרימיום נפתחת כרגע דרך קוד גישה מתחלף.";
         const returnTo = encodeURIComponent(window.location.pathname);
         const primaryHref = accessEnabled ? `${accessRoute}?returnTo=${returnTo}` : fallbackCtaHref;
-        const primaryLabel = accessEnabled ? "׳׳”׳–׳™׳ ׳§׳•׳“ ׳’׳™׳©׳”" : fallbackCtaLabel;
+        const primaryLabel = accessEnabled ? "להזין קוד גישה" : fallbackCtaLabel;
 
         const range = document.createRange();
-        range.setStartAfter(markerNode);
+        if (contentStartRef) {
+          range.setStartBefore(contentStartRef);
+        } else {
+          range.setStart(premiumBody, premiumBody.childNodes.length);
+        }
         range.setEndAfter(premiumBody.lastChild);
         const hiddenContent = range.extractContents();
 
@@ -705,7 +749,7 @@ const components = {
             await navigator.clipboard.writeText(value);
             showToast();
           } catch {
-            window.prompt("׳”׳¢׳×׳§ ׳§׳™׳©׳•׳¨", value);
+            window.prompt("העתק קישור", value);
           }
         };
         copyButton.addEventListener("click", onCopyClick);
@@ -722,7 +766,7 @@ const components = {
               body: formData,
             });
             if (formStatus instanceof HTMLElement) {
-              formStatus.textContent = response.ok ? "׳×׳•׳“׳”, ׳”׳”׳•׳“׳¢׳” ׳¢׳‘׳¨׳”." : "׳׳©׳”׳• ׳”׳©׳×׳‘׳©, ׳ ׳¡׳” ׳©׳•׳‘.";
+              formStatus.textContent = response.ok ? "תודה, ההודעה עברה." : "משהו השתבש, נסה שוב.";
               formStatus.classList.add("opacity-100");
             }
             if (response.ok) {
@@ -730,7 +774,7 @@ const components = {
             }
           } catch {
             if (formStatus instanceof HTMLElement) {
-              formStatus.textContent = "׳׳©׳”׳• ׳”׳©׳×׳‘׳©, ׳ ׳¡׳” ׳©׳•׳‘.";
+              formStatus.textContent = "משהו השתבש, נסה שוב.";
               formStatus.classList.add("opacity-100");
             }
           }

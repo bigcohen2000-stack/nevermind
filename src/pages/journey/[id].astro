@@ -1,0 +1,106 @@
+---
+import { getCollection, type CollectionEntry } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+import clarityPathsFile from "../../config/clarityPaths.json";
+
+type ArticleEntry = CollectionEntry<"articles">;
+type JourneyDef = (typeof clarityPathsFile.paths)[number];
+
+const toSlugKeys = (entry: ArticleEntry): string[] => {
+  const keys = new Set<string>();
+  keys.add(entry.slug);
+  const base = entry.id.replace(/\.mdx$/i, "");
+  keys.add(base);
+  const tail = base.split("/").pop();
+  if (tail) keys.add(tail);
+  return [...keys];
+};
+
+const buildSlugMap = (entries: ArticleEntry[]) => {
+  const map = new Map<string, ArticleEntry>();
+  for (const e of entries) {
+    for (const k of toSlugKeys(e)) {
+      if (!map.has(k)) map.set(k, e);
+    }
+  }
+  return map;
+};
+
+export async function getStaticPaths() {
+  const entries = await getCollection("articles", ({ data }) => data.draft !== true);
+  const bySlug = buildSlugMap(entries);
+
+  return clarityPathsFile.paths.map((journey) => {
+    if (journey.articleSlugs.length !== 3) {
+      throw new Error(`[journey] "${journey.id}": נדרשות בדיוק 3 articleSlugs, קיבלתי ${journey.articleSlugs.length}.`);
+    }
+    const missing = journey.articleSlugs.filter((s) => !bySlug.has(s));
+    if (missing.length) {
+      throw new Error(`[journey] "${journey.id}": מאמרים חסרים או בטיוטה: ${missing.join(", ")}`);
+    }
+    const articles = journey.articleSlugs.map((s) => bySlug.get(s)!);
+    return {
+      params: { id: journey.id },
+      props: { journey, articles },
+    };
+  });
+}
+
+const { journey, articles } = Astro.props as { journey: JourneyDef; articles: ArticleEntry[] };
+
+const stepHints = [
+  "צעד ראשון — לקרוא בלי לשפוט: רק לאסוף את מה שהמוח אומר.",
+  "צעד שני — לבדוק אם יש עובדה אחת שאפשר לאמת, או רק פרשנות.",
+  "צעד שלישי — לבחור פעולה קטנה אחת שמתאימה למה שברור עכשיו.",
+];
+
+const title = `NeverMind | ${journey.title}`;
+const description = journey.shortDescription;
+---
+
+<Layout {title} {description}>
+  <article class="mx-auto max-w-4xl space-y-10 px-5 py-16 text-right sm:px-8 md:py-24" dir="rtl">
+    <header class="space-y-4">
+      <p class="text-4xl" aria-hidden="true">{journey.emoji}</p>
+      <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[#D42B2B]">Clarity Path</p>
+      <h1 class="text-[clamp(1.85rem,1.4rem+1.6vw,2.75rem)] font-semibold leading-tight text-[#1A1A1A] dark:text-white">
+        {journey.title}
+      </h1>
+      <p class="max-w-2xl text-[clamp(1.02rem,0.96rem+0.25vw,1.2rem)] leading-relaxed text-[#1A1A1A]/72 dark:text-neutral-300">
+        {journey.shortDescription}
+      </p>
+      <a
+        href="/"
+        class="inline-flex items-center justify-center rounded-full border border-[#1A1A1A]/12 bg-white px-4 py-2 text-sm font-semibold text-[#1A1A1A]/78 transition hover:bg-[#FAFAF8] dark:border-white/15 dark:bg-neutral-900 dark:text-[#FAFAF8]/88"
+      >
+        ← חזרה לדף הבית
+      </a>
+    </header>
+
+    <ol class="space-y-8" role="list">
+      {
+        articles.map((article, index) => (
+          <li class="relative">
+            <div class="flex flex-col gap-3 rounded-[1.75rem] border border-[#1D3557]/14 bg-white/90 p-6 shadow-[0_20px_60px_rgba(29,53,87,0.06)] dark:border-white/10 dark:bg-neutral-900/80 md:p-8">
+              <div class="flex flex-wrap items-baseline justify-between gap-3">
+                <span class="inline-flex h-9 min-w-[2.25rem] items-center justify-center rounded-full bg-[#1D3557] px-3 text-sm font-bold text-white">
+                  {index + 1}
+                </span>
+                <span class="text-xs font-medium text-[#1D3557]/55 dark:text-[#FAFAF8]/50">שלב {index + 1} מתוך 3</span>
+              </div>
+              <p class="text-sm leading-7 text-[#1D3557]/75 dark:text-neutral-400">{stepHints[index] ?? stepHints[0]}</p>
+              <h2 class="text-xl font-semibold text-[#1D3557] dark:text-[#FAFAF8] md:text-2xl">{article.data.title}</h2>
+              <p class="text-sm leading-7 text-[#1A1A1A]/68 dark:text-neutral-400">{article.data.description}</p>
+              <a
+                href={`/articles/${article.slug}`}
+                class="inline-flex w-fit items-center justify-center rounded-full bg-[#D42B2B] px-5 py-2.5 text-sm font-semibold text-[#FAFAF8] transition hover:bg-[#b82424]"
+              >
+                לקריאת המאמר
+              </a>
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+  </article>
+</Layout>

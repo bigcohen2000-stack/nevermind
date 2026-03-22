@@ -1,56 +1,113 @@
 ---
 import appConfig from "../config/appConfig.json";
+import { buildArticleContextLeadMessage } from "../lib/services";
 
-const { phone = appConfig.contact.whatsAppNumber } = Astro.props;
-const baseUrl = `https://wa.me/${phone}`;
+export interface Props {
+  /** מזהה וואטסאפ בלי + (למשל 9725...) */
+  phone?: string;
+  /** מתוך frontmatter — תג ראשון לטקסט הליד */
+  tags?: string[];
+  /** אופציונלי ב-MDX: נושא במקום מערך tags */
+  topic?: string;
+  /** כותרת מאמר לגיבוי */
+  articleTitle?: string;
+  /** fab = צף; inline = בתוך התוכן */
+  variant?: "fab" | "inline";
+  /** טקסט לכפתור ב-inline */
+  label?: string;
+}
+
+const {
+  phone = appConfig.contact.whatsAppNumber,
+  tags = [],
+  topic = "",
+  articleTitle = "",
+  variant = "fab",
+  label = "שלח הודעה ליקיר בוואטסאפ",
+} = Astro.props;
+
+const leadMessage = buildArticleContextLeadMessage({ tags, topic, articleTitle });
+
+const baseWa = `https://wa.me/${phone}`;
+const hrefWithText = `${baseWa}?text=${encodeURIComponent(leadMessage)}`;
+const prefillEncoded = encodeURIComponent(leadMessage);
 ---
-<a
-  data-whatsapp
-  data-wa-base={baseUrl}
-  href={baseUrl}
-  target="_blank"
-  rel="noreferrer"
-  aria-label="יצירת קשר בוואטסאפ"
-  class="fixed bottom-6 left-6 z-40 flex h-10 w-10 items-center justify-center rounded-full bg-white/70 shadow-sm backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-500"
->
-  <span class="block h-2 w-2 rounded-full bg-[#1A1A1A]/45"></span>
-</a>
-<script is:inline>
-  document.addEventListener("astro:page-load", () => {
-    if (window.__nmWhatsappCleanup) {
-      window.__nmWhatsappCleanup();
-    }
 
-    const whatsappButton = document.querySelector("[data-whatsapp]");
-    const base = whatsappButton?.getAttribute("data-wa-base") ?? "";
+{
+  variant === "inline" ? (
+    <a
+      href={hrefWithText}
+      target="_blank"
+      rel="noreferrer"
+      class="inline-flex w-full items-center justify-center gap-2 rounded-full border border-[#128C7E]/30 bg-[#25D366]/15 px-5 py-3 text-sm font-semibold text-[#075E54] transition-colors hover:bg-[#25D366]/25 [letter-spacing:0]"
+      aria-label={label}
+    >
+      <span aria-hidden="true">??</span>
+      {label}
+    </a>
+  ) : (
+    <a
+      data-whatsapp
+      data-wa-base={baseWa}
+      data-wa-prefill={prefillEncoded}
+      href={hrefWithText}
+      target="_blank"
+      rel="noreferrer"
+      aria-label="יצירת קשר בוואטסאפ"
+      class="fixed bottom-6 left-6 z-40 flex h-10 w-10 items-center justify-center rounded-full bg-white/70 shadow-sm backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-500"
+    >
+      <span class="block h-2 w-2 rounded-full bg-[#1A1A1A]/45" />
+    </a>
+  )
+}
 
-    const updateWhatsappVisibility = () => {
-      if (!whatsappButton) return;
-      const doc = document.documentElement;
-      const scrollTop = doc.scrollTop || document.body.scrollTop;
-      const scrollHeight = doc.scrollHeight - doc.clientHeight;
-      const progress = scrollHeight > 0 ? scrollTop / scrollHeight : 0;
-      const shouldShow = progress >= 0.5;
+{variant === "fab" && (
+  <script is:inline>
+    document.addEventListener("astro:page-load", () => {
+      if (window.__nmWhatsappCleanup) {
+        window.__nmWhatsappCleanup();
+      }
 
-      whatsappButton.classList.toggle("opacity-100", shouldShow);
-      whatsappButton.classList.toggle("pointer-events-auto", shouldShow);
-    };
+      const whatsappButton = document.querySelector("[data-whatsapp]");
+      const base = whatsappButton?.getAttribute("data-wa-base") ?? "";
+      const prefillAttr = whatsappButton?.getAttribute("data-wa-prefill") ?? "";
 
-    const updateWhatsappHref = () => {
-      if (!whatsappButton || !base) return;
-      const rawTitle = document.title ? document.title.split("|")[0].trim() : "NeverMind";
-      const pageTitle = rawTitle || "NeverMind";
-      const message = `היי, הגעתי מהעמוד ${pageTitle}, ואשמח לבדוק יחד מה נכון כאן.`;
-      const encoded = encodeURIComponent(message);
-      whatsappButton.setAttribute("href", `${base}?text=${encoded}`);
-    };
+      const updateWhatsappVisibility = () => {
+        if (!whatsappButton) return;
+        const doc = document.documentElement;
+        const scrollTop = doc.scrollTop || document.body.scrollTop;
+        const scrollHeight = doc.scrollHeight - doc.clientHeight;
+        const progress = scrollHeight > 0 ? scrollTop / scrollHeight : 0;
+        const shouldShow = progress >= 0.5;
 
-    updateWhatsappHref();
-    document.addEventListener("scroll", updateWhatsappVisibility, { passive: true });
-    updateWhatsappVisibility();
+        whatsappButton.classList.toggle("opacity-100", shouldShow);
+        whatsappButton.classList.toggle("pointer-events-auto", shouldShow);
+      };
 
-    window.__nmWhatsappCleanup = () => {
-      document.removeEventListener("scroll", updateWhatsappVisibility);
-    };
-  });
-</script>
+      const updateWhatsappHref = () => {
+        if (!whatsappButton || !base) return;
+        let message = "";
+        try {
+          message = prefillAttr ? decodeURIComponent(prefillAttr) : "";
+        } catch {
+          message = "";
+        }
+        if (!message) {
+          const rawTitle = document.title ? document.title.split("|")[0].trim() : "NeverMind";
+          const pageTitle = rawTitle || "NeverMind";
+          message = `היי, הגעתי מהעמוד ${pageTitle}, ואשמח לבדוק יחד מה נכון כאן.`;
+        }
+        const encoded = encodeURIComponent(message);
+        whatsappButton.setAttribute("href", `${base}?text=${encoded}`);
+      };
+
+      updateWhatsappHref();
+      document.addEventListener("scroll", updateWhatsappVisibility, { passive: true });
+      updateWhatsappVisibility();
+
+      window.__nmWhatsappCleanup = () => {
+        document.removeEventListener("scroll", updateWhatsappVisibility);
+      };
+    });
+  </script>
+)}

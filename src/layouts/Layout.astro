@@ -1,4 +1,4 @@
-﻿---
+---
 import "../styles/global.css";
 import { getCollection } from "astro:content";
 import { ClientRouter } from "astro:transitions";
@@ -17,6 +17,9 @@ const {
   image,
   noIndex = false,
 } = Astro.props;
+
+const waTags = Array.isArray(frontmatter?.tags) ? frontmatter.tags : [];
+const waArticleTitle = typeof title === "string" ? title : "";
 
 const siteTitle = appConfig.site.name;
 const siteDescription = "מרחב חקירה שקט להקשבה פנימית, בהירות ודיוק רגשי.";
@@ -124,7 +127,7 @@ const fallbackFaqItems =
     : [];
 const faqItemsForSchema = normalizedFaqItems.length > 0 ? normalizedFaqItems : fallbackFaqItems;
 const faqSchema =
-  hasInquirySection && faqItemsForSchema.length > 0
+  faqItemsForSchema.length > 0
     ? {
         "@context": "https://schema.org",
         "@type": "FAQPage",
@@ -139,7 +142,45 @@ const faqSchema =
       }
     : null;
 
-const schemas = [organizationSchema, websiteSchema, breadcrumbSchema, articleSchema, faqSchema].filter(Boolean);
+const youtubeIdRaw = typeof frontmatter?.youtubeId === "string" ? frontmatter.youtubeId.trim() : "";
+const videoSummaryPointsForSchema = Array.isArray(frontmatter?.videoSummaryPoints)
+  ? frontmatter.videoSummaryPoints.map((p) => String(p).trim()).filter(Boolean)
+  : [];
+
+const videoObjectSchema =
+  youtubeIdRaw.length > 0
+    ? {
+        "@context": "https://schema.org",
+        "@type": "VideoObject",
+        name: frontmatter?.title ?? pageTitle,
+        description: frontmatter?.description ?? pageDescription,
+        thumbnailUrl: [`https://i.ytimg.com/vi/${youtubeIdRaw}/hqdefault.jpg`],
+        uploadDate: toIso(frontmatter?.pubDate),
+        contentUrl: `https://www.youtube.com/watch?v=${youtubeIdRaw}`,
+        embedUrl: `https://www.youtube-nocookie.com/embed/${youtubeIdRaw}`,
+        ...(videoSummaryPointsForSchema.length > 0
+          ? {
+              keywords: videoSummaryPointsForSchema.join(", "),
+              transcript: videoSummaryPointsForSchema.map((line) => `• ${line}`).join("\n"),
+            }
+          : {}),
+        publisher: {
+          "@type": "Organization",
+          name: siteTitle,
+          url: siteUrl,
+        },
+        inLanguage: "he-IL",
+      }
+    : null;
+
+const schemas = [
+  organizationSchema,
+  websiteSchema,
+  breadcrumbSchema,
+  articleSchema,
+  videoObjectSchema,
+  faqSchema,
+].filter(Boolean);
 const randomArticlePaths = (await getCollection("articles", ({ data }) => data.draft !== true)).map((entry) => `/articles/${entry.slug}`);
 
 const socialLinks = [
@@ -326,7 +367,11 @@ const socialLinks = [
       </div>
     </footer>
 
-    <WhatsAppButton phone={appConfig.contact.whatsAppNumber} />
+    <WhatsAppButton
+      phone={appConfig.contact.whatsAppNumber}
+      tags={waTags}
+      articleTitle={waArticleTitle}
+    />
     <SearchModal client:idle />
 
     <script is:inline define:vars={{ randomArticlePaths }}>
