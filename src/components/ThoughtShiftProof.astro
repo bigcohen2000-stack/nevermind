@@ -1,0 +1,45 @@
+﻿---
+import type { ThoughtShift } from "../lib/services";
+
+interface Props {
+  items: ThoughtShift[];
+  heading?: string;
+  eyebrow?: string;
+}
+
+const {
+  items,
+  heading = "לא עוד המלצה. שינוי בדפוס החשיבה.",
+  eyebrow = "לפני ואחרי"
+} = Astro.props as Props;
+---
+
+<section class="space-y-6 text-right">
+  <div class="space-y-3">
+    <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[#D42B2B]">{eyebrow}</p>
+    <h2 class="text-[clamp(1.9rem,1.5rem+1vw,2.8rem)] font-semibold text-[#1A1A1A]">{heading}</h2>
+    <p class="max-w-3xl text-sm leading-7 text-[#1A1A1A]/68">
+      לא "המלצה" כללית, אלא מעבר חד בין מנגנון ישן לאופן חשיבה מדויק יותר שנבנה מתוך הייעוץ.
+    </p>
+  </div>
+
+  <div class="grid gap-5 lg:grid-cols-3">
+    {items.map((item) => (
+      <article class="overflow-hidden rounded-[1.9rem] border border-[#1A1A1A]/10 bg-white/84 shadow-[0_18px_50px_rgba(26,26,26,0.05)]">
+        <header class="border-b border-[#1A1A1A]/8 bg-[#FAFAF8] px-5 py-4">
+          <h3 class="text-lg font-semibold text-[#1A1A1A]">{item.title}</h3>
+        </header>
+        <div class="grid gap-px bg-[#1A1A1A]/8 md:grid-cols-2">
+          <div class="space-y-3 bg-white px-5 py-5">
+            <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#1A1A1A]/45">דפוס ישן</p>
+            <p class="text-sm leading-7 text-[#1A1A1A]/64">{item.before}</p>
+          </div>
+          <div class="space-y-3 bg-[#FFF4F3] px-5 py-5">
+            <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">דפוס NeverMind</p>
+            <p class="text-sm leading-7 text-[#1A1A1A]/82">{item.after}</p>
+          </div>
+        </div>
+      </article>
+    ))}
+  </div>
+</section>

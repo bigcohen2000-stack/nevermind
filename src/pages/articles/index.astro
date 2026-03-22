@@ -1,44 +1,49 @@
 ﻿---
+import { getCollection } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
 
-type ArticleModule = {
-  frontmatter?: {
-    title?: string;
-    description?: string;
-    tags?: string[];
-    pubDate?: string | Date;
-    draft?: boolean;
-  };
+type DifficultyKey = "beginner" | "advanced" | "deep";
+
+const difficultyConfig: Record<DifficultyKey, { label: string; tone: string }> = {
+  beginner: {
+    label: "מתחילים",
+    tone: "bg-[#F4FAF4] text-[#166534] border-[#BBF7D0]/70",
+  },
+  advanced: {
+    label: "מתקדמים",
+    tone: "bg-[#FFF7ED] text-[#9A3412] border-[#FDBA74]/60",
+  },
+  deep: {
+    label: "חקירה עמוקה",
+    tone: "bg-[#1A1A1A] text-[#FAFAF8] border-[#1A1A1A]",
+  },
 };
 
-const entries = Object.entries(
-  import.meta.glob("../../content/articles/**/*.mdx", { eager: true })
-) as Array<[string, ArticleModule]>;
+const resolveDifficulty = (level: DifficultyKey | undefined, body: string): DifficultyKey => {
+  if (level && level in difficultyConfig) return level;
 
-const articles = entries
-  .map(([path, mod]) => {
-    const frontmatter = mod.frontmatter ?? {};
-    if (frontmatter.draft === true) {
-      return null;
-    }
+  const wordCount = body.replace(/<[^>]*>/g, " ").split(/\s+/).filter(Boolean).length;
+  if (wordCount > 1400) return "deep";
+  if (wordCount > 900) return "advanced";
+  return "beginner";
+};
 
-    const slug = path
-      .replace("../../content/articles/", "")
-      .replace(/\.mdx$/, "");
+const articles = (await getCollection("articles", ({ data }) => data.draft !== true))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .map((article) => {
+    const difficultyKey = resolveDifficulty(article.data.difficultyLevel as DifficultyKey | undefined, article.body ?? "");
+    const difficultyMeta = difficultyConfig[difficultyKey];
 
     return {
-      slug,
-      title: frontmatter.title ?? "מאמר",
-      description: frontmatter.description ?? "",
-      tags: Array.isArray(frontmatter.tags) ? frontmatter.tags : [],
-      date: frontmatter.pubDate ? new Date(frontmatter.pubDate) : null,
-      transitionId: slug.replace(/[^\w-]+/g, "-"),
+      slug: article.slug,
+      title: article.data.title,
+      description: article.data.description,
+      tags: Array.isArray(article.data.tags) ? article.data.tags : [],
+      date: article.data.pubDate,
+      transitionId: article.slug.replace(/[^\w-]+/g, "-"),
+      difficultyLabel: difficultyMeta.label,
+      difficultyTone: difficultyMeta.tone,
     };
-  })
-  .filter((article): article is NonNullable<typeof article> => article !== null)
-  .sort((a, b) => {
-    if (!a.date || !b.date) return 0;
-    return b.date.getTime() - a.date.getTime();
   });
 
 const tagSet = new Set<string>();
@@ -48,12 +53,19 @@ const tags = Array.from(tagSet);
 <Layout title="מאמרים">
   <section class="space-y-10">
     <header class="space-y-4">
-      <h1 class="text-[clamp(2.2rem,1.7rem+2vw,3.2rem)] font-semibold text-[#1A1A1A]">
-        מאמרים
-      </h1>
-      <p class="text-[clamp(1.05rem,1rem+0.35vw,1.4rem)] text-[#1A1A1A]/70">
-        ספריית עומק חיה, מסודרת לפי חקירה ותנועה.
-      </p>
+      <div class="flex flex-wrap items-end justify-between gap-4">
+        <div class="space-y-4 text-right">
+          <h1 class="text-[clamp(2.2rem,1.7rem+2vw,3.2rem)] font-semibold text-[#1A1A1A]">
+            מאמרים
+          </h1>
+          <p class="text-[clamp(1.05rem,1rem+0.35vw,1.4rem)] text-[#1A1A1A]/70">
+            ספריית עומק חיה, מסודרת לפי חקירה ותנועה.
+          </p>
+        </div>
+        <button type="button" data-random-article-trigger class="inline-flex items-center justify-center rounded-full border border-[#D42B2B]/14 bg-[#FFF4F3] px-5 py-3 text-sm font-semibold text-[#D42B2B] transition hover:bg-[#ffe7e5]">
+          הפתע אותי עם מאמר אקראי
+        </button>
+      </div>
     </header>
 
     <div class="flex flex-wrap gap-3">
@@ -66,9 +78,15 @@ const tags = Array.from(tagSet);
     <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
       {articles.map((article) => (
         <a href={`/articles/${article.slug}`} data-article-card data-tags={article.tags.join(",")} class="group flex h-full flex-col justify-between gap-6 rounded-3xl border border-white/70 bg-white/70 p-6 shadow-sm backdrop-blur-md transition-all duration-500 ease-out hover:scale-[1.01] focus-visible:scale-[1.01] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A]/20">
-          <div class="space-y-3">
-            <h2 transition:name={`article-${article.transitionId}`} class="text-[clamp(1.3rem,1.1rem+0.6vw,1.7rem)] font-semibold text-[#1A1A1A]">{article.title}</h2>
-            {article.description && <p class="text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] text-[#1A1A1A]/65">{article.description}</p>}
+          <div class="space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+              <span class={`inline-flex rounded-full border px-3 py-1 text-xs font-semibold ${article.difficultyTone}`}>{article.difficultyLabel}</span>
+              <span class="text-[clamp(0.8rem,0.78rem+0.2vw,0.95rem)] text-[#1A1A1A]/50">{article.date.toLocaleDateString("he-IL")}</span>
+            </div>
+            <div class="space-y-3">
+              <h2 transition:name={`article-${article.transitionId}`} class="text-[clamp(1.3rem,1.1rem+0.6vw,1.7rem)] font-semibold text-[#1A1A1A]">{article.title}</h2>
+              {article.description && <p class="text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] text-[#1A1A1A]/65">{article.description}</p>}
+            </div>
           </div>
           {article.tags.length > 0 && (
             <div class="flex flex-wrap gap-2 text-[clamp(0.8rem,0.78rem+0.2vw,0.95rem)] text-[#1A1A1A]/55">
@@ -113,3 +131,4 @@ const tags = Array.from(tagSet);
     });
   </script>
 </Layout>
+

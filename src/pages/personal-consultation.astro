@@ -1,0 +1,235 @@
+﻿---
+import Layout from "../layouts/Layout.astro";
+import ServiceCard from "../components/ServiceCard.astro";
+import ThoughtShiftProof from "../components/ThoughtShiftProof.astro";
+import { findServiceById, servicesThoughtShifts, servicesTrust, type FlatService } from "../lib/services";
+
+const consultationService = findServiceById("phone-consult");
+const subscriptionService = findServiceById("merpeset-subscription");
+const authorityService = findServiceById("podcast-mic");
+
+const fallbackConsultation: FlatService = {
+  id: "phone-consult",
+  title: "שיחת מיקוד 20 דקות",
+  subtitle: "להפריד עובדה מפירוש - עכשיו",
+  description: "שיחה קצרה ומדויקת למצב שבו אתה צריך בהירות עכשיו, לא בעוד חודש.",
+  price_full: 450,
+  action_type: "whatsapp",
+  action_text: "כן, אני רוצה להתחיל",
+  visible: true,
+  badges: [],
+  features: [],
+  stageName: "שלב 1: בהירות מיידית",
+  targetAudience: "מי שצריך תשובה עכשיו",
+};
+
+const fallbackSubscription: FlatService = {
+  id: "merpeset-subscription",
+  title: "מנוי מרפסת - Retainer",
+  subtitle: "המסלול הקבוע שלך להתפתחות אמיתית",
+  description: "שני מפגשים בחודש וליווי וואטסאפ יומי למי שצריך עומק מתמשך ולא רק תשובה רגעית.",
+  price_full: 1800,
+  action_type: "whatsapp",
+  action_text: "אני רוצה להתחיל מנוי מרפסת",
+  visible: true,
+  badges: ["הכי פופולרי"],
+  features: [],
+  stageName: "שלב 3: ליווי והמשכיות",
+  targetAudience: "מי שרוצה גב קבוע",
+};
+
+const fallbackAuthority: FlatService = {
+  id: "podcast-mic",
+  title: "סשן מצולם + ייעוץ אסטרטגי",
+  subtitle: "תוכן ברמה גבוהה לרשתות שלך",
+  description: "יום צילום מלא באולפן עם ייעוץ מדויק למי שרוצה להפוך תובנות לנכס תוכן וסמכות.",
+  price_full: 2950,
+  action_type: "invoice",
+  action_text: "שריין סשן מצולם",
+  visible: true,
+  badges: ["High-End"],
+  features: [],
+  stageName: "שלב 5: השפעה וסמכות",
+  targetAudience: "מי שרוצה להפוך תובנות לנכס",
+};
+
+const featuredServices = [
+  consultationService ?? fallbackConsultation,
+  subscriptionService ?? fallbackSubscription,
+  authorityService ?? fallbackAuthority,
+];
+
+const pageTitle = "ייעוץ אישי הוא לא המטרה, הוא הדרך";
+const pageDescription = "שיחת מיקוד אישית למי שנתקע בצומת בחיים וצריך בהירות נקייה, בלי סיבוכים ובלי מריחות.";
+const pricingHref = "#pricing";
+const proofItems = [
+  "לא טיפול. לא תהליך ארוך. שיחה אחת שמחזירה סדר למה שמרגיש מפוזר.",
+  "מתאים לרגעים של קונפליקט, משבר אמונה, פיצול פנימי, זוגיות או החלטה שאתה דוחה יותר מדי זמן.",
+  "המטרה היא לא להרשים אותך. המטרה היא שתצא עם דבר אחד ברור שאפשר לפעול עליו מיד.",
+];
+
+const pillars = [
+  {
+    icon: "◎",
+    title: "עומק חד-פעמי",
+    text: "שיחה אחת מדויקת יכולה לחתוך שכבות של רעש, בלבול ודחייה. במקום לגרור תהליך, נכנסים ישר לליבה של מה שקורה.",
+  },
+  {
+    icon: "◇",
+    title: "עצמאות מחשבתית",
+    text: "המטרה היא לא שתהיה תלוי בי. המטרה היא שתלמד לזהות בעצמך איפה אתה מתבלבל, ואיך לחזור לקרקע יציבה.",
+  },
+  {
+    icon: "↗",
+    title: "שיטה פרקטית",
+    text: "לא רעיונות יפים. לא שפה גבוהה. פירוק פשוט של המציאות כמו שהיא, ותרגום שלה לצעד ברור שאפשר לבצע בעולם האמיתי.",
+  },
+];
+
+const processSteps = [
+  {
+    title: "מיפוי מטרות",
+    text: "לא מתחילים בפתרון. מתחילים בלראות מה אתה באמת רוצה, ומה כרגע רק נשמע דחוף כי יש לחץ סביבו.",
+  },
+  {
+    title: "ניתוח לוגי",
+    text: "מפרידים בין עובדה, פירוש, פחד והרגל. זה השלב שבו הסיפור מאבד שליטה, והמצב מתחיל להתבהר.",
+  },
+  {
+    title: "תוכנית פעולה",
+    text: "יוצאים עם כיוון ברור אחד. לא חמישה תרחישים ולא עוד עומס. פעולה אחת נכונה שמחזירה תנועה למערכת.",
+  },
+];
+
+const benefits = [
+  {
+    title: "בהירות בקבלת החלטות",
+    text: "פחות רעש, פחות התלבטות מיותרת, ויותר יכולת לראות מה באמת נכון לבחור.",
+  },
+  {
+    title: "צמיחה כלכלית ואישית",
+    text: "כשמחשבה מפסיקה להיתקע סביב עצמה, מתחילים לזוז טוב יותר גם בעבודה, גם בכסף וגם ביחסים.",
+  },
+  {
+    title: "שקט נפשי בר-קיימא",
+    text: "לא שקט מזויף של הדחקה. שקט שמגיע כשיש מבנה פנימי מסודר יותר ואחיזה יציבה יותר במציאות.",
+  },
+];
+---
+
+<Layout title={pageTitle} description={pageDescription}>
+  <section class="mx-auto max-w-6xl space-y-20 px-4 pb-20 text-[#1A1A1A]">
+    <header class="grid gap-10 rounded-[2.2rem] border border-[#1A1A1A]/10 bg-white/82 px-6 py-10 shadow-[0_24px_80px_rgba(26,26,26,0.06)] md:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] md:px-10 md:py-14">
+      <div class="space-y-6 text-right">
+        <p class="text-sm font-semibold uppercase tracking-[0.24em] text-[#D42B2B]">השם לא משנה | עצה אחת משנה הכל</p>
+        <h1 class="text-[clamp(2.5rem,2rem+2vw,4.7rem)] font-semibold leading-[1.02] text-[#1A1A1A]">
+          ייעוץ אישי הוא לא המטרה, הוא הדרך. לאן הדרך שלך לוקחת?
+        </h1>
+        <p class="max-w-3xl text-[clamp(1rem,0.96rem+0.35vw,1.18rem)] leading-8 text-[#1A1A1A]/72">
+          אם אתה מרגיש שנתקעת בצומת בחיים, בתוך קשר, מול החלטה, או מול רעש פנימי שלא נותן לך לנשום, אתה לא חייב עוד תוכן. אתה צריך בהירות. בשיחה אחת קצרה אנחנו מפרידים בין מה שקרה, למה שאתה מספר לעצמך, ולמה שבאמת צריך לקרות עכשיו.
+        </p>
+        <div class="flex flex-wrap justify-end gap-3 pt-2">
+          <a href={pricingHref} class="inline-flex items-center justify-center rounded-full bg-[#D42B2B] px-6 py-3 text-sm font-semibold text-[#FAFAF8] transition hover:bg-[#b82424]">
+            כן, אני רוצה להתחיל
+          </a>
+          <a href="/intake/" class="inline-flex items-center justify-center rounded-full border border-[#1A1A1A]/10 bg-white px-6 py-3 text-sm font-semibold text-[#1A1A1A]/78 transition hover:bg-[#FAFAF8]">
+            אני עוד לא בטוח, תן לי טופס קצר
+          </a>
+        </div>
+      </div>
+
+      <aside class="rounded-[1.9rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] p-6 text-right">
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">מה קורה בשיחה</p>
+        <ul class="mt-5 space-y-4">
+          {proofItems.map((item) => (
+            <li class="rounded-[1.3rem] border border-[#1A1A1A]/10 bg-white px-4 py-3 text-sm leading-7 text-[#1A1A1A]/72">{item}</li>
+          ))}
+        </ul>
+      </aside>
+    </header>
+
+    <section class="space-y-6 text-right">
+      <div class="space-y-3">
+        <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[#D42B2B]">עמודי התווך</p>
+        <h2 class="text-[clamp(1.9rem,1.5rem+1vw,2.8rem)] font-semibold text-[#1A1A1A]">זה לא עוד ייעוץ. זו דרך חשיבה.</h2>
+      </div>
+      <div class="grid gap-5 md:grid-cols-3">
+        {pillars.map((pillar) => (
+          <article class="rounded-[1.8rem] border border-[#1A1A1A]/10 border-l-4 border-l-[#D42B2B] bg-white/82 p-5 shadow-[0_18px_50px_rgba(26,26,26,0.04)] transition duration-300 hover:scale-[1.02] hover:shadow-[0_24px_70px_rgba(26,26,26,0.08)]">
+            <div class="flex items-center justify-end gap-3">
+              <h3 class="text-xl font-semibold text-[#1A1A1A]">{pillar.title}</h3>
+              <span class="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[#D42B2B]/18 bg-[#FFF4F3] text-lg font-semibold text-[#D42B2B]">
+                {pillar.icon}
+              </span>
+            </div>
+            <p class="mt-4 text-sm leading-7 text-[#1A1A1A]/68">{pillar.text}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section class="space-y-6 text-right">
+      <div class="space-y-3">
+        <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[#D42B2B]">תהליך הייעוץ</p>
+        <h2 class="text-[clamp(1.9rem,1.5rem+1vw,2.8rem)] font-semibold text-[#1A1A1A]">איך זה עובד בפועל?</h2>
+      </div>
+      <div class="grid gap-5 md:grid-cols-3">
+        {processSteps.map((step, index) => (
+          <article class="rounded-[1.8rem] border border-[#1A1A1A]/10 border-l-4 border-l-[#D42B2B] bg-white/82 p-5 shadow-[0_18px_50px_rgba(26,26,26,0.04)] transition duration-300 hover:scale-[1.02] hover:shadow-[0_24px_70px_rgba(26,26,26,0.08)]">
+            <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">0{index + 1}</p>
+            <h3 class="mt-3 text-xl font-semibold text-[#1A1A1A]">{step.title}</h3>
+            <p class="mt-3 text-sm leading-7 text-[#1A1A1A]/68">{step.text}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section class="grid gap-6 rounded-[2rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] px-6 py-8 md:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] md:px-10">
+      <div class="space-y-3 text-right">
+        <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[#D42B2B]">למי זה נכון</p>
+        <h2 class="text-2xl font-semibold text-[#1A1A1A]">לא לכל אחד. כן למי שכבר מבין שהבעיה היא לא מחסור במידע.</h2>
+      </div>
+      <div class="space-y-4 text-right text-sm leading-8 text-[#1A1A1A]/70">
+        <p>זה נכון למי שמרגיש שהוא מסתובב סביב אותו צומת יותר מדי זמן. למי ששומע את עצמו מסביר, מצדיק, דוחה, ומתעייף מהקול שלו עצמו.</p>
+        <p>זה נכון גם למי שלא מחפש יד מחזיקה, אלא מישהו שיכול לחתוך דרך הערפל ולהראות את המבנה. לא מה נעים לשמוע. מה נכון לראות.</p>
+      </div>
+    </section>
+
+    <section class="space-y-6 rounded-[2rem] border border-[#1A1A1A]/10 bg-white/86 px-6 py-8 shadow-[0_18px_60px_rgba(26,26,26,0.04)] md:px-10">
+      <div class="space-y-3 text-right">
+        <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[#D42B2B]">הערך הסופי</p>
+        <h2 class="text-[clamp(1.9rem,1.5rem+1vw,2.8rem)] font-semibold text-[#1A1A1A]">מערכת הפעלה חדשה לחשיבה</h2>
+      </div>
+      <div class="grid gap-5 md:grid-cols-3">
+        {benefits.map((benefit) => (
+          <article class="rounded-[1.8rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] p-5 text-right">
+            <h3 class="text-xl font-semibold text-[#1A1A1A]">{benefit.title}</h3>
+            <p class="mt-3 text-sm leading-7 text-[#1A1A1A]/68">{benefit.text}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <ThoughtShiftProof items={servicesThoughtShifts} heading="מה משתנה אחרי שיחה מדויקת" eyebrow="לפני ואחרי לוגי" />
+
+    <section id="pricing" class="space-y-6 text-right">
+      <div class="space-y-3">
+        <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[#D42B2B]">מסלולי עבודה</p>
+        <h2 class="text-[clamp(2rem,1.6rem+1vw,3rem)] font-semibold text-[#1A1A1A]">תבחר את עומק ההתקדמות שמתאים לך עכשיו</h2>
+        <p class="max-w-3xl text-sm leading-7 text-[#1A1A1A]/70">אם אתה רק צריך בהירות, תתחיל קצר. אם אתה רוצה תהליך עמוק יותר או מהלך עם השפעה חיצונית, תבחר את המסלול שמחזיק את זה נכון.</p>
+      </div>
+      <div class="grid gap-6 lg:grid-cols-3">
+        {featuredServices.map((featuredService) => (
+          <ServiceCard service={featuredService} disclaimer={servicesTrust.disclaimer} />
+        ))}
+      </div>
+      <div class="rounded-[1.6rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] px-5 py-4 text-sm leading-7 text-[#1A1A1A]/66">
+        התשלום מבוצע במערכת Grow המאובטחת בתקן המחמיר ביותר.
+      </div>
+    </section>
+  </section>
+</Layout>
+
+
+
+

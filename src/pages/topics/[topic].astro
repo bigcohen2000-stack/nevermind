@@ -2,11 +2,51 @@
 import Layout from "../../layouts/Layout.astro";
 
 const topicMap = {
-  freedom: { label: "חופש", tag: "חופש" },
-  "thought-mechanics": { label: "מכניקת מחשבה", tag: "מכניקת מחשבה" },
-  self: { label: "העצמי", tag: "העצמי" },
-  clarity: { label: "בהירות", tag: "בהירות" },
-  choice: { label: "בחירה", tag: "בחירה" },
+  freedom: {
+    label: "חופש",
+    tag: "חופש",
+    opposite: {
+      href: "/topics/self/",
+      title: "הצד השני: העצמי",
+      description: "אם חופש פותח מרחב, העצמי הנאחז סוגר אותו סביב דמות קבועה שצריך להגן עליה.",
+    },
+  },
+  "thought-mechanics": {
+    label: "מכניקת מחשבה",
+    tag: "מכניקת מחשבה",
+    opposite: {
+      href: "/topics/clarity/",
+      title: "הצד השני: בהירות",
+      description: "אם מכניקת מחשבה מסבירה איך נבנה הערפל, בהירות מראה איך לראות דרכו בלי לשקר לעצמך.",
+    },
+  },
+  self: {
+    label: "העצמי",
+    tag: "העצמי",
+    opposite: {
+      href: "/topics/freedom/",
+      title: "הצד השני: חופש",
+      description: "אם העצמי נצמד לדמות, חופש מתחיל במקום שבו הדמות כבר לא חייבת לשלוט בכל תגובה.",
+    },
+  },
+  clarity: {
+    label: "בהירות",
+    tag: "בהירות",
+    opposite: {
+      href: "/topics/thought-mechanics/",
+      title: "הצד השני: מכניקת מחשבה",
+      description: "אם בהירות היא ראייה נקייה, מכניקת מחשבה היא המבנה שמסביר איך הראייה הזאת מתערפלת.",
+    },
+  },
+  choice: {
+    label: "בחירה",
+    tag: "בחירה",
+    opposite: {
+      href: "/topics/thought-mechanics/",
+      title: "הצד השני: מכניקת מחשבה",
+      description: "אם בחירה היא אפשרות חיה, מכניקת מחשבה מראה מה הופך אותה לאוטומטית ומצומצמת.",
+    },
+  },
 } as const;
 
 type TopicKey = keyof typeof topicMap;
@@ -65,6 +105,17 @@ const articles = topicInfo.tag
       <h1 class="text-[clamp(2.1rem,1.6rem+2vw,3.1rem)] font-semibold text-[#1A1A1A]">{topicInfo.label}</h1>
       <p class="text-[clamp(1rem,0.95rem+0.35vw,1.3rem)] text-[#1A1A1A]/65">מאמרים שמסכמים את המהות בלי רעש.</p>
     </header>
+
+    {topicInfo.opposite && (
+      <aside class="rounded-[1.8rem] border border-[#D42B2B]/14 bg-[#FFF4F3] p-6 text-right shadow-[0_16px_40px_rgba(212,43,43,0.08)]">
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">הצד השני של המטבע</p>
+        <h2 class="mt-3 text-2xl font-semibold text-[#1A1A1A]">{topicInfo.opposite.title}</h2>
+        <p class="mt-3 text-sm leading-7 text-[#1A1A1A]/68">{topicInfo.opposite.description}</p>
+        <a href={topicInfo.opposite.href} class="mt-5 inline-flex items-center rounded-full border border-[#D42B2B]/14 bg-white px-4 py-2 text-sm font-semibold text-[#D42B2B] transition hover:bg-[#FFF4F3]">
+          לעבור לצד השני
+        </a>
+      </aside>
+    )}
 
     {articles.length > 0 ? (
       <div class="grid gap-6 md:grid-cols-2">

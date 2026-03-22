@@ -1,7 +1,8 @@
----
+ο»Ώ---
 import "../styles/global.css";
+import { getCollection } from "astro:content";
 import { ClientRouter } from "astro:transitions";
-import { Moon, Search, Sun } from "lucide-react";
+import { Facebook, Instagram, Moon, Music2, Search, Sun, Twitter } from "lucide-react";
 import SearchModal from "../components/SearchModal";
 import WhatsAppButton from "../components/WhatsAppButton.astro";
 import WhisperBanner from "../components/WhisperBanner.astro";
@@ -18,7 +19,7 @@ const {
 } = Astro.props;
 
 const siteTitle = appConfig.site.name;
-const siteDescription = "ξψηα ηχιψδ ωχθ μδχωαδ τπιξιϊ, αδιψεϊ εγιεχ ψβωι.";
+const siteDescription = "ΧΧ¨Χ—Χ‘ Χ—Χ§Χ™Χ¨Χ” Χ©Χ§Χ ΧΧ”Χ§Χ©Χ‘Χ” Χ¤Χ Χ™ΧΧ™Χª, Χ‘Χ”Χ™Χ¨Χ•Χª Χ•Χ“Χ™Χ•Χ§ Χ¨Χ’Χ©Χ™.";
 const siteUrl = appConfig.site.url;
 const pageTitle = title ? `${title} | ${siteTitle}` : siteTitle;
 const pageDescription = description ?? frontmatter?.description ?? siteDescription;
@@ -49,11 +50,11 @@ const websiteSchema = {
 
 const normalizeSegment = (segment: string) => {
   const map: Record<string, string> = {
-    articles: "ξΰξψιν",
-    topics: "πεωΰιν",
-    now: "ξδ δξφα ςλωιε?",
-    training: "δλωψεϊ",
-    admin: "πιδεμ",
+    articles: "ΧΧΧΧ¨Χ™Χ",
+    topics: "Χ Χ•Χ©ΧΧ™Χ",
+    now: "ΧΧ” Χ”ΧΧ¦Χ‘ ΧΆΧ›Χ©Χ™Χ•?",
+    training: "Χ”Χ›Χ©Χ¨Χ•Χª",
+    admin: "Χ Χ™Χ”Χ•Χ",
   };
 
   return map[segment] ?? segment;
@@ -61,7 +62,7 @@ const normalizeSegment = (segment: string) => {
 
 const pathName = Astro.url?.pathname ?? "/";
 const pathSegments = pathName.split("/").filter(Boolean);
-const breadcrumbItems = [{ name: "αιϊ", item: siteUrl }];
+const breadcrumbItems = [{ name: "Χ‘Χ™Χª", item: siteUrl }];
 let runningUrl = siteUrl.replace(/\/$/, "");
 
 pathSegments.forEach((segment: string, index: number) => {
@@ -96,7 +97,7 @@ const articleSchema = frontmatter
       description: frontmatter.description ?? pageDescription,
       author: {
         "@type": "Person",
-        name: frontmatter.author ?? "δων μΰ ξωπδ",
+        name: frontmatter.author ?? "Χ”Χ©Χ ΧΧ ΧΧ©Χ Χ”",
       },
       datePublished: toIso(frontmatter.pubDate),
       dateModified: toIso(frontmatter.updatedDate) ?? toIso(frontmatter.pubDate),
@@ -116,7 +117,7 @@ const fallbackFaqItems =
   hasInquirySection && normalizedFaqItems.length === 0 && frontmatter?.description
     ? [
         {
-          question: `ξδ παγεχ αξΰξψ "${frontmatter.title ?? pageTitle}"?`,
+          question: `ΧΧ” Χ Χ‘Χ“Χ•Χ§ Χ‘ΧΧΧΧ¨ "${frontmatter.title ?? pageTitle}"?`,
           answer: frontmatter.description,
         },
       ]
@@ -139,6 +140,30 @@ const faqSchema =
     : null;
 
 const schemas = [organizationSchema, websiteSchema, breadcrumbSchema, articleSchema, faqSchema].filter(Boolean);
+const randomArticlePaths = (await getCollection("articles", ({ data }) => data.draft !== true)).map((entry) => `/articles/${entry.slug}`);
+
+const socialLinks = [
+  {
+    label: "Χ¤Χ™Χ™Χ΅Χ‘Χ•Χ§",
+    href: "https://www.facebook.com/nevermindyakir",
+    icon: Facebook,
+  },
+  {
+    label: "ΧΧ™Χ Χ΅ΧΧ’Χ¨Χ",
+    href: "https://www.instagram.com/nevermind.co.il/",
+    icon: Instagram,
+  },
+  {
+    label: "ΧΧ™Χ§ΧΧ•Χ§",
+    href: "https://www.tiktok.com/@nevermind.co.il",
+    icon: Music2,
+  },
+  {
+    label: "X",
+    href: "https://x.com/nevermindyakir",
+    icon: Twitter,
+  },
+];
 ---
 <!doctype html>
 <html lang="he" dir="rtl">
@@ -233,21 +258,28 @@ const schemas = [organizationSchema, websiteSchema, breadcrumbSchema, articleSch
       href="#main-content"
       class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:rounded-md focus:bg-white focus:px-4 focus:py-2 focus:text-black shadow-xl"
     >
-      γμβ μϊελο δψΰωι
+      Χ“ΧΧ’ ΧΧªΧ•Χ›Χ Χ”Χ¨ΧΧ©Χ™
     </a>
 
     <WhisperBanner />
 
     <nav data-nav class="fixed inset-x-0 top-[var(--nm-nav-top,1.5rem)] z-50 flex justify-center px-4 transition-[top,transform] duration-300">
       <div class="flex items-center gap-4 rounded-full border border-neutral-200/50 bg-white/80 px-6 py-3 shadow-sm backdrop-blur-md dark:border-neutral-800/50 dark:bg-neutral-900/80">
-        <a href="/" class="text-sm font-medium transition-opacity hover:opacity-70">αιϊ</a>
-        <a href="/articles" class="text-sm font-medium transition-opacity hover:opacity-70">ξΰξψιν</a>
-        <a href="/now" class="text-sm font-medium transition-opacity hover:opacity-70">ξδ δξφα ςλωιε?</a>
+        <a href="/" class="text-sm font-medium transition-opacity hover:opacity-70">Χ‘Χ™Χª</a>
+        <a href="/articles" class="text-sm font-medium transition-opacity hover:opacity-70">ΧΧΧΧ¨Χ™Χ</a>
+        <button
+          type="button"
+          data-random-article-trigger
+          class="text-sm font-medium text-[#D42B2B] transition-opacity hover:opacity-70"
+        >
+          Χ”Χ¤ΧªΧΆ ΧΧ•ΧªΧ™
+        </button>
+        <a href="/now" class="text-sm font-medium transition-opacity hover:opacity-70">ΧΧ” Χ”ΧΧ¦Χ‘ ΧΆΧ›Χ©Χ™Χ•?</a>
         <div class="mx-1 h-4 w-px bg-neutral-300 dark:bg-neutral-700"></div>
 
         <button
           id="theme-toggle"
-          aria-label="δημσ ξφα ϊφεβδ"
+          aria-label="Χ”Χ—ΧΧ£ ΧΧ¦Χ‘ ΧªΧ¦Χ•Χ’Χ”"
           class="p-1 transition-colors hover:text-neutral-500"
         >
           <Sun className="h-4 w-4 dark:hidden" />
@@ -257,7 +289,7 @@ const schemas = [organizationSchema, websiteSchema, breadcrumbSchema, articleSch
         <button
           id="search-trigger"
           data-search-trigger
-          aria-label="τϊη ηιτεω"
+          aria-label="Χ¤ΧªΧ— Χ—Χ™Χ¤Χ•Χ©"
           class="p-1 transition-colors hover:text-neutral-500"
         >
           <Search className="h-4 w-4" />
@@ -270,10 +302,26 @@ const schemas = [organizationSchema, websiteSchema, breadcrumbSchema, articleSch
     </main>
 
     <footer data-footer class="mt-20 border-t border-neutral-200 px-6 py-12 dark:border-neutral-800">
-      <div class="mx-auto flex max-w-6xl flex-col items-center justify-between gap-6 md:flex-row">
-        <p class="text-sm opacity-60">© {new Date().getFullYear()} NeverMind | ς.ξ. 301773289 | SSL Secured</p>
-        <div class="flex gap-4">
-          <a href="https://tally.so/r/3N0x0q" class="text-sm hover:underline">ιφιψϊ χωψ</a>
+      <div class="mx-auto flex max-w-6xl flex-col gap-6">
+        <div class="flex flex-col items-center justify-between gap-6 md:flex-row">
+          <div class="space-y-2 text-center md:text-right">
+            <p class="text-sm text-[#1A1A1A]/60 dark:text-white/60">Β© {new Date().getFullYear()} NeverMind | ΧΆ.Χ. 301773289</p>
+            <p class="text-xs text-[#1A1A1A]/45 dark:text-white/45">Χ”ΧΧªΧ¨ ΧΧΧ•Χ‘ΧΧ— SSL | Χ΅ΧΧ™Χ§Χ” ΧΧΧ•Χ©Χ¨Χª Χ•ΧΧΧ•Χ‘ΧΧ—Χª Χ“Χ¨Χ Grow</p>
+          </div>
+          <div class="flex items-center gap-3">
+            {socialLinks.map(({ label, href, icon: Icon }) => (
+              <a
+                href={href}
+                target="_blank"
+                rel="noreferrer"
+                aria-label={label}
+                class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#1A1A1A]/10 bg-white/70 text-[#1A1A1A]/72 transition hover:border-[#D42B2B]/20 hover:text-[#D42B2B] dark:border-white/10 dark:bg-white/5 dark:text-white/72"
+              >
+                <Icon className="h-4 w-4" />
+              </a>
+            ))}
+            <a href="https://tally.so/r/3N0x0q" class="text-sm text-[#1A1A1A]/70 transition hover:text-[#D42B2B] dark:text-white/70 dark:hover:text-[#FAFAF8]">Χ™Χ¦Χ™Χ¨Χª Χ§Χ©Χ¨</a>
+          </div>
         </div>
       </div>
     </footer>
@@ -281,7 +329,7 @@ const schemas = [organizationSchema, websiteSchema, breadcrumbSchema, articleSch
     <WhatsAppButton phone={appConfig.contact.whatsAppNumber} />
     <SearchModal client:idle />
 
-    <script is:inline>
+    <script is:inline define:vars={{ randomArticlePaths }}>
       document.addEventListener("astro:page-load", () => {
         if (window.__nmLayoutCleanup) {
           window.__nmLayoutCleanup();
@@ -289,6 +337,7 @@ const schemas = [organizationSchema, websiteSchema, breadcrumbSchema, articleSch
 
         const themeBtn = document.getElementById("theme-toggle");
         const searchTriggers = Array.from(document.querySelectorAll("[data-search-trigger]"));
+        const randomTriggers = Array.from(document.querySelectorAll("[data-random-article-trigger]"));
 
         const onThemeClick = () => {
           const isDark = document.documentElement.classList.toggle("dark");
@@ -301,16 +350,34 @@ const schemas = [organizationSchema, websiteSchema, breadcrumbSchema, articleSch
           window.dispatchEvent(new CustomEvent("open-search"));
         };
 
+        const onRandomClick = (event) => {
+          event.preventDefault();
+          const paths = Array.isArray(randomArticlePaths) ? randomArticlePaths : [];
+          if (!paths.length) return;
+
+          const currentPath = window.location.pathname.replace(/\/$/, "");
+          const pool = paths.filter((path) => path.replace(/\/$/, "") !== currentPath);
+          const source = pool.length ? pool : paths;
+          const target = source[Math.floor(Math.random() * source.length)];
+          if (target) window.location.href = target;
+        };
+
         themeBtn?.addEventListener("click", onThemeClick);
         searchTriggers.forEach((trigger) => trigger.addEventListener("click", onSearchClick));
+        randomTriggers.forEach((trigger) => trigger.addEventListener("click", onRandomClick));
 
         window.__nmLayoutCleanup = () => {
           themeBtn?.removeEventListener("click", onThemeClick);
           searchTriggers.forEach((trigger) => trigger.removeEventListener("click", onSearchClick));
+          randomTriggers.forEach((trigger) => trigger.removeEventListener("click", onRandomClick));
         };
       });
     </script>
   </body>
 </html>
+
+
+
+
 
 

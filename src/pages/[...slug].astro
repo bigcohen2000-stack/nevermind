@@ -1,4 +1,4 @@
-﻿---
+---
 import { getCollection, render, type CollectionEntry } from "astro:content";
 import Layout from "../layouts/Layout.astro";
 import siteSettings from "../config/siteSettings.json";
@@ -8,9 +8,16 @@ import SubscribeBanner from "../components/SubscribeBanner.astro";
 import LiteYouTubeEmbed from "../components/LiteYouTubeEmbed.astro";
 import SkepticBox from "../components/SkepticBox.astro";
 import ConceptCallout from "../components/ConceptCallout.astro";
+import BottomLineSummary from "../components/BottomLineSummary.astro";
 import PremiumLock from "../components/PremiumLock.astro";
 import RevealInsight from "../components/RevealInsight.astro";
+import ReflectionQuestions from "../components/ReflectionQuestions.astro";
+import LogicalQuestionBox from "../components/LogicalQuestionBox.astro";
+import RefutationBox from "../components/RefutationBox.astro";
+import DeepDiveConcepts from "../components/DeepDiveConcepts.astro";
+import LogicNote from "../components/LogicNote.astro";
 import appConfig from "../config/appConfig.json";
+import { glossaryConcepts } from "../data/glossary";
 
 type ArticleEntry = CollectionEntry<"articles">;
 type InternalLink = {
@@ -21,38 +28,54 @@ type InternalLink = {
   score?: number;
 };
 
+const difficultyConfig = {
+  beginner: {
+    label: "׳׳×׳—׳™׳׳™׳",
+    tone: "bg-[#F4FAF4] text-[#166534] border-[#BBF7D0]/70",
+  },
+  advanced: {
+    label: "׳׳×׳§׳“׳׳™׳",
+    tone: "bg-[#FFF7ED] text-[#9A3412] border-[#FDBA74]/60",
+  },
+  deep: {
+    label: "׳—׳§׳™׳¨׳” ׳¢׳׳•׳§׳”",
+    tone: "bg-[#1A1A1A] text-[#FAFAF8] border-[#1A1A1A]",
+  },
+} as const;
+type DifficultyKey = keyof typeof difficultyConfig;
+
 const toArticleSlug = (entry: ArticleEntry) => entry.id.replace(/\.mdx$/, "");
 const topicMap = {
-  "חופש": {
+  "׳—׳•׳₪׳©": {
     href: "/topics/freedom/",
-    title: "נושא: חופש",
-    description: "ריכוז מאמרים על חופש, אחריות, והמחיר של בחירה אמיתית.",
+    title: "׳ ׳•׳©׳: ׳—׳•׳₪׳©",
+    description: "׳¨׳™׳›׳•׳– ׳׳׳׳¨׳™׳ ׳¢׳ ׳—׳•׳₪׳©, ׳׳—׳¨׳™׳•׳×, ׳•׳”׳׳—׳™׳¨ ׳©׳ ׳‘׳—׳™׳¨׳” ׳׳׳™׳×׳™׳×.",
   },
-  "מכניקת מחשבה": {
+  "׳׳›׳ ׳™׳§׳× ׳׳—׳©׳‘׳”": {
     href: "/topics/thought-mechanics/",
-    title: "נושא: מכניקת מחשבה",
-    description: "מקום אחד למאמרים שמפרקים איך מחשבה מנהלת התנהגות.",
+    title: "׳ ׳•׳©׳: ׳׳›׳ ׳™׳§׳× ׳׳—׳©׳‘׳”",
+    description: "׳׳§׳•׳ ׳׳—׳“ ׳׳׳׳׳¨׳™׳ ׳©׳׳₪׳¨׳§׳™׳ ׳׳™׳ ׳׳—׳©׳‘׳” ׳׳ ׳”׳׳× ׳”׳×׳ ׳”׳’׳•׳×.",
   },
-  "העצמי": {
+  "׳”׳¢׳¦׳׳™": {
     href: "/topics/self/",
-    title: "נושא: העצמי",
-    description: "חקירה של זהות, הזדהות, ודמות פנימית שמתעקשת להחזיק מעמד.",
+    title: "׳ ׳•׳©׳: ׳”׳¢׳¦׳׳™",
+    description: "׳—׳§׳™׳¨׳” ׳©׳ ׳–׳”׳•׳×, ׳”׳–׳“׳”׳•׳×, ׳•׳“׳׳•׳× ׳₪׳ ׳™׳׳™׳× ׳©׳׳×׳¢׳§׳©׳× ׳׳”׳—׳–׳™׳§ ׳׳¢׳׳“.",
   },
-  "בהירות": {
+  "׳‘׳”׳™׳¨׳•׳×": {
     href: "/topics/clarity/",
-    title: "נושא: בהירות",
-    description: "מאמרים שמנקים רעש ומכריחים לראות מה באמת קורה.",
+    title: "׳ ׳•׳©׳: ׳‘׳”׳™׳¨׳•׳×",
+    description: "׳׳׳׳¨׳™׳ ׳©׳׳ ׳§׳™׳ ׳¨׳¢׳© ׳•׳׳›׳¨׳™׳—׳™׳ ׳׳¨׳׳•׳× ׳׳” ׳‘׳׳׳× ׳§׳•׳¨׳”.",
   },
-  "בחירה": {
+  "׳‘׳—׳™׳¨׳”": {
     href: "/topics/choice/",
-    title: "נושא: בחירה",
-    description: "מאמרים על רצון, החלטה, ושליטה מדומיינת.",
+    title: "׳ ׳•׳©׳: ׳‘׳—׳™׳¨׳”",
+    description: "׳׳׳׳¨׳™׳ ׳¢׳ ׳¨׳¦׳•׳, ׳”׳—׳׳˜׳”, ׳•׳©׳׳™׳˜׳” ׳׳“׳•׳׳™׳™׳ ׳×.",
   },
 } as const;
 const kindLabelMap = {
-  article: "מאמר קשור",
-  topic: "דף נושא",
-  page: "עמוד ליבה",
+  article: "׳׳׳׳¨ ׳§׳©׳•׳¨",
+  topic: "׳“׳£ ׳ ׳•׳©׳",
+  page: "׳¢׳׳•׳“ ׳׳™׳‘׳”",
 } as const;
 
 export async function getStaticPaths() {
@@ -70,6 +93,7 @@ const frontmatter = entry.data;
 const rawContent = entry.body ?? "";
 const title = frontmatter.title;
 const description = frontmatter.description;
+const bottomLine = frontmatter.bottomLine ?? frontmatter.description;
 const youtubeId = frontmatter.youtubeId;
 const audioUrl = frontmatter.audioUrl;
 const tags = Array.isArray(frontmatter.tags) ? frontmatter.tags : [];
@@ -77,14 +101,65 @@ const faqItems = Array.isArray(frontmatter.faq) ? frontmatter.faq : [];
 const hasInquirySection = rawContent.includes("InquirySection") || rawContent.includes("InquiryBox");
 const siteUrl = Astro.site?.toString() ?? appConfig.site.url;
 const shareUrl = Astro.url ? new URL(Astro.url.pathname, siteUrl).toString() : siteUrl;
-const whatsappShareUrl = `https://wa.me/?text=${encodeURIComponent(`מצאתי תובנה מעניינת ב-NeverMind: ${title} - ${shareUrl}`)}`;
+const whatsappShareUrl = `https://wa.me/?text=${encodeURIComponent(`קראתי את זה וחשבתי עליך, זה בדיוק מה שדיברנו עליו:
+${title}
+${shareUrl}`)}`;
 const web3formsKey = "94b32b6c-7590-4ac6-b8b4-1bc73dd2e5c8";
 const currentSlug = `articles/${toArticleSlug(entry)}`;
 const wordCount = rawContent.replace(/<[^>]*>/g, " ").split(/\s+/).filter(Boolean).length;
 const readingMinutes = Math.max(1, Math.round(wordCount / 200));
-const depth = wordCount > 1400 ? "עמוק מאוד" : wordCount > 900 ? "עמוק" : "נגיש";
+const difficultyKey: DifficultyKey = frontmatter.difficultyLevel && frontmatter.difficultyLevel in difficultyConfig
+  ? (frontmatter.difficultyLevel as DifficultyKey)
+  : wordCount > 1400
+    ? "deep"
+    : wordCount > 900
+      ? "advanced"
+      : "beginner";
+const difficultyMeta = difficultyConfig[difficultyKey];
+const showBottomLine = wordCount >= 900 && Boolean(bottomLine);
+const primaryTag = tags[0] ?? "׳”׳ ׳§׳•׳“׳” ׳”׳–׳׳×";
+const tagPromptMap: Record<string, string> = {
+  "׳—׳•׳₪׳©": "׳׳™׳₪׳” ׳׳×׳” ׳¢׳“׳™׳™׳ ׳׳•׳•׳×׳¨ ׳¢׳ ׳—׳•׳₪׳© ׳₪׳ ׳™׳׳™ ׳›׳“׳™ ׳׳ ׳׳©׳׳ ׳׳—׳™׳¨ ׳—׳™׳¦׳•׳ ׳™?",
+  "׳׳›׳ ׳™׳§׳× ׳׳—׳©׳‘׳”": "׳׳™׳–׳• ׳׳—׳©׳‘׳” ׳׳¦׳׳ ׳ ׳©׳׳¢׳× ׳›׳׳• ׳׳׳×, ׳׳‘׳ ׳‘׳₪׳•׳¢׳ ׳׳ ׳”׳׳× ׳׳•׳×׳ ׳׳•׳˜׳•׳׳˜׳™׳×?",
+  "׳”׳¢׳¦׳׳™": "׳׳™׳–׳• ׳“׳׳•׳× ׳₪׳ ׳™׳׳™׳× ׳׳×׳” ׳¢׳“׳™׳™׳ ׳׳ ׳¡׳” ׳׳”׳’׳ ׳¢׳׳™׳” ׳’׳ ׳›׳©׳”׳™׳ ׳›׳‘׳¨ ׳׳›׳‘׳™׳“׳” ׳¢׳׳™׳?",
+  "׳‘׳”׳™׳¨׳•׳×": "׳׳™׳₪׳” ׳׳×׳” ׳›׳‘׳¨ ׳™׳•׳“׳¢ ׳׳” ׳ ׳›׳•׳, ׳׳‘׳ ׳¢׳“׳™׳™׳ ׳׳¢׳“׳™׳£ ׳¢׳¨׳₪׳ ׳›׳™ ׳”׳•׳ ׳₪׳—׳•׳× ׳׳—׳™׳™׳‘?",
+  "׳‘׳—׳™׳¨׳”": "׳‘׳׳™׳–׳” ׳׳§׳•׳ ׳‘׳—׳™׳™׳ ׳©׳׳ ׳׳×׳” ׳§׳•׳¨׳ ׳׳–׳” '׳׳™׳ ׳׳™ ׳‘׳¨׳™׳¨׳”', ׳›׳©׳‘׳₪׳•׳¢׳ ׳™׳© ׳‘׳¨׳™׳¨׳” ׳¢׳ ׳׳—׳™׳¨?",
+};
+const fallbackReflectionQuestions = [
+  `׳׳” ׳׳×׳•׳ "${title}" ׳₪׳’׳© ׳׳•׳×׳ ׳׳ ׳›׳¨׳¢׳™׳•׳, ׳׳׳ ׳›׳׳©׳”׳• ׳©׳׳×׳” ׳׳–׳”׳” ׳¢׳ ׳¢׳¦׳׳ ׳¢׳›׳©׳™׳•?`,
+  tagPromptMap[primaryTag] ?? `׳׳™׳₪׳” ${primaryTag} ׳₪׳•׳’׳© ׳׳•׳×׳ ׳‘׳—׳™׳™׳ ׳”׳׳׳™׳×׳™׳™׳, ׳•׳׳ ׳¨׳§ ׳‘׳¨׳׳× ׳”׳”׳¡׳›׳׳” ׳”׳©׳›׳׳™׳×?`,
+  "׳׳ ׳”׳™׳™׳× ׳¦׳¨׳™׳ ׳׳©׳׳•׳— ׳׳™ ׳¢׳›׳©׳™׳• ׳×׳©׳•׳‘׳” ׳›׳ ׳” ׳‘׳•׳•׳׳˜׳¡׳׳₪ ׳‘׳׳©׳₪׳˜ ׳׳—׳“ ׳‘׳׳‘׳“, ׳׳” ׳”׳™׳™׳× ׳›׳•׳×׳‘?",
+];
+const reflectionQuestions =
+  Array.isArray(frontmatter.reflectionQuestions) && frontmatter.reflectionQuestions.length === 3
+    ? frontmatter.reflectionQuestions
+    : fallbackReflectionQuestions;
+const reflectionWhatsAppUrl = `https://wa.me/${appConfig.contact.whatsAppNumber}?text=${encodeURIComponent(`׳§׳¨׳׳×׳™ ׳׳× ׳”׳׳׳׳¨ "${title}" ׳•׳׳ ׳™ ׳¨׳•׳¦׳” ׳׳¢׳ ׳•׳× ׳¢׳ ׳”׳©׳׳׳•׳× ׳©׳‘׳¡׳•׳£:\n1. \n2. \n3. `)}`;
 const premiumVault = siteSettings.premiumVault;
 const premiumAccess = appConfig.premiumAccess;
+const manualRelatedConcepts = Array.isArray(frontmatter.relatedConcepts) ? frontmatter.relatedConcepts : [];
+const articleSignal = `${title} ${description} ${tags.join(" ")} ${(rawContent ?? "").slice(0, 1200)}`;
+const relatedConcepts = glossaryConcepts
+  .map((concept) => {
+    let score = 0;
+
+    if (manualRelatedConcepts.includes(concept.slug) || manualRelatedConcepts.includes(concept.title)) {
+      score += 12;
+    }
+
+    score += concept.tags.filter((tag) => tags.includes(tag)).length * 3;
+    score += concept.keywords.filter((keyword) => articleSignal.includes(keyword)).length * 2;
+
+    if (articleSignal.includes(concept.title)) {
+      score += 4;
+    }
+
+    return { concept, score };
+  })
+  .filter((entry) => entry.score > 0)
+  .sort((left, right) => right.score - left.score)
+  .slice(0, 5)
+  .map((entry) => entry.concept);
 const relatedArticles = allEntries
   .filter((item) => `articles/${toArticleSlug(item)}` !== currentSlug)
   .map((item) => {
@@ -130,20 +205,26 @@ for (const tag of tags) {
 [
   {
     href: "/articles/",
-    title: "כל המאמרים",
-    description: "ספריית התוכן המלאה, למעבר בין חקירות לפי כיוון ולא לפי רעש.",
+    title: "׳›׳ ׳”׳׳׳׳¨׳™׳",
+    description: "׳¡׳₪׳¨׳™׳™׳× ׳”׳×׳•׳›׳ ׳”׳׳׳׳”, ׳׳׳¢׳‘׳¨ ׳‘׳™׳ ׳—׳§׳™׳¨׳•׳× ׳׳₪׳™ ׳›׳™׳•׳•׳ ׳•׳׳ ׳׳₪׳™ ׳¨׳¢׳©.",
+    kind: "page" as const,
+  },
+  {
+    href: "/glossary/",
+    title: "׳׳•׳©׳’׳™ ׳™׳¡׳•׳“",
+    description: "׳׳₪׳× ׳”׳׳•׳©׳’׳™׳ ׳©׳ NeverMind: ׳׳’׳•, ׳‘׳—׳™׳¨׳”, ׳¢׳•׳‘׳“׳” ׳׳•׳ ׳₪׳™׳¨׳•׳©, ׳•׳‘׳”׳™׳¨׳•׳× ׳›׳ ׳§׳•׳“׳× ׳”׳×׳—׳׳” ׳׳¢׳•׳׳§ ׳ ׳•׳¡׳£.",
     kind: "page" as const,
   },
   {
     href: "/services/",
-    title: "עבודה משותפת",
-    description: "אם המאמר פגש נקודה חיה, אפשר להפוך אותה לעבודה ממוקדת ולא לעוד מחשבה.",
+    title: "׳¢׳‘׳•׳“׳” ׳׳©׳•׳×׳₪׳×",
+    description: "׳׳ ׳”׳׳׳׳¨ ׳₪׳’׳© ׳ ׳§׳•׳“׳” ׳—׳™׳”, ׳׳₪׳©׳¨ ׳׳”׳₪׳•׳ ׳׳•׳×׳” ׳׳¢׳‘׳•׳“׳” ׳׳׳•׳§׳“׳× ׳•׳׳ ׳׳¢׳•׳“ ׳׳—׳©׳‘׳”.",
     kind: "page" as const,
   },
   {
     href: "/now/",
-    title: "מה המצב עכשיו",
-    description: "עדכון קצר על הכיוון הנוכחי של NeverMind, בלי מסכות ובלי יחסי ציבור.",
+    title: "׳׳” ׳”׳׳¦׳‘ ׳¢׳›׳©׳™׳•",
+    description: "׳¢׳“׳›׳•׳ ׳§׳¦׳¨ ׳¢׳ ׳”׳›׳™׳•׳•׳ ׳”׳ ׳•׳›׳—׳™ ׳©׳ NeverMind, ׳‘׳׳™ ׳׳¡׳›׳•׳× ׳•׳‘׳׳™ ׳™׳—׳¡׳™ ׳¦׳™׳‘׳•׳¨.",
     kind: "page" as const,
   },
 ].forEach(pushInternalLink);
@@ -170,8 +251,13 @@ const components = {
   SubscribeBanner,
   SkepticBox,
   ConceptCallout,
+  BottomLineSummary,
   PremiumLock,
   RevealInsight,
+  ReflectionQuestions,
+  RefutationBox,
+  DeepDiveConcepts,
+  LogicNote,
 };
 ---
 
@@ -186,13 +272,15 @@ const components = {
     <span id="reading-progress" class="block h-px w-0 bg-[#1A1A1A]"></span>
   </div>
 
-  <article class="mx-auto max-w-[72ch] space-y-[clamp(2.5rem,3vw,3.5rem)] leading-[1.8]">
+  <div class="mx-auto max-w-7xl lg:grid lg:grid-cols-[minmax(0,72ch)_minmax(280px,340px)] lg:gap-10">
+  <div class="min-w-0">
+    <article class="mx-auto max-w-[72ch] space-y-[clamp(2.5rem,3vw,3.5rem)] leading-[1.8]">
     <header class="space-y-5">
       <h1 class="text-[clamp(2.2rem,1.7rem+2vw,3.2rem)] font-semibold text-[#1A1A1A]">{title}</h1>
       <p class="text-[clamp(1.05rem,1rem+0.35vw,1.4rem)] text-[#1A1A1A]/70">{description}</p>
       <div class="flex flex-wrap items-center gap-3 text-[clamp(0.85rem,0.82rem+0.2vw,1rem)] text-[#1A1A1A]/60">
-        <span>זמן קריאה: {readingMinutes} דק׳</span>
-        <span>רמת עומק: {depth}</span>
+        <span>{readingMinutes} ׳“׳§׳•׳× ׳§׳¨׳™׳׳” ׳©׳™׳—׳¡׳›׳• ׳׳ ׳—׳•׳“׳©׳™׳ ׳©׳ ׳”׳×׳׳‘׳˜׳•׳×</span>
+        <span class={`inline-flex rounded-full border px-3 py-1 text-xs font-semibold ${difficultyMeta.tone}`}>׳¨׳׳× ׳¢׳•׳׳§: {difficultyMeta.label}</span>
       </div>
       <div class="flex flex-wrap items-center gap-3">
         {tags.length > 0 && (
@@ -208,15 +296,17 @@ const components = {
           aria-pressed="false"
           class="rounded-full border border-[#1A1A1A]/10 bg-white/70 px-4 py-2 text-[clamp(0.85rem,0.82rem+0.2vw,1rem)] text-[#1A1A1A]/70 transition-colors duration-300 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A]/20"
         >
-          מצב פוקוס
+          ׳׳¦׳‘ ׳₪׳•׳§׳•׳¡
         </button>
       </div>
     </header>
 
+    {showBottomLine && bottomLine && <BottomLineSummary summary={bottomLine} />}
+
     {audioUrl && (
       <div class="overflow-hidden rounded-2xl border border-[#1A1A1A]/10 bg-white/70 p-4 shadow-sm backdrop-blur-md">
         <audio class="w-full max-w-[400px] accent-[#1A1A1A] text-[#1A1A1A]" controls src={audioUrl}>
-          הדפדפן שלך לא תומך בהשמעת אודיו.
+          ׳”׳“׳₪׳“׳₪׳ ׳©׳׳ ׳׳ ׳×׳•׳׳ ׳‘׳”׳©׳׳¢׳× ׳׳•׳“׳™׳•.
         </audio>
       </div>
     )}
@@ -241,6 +331,10 @@ const components = {
     </div>
   </article>
 
+  <section class="mx-auto mt-[clamp(2.5rem,4vw,3.5rem)] max-w-[72ch]">
+    <ReflectionQuestions title={title} questions={reflectionQuestions} whatsappHref={reflectionWhatsAppUrl} />
+  </section>
+
   <section class="mx-auto mt-[clamp(2.5rem,4vw,3.5rem)] max-w-[72ch] space-y-4">
     <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
       <a
@@ -249,7 +343,7 @@ const components = {
         rel="noreferrer"
         class="inline-flex items-center justify-center rounded-full border border-[#1A1A1A]/10 bg-white/70 px-4 py-2 text-[clamp(0.9rem,0.85rem+0.2vw,1.05rem)] text-[#1A1A1A]/75 transition-colors duration-300 hover:bg-white"
       >
-        שתף בוואטסאפ
+        הפץ את האור
       </a>
       <button
         type="button"
@@ -271,9 +365,9 @@ const components = {
   {curatedInternalLinks.length > 0 && (
     <section class="mx-auto mt-[clamp(3rem,5vw,4rem)] max-w-[72ch] space-y-4">
       <div class="space-y-2">
-        <h2 class="text-[clamp(1.4rem,1.15rem+1vw,2rem)] font-semibold text-[#1A1A1A]">ראה גם</h2>
+        <h2 class="text-[clamp(1.4rem,1.15rem+1vw,2rem)] font-semibold text-[#1A1A1A]">׳¨׳׳” ׳’׳</h2>
         <p class="text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] text-[#1A1A1A]/65">
-          כדי להעמיק בלי לשבור רצף, המשך מכאן ל־3–5 עמודים שמרחיבים את אותה חקירה מכיוון אחר.
+          ׳›׳“׳™ ׳׳”׳¢׳׳™׳§ ׳‘׳׳™ ׳׳©׳‘׳•׳¨ ׳¨׳¦׳£, ׳”׳׳©׳ ׳׳›׳׳ ׳ײ¾3ג€“5 ׳¢׳׳•׳“׳™׳ ׳©׳׳¨׳—׳™׳‘׳™׳ ׳׳× ׳׳•׳×׳” ׳—׳§׳™׳¨׳” ׳׳›׳™׳•׳•׳ ׳׳—׳¨.
         </p>
       </div>
       <div class={`grid gap-4 ${curatedInternalLinks.length > 1 ? "md:grid-cols-2" : ""}`}>
@@ -292,7 +386,7 @@ const components = {
   )}
 
   <section class="mx-auto mt-[clamp(3rem,6vw,5rem)] max-w-2xl space-y-6">
-    <h2 class="text-center text-[clamp(1.4rem,1.15rem+1vw,2rem)] font-semibold text-[#1A1A1A]">אפשר להשאיר שאלה או פנייה</h2>
+    <h2 class="text-center text-[clamp(1.4rem,1.15rem+1vw,2rem)] font-semibold text-[#1A1A1A]">׳׳₪׳©׳¨ ׳׳”׳©׳׳™׳¨ ׳©׳׳׳” ׳׳• ׳₪׳ ׳™׳™׳”</h2>
     <form
       data-contact-form
       class="space-y-4 rounded-3xl border border-[#1A1A1A]/10 bg-white/70 p-6"
@@ -300,22 +394,22 @@ const components = {
       method="POST"
     >
       <input type="hidden" name="access_key" value={web3formsKey} />
-      <input type="hidden" name="subject" value="פנייה מ-NeverMind" />
+      <input type="hidden" name="subject" value="׳₪׳ ׳™׳™׳” ׳-NeverMind" />
       <input type="hidden" name="page" value={title} />
       <input type="text" name="botcheck" style="display:none" tabindex="-1" autocomplete="off" aria-hidden="true" />
 
       <div class="space-y-2 text-right">
-        <label class="text-[clamp(0.9rem,0.85rem+0.2vw,1.05rem)] text-[#1A1A1A]/70" for="name">שם מלא</label>
+        <label class="text-[clamp(0.9rem,0.85rem+0.2vw,1.05rem)] text-[#1A1A1A]/70" for="name">׳©׳ ׳׳׳</label>
         <input id="name" name="name" type="text" required class="w-full rounded-2xl border border-[#1A1A1A]/20 bg-white/80 px-4 py-3 text-right text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] text-[#1A1A1A] outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A]/20" />
       </div>
 
       <div class="space-y-2 text-right">
-        <label class="text-[clamp(0.9rem,0.85rem+0.2vw,1.05rem)] text-[#1A1A1A]/70" for="email">אימייל</label>
+        <label class="text-[clamp(0.9rem,0.85rem+0.2vw,1.05rem)] text-[#1A1A1A]/70" for="email">׳׳™׳׳™׳™׳</label>
         <input id="email" name="email" type="email" required class="w-full rounded-2xl border border-[#1A1A1A]/20 bg-white/80 px-4 py-3 text-right text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] text-[#1A1A1A] outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A]/20" />
       </div>
 
       <div class="space-y-2 text-right">
-        <label class="text-[clamp(0.9rem,0.85rem+0.2vw,1.05rem)] text-[#1A1A1A]/70" for="message">הודעה</label>
+        <label class="text-[clamp(0.9rem,0.85rem+0.2vw,1.05rem)] text-[#1A1A1A]/70" for="message">׳”׳•׳“׳¢׳”</label>
         <textarea id="message" name="message" rows="4" required class="w-full rounded-2xl border border-[#1A1A1A]/20 bg-white/80 px-4 py-3 text-right text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] text-[#1A1A1A] outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A]/20"></textarea>
       </div>
 
@@ -323,10 +417,10 @@ const components = {
         type="submit"
         class="w-full rounded-full border border-[#1A1A1A]/10 bg-white px-5 py-3 text-[clamp(0.95rem,0.9rem+0.3vw,1.1rem)] text-[#1A1A1A]/80 transition-colors duration-300 hover:bg-white/90"
       >
-        שליחה
+        ׳©׳׳™׳—׳”
       </button>
       <p data-form-status aria-live="polite" class="text-center text-[clamp(0.85rem,0.8rem+0.2vw,1rem)] text-[#1A1A1A]/60 opacity-0 transition-opacity duration-300">
-        תודה, ההודעה עברה.
+        ׳×׳•׳“׳”, ׳”׳”׳•׳“׳¢׳” ׳¢׳‘׳¨׳”.
       </p>
     </form>
   </section>
@@ -334,6 +428,13 @@ const components = {
   <div class="mx-auto mt-[clamp(3rem,6vw,5rem)] max-w-[72ch]">
     <SubscribeBanner />
   </div>
+  </div>
+
+  <div class="mt-10 space-y-5 lg:mt-0">
+    <DeepDiveConcepts concepts={relatedConcepts} />
+    <LogicalQuestionBox pageTitle={title} pageUrl={shareUrl} web3formsKey={web3formsKey} />
+  </div>
+</div>
 
   <style>
     article :global(h2) {
@@ -467,7 +568,7 @@ const components = {
         document.body.classList.toggle("is-focus-mode", enabled);
         if (focusToggle instanceof HTMLButtonElement) {
           focusToggle.setAttribute("aria-pressed", String(enabled));
-          focusToggle.textContent = enabled ? "יציאה ממצב פוקוס" : "מצב פוקוס";
+          focusToggle.textContent = enabled ? "׳™׳¦׳™׳׳” ׳׳׳¦׳‘ ׳₪׳•׳§׳•׳¡" : "׳׳¦׳‘ ׳₪׳•׳§׳•׳¡";
         }
       };
 
@@ -547,15 +648,15 @@ const components = {
         }
 
         const title = overrides.title || premiumBody.dataset.premiumTitle || "This professional method is reserved for premium members";
-        const description = overrides.description || premiumBody.dataset.premiumDescription || "המשך התוכן המלא שמור כרגע לחברי פרימיום.";
-        const fallbackCtaLabel = overrides.ctaLabel || premiumBody.dataset.premiumCtaLabel || "לשירותים ומחירים";
+        const description = overrides.description || premiumBody.dataset.premiumDescription || "׳”׳׳©׳ ׳”׳×׳•׳›׳ ׳”׳׳׳ ׳©׳׳•׳¨ ׳›׳¨׳’׳¢ ׳׳—׳‘׳¨׳™ ׳₪׳¨׳™׳׳™׳•׳.";
+        const fallbackCtaLabel = overrides.ctaLabel || premiumBody.dataset.premiumCtaLabel || "׳׳©׳™׳¨׳•׳×׳™׳ ׳•׳׳—׳™׳¨׳™׳";
         const fallbackCtaHref = overrides.ctaHref || premiumBody.dataset.premiumCtaHref || "/now";
         const accessEnabled = premiumBody.dataset.premiumAccessEnabled === "true";
         const accessRoute = premiumBody.dataset.premiumAccessRoute || "/premium-access/";
-        const helperText = premiumBody.dataset.premiumAccessHelper || "גישה לתוכן פרימיום נפתחת כרגע דרך קוד גישה מתחלף.";
+        const helperText = premiumBody.dataset.premiumAccessHelper || "׳’׳™׳©׳” ׳׳×׳•׳›׳ ׳₪׳¨׳™׳׳™׳•׳ ׳ ׳₪׳×׳—׳× ׳›׳¨׳’׳¢ ׳“׳¨׳ ׳§׳•׳“ ׳’׳™׳©׳” ׳׳×׳—׳׳£.";
         const returnTo = encodeURIComponent(window.location.pathname);
         const primaryHref = accessEnabled ? `${accessRoute}?returnTo=${returnTo}` : fallbackCtaHref;
-        const primaryLabel = accessEnabled ? "להזין קוד גישה" : fallbackCtaLabel;
+        const primaryLabel = accessEnabled ? "׳׳”׳–׳™׳ ׳§׳•׳“ ׳’׳™׳©׳”" : fallbackCtaLabel;
 
         const range = document.createRange();
         range.setStartAfter(markerNode);
@@ -604,7 +705,7 @@ const components = {
             await navigator.clipboard.writeText(value);
             showToast();
           } catch {
-            window.prompt("העתק קישור", value);
+            window.prompt("׳”׳¢׳×׳§ ׳§׳™׳©׳•׳¨", value);
           }
         };
         copyButton.addEventListener("click", onCopyClick);
@@ -621,7 +722,7 @@ const components = {
               body: formData,
             });
             if (formStatus instanceof HTMLElement) {
-              formStatus.textContent = response.ok ? "תודה, ההודעה עברה." : "משהו השתבש, נסה שוב.";
+              formStatus.textContent = response.ok ? "׳×׳•׳“׳”, ׳”׳”׳•׳“׳¢׳” ׳¢׳‘׳¨׳”." : "׳׳©׳”׳• ׳”׳©׳×׳‘׳©, ׳ ׳¡׳” ׳©׳•׳‘.";
               formStatus.classList.add("opacity-100");
             }
             if (response.ok) {
@@ -629,7 +730,7 @@ const components = {
             }
           } catch {
             if (formStatus instanceof HTMLElement) {
-              formStatus.textContent = "משהו השתבש, נסה שוב.";
+              formStatus.textContent = "׳׳©׳”׳• ׳”׳©׳×׳‘׳©, ׳ ׳¡׳” ׳©׳•׳‘.";
               formStatus.classList.add("opacity-100");
             }
           }
@@ -658,3 +759,12 @@ const components = {
     });
   </script>
 </Layout>
+
+
+
+
+
+
+
+
+

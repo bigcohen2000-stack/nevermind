@@ -1,10 +1,11 @@
-﻿import { defineCollection, z } from "astro:content";
+import { defineCollection, z } from "astro:content";
 
 const articles = defineCollection({
   type: "content",
   schema: z.object({
     title: z.string(),
     description: z.string(),
+    bottomLine: z.string().optional(),
     pubDate: z.coerce.date(),
     updatedDate: z.coerce.date().optional(),
     author: z.string(),
@@ -18,6 +19,8 @@ const articles = defineCollection({
     isPremium: z.boolean().default(false),
     draft: z.boolean().default(false),
     workflowStatus: z.enum(["writing", "review", "ready", "published"]).optional(),
+    difficultyLevel: z.enum(["beginner", "advanced", "deep"]).optional(),
+    reflectionQuestions: z.array(z.string()).length(3).optional(),
     faq: z
       .array(
         z.object({

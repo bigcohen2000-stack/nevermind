@@ -2,199 +2,93 @@
 import { getCollection } from "astro:content";
 import Layout from "../layouts/Layout.astro";
 import TruthSlider from "../components/TruthSlider";
-import servicesConfig from "../config/services.json";
-import { Compass, HeartPulse, Star, Sun } from "lucide-react";
+import { Star } from "lucide-react";
+import ThoughtShiftProof from "../components/ThoughtShiftProof.astro";
+import { resolveServiceAction, servicesHero, servicesStages, servicesThoughtShifts } from "../lib/services";
 
 const allArticles = await getCollection("articles", ({ data }) => data.draft !== true);
-const sortedArticles = allArticles.sort(
-  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
-);
+const sortedArticles = allArticles.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 const recentArticles = sortedArticles.slice(0, 9);
 const siteUrl = Astro.site?.toString() ?? "https://www.nevermind.co.il";
-const formatMoney = (value: number) => `${Math.round(value).toLocaleString("he-IL")} ${servicesConfig.currency}`;
-const grossPrice = (service: (typeof servicesConfig.services)[number]) => Math.round(service.basePrice * (1 + service.taxPercent / 100));
-const serviceBadgeMap: Record<string, string | undefined> = {
-  "learning-group": "הכי מבוקש",
-  "podcast-view": "כולל שדרוג",
-  "terrace-subscription": "ליווי רציף",
-};
-const activeServices = [...servicesConfig.services]
-  .sort((a, b) => Number(Boolean(b.upsell)) - Number(Boolean(a.upsell)))
-  .slice(0, 3)
-  .map((service) => ({
-    ...service,
-    summary: service.description,
-    priceLabel:
-      service.id === "terrace-subscription"
-        ? `${formatMoney(grossPrice(service))} / חודש`
-        : `${formatMoney(grossPrice(service))} כולל מע״מ`,
-    featured: Boolean(service.upsell) || service.id === "learning-group",
-    badge: serviceBadgeMap[service.id],
-    href: `/services/?service=${service.id}#${service.id}`,
-  }));
-
-const cards = [
-  {
-    title: "סובל כרגע?",
-    description: "חרדה, לחץ",
-    href: "/now",
-    ariaLabel: "סובל כרגע?",
-    Icon: HeartPulse,
-  },
-  {
-    title: "אשליית האושר",
-    description: "אושר הוא לא פחד שקט",
-    href: "/articles",
-    ariaLabel: "אשליית האושר",
-    Icon: Sun,
-  },
-  {
-    title: "מתחילים כאן",
-    description: "מכניקת מחשבה",
-    href: "#articles",
-    ariaLabel: "מתחילים כאן",
-    Icon: Compass,
-  },
-  {
-    title: "שירותים ומחירים",
-    description: "ליווי, פודקאסט ומפגשים",
-    href: "/services/",
-    ariaLabel: "שירותים ומחירים",
-    Icon: Star,
-  },
-];
+const stageCards = servicesStages
+  .map((stage) => ({
+    ...stage,
+    primaryService: stage.services.find((service) => service.visible !== false),
+  }))
+  .filter((stage) => stage.primaryService);
 ---
 
 <Layout
   title="NeverMind | הבנה, לא כלים"
-  description="גישה ישירה לראות את עצמך, את הקשיים ואת האפשרויות בלי מאמץ מיותר."
+  description="סולם ערך ברור: משיחת מיקוד קצרה ועד למנוי מרפסת ולמסלולי עומק מתמשכים."
 >
-  <section
-    aria-labelledby="intent-title"
-    class="mx-auto max-w-7xl space-y-12 px-5 pt-20 sm:px-8 lg:px-12"
-  >
-    <header class="max-w-3xl space-y-5">
-      <h1
-        id="intent-title"
-        class="text-[clamp(2.2rem,1.7rem+2.4vw,3.6rem)] font-semibold leading-[1.1] text-neutral-900 dark:text-white"
-      >
-        גישת NeverMind: להפסיק לתקן, להתחיל לראות.
+  <section aria-labelledby="intent-title" class="mx-auto max-w-7xl space-y-12 px-5 pt-20 sm:px-8 lg:px-12">
+    <header class="max-w-4xl space-y-5 text-right">
+      <p class="text-sm font-semibold uppercase tracking-[0.26em] text-[#D42B2B]">NeverMind</p>
+      <h1 id="intent-title" class="text-[clamp(2.2rem,1.7rem+2.4vw,3.8rem)] font-semibold leading-[1.08] text-neutral-900 dark:text-white">
+        {servicesHero.title}
       </h1>
-      <p class="text-[clamp(1.05rem,0.98rem+0.5vw,1.4rem)] text-neutral-700 dark:text-neutral-300">
-        דרך חדה לראות את עצמך, את הקשיים ואת האפשרויות בלי מאמץ מיותר.
+      <p class="max-w-3xl text-[clamp(1.05rem,0.98rem+0.5vw,1.3rem)] text-neutral-700 dark:text-neutral-300">
+        {servicesHero.subtitle}
       </p>
-      <div class="w-full max-w-md pt-4">
-        <button
-          type="button"
-          data-search-trigger
-          class="inline-flex w-full items-center justify-between rounded-2xl border border-neutral-200 bg-white/80 px-4 py-3 text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] text-neutral-700 transition-colors hover:bg-white dark:border-neutral-800 dark:bg-neutral-900/70 dark:text-neutral-300"
-          aria-label="פתח חיפוש"
-        >
-          חיפוש מהיר
-          <span class="text-sm text-neutral-400">⌘K</span>
-        </button>
+      <div class="flex flex-wrap justify-end gap-3 pt-4">
+        <a href="/services/" class="inline-flex items-center justify-center rounded-full bg-[#1A1A1A] px-5 py-3 text-sm font-semibold text-[#FAFAF8] transition hover:bg-black">לכל המסלולים</a>
+        <a href="#stage-cards" class="inline-flex items-center justify-center rounded-full border border-[#1A1A1A]/10 bg-white/80 px-5 py-3 text-sm font-semibold text-[#1A1A1A]/78 transition hover:bg-white">לראות את 5 השלבים</a>
       </div>
     </header>
 
-    <div class="-mx-4 flex snap-x snap-mandatory gap-6 overflow-x-auto px-4 pb-4 md:mx-0 md:grid md:grid-cols-2 md:px-0 lg:grid-cols-4">
-      {cards.map(({ title, description, href, ariaLabel, Icon }) => (
-        <a
-          href={href}
-          aria-label={ariaLabel}
-          data-glow
-          class="glow-card group relative flex min-w-[80%] snap-center flex-col justify-between gap-6 overflow-hidden rounded-3xl border border-neutral-200 bg-white/70 p-6 shadow-sm backdrop-blur-xl transition-all duration-500 ease-out hover:scale-[1.03] focus-visible:scale-[1.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900 dark:border-neutral-800 dark:bg-neutral-900/70 dark:focus-visible:ring-white sm:min-w-[60%] md:min-w-0"
-        >
-          <div class="flex items-center gap-3">
-            <Icon
-              aria-hidden="true"
-              className="h-6 w-6 text-neutral-800 dark:text-neutral-200"
-            />
-            <span class="text-[clamp(1.1rem,1rem+0.5vw,1.5rem)] font-semibold text-neutral-900 dark:text-white">
-              {title}
-            </span>
-          </div>
-          <p class="text-[clamp(0.85rem,0.8rem+0.2vw,0.98rem)] text-neutral-600 dark:text-neutral-400">
-            {description}
-          </p>
-        </a>
-      ))}
-    </div>
-  </section>
-
-  {activeServices.length > 0 && (
-    <section
-      id="services"
-      class="mx-auto max-w-7xl border-t border-neutral-200 px-6 py-20 dark:border-neutral-800 md:py-24"
-    >
-      <div class="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
-        <div class="space-y-3 text-right">
-          <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[#D42B2B]">Services</p>
-          <h2 class="text-3xl font-bold text-neutral-900 dark:text-white md:text-4xl">מסלולי עבודה פעילים</h2>
-          <p class="max-w-2xl text-base leading-8 text-neutral-600 dark:text-neutral-400">
-            כאן רואים את המסלולים המרכזיים, אבל את כל המשחק במחיר, משך ותוספים פותחים בעמוד השירותים המלא.
-          </p>
-        </div>
-        <a
-          href="/services/"
-          class="inline-flex items-center justify-center rounded-full bg-[#1A1A1A] px-5 py-3 text-sm font-semibold text-[#FAFAF8] transition hover:bg-black"
-        >
-          לפתוח את עמוד השירותים
-        </a>
-      </div>
-
-      <div class="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-3">
-        {activeServices.map((service) => (
-          <article class={`rounded-[2rem] border p-6 shadow-[0_20px_60px_rgba(26,26,26,0.06)] backdrop-blur-md ${service.featured ? "border-[#D42B2B]/20 bg-[#fff7f6]" : "border-neutral-200 bg-white/80 dark:border-neutral-800 dark:bg-neutral-900/70"}`}>
-            <div class="flex items-start justify-between gap-4">
-              <div class="text-right">
-                <h3 class="text-2xl font-semibold text-neutral-900 dark:text-white">{service.title}</h3>
-                <p class="mt-4 text-base leading-8 text-neutral-600 dark:text-neutral-400">{service.summary}</p>
-              </div>
-              {service.featured && (
-                <span class="rounded-full bg-[#D42B2B] px-3 py-1 text-xs font-semibold text-[#FAFAF8]">{service.badge || "מוביל"}</span>
-              )}
+    <section id="stage-cards" class="grid gap-6 lg:grid-cols-2 xl:grid-cols-3">
+      {stageCards.map((stage) => {
+        const service = stage.primaryService!;
+        const action = resolveServiceAction(service);
+        return (
+          <article class="rounded-[2rem] border border-[#1A1A1A]/10 bg-white/82 p-6 shadow-[0_24px_70px_rgba(26,26,26,0.06)] backdrop-blur-md text-right">
+            <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">{stage.stage_name}</p>
+            <h2 class="mt-3 text-2xl font-semibold text-[#1A1A1A]">{service.title}</h2>
+            <p class="mt-2 text-sm font-medium text-[#1A1A1A]/60">{stage.target_audience}</p>
+            <p class="mt-4 text-sm leading-7 text-[#1A1A1A]/68">{service.subtitle}</p>
+            <div class="mt-5 flex flex-wrap justify-end gap-2">
+              {service.badges?.map((badge) => (
+                <span class="rounded-full border border-[#D42B2B]/14 bg-[#FFF4F3] px-3 py-1 text-xs font-semibold text-[#D42B2B]">{badge}</span>
+              ))}
             </div>
-            <div class="mt-8 flex items-center justify-between gap-4">
-              <span class="text-sm font-semibold text-[#1A1A1A]/60 dark:text-neutral-300/70">{service.priceLabel}</span>
+            <div class="mt-6 flex items-center justify-between gap-4">
+              <span class="text-lg font-semibold text-[#1A1A1A]">{service.price_full.toLocaleString("he-IL")} ₪</span>
               <a
-                href={service.href}
-                class="inline-flex items-center rounded-full border border-[#1A1A1A]/10 bg-white px-4 py-2 text-sm font-semibold text-[#1A1A1A] transition hover:bg-[#ffffff] dark:border-neutral-700 dark:bg-neutral-950 dark:text-white"
+                href={action.href}
+                target={action.external ? "_blank" : undefined}
+                rel={action.external ? "noreferrer" : undefined}
+                class="inline-flex items-center justify-center rounded-full bg-[#D42B2B] px-4 py-2 text-sm font-semibold text-[#FAFAF8] transition hover:bg-[#b82424]"
               >
-                להמשיך מכאן
+                {service.action_text}
               </a>
             </div>
           </article>
-        ))}
-      </div>
+        );
+      })}
     </section>
-  )}
+  </section>
 
   <section aria-label="השוואת אמת" class="py-24 md:py-32">
     <TruthSlider client:visible />
   </section>
 
-  <section
-    id="articles"
-    class="mx-auto max-w-7xl border-t border-neutral-200 px-6 py-20 dark:border-neutral-800 md:py-28"
-  >
-    <h2 class="mb-12 text-3xl font-bold text-neutral-900 dark:text-white md:mb-16 md:text-4xl">
-      מאמרים אחרונים
-    </h2>
-    <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3 lg:gap-10">
+  <section class="mx-auto max-w-7xl border-t border-neutral-200 px-6 py-20 dark:border-neutral-800 md:py-24">
+    <ThoughtShiftProof items={servicesThoughtShifts} heading="לפני ואחרי NeverMind" eyebrow="דפוס ישן מול דפוס חדש" />
+  </section>
+
+  <section id="articles" class="mx-auto max-w-7xl border-t border-neutral-200 px-6 py-20 dark:border-neutral-800 md:py-28">
+    <div class="flex items-end justify-between gap-4">
+      <h2 class="text-3xl font-bold text-neutral-900 dark:text-white md:text-4xl">מאמרים אחרונים</h2>
+      <a href="/articles/" class="text-sm font-semibold text-[#D42B2B]">לכל המאמרים</a>
+    </div>
+    <div class="mt-12 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3 lg:gap-10">
       {recentArticles.map((article) => (
-        <a
-          href={`/articles/${article.slug}`}
-          class="group block rounded-2xl border border-neutral-200 bg-white/70 p-6 backdrop-blur-md transition-all duration-300 hover:border-neutral-400 dark:border-neutral-800 dark:bg-neutral-900/70 dark:hover:border-neutral-500 md:p-8"
-        >
-          <h3 class="mb-4 text-xl font-bold text-neutral-900 decoration-neutral-400 underline-offset-4 group-hover:underline dark:text-white md:text-2xl">
-            {article.data.title}
-          </h3>
-          <p class="mb-6 text-base text-neutral-600 dark:text-neutral-400">
-            {article.data.description}
-          </p>
-          <span class="inline-block border-b border-neutral-900 pb-0.5 text-sm font-semibold text-neutral-900 dark:border-white dark:text-white">
-            לקריאה שקטה →
-          </span>
+        <a href={`/articles/${article.slug}`} class="group block rounded-2xl border border-neutral-200 bg-white/70 p-6 backdrop-blur-md transition-all duration-300 hover:border-neutral-400 dark:border-neutral-800 dark:bg-neutral-900/70 dark:hover:border-neutral-500 md:p-8">
+          <div class="mb-4 flex items-center gap-2 text-[#D42B2B]"><Star className="h-4 w-4" /><span class="text-xs font-semibold uppercase tracking-[0.16em]">חקירה שקטה</span></div>
+          <h3 class="mb-4 text-xl font-bold text-neutral-900 decoration-neutral-400 underline-offset-4 group-hover:underline dark:text-white md:text-2xl">{article.data.title}</h3>
+          <p class="mb-6 text-base text-neutral-600 dark:text-neutral-400">{article.data.description}</p>
+          <span class="inline-block border-b border-neutral-900 pb-0.5 text-sm font-semibold text-neutral-900 dark:border-white dark:text-white">לקריאה שקטה →</span>
         </a>
       ))}
     </div>
@@ -216,81 +110,6 @@ const cards = [
         }
       }))
     }
-  </script>
-
-  <style>
-    .glow-card {
-      --glow-x: 50%;
-      --glow-y: 50%;
-      --nm-glow: rgba(0, 0, 0, 0.05);
-    }
-
-    :global(.dark) .glow-card {
-      --nm-glow: rgba(255, 255, 255, 0.08);
-    }
-
-    .glow-card::after {
-      content: "";
-      position: absolute;
-      inset: -1px;
-      background: radial-gradient(
-        200px circle at var(--glow-x) var(--glow-y),
-        var(--nm-glow),
-        transparent 70%
-      );
-      opacity: 0;
-      transition: opacity 300ms ease;
-      pointer-events: none;
-      z-index: 10;
-    }
-
-    .glow-card:hover::after,
-    .glow-card:focus-visible::after {
-      opacity: 1;
-    }
-  </style>
-
-  <script is:inline>
-    document.addEventListener("astro:page-load", () => {
-      const prefersReducedMotion = window.matchMedia(
-        "(prefers-reduced-motion: reduce)"
-      ).matches;
-      if (prefersReducedMotion) {
-        return;
-      }
-
-      if (window.__nmGlowCleanup) {
-        window.__nmGlowCleanup();
-      }
-
-      const glowCards = Array.from(document.querySelectorAll("[data-glow]"));
-      const handlers = [];
-
-      glowCards.forEach((card) => {
-        const onMove = (event) => {
-          const rect = card.getBoundingClientRect();
-          const x = ((event.clientX - rect.left) / rect.width) * 100;
-          const y = ((event.clientY - rect.top) / rect.height) * 100;
-          card.style.setProperty("--glow-x", `${x}%`);
-          card.style.setProperty("--glow-y", `${y}%`);
-        };
-
-        const onLeave = () => {
-          card.style.setProperty("--glow-x", "50%");
-          card.style.setProperty("--glow-y", "50%");
-        };
-
-        card.addEventListener("pointermove", onMove, { passive: true });
-        card.addEventListener("pointerleave", onLeave, { passive: true });
-
-        handlers.push(() => {
-          card.removeEventListener("pointermove", onMove);
-          card.removeEventListener("pointerleave", onLeave);
-        });
-      });
-
-      window.__nmGlowCleanup = () => handlers.forEach((cleanup) => cleanup());
-    });
   </script>
 </Layout>
 

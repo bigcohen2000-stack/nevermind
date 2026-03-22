@@ -1,28 +1,32 @@
-{
-  "site": {
-    "name": "NeverMind",
-    "url": "https://www.nevermind.co.il"
-  },
-  "github": {
-    "owner": "bigcohen2000-stack",
-    "repo": "nevermind",
-    "branch": "main",
-    "articlesPath": "src/content/articles"
-  },
-  "contact": {
-    "whatsAppNumber": "972555634035"
-  },
-  "premiumAccess": {
-    "enabled": true,
-    "sessionHours": 168,
-    "unlockRoute": "/premium-access/",
-    "helperText": "���� ����� ������� ����� ���� ��� ��� ���� �����.",
-    "codes": [
-      {
-        "label": "Access 2026",
-        "value": "NM-ACCESS-2026",
-        "expiresAt": "2026-12-31T23:59:59+02:00"
-      }
-    ]
-  }
+﻿{
+    "site":  {
+                 "name":  "NeverMind",
+                 "url":  "https://www.nevermind.co.il"
+             },
+    "github":  {
+                   "owner":  "bigcohen2000-stack",
+                   "repo":  "nevermind",
+                   "branch":  "main",
+                   "articlesPath":  "src/content/articles"
+               },
+    "contact":  {
+                    "whatsAppNumber":  "972555634035"
+                },
+    "premiumAccess":  {
+                          "enabled":  true,
+                          "sessionHours":  168,
+                          "unlockRoute":  "/premium-access/",
+                          "helperText":  "גישה לתוכן פרימיום נפתחת כרגע דרך קוד גישה מתחלף.",
+                          "codes":  [
+                                        {
+                                            "label":  "Access 2026",
+                                            "value":  "NM-ACCESS-2026",
+                                            "expiresAt":  "2026-12-31T23:59:59+02:00"
+                                        }
+                                    ]
+                      },
+    "whatsAppTemplates":  {
+                              "subscriptionReply":  "שלום!\nהבנתי שאתה רוצה להתחיל מסלול מרפסת.\nלפני שנקבע – אני שולח לך את כל הפרטים + תאריכים פנויים.\nמתאים לך שאשלח?"
+                          }
 }
+

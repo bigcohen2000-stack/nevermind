@@ -1,0 +1,134 @@
+﻿---
+import { buildWhatsAppHref } from "../lib/services";
+import { microPosts } from "../data/microPosts";
+
+interface Props {
+  pageTitle: string;
+  pageUrl: string;
+  web3formsKey: string;
+}
+
+const { pageTitle, pageUrl, web3formsKey } = Astro.props as Props;
+const recentMicroPosts = microPosts.slice(0, 3);
+const whatsappHref = buildWhatsAppHref(`קראתי את "${pageTitle}" ויש לי שאלה לוגית קצרה: `);
+---
+
+<aside class="space-y-5 lg:sticky lg:top-28">
+  <section class="rounded-[1.8rem] border border-[#1A1A1A]/10 bg-white/88 p-5 shadow-[0_18px_60px_rgba(26,26,26,0.06)]">
+    <div class="space-y-3 text-right">
+      <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">Micro-Question</p>
+      <h2 class="text-[1.35rem] font-semibold text-[#1A1A1A]">שאל שאלה לוגית</h2>
+      <p class="text-sm leading-7 text-[#1A1A1A]/68">
+        משפט אחד מספיק. אם השאלה שלך תפגע בנקודה חיה, היא יכולה להפוך למיקרו-פוסט קצר באתר.
+      </p>
+    </div>
+
+    <form data-logical-question-form class="mt-5 space-y-4 text-right" action="https://api.web3forms.com/submit" method="POST">
+      <input type="hidden" name="access_key" value={web3formsKey} />
+      <input type="hidden" name="subject" value="שאלה לוגית חדשה מ-NeverMind" />
+      <input type="hidden" name="source_page" value={pageTitle} />
+      <input type="hidden" name="source_url" value={pageUrl} />
+      <input type="text" name="botcheck" style="display:none" tabindex="-1" autocomplete="off" aria-hidden="true" />
+
+      <div class="space-y-2">
+        <label for="logical-name" class="text-sm font-medium text-[#1A1A1A]/72">שם פרטי</label>
+        <input
+          id="logical-name"
+          name="name"
+          type="text"
+          placeholder="לא חובה"
+          class="w-full rounded-2xl border border-[#1A1A1A]/12 bg-[#FAFAF8] px-4 py-3 text-right text-sm text-[#1A1A1A] outline-none transition focus:border-[#D42B2B]/35 focus:ring-2 focus:ring-[#D42B2B]/12"
+        />
+      </div>
+
+      <div class="space-y-2">
+        <label for="logical-question" class="text-sm font-medium text-[#1A1A1A]/72">השאלה שלך</label>
+        <textarea
+          id="logical-question"
+          name="message"
+          rows="5"
+          maxlength="320"
+          required
+          placeholder="למשל: איך מזהים מתי אני תקוע כי אני באמת לא יודע, ומתי אני פשוט מפחד מהמחיר של החלטה?"
+          class="w-full rounded-[1.4rem] border border-[#1A1A1A]/12 bg-[#FAFAF8] px-4 py-3 text-right text-sm leading-7 text-[#1A1A1A] outline-none transition focus:border-[#D42B2B]/35 focus:ring-2 focus:ring-[#D42B2B]/12"
+        ></textarea>
+      </div>
+
+      <div class="flex flex-wrap gap-3">
+        <button
+          type="submit"
+          class="inline-flex flex-1 items-center justify-center rounded-full bg-[#1A1A1A] px-5 py-3 text-sm font-semibold text-[#FAFAF8] transition hover:bg-black"
+        >
+          שלח שאלה קצרה
+        </button>
+        <a
+          href={whatsappHref}
+          target="_blank"
+          rel="noreferrer"
+          class="inline-flex items-center justify-center rounded-full border border-[#1A1A1A]/10 bg-white px-5 py-3 text-sm font-semibold text-[#1A1A1A]/82 transition hover:bg-[#FAFAF8]"
+        >
+          או שלח בוואטסאפ
+        </a>
+      </div>
+
+      <p data-logical-question-status aria-live="polite" class="text-sm text-[#1A1A1A]/58 opacity-0 transition-opacity duration-300">
+        תודה. אם זו שאלה חיה, היא יכולה להפוך לפוסט קצר בקרוב.
+      </p>
+    </form>
+  </section>
+
+  <section class="rounded-[1.8rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] p-5 text-right">
+    <div class="space-y-2">
+      <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">Micro-posts</p>
+      <h3 class="text-xl font-semibold text-[#1A1A1A]">תשובות קצרות אחרונות</h3>
+    </div>
+    <div class="mt-4 space-y-3">
+      {recentMicroPosts.map((post) => (
+        <a
+          href={`/questions/#${post.slug}`}
+          class="block rounded-[1.3rem] border border-[#1A1A1A]/10 bg-white px-4 py-4 transition hover:border-[#D42B2B]/18 hover:bg-[#FFF9F8]"
+        >
+          <p class="text-sm font-semibold leading-7 text-[#1A1A1A]">{post.question}</p>
+          <p class="mt-2 text-sm leading-7 text-[#1A1A1A]/64">{post.answer}</p>
+        </a>
+      ))}
+    </div>
+    <a href="/questions/" class="mt-4 inline-flex text-sm font-semibold text-[#D42B2B] transition hover:opacity-75">
+      לכל המיקרו-פוסטים
+    </a>
+  </section>
+
+  <script is:inline>
+    document.addEventListener("astro:page-load", () => {
+      const form = document.querySelector("[data-logical-question-form]");
+      const status = document.querySelector("[data-logical-question-status]");
+      if (!(form instanceof HTMLFormElement) || !(status instanceof HTMLElement)) return;
+
+      const handleSubmit = async (event) => {
+        event.preventDefault();
+        const formData = new FormData(form);
+
+        try {
+          const response = await fetch("https://api.web3forms.com/submit", {
+            method: "POST",
+            body: formData,
+          });
+
+          status.textContent = response.ok
+            ? "השאלה נשלחה. אם היא תיבחר, תראה עליה תשובה קצרה באתר."
+            : "משהו השתבש. אפשר לנסות שוב או לשלוח בוואטסאפ.";
+          status.classList.add("opacity-100");
+
+          if (response.ok) {
+            form.reset();
+          }
+        } catch {
+          status.textContent = "משהו השתבש. אפשר לנסות שוב או לשלוח בוואטסאפ.";
+          status.classList.add("opacity-100");
+        }
+      };
+
+      form.addEventListener("submit", handleSubmit);
+    });
+  </script>
+</aside>

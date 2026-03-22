@@ -1,16 +1,15 @@
 ﻿---
 import Layout from "../../layouts/Layout.astro";
-import servicesConfig from "../../config/services.json";
 import appConfig from "../../config/appConfig.json";
+import { formatMoney, servicesAddOns } from "../../lib/services";
 
 const pageTitle = "מחולל Mega-Prompt";
 const pageDescription = "כלי פנימי ליצירת פרומפטים, preview, validation וזרימת publish למאמרי MDX.";
 const githubDraftBase = `https://github.com/${appConfig.github.owner}/${appConfig.github.repo}/new/${appConfig.github.branch}/${appConfig.github.articlesPath}/`;
 const githubRepoLabel = `${appConfig.github.owner}/${appConfig.github.repo}`;
-const documentationService = servicesConfig.services.find((service) => service.id === "memory-documentation");
-const grossPrice = (basePrice: number, taxPercent: number) => Math.round(basePrice * (1 + taxPercent / 100));
+const documentationService = servicesAddOns.find((service) => service.id === "summary-ai") ?? servicesAddOns[0];
 const upsellPreviewText = documentationService
-  ? `${grossPrice(documentationService.basePrice, documentationService.taxPercent).toLocaleString("he-IL")} ${servicesConfig.currency} כולל מע״מ (${documentationService.title})`
+  ? `${formatMoney(documentationService.price_full)} כולל מע״מ (${documentationService.title})`
   : `לא הוגדר שירות תיעוד ב-services.json`;
 ---
 
@@ -447,6 +446,7 @@ const upsellPreviewText = documentationService
       const githubReadyOutput = document.getElementById("github-ready-output");
       const articlePreview = document.getElementById("article-preview");
       const previewStatus = document.getElementById("preview-status");
+      const articlePreviewFrame = document.getElementById("article-preview-frame");
 
       if (!(form instanceof HTMLFormElement)) return;
       if (!(rawText instanceof HTMLTextAreaElement)) return;
@@ -477,6 +477,7 @@ const upsellPreviewText = documentationService
       if (!(autofixOutput instanceof HTMLElement)) return;
       if (!(githubReadyOutput instanceof HTMLElement)) return;
       if (!(articlePreview instanceof HTMLElement)) return;
+      if (!(articlePreviewFrame instanceof HTMLIFrameElement)) return;
       if (!(previewStatus instanceof HTMLElement)) return;
 
       const normalizeBlock = (value) =>
@@ -1325,9 +1326,7 @@ Self-Correction Loop: Before outputting the final response, review your text. If
         const value = getCleanMdx();
         if (!value) {
           articlePreview.innerHTML = "הדבק MDX ולחץ על Render Preview כדי לראות את המאמר לפני commit.";
-        articlePreviewFrame.srcdoc = buildPreviewDocument("Preview", `<article class="mx-auto max-w-3xl rounded-[1.75rem] bg-white p-7"><p style="font-size:1rem;line-height:1.8;color:rgba(26,26,26,.68);text-align:right">הדבק MDX ולחץ על Render Preview כדי לראות את המאמר לפני commit.</p></article>`);
           articlePreviewFrame.srcdoc = buildPreviewDocument("Preview", `<article class="mx-auto max-w-3xl rounded-[1.75rem] bg-white p-7"><p style="font-size:1rem;line-height:1.8;color:rgba(26,26,26,.68);text-align:right">הדבק MDX ולחץ על Render Preview כדי לראות את המאמר לפני commit.</p></article>`);
-          previewStatus.textContent = "ממתין ל־MDX";
           validatorOutput.innerHTML = '<div class="rounded-2xl border border-dashed border-[#1A1A1A]/12 bg-white/70 px-4 py-3">אין עדיין בדיקות. הרץ Preview כדי לקבל סטטוס.</div>';
           autofixOutput.innerHTML = 'אין עדיין הצעות תיקון.';
           githubReadyOutput.innerHTML = 'סטטוס GitHub-ready יופיע אחרי Preview.';
@@ -1848,6 +1847,11 @@ Self-Correction Loop: Before outputting the final response, review your text. If
     });
   </script>
 </Layout>
+
+
+
+
+
 
 
 
