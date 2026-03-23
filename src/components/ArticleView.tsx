@@ -66,7 +66,7 @@ export function ArticleView({ article }: ArticleViewProps) {
           </p>
           <p className="pt-2">
             <a
-              href="/unlock"
+              href="/services/"
               className="inline-block rounded-lg border border-stone-300 bg-white px-4 py-2 text-sm font-medium text-stone-800 transition-colors hover:bg-stone-50"
             >
               פתח גישה מלאה

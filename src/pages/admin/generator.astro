@@ -5,7 +5,7 @@ import { formatMoney, servicesAddOns } from "../../lib/services";
 
 const pageTitle = "מחולל Mega-Prompt";
 const pageDescription = "כלי פנימי ליצירת פרומפטים, preview, validation וזרימת publish למאמרי MDX.";
-const githubDraftBase = `https://github.com/${appConfig.github.owner}/${appConfig.github.repo}/new/${appConfig.github.branch}/${appConfig.github.articlesPath}/`;
+const githubFolderBase = `https://github.com/${appConfig.github.owner}/${appConfig.github.repo}/tree/${appConfig.github.branch}/${appConfig.github.articlesPath}`;
 const githubRepoLabel = `${appConfig.github.owner}/${appConfig.github.repo}`;
 const documentationService = servicesAddOns.find((service) => service.id === "summary-ai") ?? servicesAddOns[0];
 const upsellPreviewText = documentationService
@@ -734,16 +734,28 @@ const upsellPreviewText = documentationService
             העבר לתצוגה מקדימה
           </button>
           <button
-            id="publishToGithub"
+            id="export-mdx-file"
             type="button"
             class="inline-flex w-full items-center justify-center rounded-full bg-[var(--nm-accent)] px-5 py-3 text-sm font-semibold text-[var(--nm-on-accent)] transition-colors hover:bg-[var(--nm-accent-hover)] sm:w-auto sm:min-w-[11rem]"
           >
-            פרסם ישירות ל-GitHub
+            הורד קובץ MDX
+          </button>
+          <button
+            id="open-github"
+            type="button"
+            class="inline-flex w-full items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white px-5 py-3 text-sm font-semibold text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))] transition-colors hover:bg-[var(--nm-surface-muted)] sm:w-auto sm:min-w-[11rem]"
+          >
+            פתח GitHub ←
           </button>
         </div>
+        <p class="text-right text-xs text-[color-mix(in_srgb,var(--nm-fg)_50%,var(--nm-bg))]">
+          הורד את הקובץ ← גרור לתיקייה articles ב-GitHub
+        </p>
       </div>
     </section>
-  <script is:inline>
+  <script>
+    import yaml from "js-yaml";
+
     document.addEventListener("astro:page-load", () => {
       const form = document.getElementById("prompt-generator-form");
       const rawText = document.getElementById("raw-text");
@@ -938,47 +950,57 @@ const upsellPreviewText = documentationService
         return `[${tags.map((tag) => `"${String(tag).replace(/"/g, '\\"')}"`).join(", ")}]`;
       };
 
-      const buildCanonicalFrontmatter = (meta, existingFaqBlock = "faq: []") => {
-        const lines = [
-          "---",
-          `title: ${formatScalar(meta.title || "")}`,
-          `description: ${formatScalar(meta.description || "")}`,
-          `pubDate: ${meta.pubDate || new Date().toISOString().slice(0, 10)}`,
-          `updatedDate: ${formatScalar(meta.updatedDate || "")}`,
-          `author: ${formatScalar(meta.author || "השם לא משנה")}`,
-          `tags: ${formatTags(meta.tags)}`,
-          `image: ${formatScalar(meta.image || "/og.jpg")}`,
-          `canonicalUrl: ${formatScalar(meta.canonicalUrl || "")}`,
-          `keywords: ${formatScalar(meta.keywords || "")}`,
-          `audioUrl: ${formatScalar(meta.audioUrl || "")}`,
-          `youtubeId: ${formatScalar(meta.youtubeId || extractYouTubeId(videoUrl.value) || "")}`,
-          `videoSummaryPoints: []`,
-          `tallyUrl: ${formatScalar(meta.tallyUrl || "")}`,
-          `isPremium: ${formatBoolean(meta.isPremium, false)}`,
-          `draft: ${formatBoolean(meta.draft, true)}`,
-          `workflowStatus: ${formatWorkflowStatus(meta.workflowStatus, meta.draft)}`,
-          existingFaqBlock.trim() || "faq: []",
-          "---",
-        ];
-        return lines.join("\n");
+      const buildCanonicalFrontmatter = (meta) => {
+        const finalMeta = {
+          ...meta,
+        };
+
+        // Non-destructive defaults: fill only when missing.
+        if (!Object.prototype.hasOwnProperty.call(finalMeta, "author")) {
+          finalMeta.author = "השם לא משנה";
+        }
+        if (!Object.prototype.hasOwnProperty.call(finalMeta, "layout")) {
+          finalMeta.layout = "../../layouts/Layout.astro";
+        }
+
+        // Preserve rich/structured fields exactly as provided.
+        if (Object.prototype.hasOwnProperty.call(meta, "reflectionQuestions")) {
+          finalMeta.reflectionQuestions = meta.reflectionQuestions;
+        }
+        if (Object.prototype.hasOwnProperty.call(meta, "videoSummaryPoints")) {
+          finalMeta.videoSummaryPoints = meta.videoSummaryPoints;
+        }
+        if (Object.prototype.hasOwnProperty.call(meta, "relatedConcepts")) {
+          finalMeta.relatedConcepts = meta.relatedConcepts;
+        }
+        if (Object.prototype.hasOwnProperty.call(meta, "faq")) {
+          finalMeta.faq = meta.faq;
+        }
+
+        const yamlBody = yaml
+          .dump(finalMeta, {
+            lineWidth: -1,
+            noRefs: true,
+            sortKeys: false,
+            noCompatMode: true,
+          })
+          .trimEnd();
+
+        return `---\n${yamlBody}\n---`;
       };
 
       const applyFrontmatterAutofix = (raw) => {
         const normalized = raw.replace(/\r\n/g, "\n").trim();
         if (!normalized) return "";
 
-        const frontmatterMatch = normalized.match(/^---\s*\n([\s\S]*?)\n---\s*\n?/);
         const parsed = parseFrontmatter(normalized);
+        if (!parsed.hasFrontmatter || parsed.parseError) {
+          // Fail safe: never rewrite MDX when frontmatter parsing fails.
+          return `${normalized}\n`;
+        }
         const body = parsed.body.trim();
         const meta = parsed.meta;
-        let faqBlock = "faq: []";
-
-        if (frontmatterMatch) {
-          const faqMatch = frontmatterMatch[1].match(/(^faq:\s*[\s\S]*$)/m);
-          if (faqMatch) faqBlock = faqMatch[1].trim();
-        }
-
-        const frontmatter = buildCanonicalFrontmatter(meta, faqBlock);
+        const frontmatter = buildCanonicalFrontmatter(meta);
         return `${frontmatter}\n\n${body}`.trim() + "\n";
       };
 
@@ -1011,34 +1033,23 @@ const upsellPreviewText = documentationService
       const parseFrontmatter = (raw) => {
         const frontmatterMatch = raw.match(/^---\s*\n([\s\S]*?)\n---\s*\n?/);
         if (!frontmatterMatch) {
-          return { meta: {}, body: raw.trim() };
+          return { meta: {}, body: raw.trim(), hasFrontmatter: false, parseError: null };
         }
 
-        const meta = {};
-        const lines = frontmatterMatch[1].split(/\r?\n/);
-
-        for (const line of lines) {
-          const trimmed = line.trim();
-          if (!trimmed || trimmed.startsWith("faq:")) continue;
-          const index = trimmed.indexOf(":");
-          if (index === -1) continue;
-
-          const key = trimmed.slice(0, index).trim();
-          const rawValue = trimmed.slice(index + 1).trim();
-
-          if (rawValue.startsWith("[") && rawValue.endsWith("]")) {
-            meta[key] = rawValue
-              .slice(1, -1)
-              .split(",")
-              .map((item) => item.trim().replace(/^"|"$/g, ""))
-              .filter(Boolean);
-          } else {
-            meta[key] = rawValue.replace(/^"|"$/g, "");
+        let meta = {};
+        let parseError = null;
+        try {
+          const loaded = yaml.load(frontmatterMatch[1]);
+          if (loaded && typeof loaded === "object" && !Array.isArray(loaded)) {
+            meta = loaded;
           }
+        } catch (error) {
+          meta = {};
+          parseError = error instanceof Error ? error.message : "YAML parse error";
         }
 
         const body = raw.slice(frontmatterMatch[0].length).trim();
-        return { meta, body };
+        return { meta, body, hasFrontmatter: true, parseError };
       };
 
       const validateMdx = (meta, body) => {
@@ -2239,7 +2250,7 @@ videoContent:
     })();
   </script>
 
-  <script is:inline define:vars={{ githubDraftBase, githubRepoLabel }}>
+  <script is:inline define:vars={{ githubFolderBase, githubRepoLabel }}>
     document.addEventListener("astro:page-load", () => {
       const postTitle = document.getElementById("postTitle");
       const postSlug = document.getElementById("postSlug");
@@ -2254,7 +2265,8 @@ videoContent:
       const publishStatusText = document.getElementById("publishStatusText");
       const copyMdxButton = document.getElementById("copyMdx");
       const injectIntoSandboxButton = document.getElementById("injectIntoSandbox");
-      const publishToGithubButton = document.getElementById("publishToGithub");
+      const exportMdxFileButton = document.getElementById("export-mdx-file");
+      const openGithubButton = document.getElementById("open-github");
       const previewInput = document.getElementById("preview-mdx");
       const renderPreviewButton = document.getElementById("render-preview");
       const helperButtons = Array.from(document.querySelectorAll("[data-helper-insert]"));
@@ -2272,7 +2284,8 @@ videoContent:
       if (!(publishStatusText instanceof HTMLElement)) return;
       if (!(copyMdxButton instanceof HTMLButtonElement)) return;
       if (!(injectIntoSandboxButton instanceof HTMLButtonElement)) return;
-      if (!(publishToGithubButton instanceof HTMLButtonElement)) return;
+      if (!(exportMdxFileButton instanceof HTMLButtonElement)) return;
+      if (!(openGithubButton instanceof HTMLButtonElement)) return;
       if (!(previewInput instanceof HTMLTextAreaElement)) return;
       if (!(renderPreviewButton instanceof HTMLButtonElement)) return;
 
@@ -2289,7 +2302,8 @@ videoContent:
           .replace(/\u2026/g, "...");
       }
 
-      const repoNewFileBase = githubDraftBase;
+      const repoFolderBase = githubFolderBase;
+      const MAX_SAFE_BYTES = 800_000;
       const today = new Date().toISOString().slice(0, 10);
 
       const extractYoutubeId = (value) => {
@@ -2326,6 +2340,45 @@ videoContent:
         return ascii || "new-article";
       };
 
+      // Keep the same behavior as src/lib/services.ts:validateSlug for client-side guard.
+      const validateSlugInput = (slug, title) => {
+        const trimmedSlug = String(slug || "").trim();
+        const trimmedTitle = String(title || "").trim();
+        const hebrewOnlyTitle = Boolean(trimmedTitle) && /^[\u0590-\u05FF\s\-.,'"!?()]+$/.test(trimmedTitle);
+        const hasHebrew = /[\u0590-\u05FF]/.test(trimmedTitle);
+        const hasLatin = /[A-Za-z]/.test(trimmedTitle);
+
+        if (!trimmedSlug) {
+          if (hebrewOnlyTitle) {
+            return {
+              valid: false,
+              error: "כותרת בעברית מחייבת slug באנגלית לפני ייצוא",
+            };
+          }
+          const suggested = generateSlug(trimmedTitle);
+          if (hasHebrew && hasLatin && suggested && suggested !== "new-article") {
+            return {
+              valid: false,
+              error:
+                "הכותרת כוללת עברית - ה-Slug האוטומטי חלקי. נא להזין Slug ידני באנגלית שמתאר את נושא המאמר",
+            };
+          }
+          if (suggested && suggested !== "new-article") {
+            return { valid: true, suggested };
+          }
+          return { valid: true };
+        }
+
+        if (!/^[a-z0-9-]+$/.test(trimmedSlug)) {
+          return {
+            valid: false,
+            error: "Slug חייב להיות באנגלית קטנה, מספרים ומקפים בלבד",
+          };
+        }
+
+        return { valid: true };
+      };
+
       const buildDescription = () => {
         const existing = postDescription.value.trim();
         if (existing) return existing;
@@ -2359,6 +2412,36 @@ videoContent:
         };
       };
 
+      const cleanFrontmatterObject = (obj) =>
+        Object.fromEntries(
+          Object.entries(obj).filter(([, value]) => {
+            if (value == null) return false;
+            if (typeof value === "string" && value.trim() === "") return false;
+            return true;
+          })
+        );
+
+      const serializeFrontmatterValue = (value) => {
+        if (Array.isArray(value)) {
+          if (value.length === 0) return "[]";
+          if (value.every((item) => typeof item === "string")) {
+            return `[${value.map((item) => `"${String(item).replace(/"/g, '\\"')}"`).join(", ")}]`;
+          }
+          return "[]";
+        }
+        if (typeof value === "boolean") return value ? "true" : "false";
+        if (typeof value === "number") return String(value);
+        return `"${String(value ?? "").replace(/"/g, '\\"')}"`;
+      };
+
+      const buildFrontmatterYaml = (meta) =>
+        [
+          "---",
+          ...Object.entries(meta).map(([key, value]) => `${key}: ${serializeFrontmatterValue(value)}`),
+          "---",
+          "",
+        ].join("\n");
+
       const generateFullMdx = () => {
         const title = postTitle.value.trim();
         const slug = postSlug.value.trim() || generateSlug(title);
@@ -2382,30 +2465,63 @@ videoContent:
           }
         }
 
-        const frontmatter = [
-          "---",
-          `title: \"${title.replace(/\"/g, '\\\"')}\"`,
-          `description: \"${description.replace(/\"/g, '\\\"')}\"`,
-          `pubDate: ${today}`,
-          'updatedDate: ""',
-          'author: "השם לא משנה"',
-          `tags: [${tags.map((tag) => `\"${tag.replace(/\"/g, '\\\"')}\"`).join(", ")}]`,
-          'image: "/og.jpg"',
-          'canonicalUrl: ""',
-          'keywords: ""',
-          'audioUrl: ""',
-          `youtubeId: "${youtubeId}"`,
-          'videoSummaryPoints: []',
-          'tallyUrl: ""',
-          `isPremium: ${isPremium ? "true" : "false"}`,
-          `draft: ${workflow.draft}`,
-          `workflowStatus: "${workflow.workflowStatus}"`,
-          'faq: []',
-          "---",
-          "",
-        ].join("\n");
+        const frontmatterMeta = cleanFrontmatterObject({
+          title,
+          description,
+          pubDate: today,
+          updatedDate: "",
+          author: "השם לא משנה",
+          tags,
+          image: "/og.jpg",
+          canonicalUrl: "",
+          keywords: "",
+          audioUrl: "",
+          youtubeId,
+          videoSummaryPoints: [],
+          tallyUrl: "",
+          isPremium,
+          draft: workflow.draft === "true",
+          workflowStatus: workflow.workflowStatus,
+          faq: [],
+        });
+
+        const frontmatter = buildFrontmatterYaml(frontmatterMeta);
 
         return cleanHumanTouch(`${frontmatter}${content}\n`);
+      };
+
+      const guardExport = (content) => {
+        const bytes = new TextEncoder().encode(content).length;
+        if (bytes > MAX_SAFE_BYTES) {
+          return {
+            safe: false,
+            message: `הקובץ גדול מדי (${Math.round(bytes / 1024)}KB). פצל לפני ייצוא.`,
+          };
+        }
+        return { safe: true };
+      };
+
+      const exportMdxFile = (content, filename) => {
+        const guard = guardExport(content);
+        if (!guard.safe) {
+          publishStatusText.textContent = guard.message;
+          return false;
+        }
+
+        const blob = new Blob([`${content}\n`], { type: "text/markdown;charset=utf-8" });
+        const href = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = href;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(href);
+        return true;
+      };
+
+      const openGitHubFolder = () => {
+        window.open(repoFolderBase, "_blank", "noopener,noreferrer");
       };
 
       const escapeHtml = (value) =>
@@ -2422,7 +2538,11 @@ videoContent:
         /** @type {{ message: string; target: string; prompt: string }[]} */
         const issues = [];
         const title = postTitle.value.trim();
-        const slug = postSlug.value.trim() || generateSlug(title);
+        const slugRaw = postSlug.value.trim();
+        const slugCheck = validateSlugInput(slugRaw, title);
+        const slug = slugCheck.valid
+          ? slugCheck.suggested || slugRaw || generateSlug(title)
+          : slugRaw || generateSlug(title);
         const description = buildDescription();
         const content = postContent.value.trim();
         const youtubeId = extractYoutubeId(videoUrlInput.value);
@@ -2435,7 +2555,13 @@ videoContent:
             prompt: `You fix MDX article metadata for a Hebrew site. The TITLE is too short (minimum 10 characters; current length ${title.length}).\nCurrent title:\n${title}\nReturn ONLY the improved Hebrew title, one line, SEO-friendly, same intent. No quotes or explanation.`,
           });
         }
-        if (!slug.match(/^[a-z0-9-]+$/)) {
+        if (!slugCheck.valid) {
+          issues.push({
+            message: slugCheck.error,
+            target: "#postSlug",
+            prompt: `Fix the article slug: lowercase English letters, digits, hyphens only. No spaces.\nCurrent slug attempt: ${slug}\nSuggested from title (may ignore): ${generateSlug(title)}\nReturn ONLY the slug string, one line.`,
+          });
+        } else if (!slug.match(/^[a-z0-9-]+$/)) {
           issues.push({
             message: "Slug חייב להיות באנגלית ומקפים בלבד",
             target: "#postSlug",
@@ -2512,10 +2638,14 @@ videoContent:
       const renderValidation = () => {
         lastValidationIssues = validateContent();
         const title = postTitle.value.trim();
-        const slug = postSlug.value.trim() || generateSlug(title);
+        const slugRaw = postSlug.value.trim();
+        const slugCheck = validateSlugInput(slugRaw, title);
+        const slug = slugCheck.valid
+          ? slugCheck.suggested || slugRaw || generateSlug(title)
+          : slugRaw || generateSlug(title);
         const workflow = getWorkflowMeta();
-        if (!postSlug.value.trim() && title) {
-          postSlug.value = slug;
+        if (!slugRaw && title && slugCheck.valid && slugCheck.suggested) {
+          postSlug.value = slugCheck.suggested;
         }
 
         clearQaFieldHighlights();
@@ -2530,14 +2660,14 @@ videoContent:
             )
             .join("");
           publishStatusText.textContent = `המאמר עדיין לא נקי. תקן את החסמים לפני העתקה או פתיחה ב-GitHub. שלב העבודה הנוכחי: ${workflow.label}.`;
-          publishToGithubButton.disabled = true;
-          publishToGithubButton.classList.add("opacity-50", "cursor-not-allowed");
+          exportMdxFileButton.disabled = true;
+          exportMdxFileButton.classList.add("opacity-50", "cursor-not-allowed");
         } else {
           validationBox.classList.add("hidden");
           errorList.innerHTML = "";
           publishStatusText.textContent = `מוכן לייצוא. ${githubRepoLabel}/${slug}.mdx | שלב עבודה: ${workflow.label} | מצב פרסום: ${workflow.draft === "false" ? "באוויר" : "טיוטה"}`;
-          publishToGithubButton.disabled = false;
-          publishToGithubButton.classList.remove("opacity-50", "cursor-not-allowed");
+          exportMdxFileButton.disabled = false;
+          exportMdxFileButton.classList.remove("opacity-50", "cursor-not-allowed");
         }
       };
 
@@ -2595,21 +2725,39 @@ videoContent:
         renderPreviewButton.click();
       };
 
-      const publishToGithub = () => {
+      const handleExportMdxFile = () => {
         renderValidation();
         const errors = validateContent();
         if (errors.length > 0) {
-          publishToGithubButton.textContent = "תקן קודם את החסמים";
+          exportMdxFileButton.textContent = "תקן קודם את החסמים";
           window.setTimeout(() => {
-            publishToGithubButton.textContent = "פרסם ישירות ל-GitHub";
+            exportMdxFileButton.textContent = "הורד קובץ MDX";
           }, 1500);
           return;
         }
 
-        const slug = postSlug.value.trim() || generateSlug(postTitle.value.trim());
+        const title = postTitle.value.trim();
+        const slugCheck = validateSlugInput(postSlug.value, title);
+        if (!slugCheck.valid) {
+          postSlug.focus();
+          exportMdxFileButton.textContent = "השלם slug תחילה";
+          window.setTimeout(() => {
+            exportMdxFileButton.textContent = "הורד קובץ MDX";
+          }, 1500);
+          return;
+        }
+
+        if (slugCheck.suggested && !postSlug.value.trim()) {
+          postSlug.value = slugCheck.suggested;
+        }
+
+        const slug = postSlug.value.trim() || slugCheck.suggested || generateSlug(title);
         const content = generateFullMdx();
-        const githubUrl = `${repoNewFileBase}?filename=${encodeURIComponent(`${slug}.mdx`)}&value=${encodeURIComponent(content)}`;
-        window.open(githubUrl, "_blank", "noopener,noreferrer");
+        const ok = exportMdxFile(content, `${slug}.mdx`);
+        exportMdxFileButton.textContent = ok ? "הקובץ ירד" : "ייצוא נחסם";
+        window.setTimeout(() => {
+          exportMdxFileButton.textContent = "הורד קובץ MDX";
+        }, 1500);
       };
 
       [postTitle, postSlug, postDescription, postTags, postWorkflowStatus, postContent, generatorPremium, videoUrlInput].forEach((element) => {
@@ -2624,7 +2772,8 @@ videoContent:
 
       copyMdxButton.addEventListener("click", copyMdx);
       injectIntoSandboxButton.addEventListener("click", injectIntoSandbox);
-      publishToGithubButton.addEventListener("click", publishToGithub);
+      exportMdxFileButton.addEventListener("click", handleExportMdxFile);
+      openGithubButton.addEventListener("click", openGitHubFolder);
 
       const srtHandoffComposerBtn = document.getElementById("srt-handoff-composer");
       if (srtHandoffComposerBtn instanceof HTMLButtonElement) {

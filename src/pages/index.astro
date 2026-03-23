@@ -4,11 +4,20 @@ import Layout from "../layouts/Layout.astro";
 import { Star } from "lucide-react";
 import ThoughtShiftProof from "../components/ThoughtShiftProof.astro";
 import LogicCanvas from "../components/LogicCanvas.astro";
+import KnowledgeCenter from "../components/KnowledgeCenter.astro";
 import { resolveServiceAction, servicesHero, servicesStages, servicesThoughtShifts } from "../lib/services";
 
 const allArticles = await getCollection("articles", ({ data }) => data.draft !== true);
 const sortedArticles = allArticles.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 const recentArticles = sortedArticles.slice(0, 9);
+const featuredArticles = [...recentArticles]
+  .sort(() => Math.random() - 0.5)
+  .slice(0, 3)
+  .map((article) => ({
+    title: article.data.title,
+    description: article.data.description,
+    href: `/articles/${article.slug}/`,
+  }));
 const siteUrl = Astro.site?.toString() ?? "https://www.nevermind.co.il";
 const stageCards = servicesStages
   .map((stage) => ({
@@ -23,6 +32,7 @@ const stageCards = servicesStages
   description="סולם ערך ברור: משיחת מיקוד קצרה שנותנת בהירות מיידית ועד לליווי עומק מתמשך במרפסת."
 >
   <LogicCanvas />
+  <KnowledgeCenter featured={featuredArticles} />
 
   <section aria-labelledby="intent-title" class="mx-auto max-w-7xl space-y-12 border-t border-neutral-200 px-5 pt-16 sm:px-8 lg:px-12">
     <header class="max-w-4xl space-y-5 text-right">

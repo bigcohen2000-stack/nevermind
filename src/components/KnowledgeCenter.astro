@@ -1,0 +1,198 @@
+---
+interface FeaturedItem {
+  title: string;
+  description: string;
+  href: string;
+}
+
+interface Props {
+  featured?: FeaturedItem[];
+}
+
+const { featured = [] } = Astro.props as Props;
+const inquiries = [
+  "איך להשיג בהירות?",
+  "מהו הפרדוקס של הבחירה?",
+  "איך פותרים בעיית שורש?",
+  "איך להבדיל בין עובדה לפירוש?",
+  "איך לצאת מלופ מחשבתי?",
+];
+---
+
+<section
+  id="knowledge-center"
+  class="mx-auto max-w-7xl border-t border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-5 py-16 sm:px-8 lg:px-12"
+  dir="rtl"
+>
+  <div class="rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/92 p-6 shadow-[0_24px_70px_rgba(26,26,26,0.06)] md:p-8">
+    <header class="space-y-3 text-right">
+      <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--nm-accent)]">NeverMind Knowledge Center</p>
+      <h2 class="text-[clamp(1.8rem,1.5rem+1.2vw,2.6rem)] font-semibold text-[var(--nm-fg)]">חיפוש שמתחיל גילוי, לא רק התאמה</h2>
+      <p class="max-w-3xl text-[clamp(1rem,0.95rem+0.3vw,1.15rem)] leading-8 text-[color-mix(in_srgb,var(--nm-fg)_66%,var(--nm-bg))]">
+        כתוב שאלה אמיתית, או בחר אחת מהשאלות הנפוצות. המערכת מחזירה את המאמרים הכי רלוונטיים עכשיו.
+      </p>
+    </header>
+
+    <div class="mt-6">
+      <input
+        id="knowledge-search-input"
+        type="search"
+        placeholder="מה אתה רוצה להבין עכשיו?"
+        class="w-full rounded-[1.5rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-white px-5 py-4 text-right text-[clamp(1.05rem,1rem+0.3vw,1.2rem)] text-[var(--nm-fg)] outline-none transition focus:border-[color-mix(in_srgb,var(--nm-accent)_38%,transparent)] focus:ring-2 focus:ring-[color-mix(in_srgb,var(--nm-accent)_18%,transparent)]"
+        aria-label="חיפוש ב-Knowledge Center"
+      />
+    </div>
+
+    <div class="mt-5 flex flex-wrap justify-end gap-2">
+      {inquiries.map((inquiry) => (
+        <button
+          type="button"
+          data-kc-inquiry={inquiry}
+          class="rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-3 py-1.5 text-sm font-semibold text-[color-mix(in_srgb,var(--nm-fg)_76%,var(--nm-bg))] transition hover:border-[color-mix(in_srgb,var(--nm-accent)_28%,transparent)] hover:bg-white"
+        >
+          {inquiry}
+        </button>
+      ))}
+    </div>
+
+    <div id="knowledge-search-status" class="mt-4 text-right text-sm text-[color-mix(in_srgb,var(--nm-fg)_62%,var(--nm-bg))]"></div>
+
+    <div id="knowledge-empty-state" class="mt-6 space-y-4">
+      <p class="text-sm font-semibold text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">מומלץ עבורך כרגע</p>
+      <div class="grid gap-4 md:grid-cols-3">
+        {featured.map((item) => (
+          <a
+            href={item.href}
+            class="group rounded-[1.4rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white px-4 py-4 text-right transition hover:border-[color-mix(in_srgb,#1E3A8A_32%,transparent)] hover:bg-[color-mix(in_srgb,#1E3A8A_5%,white)]"
+          >
+            <p class="text-sm font-semibold text-[#1E3A8A]">מומלץ עבורך כרגע</p>
+            <h3 class="mt-2 text-[1.05rem] font-semibold text-[var(--nm-fg)]">{item.title}</h3>
+            <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_64%,var(--nm-bg))]">{item.description}</p>
+          </a>
+        ))}
+      </div>
+    </div>
+
+    <ul id="knowledge-search-results" class="mt-6 space-y-3"></ul>
+  </div>
+
+  <script is:inline define:vars={{ featured }}>
+    document.addEventListener("astro:page-load", () => {
+      const input = document.getElementById("knowledge-search-input");
+      const status = document.getElementById("knowledge-search-status");
+      const resultsList = document.getElementById("knowledge-search-results");
+      const emptyState = document.getElementById("knowledge-empty-state");
+      const inquiryButtons = Array.from(document.querySelectorAll("[data-kc-inquiry]"));
+
+      if (!(input instanceof HTMLInputElement)) return;
+      if (!(status instanceof HTMLElement)) return;
+      if (!(resultsList instanceof HTMLElement)) return;
+      if (!(emptyState instanceof HTMLElement)) return;
+
+      let isPagefindReady = false;
+      let activeRun = 0;
+      const loggedGapQueries = new Set();
+
+      const loadPagefind = async () => {
+        if (window.pagefind || isPagefindReady) return;
+        await new Promise((resolve, reject) => {
+          const script = document.createElement("script");
+          script.src = "/pagefind/pagefind.js";
+          script.onload = resolve;
+          script.onerror = reject;
+          document.head.appendChild(script);
+        });
+        isPagefindReady = true;
+      };
+
+      const renderResults = (items) => {
+        if (!Array.isArray(items) || items.length === 0) {
+          resultsList.innerHTML = "";
+          return;
+        }
+        resultsList.innerHTML = items
+          .map(
+            (item) => `
+              <li>
+                <a href="${item.url}" class="block rounded-[1.25rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white px-4 py-3 text-right transition hover:border-[color-mix(in_srgb,#1E3A8A_30%,transparent)] hover:bg-[color-mix(in_srgb,#1E3A8A_5%,white)]">
+                  <p class="text-[1rem] font-semibold text-[var(--nm-fg)]">${item.title || ""}</p>
+                  <p class="mt-1 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_66%,var(--nm-bg))]">${item.excerpt || ""}</p>
+                </a>
+              </li>
+            `
+          )
+          .join("");
+      };
+
+      const runSearch = async (query) => {
+        const trimmed = String(query || "").trim();
+        activeRun += 1;
+        const runId = activeRun;
+
+        if (!trimmed) {
+          status.textContent = "התחל משאלה קצרה, או לחץ על אחת השאלות הנפוצות.";
+          resultsList.innerHTML = "";
+          emptyState.classList.remove("hidden");
+          return;
+        }
+
+        status.textContent = "מחפש עבורך...";
+        emptyState.classList.add("hidden");
+
+        try {
+          await loadPagefind();
+          const search = await window.pagefind?.search(trimmed);
+          const data = await Promise.all((search?.results || []).slice(0, 8).map((r) => r.data()));
+          if (runId !== activeRun) return;
+
+          if (!data.length) {
+            status.textContent = "לא נמצאו תוצאות מדויקות. נסה לנסח אחרת או לבחור שאלה נפוצה.";
+            resultsList.innerHTML = "";
+            const gapKey = trimmed.toLowerCase();
+            if (!loggedGapQueries.has(gapKey)) {
+              loggedGapQueries.add(gapKey);
+              void fetch("/api/log-search-gap", {
+                method: "POST",
+                headers: { "content-type": "application/json" },
+                body: JSON.stringify({ query: trimmed }),
+              }).catch(() => {});
+            }
+            return;
+          }
+
+          status.textContent = `נמצאו ${data.length} תוצאות רלוונטיות.`;
+          renderResults(
+            data.map((item) => ({
+              url: item.url || "#",
+              title: item.meta?.title || "",
+              excerpt: item.excerpt || "",
+            }))
+          );
+        } catch {
+          if (runId !== activeRun) return;
+          status.textContent = "החיפוש לא זמין כרגע. נסה שוב בעוד רגע.";
+          resultsList.innerHTML = "";
+        }
+      };
+
+      input.addEventListener("input", () => {
+        runSearch(input.value);
+      });
+
+      inquiryButtons.forEach((button) => {
+        if (!(button instanceof HTMLButtonElement)) return;
+        button.addEventListener("click", () => {
+          const value = button.dataset.kcInquiry || "";
+          input.value = value;
+          runSearch(value);
+          input.focus();
+        });
+      });
+
+      if (Array.isArray(featured) && featured.length === 0) {
+        emptyState.classList.add("hidden");
+      }
+      status.textContent = "התחל משאלה קצרה, או לחץ על אחת השאלות הנפוצות.";
+    });
+  </script>
+</section>

@@ -4,6 +4,7 @@
  */
 import TrendGraph from "./TrendGraph.astro";
 import VideoPlayer from "./VideoPlayer.astro";
+import { getCollection } from "astro:content";
 import defaultCanvas from "../config/homeCanvas.json";
 import clarityPathsFile from "../config/clarityPaths.json";
 
@@ -24,7 +25,17 @@ interface Props {
 const { canvas: canvasProp } = Astro.props;
 const canvas = (canvasProp ?? defaultCanvas) as HomeCanvasConfig;
 
-const paths = clarityPathsFile.paths;
+const publishedArticles = await getCollection("articles", ({ data }) => data.draft !== true);
+const availableSlugs = new Set<string>();
+for (const article of publishedArticles) {
+  const base = article.id.replace(/\.mdx$/i, "");
+  const tail = base.split("/").pop();
+  [article.slug, base, tail].filter(Boolean).forEach((key) => availableSlugs.add(String(key)));
+}
+
+const paths = clarityPathsFile.paths.filter((pathDef) =>
+  pathDef.articleSlugs.every((slug) => availableSlugs.has(String(slug)))
+);
 const videoId = String(canvas.featuredVideo?.youtubeId ?? "").trim();
 const videoTitle = canvas.featuredVideo?.title ?? "סרטון מומלץ";
 const videoPoints = Array.isArray(canvas.featuredVideo?.videoSummaryPoints)

@@ -1,4 +1,4 @@
-﻿import LiteYouTubeEmbed from "../LiteYouTubeEmbed";
+import LiteYouTubeEmbed from "../LiteYouTubeEmbed";
 
 interface VideoPlayerProps {
   url: string;

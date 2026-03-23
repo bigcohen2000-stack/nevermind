@@ -22,7 +22,36 @@ export default defineConfig({
     mdx({ remarkPlugins: [remarkGlossaryLinks] }),
     react(),
     sitemap({
-      filter: (page) => page !== "/404" && !page.startsWith("/admin") && page !== "/intake" && page !== "/premium-access",
+      filter: (page) => {
+        const pathname = (() => {
+          if (typeof page === "object" && page !== null) {
+            const withPath = page as { pathname?: unknown; url?: unknown };
+            if (typeof withPath.pathname === "string") {
+              return withPath.pathname.replace(/\/$/, "") || "/";
+            }
+            if (typeof withPath.url === "string") {
+              try {
+                return new URL(withPath.url).pathname.replace(/\/$/, "") || "/";
+              } catch {
+                return withPath.url.replace(/\/$/, "") || "/";
+              }
+            }
+          }
+          if (typeof page === "string") {
+            try {
+              return new URL(page).pathname.replace(/\/$/, "") || "/";
+            } catch {
+              return page.replace(/\/$/, "") || "/";
+            }
+          }
+          return "/";
+        })();
+        if (pathname === "/404") return false;
+        if (pathname.startsWith("/admin")) return false;
+        if (pathname === "/intake") return false;
+        if (pathname === "/premium-access") return false;
+        return true;
+      },
       serialize: (item) => ({ ...item, priority: 0.7 }),
     }),
     pagefind(),

@@ -4,13 +4,14 @@ import ServiceCard from "../components/ServiceCard.astro";
 import FloatingCTA from "../components/FloatingCTA.astro";
 import ThoughtShiftProof from "../components/ThoughtShiftProof.astro";
 import {
-  buildServiceWhatsAppHref,
   buildWhatsAppHref,
   disclaimerLong,
   disclaimerShort,
   flattenVisibleServices,
   formatMoney,
+  resolveServiceAction,
   servicesAddOns,
+  servicesAuthoritySection,
   servicesHero,
   servicesPaymentMethods,
   servicesStages,
@@ -27,8 +28,10 @@ const stageCards = servicesStages
 
 const addon = servicesAddOns[0];
 const subscriptionService = flattenVisibleServices().find((service) => service.id === "retainer-subscription");
+const subscriptionAction = subscriptionService ? resolveServiceAction(subscriptionService) : null;
+const authorityServices = (servicesAuthoritySection?.services ?? []).filter((service) => service.visible !== false);
 const floatingPrimaryHref = subscriptionService
-  ? buildServiceWhatsAppHref(subscriptionService)
+  ? subscriptionAction?.href ?? buildWhatsAppHref("שלום, אני רוצה להבין איזה מסלול מתאים לי כרגע.")
   : buildWhatsAppHref("שלום, אני רוצה להבין איזה מסלול מתאים לי כרגע.");
 ---
 
@@ -53,12 +56,44 @@ const floatingPrimaryHref = subscriptionService
 
           <div class="grid gap-6 xl:grid-cols-1">
             {stage.services.filter((service) => service.visible !== false).map((service) => (
-              <ServiceCard service={{ ...service, stageName: stage.stage_name, targetAudience: stage.target_audience }} />
+              <ServiceCard
+                service={{
+                  ...service,
+                  social_proof: service.social_proof ?? stage.social_proof ?? null,
+                  stageName: stage.stage_name,
+                  targetAudience: stage.target_audience,
+                }}
+              />
             ))}
           </div>
         </div>
       ))}
     </section>
+
+    {authorityServices.length ? (
+      <section class="space-y-5 rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/82 p-6 shadow-[0_24px_80px_rgba(26,26,26,0.05)]">
+        <div class="space-y-2 text-right">
+          <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--nm-accent)]">סמכות והשפעה</p>
+          <h2 class="text-[clamp(1.8rem,1.4rem+1vw,2.6rem)] font-semibold text-[var(--nm-fg)]">
+            {servicesAuthoritySection?.title || "בניית סמכות אישית"}
+          </h2>
+          {servicesAuthoritySection?.subtitle ? (
+            <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">{servicesAuthoritySection.subtitle}</p>
+          ) : null}
+        </div>
+        <div class="grid gap-6 xl:grid-cols-1">
+          {authorityServices.map((service) => (
+            <ServiceCard
+              service={{
+                ...service,
+                stageName: "סמכות והשפעה",
+                targetAudience: servicesAuthoritySection?.subtitle ?? "מי שרוצה לבנות נוכחות מקצועית",
+              }}
+            />
+          ))}
+        </div>
+      </section>
+    ) : null}
 
     {addon ? (
       <section class="rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-accent)_18%,transparent)] bg-[var(--nm-tint)] px-6 py-8 shadow-[0_24px_80px_color-mix(in_srgb,var(--nm-accent)_10%,transparent)]">
@@ -71,7 +106,11 @@ const floatingPrimaryHref = subscriptionService
           <div class="space-y-2 text-right">
             <p class="text-3xl font-semibold text-[var(--nm-fg)]">{formatMoney(addon.price_full)}</p>
             <a
-              href={buildWhatsAppHref(`שלום, אני רוצה להוסיף ${addon.title} למסלול שלי. ראיתי שזה ${formatMoney(addon.price_full)} כולל מע״מ.`)}
+              href={
+                typeof addon.payment_link === "string" && addon.payment_link.trim()
+                  ? addon.payment_link.trim()
+                  : buildWhatsAppHref(`שלום, אני רוצה להוסיף ${addon.title} למסלול שלי. ראיתי שזה ${formatMoney(addon.price_full)} כולל מע״מ.`)
+              }
               target="_blank"
               rel="noreferrer"
               class="inline-flex items-center justify-center rounded-full bg-[var(--nm-accent)] px-5 py-3 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]"
@@ -118,6 +157,26 @@ const floatingPrimaryHref = subscriptionService
     secondaryHref="#retainer-subscription"
     secondaryLabel="לקפוץ ישר לשלב 3"
   />
+
+  <script is:inline>
+    document.addEventListener("astro:page-load", () => {
+      document.querySelectorAll("[data-service-cta]").forEach((btn) => {
+        if (!(btn instanceof HTMLAnchorElement)) return;
+        if (btn.dataset.nmNotifyBound === "1") return;
+        btn.dataset.nmNotifyBound = "1";
+        btn.addEventListener("click", () => {
+          const serviceId = btn.dataset.serviceId ?? "";
+          const serviceTitle = btn.dataset.serviceTitle ?? "";
+          const flow = btn.dataset.flow ?? "";
+          const formData = new FormData();
+          formData.append("access_key", "94b32b6c-7590-4ac6-b8b4-1bc73dd2e5c8");
+          formData.append("subject", `NeverMind - עניין ב: ${serviceTitle}`);
+          formData.append("message", `שירות: ${serviceId}\nזרימה: ${flow}\nזמן: ${new Date().toISOString()}`);
+          void fetch("https://api.web3forms.com/submit", { method: "POST", body: formData }).catch(() => {});
+        });
+      });
+    });
+  </script>
 </Layout>
 
 

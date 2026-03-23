@@ -15,13 +15,23 @@ export type ServiceAvailability = {
 export type StageService = ServiceStage["services"][number] & {
   action_link?: string;
   action_href?: string;
+  payment_link?: string;
+  payment_flow?: "direct" | "after_interview" | string;
+  payment_cta?: string;
+  installments?: { count?: number; label?: string } | null;
   availability_note?: string;
   availability?: ServiceAvailability;
   social_proof?: string | null;
   whatsapp_template?: string | null;
+  features?: Array<string | { text?: string; icon?: string }>;
 };
 export type AddOn = ServicesConfig["add_ons"][number];
 export type ThoughtShift = ServicesConfig["trust_elements"]["thought_shifts"][number];
+export type AuthoritySection = {
+  title?: string;
+  subtitle?: string;
+  services?: StageService[];
+};
 export type FlatService = StageService & {
   stageName: string;
   targetAudience: string;
@@ -34,20 +44,41 @@ export type FlatService = StageService & {
 };
 
 /** גילוי נאות ארוך — מקור: `trust_elements.disclaimer` ב־services.json */
-export const disclaimerLong = servicesConfig.trust_elements.disclaimer;
+export const disclaimerLong =
+  (servicesConfig.trust_elements as Record<string, unknown>).disclaimer_full?.toString?.() ||
+  (servicesConfig.trust_elements as Record<string, unknown>).disclaimer?.toString?.() ||
+  "";
 
 /** שורה מתחת לכל כפתור פעולה בכרטיס שירות */
-export const disclaimerShort = "זהו הסבר פרספקטיבה אישית, לא טיפול.";
+export const disclaimerShort =
+  (servicesConfig.trust_elements as Record<string, unknown>).disclaimer_short?.toString?.() ||
+  "זהו הסבר פרספקטיבה אישית, לא טיפול.";
 
 /** תבנית ברירת מחדל לוואטסאפ מדף שירותים (אם חסר `whatsapp_template` ב־JSON) */
 export const defaultWhatsappServiceTemplate =
   "שלום, הגעתי מדף השירותים ב-NeverMind.\n\nמתעניין ב: {title} ({price} ₪)\n\nהנושא שאני רוצה לפרק: ";
+
+/** מפת אייקונים לפיצ'רים */
+export const featureIcons: Record<string, string> = {
+  default: "✓",
+  phone: "📱",
+  location: "📍",
+  privacy: "🔒",
+  time: "⏱",
+  group: "👥",
+  video: "🎥",
+  whatsapp: "💬",
+  content: "📖",
+  recurring: "🔄",
+};
 
 export const servicesCurrency = servicesConfig.currency;
 export const servicesTaxLabel = servicesConfig.tax_label;
 export const servicesHero = servicesConfig.hero;
 export const servicesStages = servicesConfig.funnel_stages;
 export const servicesAddOns = servicesConfig.add_ons;
+export const servicesAuthoritySection = ((servicesConfig as Record<string, unknown>).authority_section ??
+  null) as AuthoritySection | null;
 export const servicesTrust = servicesConfig.trust_elements;
 export const servicesThoughtShifts = servicesConfig.trust_elements.thought_shifts as ThoughtShift[];
 export const servicesPaymentMethods = servicesConfig.payment_methods as PaymentMethod[];
@@ -99,6 +130,18 @@ export function formatAvailabilityLine(service: StageService | FlatService): str
   return legacy || null;
 }
 
+/** תצוגת זמינות בפורמט חדש */
+export function formatAvailabilityLabel(spotsLeft: number, updatedAt: string): string {
+  const date = new Date(updatedAt);
+  if (Number.isNaN(date.getTime())) return `נותרו ${spotsLeft} מקומות`;
+  const days = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
+  const day = days[date.getDay()];
+  const prefix = date.getDay() === 6 ? 'מוצ"ש' : `יום ${day}`;
+  const hh = date.getHours().toString().padStart(2, "0");
+  const mm = date.getMinutes().toString().padStart(2, "0");
+  return `נותרו ${spotsLeft} מקומות · עודכן ${prefix} ${hh}:${mm}`;
+}
+
 function applyWhatsappTemplate(template: string, service: StageService | FlatService): string {
   const price = Math.round(service.price_full).toLocaleString("he-IL");
   return template.replace(/\{title\}/g, service.title).replace(/\{price\}/g, price);
@@ -113,6 +156,26 @@ export function buildServiceWhatsAppHref(service: StageService | FlatService): s
   const actionText = service.action_text || `אני רוצה להתקדם עם ${service.title}`;
   const defaultMessage = `שלום, אני רוצה להתקדם עם ${service.title}. ראיתי את המסלול באתר במחיר ${formatMoney(service.price_full)}. אפשר לשלוח לי את הפרטים המלאים?`;
   return buildWhatsAppHref(actionText === service.action_text ? `${actionText}. ${defaultMessage}` : defaultMessage);
+}
+
+/** התראת עניין בשירות (best-effort, לא לשבור UX) */
+export async function notifyServiceInterest(params: {
+  serviceId: string;
+  serviceTitle: string;
+  flow: string;
+}): Promise<void> {
+  try {
+    const formData = new FormData();
+    formData.append("access_key", "94b32b6c-7590-4ac6-b8b4-1bc73dd2e5c8");
+    formData.append("subject", `NeverMind - עניין ב: ${params.serviceTitle}`);
+    formData.append("message", `שירות: ${params.serviceId}\nזרימה: ${params.flow}\nזמן: ${new Date().toISOString()}`);
+    await fetch("https://api.web3forms.com/submit", {
+      method: "POST",
+      body: formData,
+    });
+  } catch {
+    // silent fail
+  }
 }
 
 /** הודעת וואטסאפ אחידה לתיאום פגישה ממאמר */
@@ -162,9 +225,83 @@ export const buildArticleReadContextLine = (
   return "קראתי מאמר באתר NeverMind.";
 };
 
+const HEBREW_TITLE_ONLY_REGEX = /^[\u0590-\u05FF\s\-.,'"!?()]+$/;
+const SAFE_SLUG_REGEX = /^[a-z0-9-]+$/;
+const HAS_HEBREW_REGEX = /[\u0590-\u05FF]/;
+const HAS_LATIN_REGEX = /[A-Za-z]/;
+
+export function slugifyTitle(value: string): string {
+  const ascii = String(value || "")
+    .toLowerCase()
+    .normalize("NFKD")
+    .replace(/[^\x00-\x7F]/g, "")
+    .replace(/['"`]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  return ascii;
+}
+
+export function validateSlug(
+  slug: string,
+  title: string
+): { valid: true; suggested?: string } | { valid: false; error: string } {
+  const trimmedSlug = String(slug || "").trim();
+  const trimmedTitle = String(title || "").trim();
+
+  if (!trimmedSlug) {
+    const isHebrewOnlyTitle = Boolean(trimmedTitle) && HEBREW_TITLE_ONLY_REGEX.test(trimmedTitle);
+    const hasHebrew = HAS_HEBREW_REGEX.test(trimmedTitle);
+    const hasLatin = HAS_LATIN_REGEX.test(trimmedTitle);
+    if (isHebrewOnlyTitle) {
+      return {
+        valid: false,
+        error: "כותרת בעברית מחייבת slug באנגלית לפני ייצוא",
+      };
+    }
+    const suggested = slugifyTitle(trimmedTitle);
+    if (hasHebrew && hasLatin && suggested) {
+      return {
+        valid: false,
+        error:
+          "הכותרת כוללת עברית - ה-Slug האוטומטי חלקי. נא להזין Slug ידני באנגלית שמתאר את נושא המאמר",
+      };
+    }
+    return suggested ? { valid: true, suggested } : { valid: true };
+  }
+
+  if (!SAFE_SLUG_REGEX.test(trimmedSlug)) {
+    return {
+      valid: false,
+      error: "Slug חייב להכיל אותיות אנגליות קטנות, מספרים ומקפים בלבד",
+    };
+  }
+
+  return { valid: true };
+}
+
 export const resolveServiceAction = (service: StageService | FlatService) => {
-  const actionText = service.action_text || `אני רוצה להתקדם עם ${service.title}`;
+  const actionText = service.payment_cta || service.action_text || `אני רוצה להתקדם עם ${service.title}`;
   const defaultMessage = `שלום, אני רוצה להתקדם עם ${service.title}. ראיתי את המסלול באתר במחיר ${formatMoney(service.price_full)}. אפשר לשלוח לי את הפרטים המלאים?`;
+
+  if (service.payment_flow === "direct" && typeof service.payment_link === "string" && service.payment_link.trim()) {
+    return {
+      href: service.payment_link.trim(),
+      external: true,
+      label: actionText,
+      kind: "payment" as const,
+      flow: service.payment_flow,
+    };
+  }
+
+  if (service.action_type === "payment" && typeof service.payment_link === "string" && service.payment_link.trim()) {
+    return {
+      href: service.payment_link.trim(),
+      external: true,
+      label: actionText,
+      kind: "payment" as const,
+      flow: service.payment_flow ?? "direct",
+    };
+  }
 
   if (service.action_type === "link" && typeof service.action_href === "string" && service.action_href.trim()) {
     return {
@@ -172,6 +309,7 @@ export const resolveServiceAction = (service: StageService | FlatService) => {
       external: false,
       label: actionText,
       kind: "link" as const,
+      flow: service.payment_flow ?? "link",
     };
   }
 
@@ -181,6 +319,7 @@ export const resolveServiceAction = (service: StageService | FlatService) => {
       external: true,
       label: actionText,
       kind: "invoice" as const,
+      flow: service.payment_flow ?? "invoice",
     };
   }
 
@@ -189,5 +328,6 @@ export const resolveServiceAction = (service: StageService | FlatService) => {
     external: true,
     label: actionText,
     kind: "whatsapp" as const,
+    flow: service.payment_flow ?? "whatsapp",
   };
 };

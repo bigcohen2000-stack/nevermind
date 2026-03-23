@@ -76,6 +76,8 @@ const normalizeSegment = (segment: string) => {
 };
 
 const pathName = Astro.url?.pathname ?? "/";
+const shouldNoIndexByPath = pathName.startsWith("/admin/");
+const effectiveNoIndex = noIndex || shouldNoIndexByPath;
 const pathSegments = pathName.split("/").filter(Boolean);
 const breadcrumbItems = [{ name: "בית", item: siteUrl }];
 let runningUrl = siteUrl.replace(/\/$/, "");
@@ -211,7 +213,7 @@ const navItems = [
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{pageTitle}</title>
     <meta name="description" content={pageDescription} />
-    {noIndex && <meta name="robots" content="noindex,nofollow,noarchive" />}
+    {effectiveNoIndex && <meta name="robots" content="noindex,nofollow,noarchive" />}
     <link rel="canonical" href={pageUrl} />
 
     <meta property="og:site_name" content={siteTitle} />
@@ -293,6 +295,11 @@ const navItems = [
             ))}
             <a href="https://tally.so/r/3N0x0q" class="text-sm font-semibold text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))] transition-colors duration-200 hover:text-[var(--nm-accent)]">יצירת קשר</a>
           </div>
+        </div>
+        <div class="flex flex-wrap items-center justify-center gap-3 text-sm font-semibold text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))] md:justify-end">
+          <span class="text-[color-mix(in_srgb,var(--nm-fg)_50%,var(--nm-bg))]">כלים וחקירה:</span>
+          <a href="/forbidden-library/" class="transition-colors duration-200 hover:text-[var(--nm-accent)]">הספרייה האסורה</a>
+          <a href="/root-problem-tree/" class="transition-colors duration-200 hover:text-[var(--nm-accent)]">עץ שורש הבעיה</a>
         </div>
       </div>
     </footer>

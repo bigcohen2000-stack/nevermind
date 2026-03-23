@@ -1,6 +1,7 @@
 ---
 import {
   disclaimerShort,
+  featureIcons,
   formatAvailabilityLine,
   formatMoney,
   getNetPrice,
@@ -27,6 +28,17 @@ const hasStructuredAvailability = Boolean(
 );
 const socialProof =
   typeof service.social_proof === "string" && service.social_proof.trim() ? service.social_proof.trim() : null;
+const installmentsLabel =
+  typeof service.installments?.label === "string" && service.installments.label.trim()
+    ? service.installments.label.trim()
+    : null;
+const normalizedFeatures = (service.features ?? [])
+  .map((feature) =>
+    typeof feature === "string"
+      ? { text: feature, icon: "default" }
+      : { text: feature?.text?.trim() || "", icon: feature?.icon?.trim() || "default" }
+  )
+  .filter((feature) => feature.text);
 ---
 
 <article
@@ -87,11 +99,14 @@ const socialProof =
   </div>
 
   {
-    service.features?.length ? (
+    normalizedFeatures.length ? (
       <ul class="mt-6 space-y-2 text-right text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
-        {service.features.map((feature: string) => (
-          <li class="rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3">
-            {feature}
+        {normalizedFeatures.map((feature) => (
+          <li class="flex items-start gap-2 rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3">
+            <span class="mt-0.5 shrink-0 text-[var(--nm-accent)]" aria-hidden="true">
+              {featureIcons[feature.icon] ?? featureIcons.default}
+            </span>
+            <span>{feature.text}</span>
           </li>
         ))}
       </ul>
@@ -111,11 +126,21 @@ const socialProof =
       href={action.href}
       target={action.external ? "_blank" : undefined}
       rel={action.external ? "noreferrer" : undefined}
+      data-service-cta=""
+      data-service-id={service.id}
+      data-service-title={service.title}
+      data-flow={action.flow}
       class="inline-flex items-center justify-center rounded-full bg-[var(--nm-accent)] px-5 py-3 text-sm font-semibold text-[var(--nm-on-accent)] transition-colors duration-200 hover:bg-[var(--nm-accent-hover)]"
     >
       {action.label}
     </a>
   </div>
+
+  {
+    installmentsLabel ? (
+      <p class="mt-2 text-center text-xs text-[color-mix(in_srgb,var(--nm-fg)_55%,var(--nm-bg))]">{installmentsLabel}</p>
+    ) : null
+  }
 
   <p class="mt-3 text-center text-xs text-[color-mix(in_srgb,var(--nm-fg)_50%,var(--nm-bg))]">
     {disclaimerShort}
