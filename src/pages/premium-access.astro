@@ -2,33 +2,33 @@
 import Layout from "../layouts/Layout.astro";
 import appConfig from "../config/appConfig.json";
 
-const pageTitle = "βιωδ μϊελο τψιξιεν";
-const pageDescription = "τϊιηϊ βιωδ ζξπιϊ μϊελο τψιξιεν γψκ χεγ βιωδ ξϊημσ.";
+const pageTitle = "Χ’Χ™Χ©Χª Χ¤Χ¨Χ™ΧΧ™Χ•Χ";
+const pageDescription = "Χ”Χ–Χ ΧΧª Χ§Χ•Χ“ Χ”Χ’Χ™Χ©Χ” Χ›Χ“Χ™ ΧΧ¤ΧªΧ•Χ— ΧªΧ•Χ›Χ Χ¤Χ¨Χ™ΧΧ™Χ•Χ ΧΧ¤Χ™ Χ”Χ”Χ’Χ“Χ¨Χ•Χª Χ‘ΧΧªΧ¨.";
 const premiumAccess = appConfig.premiumAccess;
 ---
 
 <Layout title={pageTitle} description={pageDescription} noIndex={true}>
-  <section class="mx-auto max-w-2xl space-y-8 px-4 pb-16 text-right text-[#1A1A1A]">
+  <section class="mx-auto max-w-2xl space-y-8 px-4 pb-16 text-right text-[var(--nm-fg)]">
     <header class="space-y-4">
-      <p class="text-sm font-semibold uppercase tracking-[0.24em] text-[#D42B2B]">Premium Access</p>
-      <h1 class="text-[clamp(2.2rem,1.6rem+2vw,3.5rem)] font-semibold leading-[1.05]">τϊιηϊ βιωδ μϊελο τψιξιεν</h1>
-      <p class="text-[1rem] leading-8 text-[#1A1A1A]/68">{premiumAccess.helperText}</p>
+      <p class="text-sm font-semibold uppercase tracking-[0.24em] text-[var(--nm-accent)]">Premium Access</p>
+      <h1 class="text-[clamp(2.2rem,1.6rem+2vw,3.5rem)] font-semibold leading-[1.05]">Χ’Χ™Χ©Χ” ΧΧªΧ•Χ›Χ Χ”Χ¤Χ¨Χ™ΧΧ™Χ•Χ</h1>
+      <p class="text-[1rem] leading-8 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">{premiumAccess.helperText}</p>
     </header>
 
-    <section class="rounded-[2rem] border border-[#1A1A1A]/10 bg-white/86 p-6 shadow-[0_24px_80px_rgba(26,26,26,0.06)]">
+    <section class="rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/86 p-6 shadow-[0_24px_80px_rgba(26,26,26,0.06)]">
       <div class="space-y-5">
         <label class="block space-y-2">
-          <span class="text-sm font-semibold text-[#1A1A1A]">χεγ βιωδ</span>
-          <input id="premium-code" type="password" dir="ltr" class="w-full rounded-[1.4rem] border border-[#1A1A1A]/12 bg-[#FAFAF8] px-5 py-4 text-left text-base text-[#1A1A1A] outline-none transition focus:border-[#D42B2B]/40 focus:ring-2 focus:ring-[#D42B2B]/15" placeholder="NM-ACCESS-2026" />
+          <span class="text-sm font-semibold text-[var(--nm-fg)]">Χ§Χ•Χ“ Χ’Χ™Χ©Χ”</span>
+          <input id="premium-code" type="password" dir="ltr" class="w-full rounded-[1.4rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-[var(--nm-surface-muted)] px-5 py-4 text-left text-base text-[var(--nm-fg)] outline-none transition-colors duration-200 focus:border-[color-mix(in_srgb,var(--nm-accent)_40%,transparent)] focus:ring-2 focus:ring-[color-mix(in_srgb,var(--nm-accent)_20%,transparent)]" placeholder="NM-ACCESS-2026" />
         </label>
 
         <div class="flex flex-col gap-3 sm:flex-row sm:justify-end">
-          <button id="unlock-premium" type="button" class="inline-flex items-center justify-center rounded-full bg-[#1A1A1A] px-6 py-3 text-sm font-semibold text-[#FAFAF8] transition hover:bg-black">μτϊεη βιωδ</button>
-          <a href="/services/" class="inline-flex items-center justify-center rounded-full border border-[#1A1A1A]/10 bg-white px-6 py-3 text-sm font-semibold text-[#1A1A1A]/78 transition hover:bg-[#FAFAF8]">μξρμεμιν εωιψεϊιν</a>
+          <button id="unlock-premium" type="button" class="inline-flex items-center justify-center rounded-full bg-[var(--nm-inverse)] px-6 py-3 text-sm font-semibold text-[var(--nm-inverse-fg)] transition-colors duration-200 hover:bg-[var(--nm-inverse-hover)]">Χ¤ΧªΧ— Χ’Χ™Χ©Χ”</button>
+          <a href="/services/" class="inline-flex items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white px-6 py-3 text-sm font-semibold text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))] transition-colors duration-200 hover:bg-[var(--nm-surface-muted)]">Χ—Χ–Χ¨Χ” ΧΧ©Χ™Χ¨Χ•ΧªΧ™Χ</a>
         </div>
 
-        <div id="premium-access-status" class="rounded-[1.4rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] px-4 py-3 text-sm leading-7 text-[#1A1A1A]/68">
-          δβιωδ ϊιωξψ αγτγτο δζδ μξωκ {premiumAccess.sessionHours} ωςεϊ ΰε ςγ ωϊτεβ ϊεχσ δδψωΰδ, δξεχγν ξαιπιδν.
+        <div id="premium-access-status" class="rounded-[1.4rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
+          ΧΧΧ—Χ¨ ΧΧ™ΧΧ•Χª Χ”Χ§Χ•Χ“ ΧªΧ™Χ©ΧΧ¨ Χ’Χ™Χ©Χ” ΧΧ›ΦΎ{premiumAccess.sessionHours} Χ©ΧΆΧ•Χª Χ‘Χ“Χ¤Χ“Χ¤Χ Χ–Χ”. ΧΧ¤Χ©Χ¨ ΧΧ΅Χ’Χ•Χ¨ Χ•ΧΧ—Χ–Χ•Χ¨ Χ‘ΧΧ™ ΧΧ”Χ–Χ™Χ Χ©Χ•Χ‘.
         </div>
       </div>
     </section>
@@ -65,18 +65,18 @@ const premiumAccess = appConfig.premiumAccess;
       unlockButton.addEventListener("click", () => {
         const entered = codeInput.value.trim();
         if (!entered) {
-          status.textContent = "δλπρ χεγ βιωδ μτπι τϊιηδ.";
+          status.textContent = "Χ Χ ΧΧ”Χ–Χ™Χ Χ§Χ•Χ“ Χ’Χ™Χ©Χ”.";
           return;
         }
 
         const matched = codes.find((item) => item.value === entered && (!item.expiresAt || Date.parse(item.expiresAt) > Date.now()));
         if (!matched) {
-          status.textContent = "χεγ δβιωδ μΰ ϊχιο ΰε ωλαψ τβ ϊεχτε.";
+          status.textContent = "Χ”Χ§Χ•Χ“ ΧΧ™Χ Χ• ΧªΧ§Χ£ ΧΧ• Χ©Χ¤Χ’ ΧªΧ•Χ§Χ¤Χ•.";
           return;
         }
 
         writeSession(matched);
-        status.textContent = "δβιωδ πτϊηδ. ξςαιψ ΰεϊκ ηζψδ μϊελο.";
+        status.textContent = "Χ”Χ’Χ™Χ©Χ” Χ Χ¤ΧªΧ—Χ”. ΧΧΆΧ‘Χ™Χ¨Χ™Χ ΧΧ•ΧªΧ ΧΧªΧ•Χ›Χβ€¦";
         window.setTimeout(() => {
           window.location.href = returnTo;
         }, 500);

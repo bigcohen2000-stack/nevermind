@@ -1,10 +1,13 @@
-﻿---
+---
 import Layout from "../layouts/Layout.astro";
 import ServiceCard from "../components/ServiceCard.astro";
 import FloatingCTA from "../components/FloatingCTA.astro";
 import ThoughtShiftProof from "../components/ThoughtShiftProof.astro";
 import {
+  buildServiceWhatsAppHref,
   buildWhatsAppHref,
+  disclaimerLong,
+  disclaimerShort,
   flattenVisibleServices,
   formatMoney,
   servicesAddOns,
@@ -13,7 +16,6 @@ import {
   servicesStages,
   servicesTaxLabel,
   servicesThoughtShifts,
-  servicesTrust,
 } from "../lib/services";
 
 const stageCards = servicesStages
@@ -24,9 +26,9 @@ const stageCards = servicesStages
   .filter((stage) => stage.primaryService);
 
 const addon = servicesAddOns[0];
-const subscriptionService = flattenVisibleServices().find((service) => service.id === "merpeset-subscription");
+const subscriptionService = flattenVisibleServices().find((service) => service.id === "retainer-subscription");
 const floatingPrimaryHref = subscriptionService
-  ? buildWhatsAppHref("שלום! הבנתי שאתה רוצה להתחיל מסלול מרפסת. לפני שנקבע – אני שולח לך את כל הפרטים + תאריכים פנויים. מתאים לך שאשלח?")
+  ? buildServiceWhatsAppHref(subscriptionService)
   : buildWhatsAppHref("שלום, אני רוצה להבין איזה מסלול מתאים לי כרגע.");
 ---
 
@@ -34,27 +36,24 @@ const floatingPrimaryHref = subscriptionService
   title="שירותים ומחירים | השם לא משנה"
   description="5 מסלולים ברורים, סולם ערך נקי, ומעבר ישיר לוואטסאפ או להמשך סגירה בלי הודעות מיותרות."
 >
-  <section class="mx-auto max-w-7xl space-y-16 px-4 pb-20 text-[#1A1A1A]">
+  <section class="mx-auto max-w-7xl space-y-16 px-4 pb-20 text-[var(--nm-fg)]">
     <header class="max-w-4xl space-y-5 text-right">
-      <p class="text-sm font-semibold uppercase tracking-[0.26em] text-[#D42B2B]">מסלולי העבודה</p>
+      <p class="text-sm font-semibold uppercase tracking-[0.26em] text-[var(--nm-accent)]">מסלולי העבודה</p>
       <h1 class="text-[clamp(2.6rem,2rem+2.3vw,4.6rem)] font-semibold leading-[1.04]">{servicesHero.title}</h1>
-      <p class="max-w-3xl text-[clamp(1rem,0.95rem+0.3vw,1.2rem)] leading-8 text-[#1A1A1A]/72">{servicesHero.subtitle}</p>
+      <p class="max-w-3xl text-[clamp(1rem,0.95rem+0.3vw,1.2rem)] leading-8 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">{servicesHero.subtitle}</p>
     </header>
 
     <section class="grid gap-8">
       {stageCards.map((stage) => (
-        <div class="space-y-5 rounded-[2rem] border border-[#1A1A1A]/10 bg-white/82 p-6 shadow-[0_24px_80px_rgba(26,26,26,0.05)]">
+        <div class="space-y-5 rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/82 p-6 shadow-[0_24px_80px_rgba(26,26,26,0.05)]">
           <div class="space-y-2 text-right">
-            <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[#D42B2B]">{stage.stage_name}</p>
-            <h2 class="text-[clamp(1.8rem,1.4rem+1vw,2.6rem)] font-semibold text-[#1A1A1A]">{stage.target_audience}</h2>
+            <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--nm-accent)]">{stage.stage_name}</p>
+            <h2 class="text-[clamp(1.8rem,1.4rem+1vw,2.6rem)] font-semibold text-[var(--nm-fg)]">{stage.target_audience}</h2>
           </div>
 
           <div class="grid gap-6 xl:grid-cols-1">
             {stage.services.filter((service) => service.visible !== false).map((service) => (
-              <ServiceCard
-                service={{ ...service, stageName: stage.stage_name, targetAudience: stage.target_audience }}
-                disclaimer={servicesTrust.disclaimer}
-              />
+              <ServiceCard service={{ ...service, stageName: stage.stage_name, targetAudience: stage.target_audience }} />
             ))}
           </div>
         </div>
@@ -62,23 +61,26 @@ const floatingPrimaryHref = subscriptionService
     </section>
 
     {addon ? (
-      <section class="rounded-[2rem] border border-[#D42B2B]/14 bg-[#FFF4F3] px-6 py-8 shadow-[0_24px_80px_rgba(212,43,43,0.08)]">
+      <section class="rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-accent)_18%,transparent)] bg-[var(--nm-tint)] px-6 py-8 shadow-[0_24px_80px_color-mix(in_srgb,var(--nm-accent)_10%,transparent)]">
         <div class="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
           <div class="space-y-3 text-right">
-            <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[#D42B2B]">תוספת מומלצת</p>
-            <h2 class="text-2xl font-semibold text-[#1A1A1A]">{addon.title}</h2>
-            <p class="max-w-2xl text-sm leading-7 text-[#1A1A1A]/72">{addon.description}</p>
+            <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--nm-accent)]">תוספת מומלצת</p>
+            <h2 class="text-2xl font-semibold text-[var(--nm-fg)]">{addon.title}</h2>
+            <p class="max-w-2xl text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">{addon.description}</p>
           </div>
           <div class="space-y-2 text-right">
-            <p class="text-3xl font-semibold text-[#1A1A1A]">{formatMoney(addon.price_full)}</p>
+            <p class="text-3xl font-semibold text-[var(--nm-fg)]">{formatMoney(addon.price_full)}</p>
             <a
               href={buildWhatsAppHref(`שלום, אני רוצה להוסיף ${addon.title} למסלול שלי. ראיתי שזה ${formatMoney(addon.price_full)} כולל מע״מ.`)}
               target="_blank"
               rel="noreferrer"
-              class="inline-flex items-center justify-center rounded-full bg-[#D42B2B] px-5 py-3 text-sm font-semibold text-[#FAFAF8] transition hover:bg-[#b82424]"
+              class="inline-flex items-center justify-center rounded-full bg-[var(--nm-accent)] px-5 py-3 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]"
             >
               {addon.action_text}
             </a>
+            <p class="text-center text-xs text-[color-mix(in_srgb,var(--nm-fg)_50%,var(--nm-bg))] md:text-right">
+              {disclaimerShort}
+            </p>
           </div>
         </div>
       </section>
@@ -86,32 +88,34 @@ const floatingPrimaryHref = subscriptionService
 
     <ThoughtShiftProof items={servicesThoughtShifts} heading="לא עדות כללית. שינוי לוגי שאפשר לראות." eyebrow="לפני ואחרי הייעוץ" />
 
-    <section class="rounded-[2rem] border border-[#1A1A1A]/10 bg-white/82 px-6 py-10 shadow-[0_24px_80px_rgba(26,26,26,0.05)]">
+    <section class="rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/82 px-6 py-10 shadow-[0_24px_80px_rgba(26,26,26,0.05)]">
       <div class="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
         <div class="space-y-3 text-right">
-          <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[#D42B2B]">תשלום וסליקה</p>
-          <h2 class="text-2xl font-semibold text-[#1A1A1A]">תשלום, מסמכים וסגירה נקייה</h2>
-          <p class="text-sm leading-7 text-[#1A1A1A]/68">
+          <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--nm-accent)]">תשלום וסליקה</p>
+          <h2 class="text-2xl font-semibold text-[var(--nm-fg)]">תשלום, מסמכים וסגירה נקייה</h2>
+          <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
             כל המחירים שמופיעים כאן הם {servicesTaxLabel}. אפשר לסגור דרך וואטסאפ או לקבל פרטי תשלום והמשך.
           </p>
         </div>
         <div class="grid gap-3 text-right sm:grid-cols-2">
           {servicesPaymentMethods.map((method) => (
-            <div class="rounded-[1.3rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] px-4 py-3">
-              <p class="text-sm font-semibold text-[#1A1A1A]">{method.icon} {method.name}</p>
-              <p class="mt-1 text-xs leading-6 text-[#1A1A1A]/60">{method.note}</p>
+            <div class="rounded-[1.3rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3">
+              <p class="text-sm font-semibold text-[var(--nm-fg)]">{method.icon} {method.name}</p>
+              <p class="mt-1 text-xs leading-6 text-[color-mix(in_srgb,var(--nm-fg)_60%,var(--nm-bg))]">{method.note}</p>
             </div>
           ))}
         </div>
       </div>
-      <p class="mt-6 border-t border-[#1A1A1A]/10 pt-4 text-sm leading-7 text-[#1A1A1A]/58">{servicesTrust.disclaimer}</p>
+      <p class="mt-6 whitespace-pre-line border-t border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] pt-4 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_58%,var(--nm-bg))]">
+        {disclaimerLong}
+      </p>
     </section>
   </section>
 
   <FloatingCTA
     primaryHref={floatingPrimaryHref}
     primaryLabel="להתחיל מנוי מרפסת"
-    secondaryHref="#merpeset-subscription"
+    secondaryHref="#retainer-subscription"
     secondaryLabel="לקפוץ ישר לשלב 3"
   />
 </Layout>

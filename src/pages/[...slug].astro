@@ -43,7 +43,7 @@ const difficultyConfig = {
   },
   deep: {
     label: "חקירה עמוקה",
-    tone: "bg-[#1A1A1A] text-[#FAFAF8] border-[#1A1A1A]",
+    tone: "bg-[var(--nm-inverse)] text-[var(--nm-inverse-fg)] border-[color-mix(in_srgb,var(--nm-fg)_22%,transparent)]",
   },
 } as const;
 
@@ -292,16 +292,16 @@ const components = {
   waArticleSlug={currentSlug}
 >
   <div aria-hidden="true" class="fixed inset-x-0 top-0 z-40 h-px bg-transparent">
-    <span id="reading-progress" class="block h-px w-0 bg-[#1A1A1A]"></span>
+    <span id="reading-progress" class="block h-px w-0 bg-[var(--nm-inverse)]"></span>
   </div>
 
   <div class="mx-auto max-w-7xl lg:grid lg:grid-cols-[minmax(0,72ch)_minmax(280px,340px)] lg:gap-10">
     <article class="min-w-0 space-y-[clamp(1.75rem,3vw,2.5rem)]">
       <header class="space-y-5 text-right">
-        <h1 class="text-[clamp(2.1rem,1.65rem+2vw,4rem)] font-semibold leading-[1.04] text-[#1A1A1A]">{title}</h1>
-        <p class="text-[clamp(1.05rem,1rem+0.35vw,1.4rem)] leading-8 text-[#1A1A1A]/70">{description}</p>
+        <h1 class="text-[clamp(2.1rem,1.65rem+2vw,4rem)] font-semibold leading-[1.04] text-[var(--nm-fg)]">{title}</h1>
+        <p class="text-[clamp(1.05rem,1rem+0.35vw,1.4rem)] leading-8 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">{description}</p>
 
-        <div class="flex flex-wrap items-center justify-end gap-3 text-[clamp(0.85rem,0.82rem+0.2vw,1rem)] text-[#1A1A1A]/60">
+        <div class="flex flex-wrap items-center justify-end gap-3 text-[clamp(0.85rem,0.82rem+0.2vw,1rem)] text-[color-mix(in_srgb,var(--nm-fg)_60%,var(--nm-bg))]">
           <span>{readingMinutes} דקות קריאה שיחסכו לך חודשים של התלבטות</span>
           <span class={`inline-flex rounded-full border px-3 py-1 text-xs font-semibold ${difficultyMeta.tone}`}>
             רמת עומק: {difficultyMeta.label}
@@ -310,9 +310,9 @@ const components = {
 
         <div class="flex flex-wrap items-center justify-end gap-3">
           {tags.length > 0 && (
-            <ul class="flex flex-wrap justify-end gap-2 text-[clamp(0.85rem,0.82rem+0.2vw,1rem)] text-[#1A1A1A]/60">
+            <ul class="flex flex-wrap justify-end gap-2 text-[clamp(0.85rem,0.82rem+0.2vw,1rem)] text-[color-mix(in_srgb,var(--nm-fg)_60%,var(--nm-bg))]">
               {tags.map((tag) => (
-                <li class="rounded-full border border-[#1A1A1A]/10 bg-white/70 px-3 py-1">{tag}</li>
+                <li class="rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/70 px-3 py-1">{tag}</li>
               ))}
             </ul>
           )}
@@ -321,7 +321,7 @@ const components = {
             type="button"
             data-focus-toggle
             aria-pressed="false"
-            class="rounded-full border border-[#1A1A1A]/10 bg-white/70 px-4 py-2 text-[clamp(0.85rem,0.82rem+0.2vw,1rem)] text-[#1A1A1A]/70 transition-colors duration-300 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A]/20"
+            class="rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/70 px-4 py-2 text-[clamp(0.85rem,0.82rem+0.2vw,1rem)] text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))] transition-colors duration-300 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color-mix(in_srgb,var(--nm-fg)_22%,transparent)]"
           >
             מצב פוקוס
           </button>
@@ -334,8 +334,8 @@ const components = {
         <AudioNarrative src={`/audio/articles/${audioFile}`} title={title} />
       )}
       {!audioFile && audioUrl && (
-        <div class="overflow-hidden rounded-2xl border border-[#1A1A1A]/10 bg-white/70 p-4 shadow-sm backdrop-blur-md">
-          <audio class="w-full accent-[#1A1A1A] text-[#1A1A1A]" controls src={audioUrl}>
+        <div class="overflow-hidden rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/70 p-4 shadow-sm backdrop-blur-md">
+          <audio class="w-full accent-[var(--nm-inverse)] text-[var(--nm-fg)]" controls src={audioUrl}>
             הדפדפן שלך לא תומך בהשמעת אודיו.
           </audio>
         </div>
@@ -372,7 +372,7 @@ const components = {
             href={whatsappShareUrl}
             target="_blank"
             rel="noreferrer"
-            class="inline-flex items-center justify-center rounded-full border border-[#1A1A1A]/10 bg-white/70 px-4 py-2 text-[clamp(0.9rem,0.85rem+0.2vw,1.05rem)] text-[#1A1A1A]/75 transition-colors duration-300 hover:bg-white"
+            class="inline-flex items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/70 px-4 py-2 text-[clamp(0.9rem,0.85rem+0.2vw,1.05rem)] text-[var(--nm-fg)]/75 transition-colors duration-300 hover:bg-white"
           >
             הפץ את האור
           </a>
@@ -380,7 +380,7 @@ const components = {
             type="button"
             data-copy-link
             data-copy-value={shareUrl}
-            class="inline-flex items-center justify-center rounded-full border border-[#1A1A1A]/10 bg-white/70 px-4 py-2 text-[clamp(0.9rem,0.85rem+0.2vw,1.05rem)] text-[#1A1A1A]/75 transition-colors duration-300 hover:bg-white"
+            class="inline-flex items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/70 px-4 py-2 text-[clamp(0.9rem,0.85rem+0.2vw,1.05rem)] text-[var(--nm-fg)]/75 transition-colors duration-300 hover:bg-white"
           >
             העתק קישור
           </button>
@@ -388,7 +388,7 @@ const components = {
 
         <div
           data-copy-toast
-          class="pointer-events-none fixed bottom-6 right-6 z-50 rounded-full border border-[#1A1A1A]/10 bg-white/90 px-4 py-2 text-[clamp(0.85rem,0.8rem+0.2vw,1rem)] text-[#1A1A1A]/70 opacity-0 transition-opacity duration-300"
+          class="pointer-events-none fixed bottom-6 right-6 z-50 rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 px-4 py-2 text-[clamp(0.85rem,0.8rem+0.2vw,1rem)] text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))] opacity-0 transition-opacity duration-300"
         >
           הועתק
         </div>
@@ -397,7 +397,7 @@ const components = {
           class="rounded-[1.35rem] border border-[#128C7E]/20 bg-[#F0FDF4]/80 p-5 text-right shadow-sm"
           aria-label="המשך בוואטסאפ לפי נושא המאמר"
         >
-          <p class="mb-4 text-[clamp(0.95rem,0.9rem+0.25vw,1.05rem)] font-medium text-[#1A1A1A]">
+          <p class="mb-4 text-[clamp(0.95rem,0.9rem+0.25vw,1.05rem)] font-medium text-[var(--nm-fg)]">
             רוצה להמשיך את השיחה? לחיצה כאן פותחת וואטסאפ עם הודעה שמזכירה את נושא המאמר שקראת.
           </p>
           <WhatsAppButton
@@ -414,8 +414,8 @@ const components = {
       {curatedInternalLinks.length > 0 && (
         <section class="mx-auto max-w-[72ch] space-y-4">
           <div class="space-y-2 text-right">
-            <h2 class="text-[clamp(1.4rem,1.15rem+1vw,2rem)] font-semibold text-[#1A1A1A]">ראה גם</h2>
-            <p class="text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] text-[#1A1A1A]/65">
+            <h2 class="text-[clamp(1.4rem,1.15rem+1vw,2rem)] font-semibold text-[var(--nm-fg)]">ראה גם</h2>
+            <p class="text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] text-[var(--nm-fg)]/65">
               כדי להעמיק בלי לשבור רצף, המשך מכאן ל-3–5 עמודים שמרחיבים את אותה חקירה מכיוון אחר.
             </p>
           </div>
@@ -423,11 +423,11 @@ const components = {
             {curatedInternalLinks.map((link) => (
               <a
                 href={link.href}
-                class="flex h-full flex-col justify-between gap-3 rounded-3xl border border-[#1A1A1A]/10 bg-white/70 px-5 py-4 text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] text-[#1A1A1A]/80 shadow-sm transition-all duration-500 hover:-translate-y-[2px] hover:bg-white"
+                class="flex h-full flex-col justify-between gap-3 rounded-3xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/70 px-5 py-4 text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] text-[var(--nm-fg)]/80 shadow-sm transition-all duration-500 hover:-translate-y-[2px] hover:bg-white"
               >
-                <span class="text-[clamp(0.8rem,0.78rem+0.2vw,0.95rem)] text-[#1A1A1A]/55">{kindLabelMap[link.kind]}</span>
-                <span class="font-semibold text-[#1A1A1A]">{link.title}</span>
-                <span class="text-[clamp(0.85rem,0.82rem+0.2vw,1rem)] text-[#1A1A1A]/60">{link.description}</span>
+                <span class="text-[clamp(0.8rem,0.78rem+0.2vw,0.95rem)] text-[color-mix(in_srgb,var(--nm-fg)_55%,var(--nm-bg))]">{kindLabelMap[link.kind]}</span>
+                <span class="font-semibold text-[var(--nm-fg)]">{link.title}</span>
+                <span class="text-[clamp(0.85rem,0.82rem+0.2vw,1rem)] text-[color-mix(in_srgb,var(--nm-fg)_60%,var(--nm-bg))]">{link.description}</span>
               </a>
             ))}
           </div>
@@ -435,14 +435,14 @@ const components = {
       )}
 
       <section class="mx-auto max-w-2xl space-y-6">
-        <h2 class="text-center text-[clamp(1.4rem,1.15rem+1vw,2rem)] font-semibold text-[#1A1A1A]">
+        <h2 class="text-center text-[clamp(1.4rem,1.15rem+1vw,2rem)] font-semibold text-[var(--nm-fg)]">
           אפשר להשאיר שאלה או פנייה
         </h2>
         <form
           data-contact-form
           action="https://api.web3forms.com/submit"
           method="POST"
-          class="space-y-5 rounded-[2rem] border border-[#1A1A1A]/10 bg-white/80 p-6 shadow-sm"
+          class="space-y-5 rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/80 p-6 shadow-sm"
         >
           <input type="hidden" name="access_key" value={web3formsKey} />
           <input type="hidden" name="subject" value="פנייה מ-NeverMind" />
@@ -450,45 +450,45 @@ const components = {
           <input type="text" name="botcheck" style="display:none" tabindex="-1" autocomplete="off" aria-hidden="true" />
 
           <div class="space-y-2 text-right">
-            <label class="text-[clamp(0.9rem,0.85rem+0.2vw,1.05rem)] text-[#1A1A1A]/70" for="name">שם מלא</label>
+            <label class="text-[clamp(0.9rem,0.85rem+0.2vw,1.05rem)] text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]" for="name">שם מלא</label>
             <input
               id="name"
               name="name"
               type="text"
               required
-              class="w-full rounded-2xl border border-[#1A1A1A]/20 bg-white/80 px-4 py-3 text-right text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] text-[#1A1A1A] outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A]/20"
+              class="w-full rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_20%,transparent)] bg-white/80 px-4 py-3 text-right text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] text-[var(--nm-fg)] outline-none focus-visible:ring-2 focus-visible:ring-[color-mix(in_srgb,var(--nm-fg)_22%,transparent)]"
             />
           </div>
 
           <div class="space-y-2 text-right">
-            <label class="text-[clamp(0.9rem,0.85rem+0.2vw,1.05rem)] text-[#1A1A1A]/70" for="email">אימייל</label>
+            <label class="text-[clamp(0.9rem,0.85rem+0.2vw,1.05rem)] text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]" for="email">אימייל</label>
             <input
               id="email"
               name="email"
               type="email"
               required
-              class="w-full rounded-2xl border border-[#1A1A1A]/20 bg-white/80 px-4 py-3 text-right text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] text-[#1A1A1A] outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A]/20"
+              class="w-full rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_20%,transparent)] bg-white/80 px-4 py-3 text-right text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] text-[var(--nm-fg)] outline-none focus-visible:ring-2 focus-visible:ring-[color-mix(in_srgb,var(--nm-fg)_22%,transparent)]"
             />
           </div>
 
           <div class="space-y-2 text-right">
-            <label class="text-[clamp(0.9rem,0.85rem+0.2vw,1.05rem)] text-[#1A1A1A]/70" for="message">הודעה</label>
+            <label class="text-[clamp(0.9rem,0.85rem+0.2vw,1.05rem)] text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]" for="message">הודעה</label>
             <textarea
               id="message"
               name="message"
               rows="4"
               required
-              class="w-full rounded-2xl border border-[#1A1A1A]/20 bg-white/80 px-4 py-3 text-right text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] text-[#1A1A1A] outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A]/20"
+              class="w-full rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_20%,transparent)] bg-white/80 px-4 py-3 text-right text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] text-[var(--nm-fg)] outline-none focus-visible:ring-2 focus-visible:ring-[color-mix(in_srgb,var(--nm-fg)_22%,transparent)]"
             ></textarea>
           </div>
 
           <button
             type="submit"
-            class="inline-flex w-full items-center justify-center rounded-full bg-[#1A1A1A] px-5 py-3 text-sm font-semibold text-[#FAFAF8] transition hover:bg-black"
+            class="inline-flex w-full items-center justify-center rounded-full bg-[var(--nm-inverse)] px-5 py-3 text-sm font-semibold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-inverse-hover)]"
           >
             שליחה
           </button>
-          <p data-form-status aria-live="polite" class="text-center text-[clamp(0.85rem,0.8rem+0.2vw,1rem)] text-[#1A1A1A]/60 opacity-0 transition-opacity duration-300">
+          <p data-form-status aria-live="polite" class="text-center text-[clamp(0.85rem,0.8rem+0.2vw,1rem)] text-[color-mix(in_srgb,var(--nm-fg)_60%,var(--nm-bg))] opacity-0 transition-opacity duration-300">
             תודה, ההודעה עברה.
           </p>
         </form>
@@ -766,13 +766,13 @@ const components = {
         const card = document.createElement("section");
         card.className = "nm-premium-card";
         card.innerHTML = `
-          <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">Premium Vault</p>
-          <h2 class="mt-3 text-[clamp(1.4rem,1.1rem+0.8vw,1.9rem)] font-semibold text-[#1A1A1A]">${title}</h2>
-          <p class="mt-3 text-[1rem] leading-8 text-[#1A1A1A]/68">${description}</p>
-          <p class="mt-3 text-sm leading-7 text-[#1A1A1A]/56">${helperText}</p>
+          <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">Premium Vault</p>
+          <h2 class="mt-3 text-[clamp(1.4rem,1.1rem+0.8vw,1.9rem)] font-semibold text-[var(--nm-fg)]">${title}</h2>
+          <p class="mt-3 text-[1rem] leading-8 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">${description}</p>
+          <p class="mt-3 text-sm leading-7 text-[var(--nm-fg)]/56">${helperText}</p>
           <div class="mt-5 flex flex-wrap gap-3">
-            <a href="${primaryHref}" class="inline-flex items-center rounded-full bg-[#1A1A1A] px-5 py-3 text-sm font-semibold text-[#FAFAF8] no-underline transition hover:bg-black">${primaryLabel}</a>
-            <a href="${fallbackCtaHref}" class="inline-flex items-center rounded-full border border-[#1A1A1A]/10 bg-white px-5 py-3 text-sm font-semibold text-[#1A1A1A] no-underline transition hover:bg-[#FAFAF8]">${fallbackCtaLabel}</a>
+            <a href="${primaryHref}" class="inline-flex items-center rounded-full bg-[var(--nm-inverse)] px-5 py-3 text-sm font-semibold text-[var(--nm-inverse-fg)] no-underline transition hover:bg-[var(--nm-inverse-hover)]">${primaryLabel}</a>
+            <a href="${fallbackCtaHref}" class="inline-flex items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white px-5 py-3 text-sm font-semibold text-[var(--nm-fg)] no-underline transition hover:bg-[var(--nm-surface-muted)]">${fallbackCtaLabel}</a>
           </div>
         `;
 

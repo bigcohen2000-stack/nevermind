@@ -1,4 +1,4 @@
-﻿---
+---
 interface ArticleRow {
   title: string;
   workflowStatus: string;
@@ -22,38 +22,38 @@ interface Props {
 const { articles } = Astro.props;
 ---
 
-<section class="space-y-5 rounded-[2rem] border border-[#1A1A1A]/10 bg-white/82 p-6 shadow-[0_30px_90px_rgba(26,26,26,0.08)] backdrop-blur-md">
+<section class="space-y-5 rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/82 p-6 shadow-[0_30px_90px_rgba(26,26,26,0.08)] backdrop-blur-md">
   <div class="flex flex-col gap-3 text-right md:flex-row md:items-end md:justify-between">
     <div class="space-y-2">
-      <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[#D42B2B]">Content Queue</p>
-      <h2 class="text-2xl font-semibold text-[#1A1A1A]">כל קבצי ה־MDX במערכת</h2>
-      <p class="text-sm leading-7 text-[#1A1A1A]/64">
+      <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--nm-accent)]">Content Queue</p>
+      <h2 class="text-2xl font-semibold text-[var(--nm-fg)]">כל קבצי ה־MDX במערכת</h2>
+      <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_64%,var(--nm-bg))]">
         מכאן רואים מה בטיוטה, מה מוכן לבדיקה, ומה כבר באוויר. המטרה היא לצמצם חיכוך בין רעיון, כתיבה ופרסום.
       </p>
     </div>
-    <a href="/admin/generator/" class="inline-flex items-center justify-center rounded-full bg-[#D42B2B] px-5 py-3 text-sm font-semibold text-[#FAFAF8] transition hover:bg-[#b82424]">מאמר חדש</a>
+    <a href="/admin/generator/" class="inline-flex items-center justify-center rounded-full bg-[var(--nm-accent)] px-5 py-3 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]">מאמר חדש</a>
   </div>
 
-  <div class="overflow-hidden rounded-[1.6rem] border border-[#1A1A1A]/10">
-    <table class="min-w-full divide-y divide-[#1A1A1A]/10 text-right">
-      <thead class="bg-[#FAFAF8]">
+  <div class="overflow-hidden rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)]">
+    <table class="min-w-full divide-y divide-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] text-right">
+      <thead class="bg-[var(--nm-surface-muted)]">
         <tr>
-          <th class="px-4 py-4 text-sm font-semibold text-[#1A1A1A]">כותרת</th>
-          <th class="px-4 py-4 text-sm font-semibold text-[#1A1A1A]">תור עבודה</th>
-          <th class="px-4 py-4 text-sm font-semibold text-[#1A1A1A]">רמת עומק</th>
-          <th class="px-4 py-4 text-sm font-semibold text-[#1A1A1A]">סטטוס</th>
-          <th class="px-4 py-4 text-sm font-semibold text-[#1A1A1A]">פרימיום</th>
-          <th class="px-4 py-4 text-sm font-semibold text-[#1A1A1A]">תאריך</th>
-          <th class="px-4 py-4 text-sm font-semibold text-[#1A1A1A]">פעולות</th>
+          <th class="px-4 py-4 text-sm font-semibold text-[var(--nm-fg)]">כותרת</th>
+          <th class="px-4 py-4 text-sm font-semibold text-[var(--nm-fg)]">תור עבודה</th>
+          <th class="px-4 py-4 text-sm font-semibold text-[var(--nm-fg)]">רמת עומק</th>
+          <th class="px-4 py-4 text-sm font-semibold text-[var(--nm-fg)]">סטטוס</th>
+          <th class="px-4 py-4 text-sm font-semibold text-[var(--nm-fg)]">פרימיום</th>
+          <th class="px-4 py-4 text-sm font-semibold text-[var(--nm-fg)]">תאריך</th>
+          <th class="px-4 py-4 text-sm font-semibold text-[var(--nm-fg)]">פעולות</th>
         </tr>
       </thead>
-      <tbody class="divide-y divide-[#1A1A1A]/8 bg-white">
+      <tbody class="divide-y divide-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] bg-white">
         {articles.map((article) => (
           <tr>
             <td class="px-4 py-4 align-top">
               <div class="space-y-1">
-                <p class="font-semibold text-[#1A1A1A]">{article.title}</p>
-                <p class="text-xs text-[#1A1A1A]/54">/{article.slug}</p>
+                <p class="font-semibold text-[var(--nm-fg)]">{article.title}</p>
+                <p class="text-xs text-[var(--nm-fg)]/54">/{article.slug}</p>
               </div>
             </td>
             <td class="px-4 py-4 align-top">
@@ -68,11 +68,11 @@ const { articles } = Astro.props;
             <td class="px-4 py-4 align-top">
               <span class={`inline-flex rounded-full border px-3 py-1 text-xs font-semibold ${article.premiumTone}`}>{article.premium}</span>
             </td>
-            <td class="px-4 py-4 align-top text-sm text-[#1A1A1A]/70">{article.dateLabel}</td>
+            <td class="px-4 py-4 align-top text-sm text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">{article.dateLabel}</td>
             <td class="px-4 py-4 align-top">
               <div class="flex flex-wrap justify-end gap-2">
-                <a href={article.viewHref} target="_blank" rel="noreferrer" class="inline-flex items-center justify-center rounded-full border border-[#1A1A1A]/10 bg-white px-4 py-2 text-sm font-semibold text-[#1A1A1A] transition hover:bg-[#FAFAF8]">צפה</a>
-                <a href={article.editHref} target="_blank" rel="noreferrer" class="inline-flex items-center justify-center rounded-full border border-[#1A1A1A]/10 bg-[#FAFAF8] px-4 py-2 text-sm font-semibold text-[#1A1A1A] transition hover:bg-[#ffffff]">ערוך ב-GitHub</a>
+                <a href={article.viewHref} target="_blank" rel="noreferrer" class="inline-flex items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white px-4 py-2 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]">צפה</a>
+                <a href={article.editHref} target="_blank" rel="noreferrer" class="inline-flex items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-2 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[#ffffff]">ערוך ב-GitHub</a>
               </div>
             </td>
           </tr>

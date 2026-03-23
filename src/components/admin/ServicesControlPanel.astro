@@ -1,59 +1,108 @@
-﻿---
+---
 import servicesConfig from "../../config/services.json";
-import { flattenVisibleServices, formatMoney, servicesTrust } from "../../lib/services";
+import { disclaimerLong, disclaimerShort, flattenVisibleServices, formatMoney } from "../../lib/services";
 
 const services = flattenVisibleServices();
 ---
 
-<form id="services-form" class="space-y-6 rounded-[2rem] border border-[#1A1A1A]/10 bg-white/82 p-6 shadow-[0_30px_90px_rgba(26,26,26,0.08)] backdrop-blur-md">
+<form id="services-form" class="space-y-6 rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/82 p-6 shadow-[0_30px_90px_rgba(26,26,26,0.08)] backdrop-blur-md">
   <div class="space-y-2 text-right">
-    <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[#D42B2B]">שירותים פעילים</p>
-    <h2 class="text-2xl font-semibold text-[#1A1A1A]">מקור האמת של שלבי השירות</h2>
-    <p class="text-sm leading-7 text-[#1A1A1A]/64">הקובץ נשען על <code>src/config/services.json</code>. משנים כאן שלבים, טקסטים, מחירים ותצורות פעולה במקום אחד.</p>
+    <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--nm-accent)]">שירותים פעילים</p>
+    <h2 class="text-2xl font-semibold text-[var(--nm-fg)]">מקור האמת של שלבי השירות</h2>
+    <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_64%,var(--nm-bg))]">הקובץ נשען על <code>src/config/services.json</code>. משנים כאן שלבים, טקסטים, מחירים ותצורות פעולה במקום אחד.</p>
   </div>
+
+  <details class="rounded-[1.4rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3 text-right">
+    <summary class="cursor-pointer text-sm font-semibold text-[var(--nm-fg)]">שדות אופציונליים בשירות (מפת עריכה)</summary>
+    <ul class="mt-3 list-inside list-disc space-y-2 text-xs leading-6 text-[color-mix(in_srgb,var(--nm-fg)_62%,var(--nm-bg))]">
+      <li>
+        <code class="rounded bg-[var(--nm-code-bg)] px-1 text-[var(--nm-code-fg)]">whatsapp_template</code> — טקסט הודעה; פלייסהולדרים{" "}
+        <code class="rounded bg-[var(--nm-code-bg)] px-1 text-[var(--nm-code-fg)]">{"{title}"}</code>,{" "}
+        <code class="rounded bg-[var(--nm-code-bg)] px-1 text-[var(--nm-code-fg)]">{"{price}"}</code> (מספר בלי סימן ₪). חובה מומלץ כש־<code class="rounded bg-[var(--nm-code-bg)] px-1 text-[var(--nm-code-fg)]">action_type</code> הוא{" "}
+        <code class="rounded bg-[var(--nm-code-bg)] px-1 text-[var(--nm-code-fg)]">whatsapp</code>.
+      </li>
+      <li>
+        <code class="rounded bg-[var(--nm-code-bg)] px-1 text-[var(--nm-code-fg)]">social_proof</code> — שורת הוכחה חברתית (מוצגת בכרטיס בין כותרת משנה לתיאור).
+      </li>
+      <li>
+        <code class="rounded bg-[var(--nm-code-bg)] px-1 text-[var(--nm-code-fg)]">availability</code> — אובייקט:{" "}
+        <code class="rounded bg-[var(--nm-code-bg)] px-1 text-[var(--nm-code-fg)]">spots_left</code> (מספר),{" "}
+        <code class="rounded bg-[var(--nm-code-bg)] px-1 text-[var(--nm-code-fg)]">updated_at</code> (ISO), אופציונלי{" "}
+        <code class="rounded bg-[var(--nm-code-bg)] px-1 text-[var(--nm-code-fg)]">label</code> (ברירת מחדל: «נותרו»). תאימות:{" "}
+        <code class="rounded bg-[var(--nm-code-bg)] px-1 text-[var(--nm-code-fg)]">availability_note</code> מחרוזת (legacy).
+      </li>
+      <li>גילוי נאות ארוך: <code class="rounded bg-[var(--nm-code-bg)] px-1 text-[var(--nm-code-fg)]">trust_elements.disclaimer</code> — מקור אחד לפוטר ולמקטעים ארוכים. שורה קצרה מתחת לכפתורים: קבוע בקוד (<code class="rounded bg-[var(--nm-code-bg)] px-1 text-[var(--nm-code-fg)]">disclaimerShort</code>).</li>
+    </ul>
+  </details>
 
   <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
     {services.map((service) => (
-      <article class="rounded-[1.5rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] p-4 text-right">
-        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">{service.stageName}</p>
-        <p class="mt-2 text-base font-semibold text-[#1A1A1A]">{service.title}</p>
-        <p class="mt-2 text-sm leading-7 text-[#1A1A1A]/64">{service.subtitle}</p>
-        <p class="mt-4 text-sm font-semibold text-[#1A1A1A]">{formatMoney(service.price_full)} כולל מע״מ</p>
-        <p class="mt-1 text-xs leading-6 text-[#1A1A1A]/58">{service.action_type} · {service.id}</p>
+      <article class="rounded-[1.5rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-4 text-right">
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">{service.stageName}</p>
+        <p class="mt-2 text-base font-semibold text-[var(--nm-fg)]">{service.title}</p>
+        <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_64%,var(--nm-bg))]">{service.subtitle}</p>
+        <p class="mt-4 text-sm font-semibold text-[var(--nm-fg)]">{formatMoney(service.price_full)} כולל מע״מ</p>
+        <p class="mt-1 text-xs leading-6 text-[color-mix(in_srgb,var(--nm-fg)_58%,var(--nm-bg))]">{service.action_type} · {service.id}</p>
+        <div class="mt-3 flex flex-wrap justify-end gap-1.5">
+          {service.social_proof?.trim() ? (
+            <span class="rounded-full border border-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)] bg-[var(--nm-tint)] px-2 py-0.5 text-[10px] font-semibold text-[var(--nm-accent)]">social_proof</span>
+          ) : null}
+          {service.availability && typeof service.availability.spots_left === "number" ? (
+            <span class="rounded-full border border-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)] bg-[var(--nm-tint)] px-2 py-0.5 text-[10px] font-semibold text-[var(--nm-accent)]">availability</span>
+          ) : null}
+          {service.availability_note?.trim() && !service.availability ? (
+            <span class="rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-white/70 px-2 py-0.5 text-[10px] font-semibold text-[color-mix(in_srgb,var(--nm-fg)_55%,var(--nm-bg))]">availability_note</span>
+          ) : null}
+          {service.action_type === "whatsapp" && service.whatsapp_template?.trim() ? (
+            <span class="rounded-full border border-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)] bg-[var(--nm-tint)] px-2 py-0.5 text-[10px] font-semibold text-[var(--nm-accent)]">wa תבנית</span>
+          ) : null}
+        </div>
       </article>
     ))}
   </div>
 
-  <div class="rounded-[1.4rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] px-4 py-3 text-right text-sm leading-7 text-[#1A1A1A]/64">
-    גילוי נאות פעיל: {servicesTrust.disclaimer}
+  <div class="space-y-2 rounded-[1.4rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3 text-right text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_64%,var(--nm-bg))]">
+    <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">גילוי נאות (מקור: trust_elements.disclaimer)</p>
+    <p class="whitespace-pre-line text-sm">{disclaimerLong}</p>
+    <p class="border-t border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] pt-2 text-xs text-[color-mix(in_srgb,var(--nm-fg)_52%,var(--nm-bg))]">
+      שורה קצרה בכרטיסים: <span class="font-medium text-[var(--nm-fg)]">{disclaimerShort}</span>
+    </p>
   </div>
 
   <label class="block space-y-2 text-right">
-    <span class="text-sm font-semibold text-[#1A1A1A]">services.json</span>
+    <span class="text-sm font-semibold text-[var(--nm-fg)]">services.json</span>
     <textarea
       id="services-json-input"
       rows="34"
       spellcheck="false"
       dir="ltr"
-      class="w-full rounded-[1.6rem] border border-[#1A1A1A]/12 bg-[#111111] px-5 py-4 text-left text-sm leading-7 text-[#F4F4EF] outline-none transition focus:border-[#D42B2B]/40 focus:ring-2 focus:ring-[#D42B2B]/15"
+      class="w-full rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-[var(--nm-code-bg)] px-5 py-4 text-left text-sm leading-7 text-[var(--nm-code-fg)] outline-none transition focus:border-[color-mix(in_srgb,var(--nm-accent)_40%,transparent)] focus:ring-2 focus:ring-[color-mix(in_srgb,var(--nm-accent)_20%,transparent)]"
     >{JSON.stringify(servicesConfig, null, 2)}</textarea>
   </label>
 
   <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:justify-end">
-    <button id="pick-services-file" type="button" class="inline-flex items-center justify-center rounded-full border border-[#1A1A1A]/10 bg-white px-5 py-3 text-sm font-semibold text-[#1A1A1A]/78 transition hover:bg-[#FAFAF8]">בחר services.json</button>
-    <button id="save-services-file" type="button" class="inline-flex items-center justify-center rounded-full bg-[#D42B2B] px-5 py-3 text-sm font-semibold text-[#FAFAF8] transition hover:bg-[#b82424]">שמור לקובץ האמיתי</button>
-    <button id="apply-services" type="button" class="inline-flex items-center justify-center rounded-full bg-[#1A1A1A] px-5 py-3 text-sm font-semibold text-[#FAFAF8] transition hover:bg-black">החל מקומית</button>
-    <button id="copy-services-json" type="button" class="inline-flex items-center justify-center rounded-full border border-[#1A1A1A]/10 bg-white px-5 py-3 text-sm font-semibold text-[#1A1A1A]/78 transition hover:bg-[#FAFAF8]">העתק JSON</button>
-    <button id="export-services-json" type="button" class="inline-flex items-center justify-center rounded-full border border-[#1A1A1A]/10 bg-white px-5 py-3 text-sm font-semibold text-[#1A1A1A]/78 transition hover:bg-[#FAFAF8]">הורד services.json</button>
-    <button id="reset-services" type="button" class="inline-flex items-center justify-center rounded-full border border-[#D42B2B]/16 bg-[#FFF4F3] px-5 py-3 text-sm font-semibold text-[#D42B2B] transition hover:bg-[#ffe7e5]">נקה override מקומי</button>
+    <button id="pick-services-file" type="button" class="inline-flex items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white px-5 py-3 text-sm font-semibold text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))] transition hover:bg-[var(--nm-surface-muted)]">בחר services.json</button>
+    <button id="save-services-file" type="button" class="inline-flex items-center justify-center rounded-full bg-[var(--nm-accent)] px-5 py-3 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]">שמור לקובץ האמיתי</button>
+    <button id="apply-services" type="button" class="inline-flex items-center justify-center rounded-full bg-[var(--nm-inverse)] px-5 py-3 text-sm font-semibold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-inverse-hover)]">החל מקומית</button>
+    <button id="copy-services-json" type="button" class="inline-flex items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white px-5 py-3 text-sm font-semibold text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))] transition hover:bg-[var(--nm-surface-muted)]">העתק JSON</button>
+    <button id="export-services-json" type="button" class="inline-flex items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white px-5 py-3 text-sm font-semibold text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))] transition hover:bg-[var(--nm-surface-muted)]">הורד services.json</button>
+    <button id="reset-services" type="button" class="inline-flex items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-accent)_20%,transparent)] bg-[var(--nm-tint)] px-5 py-3 text-sm font-semibold text-[var(--nm-accent)] transition hover:bg-[var(--nm-tint-strong)]">נקה override מקומי</button>
   </div>
 
-  <div class="rounded-[1.5rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] p-4 text-right">
-    <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">סנכרון שירותים</p>
-    <p id="services-file-status" class="mt-3 text-sm leading-7 text-[#1A1A1A]/68">עדיין לא נבחר קובץ יעד. אפשר לבחור את <code>src/config/services.json</code> ולשמור אליו ישירות מתוך Chrome.</p>
+  <div class="rounded-[1.5rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-4 text-right">
+    <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">סנכרון שירותים</p>
+    <p id="services-file-status" class="mt-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">עדיין לא נבחר קובץ יעד. אפשר לבחור את <code>src/config/services.json</code> ולשמור אליו ישירות מתוך Chrome.</p>
   </div>
 
-  <pre class="min-h-[10rem] overflow-auto rounded-[1.6rem] bg-[#111111] p-5 text-sm leading-7 text-[#F4F4EF] shadow-inner"><code id="services-json-output">ה-JSON המעובד יופיע כאן.</code></pre>
+  <div class="rounded-[1.5rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-4 text-right">
+    <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">בדיקות שדות (לא חוסמות שמירה)</p>
+    <pre
+      id="services-json-hints"
+      class="mt-2 max-h-48 overflow-auto whitespace-pre-wrap break-words text-xs leading-6 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]"
+    >טוען…</pre>
+  </div>
+
+  <pre class="min-h-[10rem] overflow-auto rounded-[1.6rem] bg-[var(--nm-code-bg)] p-5 text-sm leading-7 text-[var(--nm-code-fg)] shadow-inner"><code id="services-json-output">ה-JSON המעובד יופיע כאן.</code></pre>
 </form>
 
 <script is:inline define:vars={{ defaultServices: servicesConfig }}>
@@ -68,6 +117,7 @@ const services = flattenVisibleServices();
     const resetServicesButton = document.getElementById("reset-services");
     const servicesFileStatus = document.getElementById("services-file-status");
     const servicesOutput = document.getElementById("services-json-output");
+    const servicesHints = document.getElementById("services-json-hints");
 
     if (!(input instanceof HTMLTextAreaElement) ||
         !(pickServicesFileButton instanceof HTMLButtonElement) ||
@@ -77,7 +127,8 @@ const services = flattenVisibleServices();
         !(exportServicesButton instanceof HTMLButtonElement) ||
         !(resetServicesButton instanceof HTMLButtonElement) ||
         !(servicesFileStatus instanceof HTMLElement) ||
-        !(servicesOutput instanceof HTMLElement)) return;
+        !(servicesOutput instanceof HTMLElement) ||
+        !(servicesHints instanceof HTMLElement)) return;
 
     let servicesFileHandle = null;
 
@@ -98,14 +149,59 @@ const services = flattenVisibleServices();
 
     const parseInput = () => {
       const parsed = JSON.parse(input.value);
-      if (!parsed || !Array.isArray(parsed.stages) || !parsed.hero || !parsed.trust_elements) {
+      if (!parsed || !Array.isArray(parsed.funnel_stages) || !parsed.hero || !parsed.trust_elements) {
         throw new Error("מבנה services.json לא תקין");
       }
       return parsed;
     };
 
+    const collectServicesHints = (parsed) => {
+      const hints = [];
+      if (!Array.isArray(parsed.funnel_stages)) return hints;
+      for (const stage of parsed.funnel_stages) {
+        const list = Array.isArray(stage.services) ? stage.services : [];
+        for (const s of list) {
+          const sid = s.title || s.id || "?";
+          if (s.action_type === "whatsapp") {
+            const tpl = s.whatsapp_template;
+            if (tpl == null || String(tpl).trim() === "") {
+              hints.push(`«${sid}»: whatsapp בלי whatsapp_template — תבנית ברירת־מחדל מהקוד.`);
+            }
+          }
+          if (s.availability && typeof s.availability === "object") {
+            const a = s.availability;
+            if (typeof a.spots_left !== "number" || Number.isNaN(a.spots_left)) {
+              hints.push(`«${sid}»: availability.spots_left חייב להיות מספר.`);
+            }
+            const upd = a.updated_at != null ? String(a.updated_at).trim() : "";
+            if (!upd) {
+              hints.push(`«${sid}»: חסר availability.updated_at (מומלץ ISO 8601).`);
+            } else if (Number.isNaN(new Date(upd).getTime())) {
+              hints.push(`«${sid}»: availability.updated_at לא נראה כתאריך תקין.`);
+            }
+          }
+          if (s.availability && s.availability_note && String(s.availability_note).trim()) {
+            hints.push(`«${sid}»: יש גם availability וגם availability_note — בכרטיס תוצג רק הזמינות המובנית.`);
+          }
+        }
+      }
+      const disc = parsed.trust_elements?.disclaimer;
+      if (typeof disc === "string" && !disc.trim()) {
+        hints.push("trust_elements.disclaimer ריק — גילוי נאות ארוך בפוטר יהיה ריק.");
+      }
+      return hints;
+    };
+
+    const renderHints = (parsed) => {
+      const hints = collectServicesHints(parsed);
+      servicesHints.textContent = hints.length
+        ? hints.map((h, i) => `${i + 1}. ${h}`).join("\n")
+        : "אין אזהרות מבנה לפי התוכן הנוכחי.";
+    };
+
     const renderServicesState = (state) => {
       servicesOutput.textContent = JSON.stringify(state, null, 2);
+      renderHints(state);
     };
 
     const updateFileStatus = (message) => {
@@ -115,6 +211,14 @@ const services = flattenVisibleServices();
     const current = readServices() || defaultServices;
     input.value = JSON.stringify(current, null, 2);
     renderServicesState(current);
+
+    input.addEventListener("input", () => {
+      try {
+        renderHints(parseInput());
+      } catch {
+        servicesHints.textContent = "לא ניתן לנתח JSON — תקן תחביר לפני שמירה.";
+      }
+    });
 
     applyServicesButton.addEventListener("click", () => {
       try {
@@ -186,10 +290,11 @@ const services = flattenVisibleServices();
         return;
       }
       try {
-        parseInput();
+        const saved = parseInput();
         const writable = await servicesFileHandle.createWritable();
         await writable.write(`${input.value.trim()}\n`);
         await writable.close();
+        renderHints(saved);
         updateFileStatus(`הקובץ ${servicesFileHandle.name} עודכן בהצלחה.`);
         pulse(saveServicesFileButton, "נשמר לקובץ", "שמור לקובץ האמיתי");
       } catch (error) {

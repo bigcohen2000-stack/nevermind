@@ -12,14 +12,14 @@ const labelId = `audio-narrative-${Math.random().toString(36).slice(2, 10)}`;
 ---
 
 <div
-  class="overflow-hidden rounded-2xl border border-[#1A1A1A]/10 bg-white/70 p-4 text-right shadow-sm backdrop-blur-md dark:border-white/10 dark:bg-neutral-900/60"
+  class="overflow-hidden rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/70 p-4 text-right shadow-sm backdrop-blur-md dark:border-white/10 dark:bg-neutral-900/60"
   dir="rtl"
 >
-  <p id={labelId} class="text-sm font-semibold text-[#1A1A1A] [letter-spacing:0] dark:text-[#FAFAF8]">
+  <p id={labelId} class="text-sm font-semibold text-[var(--nm-fg)] [letter-spacing:0] dark:text-[var(--nm-inverse-fg)]">
     {title}
   </p>
   <audio
-    class="mt-3 w-full accent-[#1A1A1A] text-[#1A1A1A] dark:accent-[#FAFAF8]"
+    class="mt-3 w-full accent-[var(--nm-inverse)] text-[var(--nm-fg)] dark:accent-[#FAFAF8]"
     controls
     src={src}
     aria-labelledby={labelId}

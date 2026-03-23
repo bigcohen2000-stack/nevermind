@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState } from "react";
 import LiteYouTubeEmbed from "./LiteYouTubeEmbed";
@@ -82,7 +82,7 @@ export function ArticleView({ article }: ArticleViewProps) {
           ) : null}
 
           <section
-            className="article-body space-y-4 text-base leading-relaxed text-stone-900 [&_h3]:mt-6 [&_h3]:text-lg [&_h3]:font-medium [&_h3]:text-red-700 first:[&_h3]:mt-4 [&_p]:mb-4 [&_p]:text-stone-900 [&_strong]:font-semibold [&_strong]:text-stone-900"
+            className="article-body space-y-4 text-base leading-relaxed text-stone-900 [&_h3]:mt-6 [&_h3]:text-lg [&_h3]:font-medium [&_h3]:text-[var(--nm-accent)] first:[&_h3]:mt-4 [&_p]:mb-4 [&_p]:text-stone-900 [&_strong]:font-semibold [&_strong]:text-stone-900"
             dangerouslySetInnerHTML={{ __html: article.content }}
           />
         </>

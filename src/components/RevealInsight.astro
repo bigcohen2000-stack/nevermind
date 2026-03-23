@@ -7,19 +7,19 @@ const { title = "לחץ לחשיפת התובנה" } = Astro.props;
 const panelId = `reveal-insight-${Math.random().toString(36).slice(2, 10)}`;
 ---
 
-<section class="not-prose my-10 rounded-[2rem] border border-[#1A1A1A]/10 bg-white/88 p-5 shadow-[0_20px_60px_rgba(26,26,26,0.06)]">
+<section class="not-prose my-10 rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/88 p-5 shadow-[0_20px_60px_rgba(26,26,26,0.06)]">
   <button
     type="button"
     data-reveal-insight-trigger
     aria-expanded="false"
     aria-controls={panelId}
-    class="flex w-full items-center justify-between gap-4 rounded-[1.4rem] border border-[#1A1A1A]/12 bg-[#1A1A1A] px-5 py-4 text-right text-[#FAFAF8] transition hover:border-[#1A1A1A]/25 hover:bg-[#111111] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A]/25"
+    class="flex w-full items-center justify-between gap-4 rounded-[1.4rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-[var(--nm-inverse)] px-5 py-4 text-right text-[var(--nm-inverse-fg)] transition hover:border-[color-mix(in_srgb,var(--nm-fg)_25%,transparent)] hover:bg-[var(--nm-inverse-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color-mix(in_srgb,var(--nm-inverse)_28%,transparent)]"
   >
     <span>
-      <span class="block text-xs font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">Reveal Insight</span>
-      <span class="mt-2 block text-lg font-semibold text-[#1A1A1A]">{title}</span>
+      <span class="block text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">Reveal Insight</span>
+      <span class="mt-2 block text-lg font-semibold text-[var(--nm-inverse-fg)]">{title}</span>
     </span>
-    <span data-reveal-insight-icon class="text-[#D42B2B] transition-transform duration-300">+</span>
+    <span data-reveal-insight-icon class="text-[var(--nm-accent)] transition-transform duration-300">+</span>
   </button>
 
   <div
@@ -29,7 +29,7 @@ const panelId = `reveal-insight-${Math.random().toString(36).slice(2, 10)}`;
     class="grid grid-rows-[0fr] transition-all duration-500 ease-out"
   >
     <div class="overflow-hidden">
-      <div class="px-2 pt-4 text-right text-[1rem] leading-8 text-[#1A1A1A]/76">
+      <div class="px-2 pt-4 text-right text-[1rem] leading-8 text-[color-mix(in_srgb,var(--nm-fg)_76%,var(--nm-bg))]">
         <slot />
       </div>
     </div>

@@ -1,4 +1,4 @@
-﻿---
+---
 import { getCollection } from "astro:content";
 import Layout from "../layouts/Layout.astro";
 
@@ -15,7 +15,7 @@ const difficultyConfig: Record<DifficultyKey, { label: string; tone: string }> =
   },
   deep: {
     label: "חקירה עמוקה",
-    tone: "bg-[#1A1A1A] text-[#FAFAF8] border-[#1A1A1A]",
+    tone: "bg-[var(--nm-inverse)] text-[var(--nm-inverse-fg)] border-[color-mix(in_srgb,var(--nm-fg)_22%,transparent)]",
   },
 };
 
@@ -58,11 +58,11 @@ const forbiddenArticles = allArticles
 ---
 
 <Layout title={pageTitle} description={pageDescription}>
-  <section class="mx-auto max-w-6xl space-y-10 px-4 pb-20 text-right text-[#1A1A1A]">
+  <section class="mx-auto max-w-6xl space-y-10 px-4 pb-20 text-right text-[var(--nm-fg)]">
     <header class="max-w-4xl space-y-4">
-      <p class="text-sm font-semibold uppercase tracking-[0.24em] text-[#D42B2B]">פרות קדושות</p>
+      <p class="text-sm font-semibold uppercase tracking-[0.24em] text-[var(--nm-accent)]">פרות קדושות</p>
       <h1 class="text-[clamp(2.2rem,1.7rem+2vw,3.4rem)] font-semibold">הספרייה האסורה</h1>
-      <p class="text-[clamp(1rem,0.95rem+0.35vw,1.15rem)] leading-8 text-[#1A1A1A]/68">
+      <p class="text-[clamp(1rem,0.95rem+0.35vw,1.15rem)] leading-8 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
         כאן מרוכזים המאמרים שהולכים נגד הכיוון המוכר. לא כדי להיות פרובוקטיבי, אלא כדי לפרק רעיון מקובל בדיוק במקום שבו הוא מרגיש הכי בטוח.
       </p>
     </header>
@@ -71,23 +71,23 @@ const forbiddenArticles = allArticles
       {forbiddenArticles.map((article) => (
         <a
           href={`/articles/${article.slug}/`}
-          class="group flex h-full flex-col justify-between gap-5 rounded-[2rem] border border-[#1A1A1A]/10 bg-white/84 p-6 shadow-[0_18px_55px_rgba(26,26,26,0.05)] transition hover:translate-y-[-2px] hover:bg-white"
+          class="group flex h-full flex-col justify-between gap-5 rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/84 p-6 shadow-[0_18px_55px_rgba(26,26,26,0.05)] transition hover:translate-y-[-2px] hover:bg-white"
         >
           <div class="space-y-3">
             <div class="flex flex-wrap items-center justify-between gap-3">
               <span class={`inline-flex rounded-full border px-3 py-1 text-xs font-semibold ${article.difficultyTone}`}>{article.difficultyLabel}</span>
-              <span class="text-xs text-[#1A1A1A]/52">{article.dateLabel}</span>
+              <span class="text-xs text-[var(--nm-fg)]/52">{article.dateLabel}</span>
             </div>
-            <h2 class="text-2xl font-semibold text-[#1A1A1A]">{article.title}</h2>
-            <p class="text-sm leading-7 text-[#1A1A1A]/68">{article.description}</p>
+            <h2 class="text-2xl font-semibold text-[var(--nm-fg)]">{article.title}</h2>
+            <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">{article.description}</p>
           </div>
           <div class="space-y-3">
-            <div class="flex flex-wrap justify-end gap-2 text-xs text-[#1A1A1A]/55">
+            <div class="flex flex-wrap justify-end gap-2 text-xs text-[color-mix(in_srgb,var(--nm-fg)_55%,var(--nm-bg))]">
               {article.tags.map((tag) => (
-                <span class="rounded-full border border-[#1A1A1A]/10 bg-[#FAFAF8] px-3 py-1">{tag}</span>
+                <span class="rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-3 py-1">{tag}</span>
               ))}
             </div>
-            <span class="inline-flex items-center justify-end gap-2 text-sm font-semibold text-[#D42B2B]">
+            <span class="inline-flex items-center justify-end gap-2 text-sm font-semibold text-[var(--nm-accent)]">
               לקריאה ששוברת מוסכמה
               <span aria-hidden="true">←</span>
             </span>

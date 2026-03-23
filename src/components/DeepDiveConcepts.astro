@@ -1,4 +1,4 @@
-﻿---
+---
 import type { GlossaryConcept } from "../data/glossary";
 
 interface Props {
@@ -9,11 +9,11 @@ const { concepts = [] } = Astro.props as Props;
 ---
 
 {concepts.length > 0 && (
-  <section class="rounded-[1.8rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] p-5 text-right">
+  <section class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-5 text-right">
     <div class="space-y-2">
-      <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">Deep Dive</p>
-      <h2 class="text-xl font-semibold text-[#1A1A1A]">מושגים קשורים</h2>
-      <p class="text-sm leading-7 text-[#1A1A1A]/62">
+      <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">Deep Dive</p>
+      <h2 class="text-xl font-semibold text-[var(--nm-fg)]">מושגים קשורים</h2>
+      <p class="text-sm leading-7 text-[var(--nm-fg)]/62">
         אם הנקודה הזאת כבר נגעה במשהו עמוק יותר, המשך מכאן למושגים שמחזיקים את אותה חקירה מזווית שקטה יותר.
       </p>
     </div>
@@ -22,7 +22,7 @@ const { concepts = [] } = Astro.props as Props;
       {concepts.map((concept) => (
         <a
           href={`/glossary/${concept.slug}/`}
-          class="inline-flex items-center rounded-full border border-[#D42B2B]/14 bg-white px-4 py-2 text-sm font-semibold text-[#1A1A1A] transition hover:border-[#D42B2B]/28 hover:bg-[#FFF7F6]"
+          class="inline-flex items-center rounded-full border border-[color-mix(in_srgb,var(--nm-accent)_18%,transparent)] bg-white px-4 py-2 text-sm font-semibold text-[var(--nm-fg)] transition hover:border-[color-mix(in_srgb,var(--nm-accent)_30%,transparent)] hover:bg-[var(--nm-tint)]"
         >
           {concept.title}
         </a>

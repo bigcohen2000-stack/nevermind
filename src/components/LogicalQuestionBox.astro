@@ -1,4 +1,4 @@
-﻿---
+---
 import { buildArticleContextWhatsAppHref } from "../lib/services";
 import { microPosts } from "../data/microPosts";
 import BigQuestionLayout from "./BigQuestionLayout.astro";
@@ -23,11 +23,11 @@ const contextWaHref = buildArticleContextWhatsAppHref({ tags, articleTitle: arti
 ---
 
 <aside class="space-y-5 lg:sticky lg:top-28">
-  <section class="rounded-[1.8rem] border border-[#1A1A1A]/10 bg-white/88 p-5 shadow-[0_18px_60px_rgba(26,26,26,0.06)]">
+  <section class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/88 p-5 shadow-[0_18px_60px_rgba(26,26,26,0.06)]">
     <div class="space-y-3 text-right">
-      <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">שאלה לוגית</p>
-      <h2 class="text-[1.35rem] font-semibold text-[#1A1A1A]">שאל שאלה לוגית</h2>
-      <p class="text-sm leading-7 text-[#1A1A1A]/68">
+      <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">שאלה לוגית</p>
+      <h2 class="text-[1.35rem] font-semibold text-[var(--nm-fg)]">שאל שאלה לוגית</h2>
+      <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
         לפעמים מספיק משפט אחד מדויק כדי לפתוח כיוון חדש. אם השאלה שלך תיגע בנקודה חיה, היא יכולה להפוך למיקרו־פוסט קצר באתר.
       </p>
     </div>
@@ -44,18 +44,18 @@ const contextWaHref = buildArticleContextWhatsAppHref({ tags, articleTitle: arti
       <input type="text" name="botcheck" style="display:none" tabindex="-1" autocomplete="off" aria-hidden="true" />
 
       <div class="space-y-2">
-        <label for="logical-name" class="text-sm font-medium text-[#1A1A1A]/72">שם פרטי</label>
+        <label for="logical-name" class="text-sm font-medium text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">שם פרטי</label>
         <input
           id="logical-name"
           name="name"
           type="text"
           placeholder="לא חובה"
-          class="w-full rounded-2xl border border-[#1A1A1A]/12 bg-[#FAFAF8] px-4 py-3 text-right text-sm text-[#1A1A1A] outline-none transition focus:border-[#D42B2B]/35 focus:ring-2 focus:ring-[#D42B2B]/12"
+          class="w-full rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3 text-right text-sm text-[var(--nm-fg)] outline-none transition focus:border-[color-mix(in_srgb,var(--nm-accent)_35%,transparent)] focus:ring-2 focus:ring-[color-mix(in_srgb,var(--nm-accent)_16%,transparent)]"
         />
       </div>
 
       <div class="space-y-2">
-        <label for="logical-question" class="text-sm font-medium text-[#1A1A1A]/72">השאלה שלך</label>
+        <label for="logical-question" class="text-sm font-medium text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">השאלה שלך</label>
         <textarea
           id="logical-question"
           name="message"
@@ -63,14 +63,14 @@ const contextWaHref = buildArticleContextWhatsAppHref({ tags, articleTitle: arti
           maxlength="320"
           required
           placeholder="למשל: איך מזהים מתי אני תקוע כי אני באמת לא יודע, ומתי אני פשוט מפחד מהמחיר של ההחלטה?"
-          class="w-full rounded-[1.4rem] border border-[#1A1A1A]/12 bg-[#FAFAF8] px-4 py-3 text-right text-sm leading-7 text-[#1A1A1A] outline-none transition focus:border-[#D42B2B]/35 focus:ring-2 focus:ring-[#D42B2B]/12"
+          class="w-full rounded-[1.4rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3 text-right text-sm leading-7 text-[var(--nm-fg)] outline-none transition focus:border-[color-mix(in_srgb,var(--nm-accent)_35%,transparent)] focus:ring-2 focus:ring-[color-mix(in_srgb,var(--nm-accent)_16%,transparent)]"
         ></textarea>
       </div>
 
       <div class="flex flex-wrap gap-3">
         <button
           type="submit"
-          class="inline-flex flex-1 items-center justify-center rounded-full bg-[#1A1A1A] px-5 py-3 text-sm font-semibold text-[#FAFAF8] transition hover:bg-black"
+          class="inline-flex flex-1 items-center justify-center rounded-full bg-[var(--nm-inverse)] px-5 py-3 text-sm font-semibold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-inverse-hover)]"
         >
           שלח שאלה קצרה
         </button>
@@ -78,35 +78,35 @@ const contextWaHref = buildArticleContextWhatsAppHref({ tags, articleTitle: arti
           href={contextWaHref}
           target="_blank"
           rel="noreferrer"
-          class="inline-flex items-center justify-center rounded-full border border-[#1A1A1A]/10 bg-white px-5 py-3 text-sm font-semibold text-[#1A1A1A]/82 transition hover:bg-[#FAFAF8]"
+          class="inline-flex items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white px-5 py-3 text-sm font-semibold text-[color-mix(in_srgb,var(--nm-fg)_82%,var(--nm-bg))] transition hover:bg-[var(--nm-surface-muted)]"
         >
           או שלח בוואטסאפ
         </a>
       </div>
 
-      <p data-logical-question-status aria-live="polite" class="text-sm text-[#1A1A1A]/58 opacity-0 transition-opacity duration-300">
+      <p data-logical-question-status aria-live="polite" class="text-sm text-[color-mix(in_srgb,var(--nm-fg)_58%,var(--nm-bg))] opacity-0 transition-opacity duration-300">
         תודה. אם זו שאלה חיה, היא יכולה להפוך לפוסט קצר בקרוב.
       </p>
     </form>
   </section>
 
-  <section class="rounded-[1.8rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] p-5 text-right">
+  <section class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-5 text-right">
     <div class="space-y-2">
-      <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">מיקרו־פוסטים</p>
-      <h3 class="text-xl font-semibold text-[#1A1A1A]">תשובות קצרות אחרונות</h3>
+      <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">מיקרו־פוסטים</p>
+      <h3 class="text-xl font-semibold text-[var(--nm-fg)]">תשובות קצרות אחרונות</h3>
     </div>
     <div class="mt-4 space-y-3">
       {recentMicroPosts.map((post) => (
         <a
           href={`/questions/#${post.slug}`}
-          class="block rounded-[1.3rem] border border-[#1A1A1A]/10 bg-white px-4 py-4 transition hover:border-[#D42B2B]/18 hover:bg-[#FFF9F8]"
+          class="block rounded-[1.3rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white px-4 py-4 transition hover:border-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)] hover:bg-[var(--nm-tint-hover)]"
         >
-          <p class="text-sm font-semibold leading-7 text-[#1A1A1A]">{post.question}</p>
-          <p class="mt-2 text-sm leading-7 text-[#1A1A1A]/64">{post.answer}</p>
+          <p class="text-sm font-semibold leading-7 text-[var(--nm-fg)]">{post.question}</p>
+          <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_64%,var(--nm-bg))]">{post.answer}</p>
         </a>
       ))}
     </div>
-    <a href="/questions/" class="mt-4 inline-flex text-sm font-semibold text-[#D42B2B] transition hover:opacity-75">
+    <a href="/questions/" class="mt-4 inline-flex text-sm font-semibold text-[var(--nm-accent)] transition hover:opacity-75">
       לכל המיקרו־פוסטים
     </a>
   </section>

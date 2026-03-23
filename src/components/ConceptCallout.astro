@@ -1,19 +1,19 @@
-﻿---
+---
 const { title = "פירוק מושג", term = "" } = Astro.props;
 const heading = term || title;
 ---
 <aside
-  class="rounded-2xl border border-[#1A1A1A]/10 bg-[#F3F1EC] p-[clamp(1.25rem,2vw,2rem)] shadow-sm"
+  class="rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[#F3F1EC] p-[clamp(1.25rem,2vw,2rem)] shadow-sm"
   role="note"
   aria-label={heading}
 >
-  <p class="text-[clamp(0.8rem,0.76rem+0.2vw,0.95rem)] font-semibold uppercase tracking-[0.18em] text-[#1A1A1A]/55">
+  <p class="text-[clamp(0.8rem,0.76rem+0.2vw,0.95rem)] font-semibold uppercase tracking-[0.18em] text-[color-mix(in_srgb,var(--nm-fg)_55%,var(--nm-bg))]">
     פירוק מושג
   </p>
-  <h3 class="mt-3 text-[clamp(1.15rem,1.05rem+0.45vw,1.5rem)] font-semibold leading-tight text-[#1A1A1A]">
+  <h3 class="mt-3 text-[clamp(1.15rem,1.05rem+0.45vw,1.5rem)] font-semibold leading-tight text-[var(--nm-fg)]">
     {heading}
   </h3>
-  <div class="mt-4 text-[clamp(1rem,0.95rem+0.25vw,1.1rem)] leading-[1.85] text-[#1A1A1A]/78">
+  <div class="mt-4 text-[clamp(1rem,0.95rem+0.25vw,1.1rem)] leading-[1.85] text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))]">
     <slot />
   </div>
 </aside>

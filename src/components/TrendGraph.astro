@@ -24,15 +24,15 @@ const { title = "מגמות בקהילה", subtitle = "לפי שאלות ופנ�
 ---
 
 <section
-  class="rounded-[1.75rem] border border-[#1D3557]/12 bg-white p-6 text-right shadow-sm sm:p-8"
+  class="rounded-[1.75rem] border border-[color-mix(in_srgb,var(--nm-fg-secondary)_14%,transparent)] bg-white p-6 text-right shadow-sm sm:p-8"
   dir="rtl"
   aria-labelledby="trend-graph-heading"
 >
   <header class="mb-6 space-y-1">
-    <h2 id="trend-graph-heading" class="text-lg font-semibold text-[#1D3557] sm:text-xl">
+    <h2 id="trend-graph-heading" class="text-lg font-semibold text-[var(--nm-fg-secondary)] sm:text-xl">
       {title}
     </h2>
-    <p class="text-sm text-[#1D3557]/65">{subtitle}</p>
+    <p class="text-sm text-[color-mix(in_srgb,var(--nm-fg-secondary)_70%,var(--nm-bg))]">{subtitle}</p>
   </header>
 
   <ul class="flex flex-col gap-5" role="list">
@@ -42,7 +42,7 @@ const { title = "מגמות בקהילה", subtitle = "לפי שאלות ופנ�
           <div class="flex items-baseline justify-between gap-3 text-sm">
             <span
               class:list={[
-                "font-medium text-[#1D3557]",
+                "font-medium text-[var(--nm-fg-secondary)]",
                 item.isHot && "font-semibold text-[#C1121F]",
               ]}
             >
@@ -55,7 +55,7 @@ const { title = "מגמות בקהילה", subtitle = "לפי שאלות ופנ�
             </span>
             <span
               class:list={[
-                "tabular-nums text-[#1D3557]/75",
+                "tabular-nums text-[var(--nm-fg-secondary)]/75",
                 item.isHot && "font-semibold text-[#C1121F]",
               ]}
             >

@@ -1,4 +1,4 @@
-﻿---
+---
 import appConfig from "../config/appConfig.json";
 
 interface Props {
@@ -28,22 +28,22 @@ const defaultHref = `https://wa.me/${phone}?text=${encodeURIComponent(baseMessag
     type="button"
     data-trigger-open
     aria-expanded="false"
-    class="fixed bottom-24 left-4 z-[72] inline-flex items-center gap-2 rounded-full border border-[#1A1A1A]/10 bg-white/94 px-4 py-3 text-sm font-semibold text-[#1A1A1A] shadow-[0_22px_50px_rgba(26,26,26,0.12)] transition duration-300 hover:translate-y-[-1px] hover:border-[#D42B2B]/24 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D42B2B]/20 md:bottom-28 md:left-6"
+    class="fixed bottom-24 left-4 z-[72] inline-flex items-center gap-2 rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/94 px-4 py-3 text-sm font-semibold text-[var(--nm-fg)] shadow-[0_22px_50px_rgba(26,26,26,0.12)] transition duration-300 hover:translate-y-[-1px] hover:border-[color-mix(in_srgb,var(--nm-accent)_26%,transparent)] hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color-mix(in_srgb,var(--nm-accent)_25%,transparent)] md:bottom-28 md:left-6"
   >
-    <span class="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[#FFF4F3] text-[#D42B2B]">!</span>
+    <span class="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[var(--nm-tint)] text-[var(--nm-accent)]">!</span>
     <span>{buttonLabel}</span>
   </button>
 
   <div
     data-trigger-overlay
     hidden
-    class="fixed inset-0 z-[70] bg-[#1A1A1A]/12 opacity-0 transition-opacity duration-300"
+    class="fixed inset-0 z-[70] bg-[var(--nm-inverse)]/12 opacity-0 transition-opacity duration-300"
   ></div>
 
   <aside
     data-trigger-panel
     hidden
-    class="fixed bottom-24 left-4 z-[71] w-[min(92vw,26rem)] rounded-[2rem] border border-[#1A1A1A]/10 bg-[#FAFAF8]/98 p-5 text-right text-[#1A1A1A] shadow-[0_34px_80px_rgba(26,26,26,0.18)] opacity-0 translate-y-3 transition duration-300 md:bottom-28 md:left-6"
+    class="fixed bottom-24 left-4 z-[71] w-[min(92vw,26rem)] rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)]/98 p-5 text-right text-[var(--nm-fg)] shadow-[0_34px_80px_rgba(26,26,26,0.18)] opacity-0 translate-y-3 transition duration-300 md:bottom-28 md:left-6"
     role="dialog"
     aria-modal="true"
     aria-labelledby="trigger-buster-title"
@@ -52,83 +52,83 @@ const defaultHref = `https://wa.me/${phone}?text=${encodeURIComponent(baseMessag
       <button
         type="button"
         data-trigger-close
-        class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#1A1A1A]/10 bg-white text-lg text-[#1A1A1A]/70 transition hover:border-[#D42B2B]/20 hover:text-[#D42B2B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D42B2B]/20"
+        class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white text-lg text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))] transition hover:border-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)] hover:text-[var(--nm-accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color-mix(in_srgb,var(--nm-accent)_25%,transparent)]"
         aria-label="סגור"
       >
         ×
       </button>
       <div class="space-y-2">
-        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">Trigger Buster</p>
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">Trigger Buster</p>
         <h2 id="trigger-buster-title" class="text-[1.35rem] font-semibold leading-8">בוא נפריד רגע בין מה שקרה לבין מה שהמחשבה בנתה עליו.</h2>
-        <p class="text-sm leading-7 text-[#1A1A1A]/66">שלושה צעדים קצרים. בלי לנתח חיים שלמים. רק לעצור את הלופ ולהחזיר בהירות.</p>
+        <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_66%,var(--nm-bg))]">שלושה צעדים קצרים. בלי לנתח חיים שלמים. רק לעצור את הלופ ולהחזיר בהירות.</p>
       </div>
     </div>
 
     <div class="mt-5 flex gap-2" aria-hidden="true">
-      <span data-trigger-dot="1" class="h-1.5 flex-1 rounded-full bg-[#D42B2B]"></span>
-      <span data-trigger-dot="2" class="h-1.5 flex-1 rounded-full bg-[#1A1A1A]/10"></span>
-      <span data-trigger-dot="3" class="h-1.5 flex-1 rounded-full bg-[#1A1A1A]/10"></span>
+      <span data-trigger-dot="1" class="h-1.5 flex-1 rounded-full bg-[var(--nm-accent)]"></span>
+      <span data-trigger-dot="2" class="h-1.5 flex-1 rounded-full bg-[var(--nm-inverse)]/10"></span>
+      <span data-trigger-dot="3" class="h-1.5 flex-1 rounded-full bg-[var(--nm-inverse)]/10"></span>
     </div>
 
     <div class="mt-6 space-y-5">
       <section data-trigger-step="1" class="space-y-4">
         <div class="space-y-2">
-          <p class="text-sm font-semibold text-[#D42B2B]">שלב 1 מתוך 3</p>
+          <p class="text-sm font-semibold text-[var(--nm-accent)]">שלב 1 מתוך 3</p>
           <h3 class="text-xl font-semibold leading-8">מה העובדה נטו?</h3>
-          <p class="text-sm leading-7 text-[#1A1A1A]/64">בלי הסיפור שסיפרת לעצמך. רק מה קרה בפועל.</p>
+          <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_64%,var(--nm-bg))]">בלי הסיפור שסיפרת לעצמך. רק מה קרה בפועל.</p>
         </div>
         <textarea
           data-trigger-input="fact"
           rows="4"
-          class="w-full rounded-[1.4rem] border border-[#1A1A1A]/12 bg-white px-4 py-3 text-right text-sm leading-7 text-[#1A1A1A] outline-none transition focus:border-[#D42B2B]/35 focus:ring-2 focus:ring-[#D42B2B]/12"
+          class="w-full rounded-[1.4rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-white px-4 py-3 text-right text-sm leading-7 text-[var(--nm-fg)] outline-none transition focus:border-[color-mix(in_srgb,var(--nm-accent)_35%,transparent)] focus:ring-2 focus:ring-[color-mix(in_srgb,var(--nm-accent)_16%,transparent)]"
           placeholder="למשל: הוא לא ענה לי מאז הבוקר"
         ></textarea>
         <div class="flex justify-between gap-3">
-          <button type="button" data-trigger-next="2" class="inline-flex items-center justify-center rounded-full bg-[#1A1A1A] px-5 py-3 text-sm font-semibold text-[#FAFAF8] transition hover:bg-black">להמשיך</button>
-          <button type="button" data-trigger-close-inline class="text-sm font-semibold text-[#1A1A1A]/56 transition hover:text-[#1A1A1A]">לעצור כאן</button>
+          <button type="button" data-trigger-next="2" class="inline-flex items-center justify-center rounded-full bg-[var(--nm-inverse)] px-5 py-3 text-sm font-semibold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-inverse-hover)]">להמשיך</button>
+          <button type="button" data-trigger-close-inline class="text-sm font-semibold text-[var(--nm-fg)]/56 transition hover:text-[var(--nm-fg)]">לעצור כאן</button>
         </div>
       </section>
 
       <section data-trigger-step="2" class="hidden space-y-4">
         <div class="space-y-2">
-          <p class="text-sm font-semibold text-[#D42B2B]">שלב 2 מתוך 3</p>
+          <p class="text-sm font-semibold text-[var(--nm-accent)]">שלב 2 מתוך 3</p>
           <h3 class="text-xl font-semibold leading-8">מה הפירוש שהלבשת על העובדה הזו?</h3>
-          <p class="text-sm leading-7 text-[#1A1A1A]/64">מה כבר החלטת שזה אומר עליך, עליו או על העתיד?</p>
+          <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_64%,var(--nm-bg))]">מה כבר החלטת שזה אומר עליך, עליו או על העתיד?</p>
         </div>
         <textarea
           data-trigger-input="story"
           rows="4"
-          class="w-full rounded-[1.4rem] border border-[#1A1A1A]/12 bg-white px-4 py-3 text-right text-sm leading-7 text-[#1A1A1A] outline-none transition focus:border-[#D42B2B]/35 focus:ring-2 focus:ring-[#D42B2B]/12"
+          class="w-full rounded-[1.4rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-white px-4 py-3 text-right text-sm leading-7 text-[var(--nm-fg)] outline-none transition focus:border-[color-mix(in_srgb,var(--nm-accent)_35%,transparent)] focus:ring-2 focus:ring-[color-mix(in_srgb,var(--nm-accent)_16%,transparent)]"
           placeholder="למשל: הוא מזלזל בי, אז כנראה שאני לא באמת חשוב"
         ></textarea>
         <div class="flex justify-between gap-3">
-          <button type="button" data-trigger-next="3" class="inline-flex items-center justify-center rounded-full bg-[#1A1A1A] px-5 py-3 text-sm font-semibold text-[#FAFAF8] transition hover:bg-black">להמשיך</button>
-          <button type="button" data-trigger-back="1" class="text-sm font-semibold text-[#1A1A1A]/56 transition hover:text-[#1A1A1A]">חזרה</button>
+          <button type="button" data-trigger-next="3" class="inline-flex items-center justify-center rounded-full bg-[var(--nm-inverse)] px-5 py-3 text-sm font-semibold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-inverse-hover)]">להמשיך</button>
+          <button type="button" data-trigger-back="1" class="text-sm font-semibold text-[var(--nm-fg)]/56 transition hover:text-[var(--nm-fg)]">חזרה</button>
         </div>
       </section>
 
       <section data-trigger-step="3" class="hidden space-y-4">
         <div class="space-y-2">
-          <p class="text-sm font-semibold text-[#D42B2B]">שלב 3 מתוך 3</p>
+          <p class="text-sm font-semibold text-[var(--nm-accent)]">שלב 3 מתוך 3</p>
           <h3 class="text-xl font-semibold leading-8">מה הרווח הסמוי שלך מלהישאר כועס או פגוע עכשיו?</h3>
-          <p class="text-sm leading-7 text-[#1A1A1A]/64">לפעמים הכאב מחזיק תחושת צדק, שליטה או הימנעות מהצעד הבא.</p>
+          <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_64%,var(--nm-bg))]">לפעמים הכאב מחזיק תחושת צדק, שליטה או הימנעות מהצעד הבא.</p>
         </div>
         <textarea
           data-trigger-input="gain"
           rows="4"
-          class="w-full rounded-[1.4rem] border border-[#1A1A1A]/12 bg-white px-4 py-3 text-right text-sm leading-7 text-[#1A1A1A] outline-none transition focus:border-[#D42B2B]/35 focus:ring-2 focus:ring-[#D42B2B]/12"
+          class="w-full rounded-[1.4rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-white px-4 py-3 text-right text-sm leading-7 text-[var(--nm-fg)] outline-none transition focus:border-[color-mix(in_srgb,var(--nm-accent)_35%,transparent)] focus:ring-2 focus:ring-[color-mix(in_srgb,var(--nm-accent)_16%,transparent)]"
           placeholder="למשל: כל עוד אני פגוע, אני לא צריך לדבר ישירות או לבדוק מה באמת קרה"
         ></textarea>
         <div class="flex justify-between gap-3">
-          <button type="button" data-trigger-finish class="inline-flex items-center justify-center rounded-full bg-[#D42B2B] px-5 py-3 text-sm font-semibold text-[#FAFAF8] transition hover:bg-[#bc2727]">לסיים</button>
-          <button type="button" data-trigger-back="2" class="text-sm font-semibold text-[#1A1A1A]/56 transition hover:text-[#1A1A1A]">חזרה</button>
+          <button type="button" data-trigger-finish class="inline-flex items-center justify-center rounded-full bg-[var(--nm-accent)] px-5 py-3 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]">לסיים</button>
+          <button type="button" data-trigger-back="2" class="text-sm font-semibold text-[var(--nm-fg)]/56 transition hover:text-[var(--nm-fg)]">חזרה</button>
         </div>
       </section>
 
-      <section data-trigger-result class="hidden rounded-[1.5rem] border border-[#D42B2B]/12 bg-white px-4 py-5">
-        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">השלב הבא</p>
+      <section data-trigger-result class="hidden rounded-[1.5rem] border border-[color-mix(in_srgb,var(--nm-accent)_14%,transparent)] bg-white px-4 py-5">
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">השלב הבא</p>
         <h3 class="mt-3 text-xl font-semibold leading-8">עדיין תקוע בלופ? בוא נפרק את זה.</h3>
-        <p class="mt-3 text-sm leading-7 text-[#1A1A1A]/68">
+        <p class="mt-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
           אם גם אחרי ההפרדה הזו יש רעש, כנראה שכבר לא צריך עוד מחשבה. צריך פירוק מדויק של המנגנון עצמו.
         </p>
         <a
@@ -136,7 +136,7 @@ const defaultHref = `https://wa.me/${phone}?text=${encodeURIComponent(baseMessag
           href={defaultHref}
           target="_blank"
           rel="noreferrer"
-          class="mt-5 inline-flex w-full items-center justify-center rounded-full bg-[#1A1A1A] px-5 py-3 text-sm font-semibold text-[#FAFAF8] transition hover:bg-black"
+          class="mt-5 inline-flex w-full items-center justify-center rounded-full bg-[var(--nm-inverse)] px-5 py-3 text-sm font-semibold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-inverse-hover)]"
         >
           {ctaLabel}
         </a>
@@ -179,8 +179,8 @@ const defaultHref = `https://wa.me/${phone}?text=${encodeURIComponent(baseMessag
     const setDotState = (step) => {
       dots.forEach((dot, index) => {
         if (!(dot instanceof HTMLElement)) return;
-        dot.classList.toggle("bg-[#D42B2B]", index < step);
-        dot.classList.toggle("bg-[#1A1A1A]/10", index >= step);
+        dot.classList.toggle("bg-[var(--nm-accent)]", index < step);
+        dot.classList.toggle("bg-[var(--nm-inverse)]/10", index >= step);
       });
     };
 

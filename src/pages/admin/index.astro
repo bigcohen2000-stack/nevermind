@@ -1,4 +1,4 @@
-﻿---
+---
 import { getCollection } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
 import siteSettings from "../../config/siteSettings.json";
@@ -36,7 +36,7 @@ const workflowConfig = {
   },
   published: {
     label: "פורסם",
-    tone: "bg-[#1A1A1A] text-[#FAFAF8] border-[#1A1A1A]",
+    tone: "bg-[var(--nm-inverse)] text-[var(--nm-inverse-fg)] border-[color-mix(in_srgb,var(--nm-fg)_22%,transparent)]",
   },
 } as const;
 
@@ -53,7 +53,7 @@ const difficultyConfig = {
   },
   deep: {
     label: "חקירה עמוקה",
-    tone: "bg-[#1A1A1A] text-[#FAFAF8] border-[#1A1A1A]",
+    tone: "bg-[var(--nm-inverse)] text-[var(--nm-inverse-fg)] border-[color-mix(in_srgb,var(--nm-fg)_22%,transparent)]",
   },
 } as const;
 
@@ -95,12 +95,12 @@ const articles = (await getCollection("articles"))
       difficultyTone: difficultyMeta.tone,
       status: article.data.draft ? "טיוטה" : "באוויר",
       statusTone: article.data.draft
-        ? "bg-[#FFF4F3] text-[#D42B2B] border-[#D42B2B]/12"
-        : "bg-[#F4FAF4] text-[#1A1A1A] border-[#1A1A1A]/10",
+        ? "bg-[var(--nm-tint)] text-[var(--nm-accent)] border-[color-mix(in_srgb,var(--nm-accent)_14%,transparent)]"
+        : "bg-[#F4FAF4] text-[var(--nm-fg)] border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)]",
       premium: article.data.isPremium ? "כן" : "לא",
       premiumTone: article.data.isPremium
-        ? "bg-[#1A1A1A] text-[#FAFAF8] border-[#1A1A1A]"
-        : "bg-white text-[#1A1A1A]/72 border-[#1A1A1A]/10",
+        ? "bg-[var(--nm-inverse)] text-[var(--nm-inverse-fg)] border-[color-mix(in_srgb,var(--nm-fg)_22%,transparent)]"
+        : "bg-white text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))] border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)]",
       dateLabel: formatDate.format(article.data.pubDate),
       editHref: `${githubArticleBase}${article.id}`,
       viewHref: `/articles/${slug}/`,
@@ -172,19 +172,19 @@ const topPriority =
 ---
 
 <Layout title={pageTitle} description={pageDescription} noIndex={true}>
-  <section class="mx-auto max-w-7xl space-y-10 px-4 pb-12 text-[#1A1A1A]">
-    <header class="grid gap-6 rounded-[2rem] border border-[#1A1A1A]/10 bg-white/82 p-6 shadow-[0_30px_90px_rgba(26,26,26,0.08)] backdrop-blur-md lg:grid-cols-[minmax(0,1fr)_20rem]">
+  <section class="mx-auto max-w-7xl space-y-10 px-4 pb-12 text-[var(--nm-fg)]">
+    <header class="grid gap-6 rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/82 p-6 shadow-[0_30px_90px_rgba(26,26,26,0.08)] backdrop-blur-md lg:grid-cols-[minmax(0,1fr)_20rem]">
       <div class="space-y-5 text-right">
-        <p class="text-sm font-semibold uppercase tracking-[0.26em] text-[#D42B2B]">Creator Dashboard</p>
+        <p class="text-sm font-semibold uppercase tracking-[0.26em] text-[var(--nm-accent)]">Creator Dashboard</p>
         <h1 class="text-[clamp(2.4rem,1.8rem+2vw,4rem)] font-semibold leading-[1.05]">מרכז השליטה של התוכן והמערכת</h1>
-        <p class="max-w-3xl text-[clamp(1rem,0.94rem+0.3vw,1.15rem)] leading-8 text-[#1A1A1A]/70">
+        <p class="max-w-3xl text-[clamp(1rem,0.94rem+0.3vw,1.15rem)] leading-8 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">
           זה הקוקפיט התפעולי שלך. מכאן רואים מה נכתב, מה תקוע, מה מוכן לפרסום, ואילו מנגנונים באתר פעילים כרגע. לא CMS כללי, אלא סביבת עבודה שמותאמת ל־NeverMind.
         </p>
       </div>
-      <div class="rounded-[1.6rem] border border-[#D42B2B]/14 bg-[#FFF4F3] p-5 text-right">
-        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">תעדוף להיום</p>
-        <p class="mt-3 text-lg font-semibold text-[#1A1A1A]">{topPriority}</p>
-        <p class="mt-3 text-sm leading-7 text-[#1A1A1A]/64">
+      <div class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-accent)_18%,transparent)] bg-[var(--nm-tint)] p-5 text-right">
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">תעדוף להיום</p>
+        <p class="mt-3 text-lg font-semibold text-[var(--nm-fg)]">{topPriority}</p>
+        <p class="mt-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_64%,var(--nm-bg))]">
           אם אתה רק מתחיל סבב עבודה חדש, המסלול הנכון הוא: מחולל מאמרים, בדיקת QA, ואז קפיצה לטבלת התוכן כדי לקדם את הסטטוס.
         </p>
       </div>
@@ -192,23 +192,23 @@ const topPriority =
 
     <section class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
       {quickActions.map((item) => (
-        <article class="rounded-[1.8rem] border border-[#1A1A1A]/10 bg-white/82 p-5 shadow-[0_24px_70px_rgba(26,26,26,0.06)]">
-          <h2 class="text-xl font-semibold text-[#1A1A1A]">{item.title}</h2>
-          <p class="mt-4 text-sm leading-7 text-[#1A1A1A]/68">{item.description}</p>
-          <a href={item.href} class="mt-6 inline-flex items-center rounded-full bg-[#1A1A1A] px-4 py-2 text-sm font-semibold text-[#FAFAF8] transition hover:bg-black">{item.cta}</a>
+        <article class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/82 p-5 shadow-[0_24px_70px_rgba(26,26,26,0.06)]">
+          <h2 class="text-xl font-semibold text-[var(--nm-fg)]">{item.title}</h2>
+          <p class="mt-4 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">{item.description}</p>
+          <a href={item.href} class="mt-6 inline-flex items-center rounded-full bg-[var(--nm-inverse)] px-4 py-2 text-sm font-semibold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-inverse-hover)]">{item.cta}</a>
         </article>
       ))}
     </section>
 
     <section class="grid gap-4 md:grid-cols-4 xl:grid-cols-8">
-      <article class="rounded-[1.6rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] p-5 text-right"><p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">מאמרים</p><p class="mt-3 text-3xl font-semibold text-[#1A1A1A]">{stats.totalArticles}</p></article>
-      <article class="rounded-[1.6rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] p-5 text-right"><p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">טיוטות</p><p class="mt-3 text-3xl font-semibold text-[#1A1A1A]">{stats.drafts}</p></article>
-      <article class="rounded-[1.6rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] p-5 text-right"><p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">באוויר</p><p class="mt-3 text-3xl font-semibold text-[#1A1A1A]">{stats.live}</p></article>
-      <article class="rounded-[1.6rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] p-5 text-right"><p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">בכתיבה</p><p class="mt-3 text-3xl font-semibold text-[#1A1A1A]">{stats.writing}</p></article>
-      <article class="rounded-[1.6rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] p-5 text-right"><p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">לבדיקה</p><p class="mt-3 text-3xl font-semibold text-[#1A1A1A]">{stats.review}</p></article>
-      <article class="rounded-[1.6rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] p-5 text-right"><p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">מוכן לפרסום</p><p class="mt-3 text-3xl font-semibold text-[#1A1A1A]">{stats.ready}</p></article>
-      <article class="rounded-[1.6rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] p-5 text-right"><p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">פורסם</p><p class="mt-3 text-3xl font-semibold text-[#1A1A1A]">{stats.published}</p></article>
-      <article class="rounded-[1.6rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] p-5 text-right"><p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">שירותים פעילים</p><p class="mt-3 text-3xl font-semibold text-[#1A1A1A]">{stats.activeServices}</p></article>
+      <article class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-5 text-right"><p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">מאמרים</p><p class="mt-3 text-3xl font-semibold text-[var(--nm-fg)]">{stats.totalArticles}</p></article>
+      <article class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-5 text-right"><p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">טיוטות</p><p class="mt-3 text-3xl font-semibold text-[var(--nm-fg)]">{stats.drafts}</p></article>
+      <article class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-5 text-right"><p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">באוויר</p><p class="mt-3 text-3xl font-semibold text-[var(--nm-fg)]">{stats.live}</p></article>
+      <article class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-5 text-right"><p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">בכתיבה</p><p class="mt-3 text-3xl font-semibold text-[var(--nm-fg)]">{stats.writing}</p></article>
+      <article class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-5 text-right"><p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">לבדיקה</p><p class="mt-3 text-3xl font-semibold text-[var(--nm-fg)]">{stats.review}</p></article>
+      <article class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-5 text-right"><p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">מוכן לפרסום</p><p class="mt-3 text-3xl font-semibold text-[var(--nm-fg)]">{stats.ready}</p></article>
+      <article class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-5 text-right"><p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">פורסם</p><p class="mt-3 text-3xl font-semibold text-[var(--nm-fg)]">{stats.published}</p></article>
+      <article class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-5 text-right"><p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">שירותים פעילים</p><p class="mt-3 text-3xl font-semibold text-[var(--nm-fg)]">{stats.activeServices}</p></article>
     </section>
 
     <ArticlesTable articles={articles} />
@@ -224,24 +224,24 @@ const topPriority =
     </div>
 
     <section class="grid gap-4 md:grid-cols-2">
-      <article class="rounded-[1.8rem] border border-[#1A1A1A]/10 bg-white/82 p-5 shadow-[0_24px_70px_rgba(26,26,26,0.06)] text-right">
-        <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[#D42B2B]">System State</p>
-        <h2 class="mt-3 text-2xl font-semibold text-[#1A1A1A]">מודולים גלובליים</h2>
-        <ul class="mt-5 space-y-3 text-sm leading-7 text-[#1A1A1A]/72">
-          <li class="rounded-[1.2rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] px-4 py-3">Whisper Banner: <strong>{siteSettings.whisperBanner.enabled ? "מופעל" : "כבוי"}</strong></li>
-          <li class="rounded-[1.2rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] px-4 py-3">Premium Vault: <strong>{siteSettings.premiumVault.enabled ? "מופעל" : "כבוי"}</strong></li>
-          <li class="rounded-[1.2rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] px-4 py-3">Logic Canvas / TrendGraph: <strong>{stats.homeCanvasTrend}</strong></li>
-          <li class="rounded-[1.2rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] px-4 py-3">Clarity Journeys: <strong>{stats.clarityJourneys} מסלולים</strong></li>
+      <article class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/82 p-5 shadow-[0_24px_70px_rgba(26,26,26,0.06)] text-right">
+        <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--nm-accent)]">System State</p>
+        <h2 class="mt-3 text-2xl font-semibold text-[var(--nm-fg)]">מודולים גלובליים</h2>
+        <ul class="mt-5 space-y-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+          <li class="rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3">Whisper Banner: <strong>{siteSettings.whisperBanner.enabled ? "מופעל" : "כבוי"}</strong></li>
+          <li class="rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3">Premium Vault: <strong>{siteSettings.premiumVault.enabled ? "מופעל" : "כבוי"}</strong></li>
+          <li class="rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3">Logic Canvas / TrendGraph: <strong>{stats.homeCanvasTrend}</strong></li>
+          <li class="rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3">Clarity Journeys: <strong>{stats.clarityJourneys} מסלולים</strong></li>
         </ul>
       </article>
 
-      <article class="rounded-[1.8rem] border border-[#1A1A1A]/10 bg-white/82 p-5 shadow-[0_24px_70px_rgba(26,26,26,0.06)] text-right">
-        <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[#D42B2B]">Recommended Flow</p>
-        <h2 class="mt-3 text-2xl font-semibold text-[#1A1A1A]">מה עושים מכאן</h2>
-        <ol class="mt-5 space-y-3 text-sm leading-7 text-[#1A1A1A]/72">
-          <li class="rounded-[1.2rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] px-4 py-3">יוצרים מאמר חדש דרך המחולל.</li>
-          <li class="rounded-[1.2rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] px-4 py-3">מקדמים כל מאמר דרך התור: בכתיבה, לבדיקה, מוכן לפרסום, ואז פורסם.</li>
-          <li class="rounded-[1.2rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] px-4 py-3">בודקים את השירותים והקונפיג לפני כל push כדי לא לשבור את האתר החי.</li>
+      <article class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/82 p-5 shadow-[0_24px_70px_rgba(26,26,26,0.06)] text-right">
+        <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--nm-accent)]">Recommended Flow</p>
+        <h2 class="mt-3 text-2xl font-semibold text-[var(--nm-fg)]">מה עושים מכאן</h2>
+        <ol class="mt-5 space-y-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+          <li class="rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3">יוצרים מאמר חדש דרך המחולל.</li>
+          <li class="rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3">מקדמים כל מאמר דרך התור: בכתיבה, לבדיקה, מוכן לפרסום, ואז פורסם.</li>
+          <li class="rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3">בודקים את השירותים והקונפיג לפני כל push כדי לא לשבור את האתר החי.</li>
         </ol>
       </article>
     </section>

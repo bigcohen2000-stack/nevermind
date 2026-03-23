@@ -1,4 +1,4 @@
-﻿import React, { useState } from "react";
+import React, { useState } from "react";
 
 interface LiteYouTubeEmbedProps {
   videoId: string;
@@ -54,8 +54,8 @@ export default function LiteYouTubeEmbed({
         height="360"
       />
       <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-red-600 shadow-xl transition-transform group-hover:scale-110">
-          <svg className="ml-1 h-8 w-8 text-white" viewBox="0 0 24 24" fill="currentColor">
+        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[var(--nm-accent)] shadow-xl transition-transform group-hover:scale-110">
+          <svg className="ml-1 h-8 w-8 text-[var(--nm-on-accent)]" viewBox="0 0 24 24" fill="currentColor">
             <path d="M8 5v14l11-7z" />
           </svg>
         </div>

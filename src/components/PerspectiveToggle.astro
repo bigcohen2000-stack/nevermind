@@ -14,26 +14,26 @@ const uid = `pt-${Math.random().toString(36).slice(2, 11)}`;
 const switchLabel = `${labelProblem} / ${labelOpposite}`;
 ---
 
-<div class="nm-perspective-toggle my-8 rounded-[1.5rem] border border-[#1D3557]/14 bg-white p-6 text-right shadow-sm dark:border-white/12 dark:bg-neutral-900/75" dir="rtl">
-  <p class="text-sm font-semibold text-[#1D3557] dark:text-[#FAFAF8]">נקודת מבט</p>
+<div class="nm-perspective-toggle my-8 rounded-[1.5rem] border border-[color-mix(in_srgb,var(--nm-fg-secondary)_16%,transparent)] bg-white p-6 text-right shadow-sm dark:border-white/12 dark:bg-neutral-900/75" dir="rtl">
+  <p class="text-sm font-semibold text-[var(--nm-fg-secondary)] dark:text-[var(--nm-inverse-fg)]">נקודת מבט</p>
 
   <input type="checkbox" id={uid} class="peer sr-only" aria-label={switchLabel} />
 
   <label
     for={uid}
-    class="mt-4 inline-flex w-full max-w-md cursor-pointer select-none rounded-full border border-[#1D3557]/18 bg-[#FAFAF8] p-1 dark:border-white/14 dark:bg-neutral-800 [&_.t-problem]:bg-[#1D3557]/14 [&_.t-problem]:text-[#1D3557] [&_.t-opposite]:text-[#1D3557]/48 peer-checked:[&_.t-problem]:bg-transparent peer-checked:[&_.t-problem]:text-[#1D3557]/45 dark:[&_.t-problem]:bg-white/10 dark:[&_.t-problem]:text-[#FAFAF8] dark:[&_.t-opposite]:text-[#FAFAF8]/45 dark:peer-checked:[&_.t-problem]:text-[#FAFAF8]/40 peer-checked:[&_.t-opposite]:bg-[#D42B2B] peer-checked:[&_.t-opposite]:text-[#FAFAF8] peer-checked:[&_.t-opposite]:shadow-[0_0_0_2px_rgba(29,53,87,0.22)]"
+    class="mt-4 inline-flex w-full max-w-md cursor-pointer select-none rounded-full border border-[color-mix(in_srgb,var(--nm-fg-secondary)_20%,transparent)] bg-[var(--nm-surface-muted)] p-1 dark:border-white/14 dark:bg-neutral-800 [&_.t-problem]:bg-[#1D3557]/14 [&_.t-problem]:text-[var(--nm-fg-secondary)] [&_.t-opposite]:text-[var(--nm-fg-secondary)]/48 peer-checked:[&_.t-problem]:bg-transparent peer-checked:[&_.t-problem]:text-[var(--nm-fg-secondary)]/45 dark:[&_.t-problem]:bg-white/10 dark:[&_.t-problem]:text-[var(--nm-inverse-fg)] dark:[&_.t-opposite]:text-[var(--nm-inverse-fg)]/45 dark:peer-checked:[&_.t-problem]:text-[var(--nm-inverse-fg)]/40 peer-checked:[&_.t-opposite]:bg-[var(--nm-accent)] peer-checked:[&_.t-opposite]:text-[var(--nm-on-accent)] peer-checked:[&_.t-opposite]:shadow-[0_0_0_2px_color-mix(in_srgb,var(--nm-accent)_28%,transparent)]"
   >
     <span class="t-problem flex-1 rounded-full px-3 py-2 text-center text-sm font-semibold transition-colors">{labelProblem}</span>
     <span class="t-opposite flex-1 rounded-full px-3 py-2 text-center text-sm font-semibold transition-colors">{labelOpposite}</span>
   </label>
 
   <p
-    class="mt-5 border-s-4 border-[#1D3557] ps-4 text-[clamp(1rem,0.95rem+0.25vw,1.12rem)] leading-[1.85] text-[#1A1A1A] peer-checked:hidden dark:border-[#FAFAF8]/35 dark:text-[#FAFAF8]/92"
+    class="mt-5 border-s-4 border-[#1D3557] ps-4 text-[clamp(1rem,0.95rem+0.25vw,1.12rem)] leading-[1.85] text-[var(--nm-fg)] peer-checked:hidden dark:border-[#FAFAF8]/35 dark:text-[var(--nm-inverse-fg)]/92"
   >
     {problem}
   </p>
   <p
-    class="mt-5 hidden border-s-4 border-[#D42B2B] ps-4 text-[clamp(1rem,0.95rem+0.25vw,1.12rem)] leading-[1.85] text-[#1A1A1A] peer-checked:block dark:text-[#FAFAF8]/92"
+    class="mt-5 hidden border-s-4 border-[var(--nm-accent)] ps-4 text-[clamp(1rem,0.95rem+0.25vw,1.12rem)] leading-[1.85] text-[var(--nm-fg)] peer-checked:block dark:text-[var(--nm-inverse-fg)]/92"
   >
     {opposite}
   </p>

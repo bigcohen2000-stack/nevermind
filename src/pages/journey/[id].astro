@@ -57,16 +57,16 @@ const description = journey.shortDescription;
   <article class="mx-auto max-w-4xl space-y-10 px-5 py-16 text-right sm:px-8 md:py-24" dir="rtl">
     <header class="space-y-4">
       <p class="text-4xl" aria-hidden="true">{journey.emoji}</p>
-      <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[#D42B2B]">Clarity Path</p>
-      <h1 class="text-[clamp(1.85rem,1.4rem+1.6vw,2.75rem)] font-semibold leading-tight text-[#1A1A1A] dark:text-white">
+      <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--nm-accent)]">Clarity Path</p>
+      <h1 class="text-[clamp(1.85rem,1.4rem+1.6vw,2.75rem)] font-semibold leading-tight text-[var(--nm-fg)] dark:text-[var(--nm-fg)]">
         {journey.title}
       </h1>
-      <p class="max-w-2xl text-[clamp(1.02rem,0.96rem+0.25vw,1.2rem)] leading-relaxed text-[#1A1A1A]/72 dark:text-neutral-300">
+      <p class="max-w-2xl text-[clamp(1.02rem,0.96rem+0.25vw,1.2rem)] leading-relaxed text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))] dark:text-neutral-300">
         {journey.shortDescription}
       </p>
       <a
         href="/"
-        class="inline-flex items-center justify-center rounded-full border border-[#1A1A1A]/12 bg-white px-4 py-2 text-sm font-semibold text-[#1A1A1A]/78 transition hover:bg-[#FAFAF8] dark:border-white/15 dark:bg-neutral-900 dark:text-[#FAFAF8]/88"
+        class="inline-flex items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-white px-4 py-2 text-sm font-semibold text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))] transition hover:bg-[var(--nm-surface-muted)] dark:border-white/15 dark:bg-neutral-900 dark:text-[var(--nm-inverse-fg)]/88"
       >
         חזרה לדף הבית
       </a>
@@ -76,19 +76,19 @@ const description = journey.shortDescription;
       {
         articles.map((article, index) => (
           <li class="relative">
-            <div class="flex flex-col gap-3 rounded-[1.75rem] border border-[#1D3557]/14 bg-white/90 p-6 shadow-[0_20px_60px_rgba(29,53,87,0.06)] dark:border-white/10 dark:bg-neutral-900/80 md:p-8">
+            <div class="flex flex-col gap-3 rounded-[1.75rem] border border-[color-mix(in_srgb,var(--nm-fg-secondary)_16%,transparent)] bg-white/90 p-6 shadow-[0_20px_60px_rgba(29,53,87,0.06)] dark:border-white/10 dark:bg-neutral-900/80 md:p-8">
               <div class="flex flex-wrap items-baseline justify-between gap-3">
-                <span class="inline-flex h-9 min-w-[2.25rem] items-center justify-center rounded-full bg-[#1D3557] px-3 text-sm font-bold text-white">
+                <span class="inline-flex h-9 min-w-[2.25rem] items-center justify-center rounded-full bg-[var(--nm-inverse)] px-3 text-sm font-bold text-[var(--nm-inverse-fg)]">
                   {index + 1}
                 </span>
-                <span class="text-xs font-medium text-[#1D3557]/55 dark:text-[#FAFAF8]/50">שלב {index + 1} מתוך 3</span>
+                <span class="text-xs font-medium text-[var(--nm-fg-secondary)]/55 dark:text-[var(--nm-inverse-fg)]/50">שלב {index + 1} מתוך 3</span>
               </div>
-              <p class="text-sm leading-7 text-[#1D3557]/75 dark:text-neutral-400">{stepHints[index] ?? stepHints[0]}</p>
-              <h2 class="text-xl font-semibold text-[#1D3557] dark:text-[#FAFAF8] md:text-2xl">{article.data.title}</h2>
-              <p class="text-sm leading-7 text-[#1A1A1A]/68 dark:text-neutral-400">{article.data.description}</p>
+              <p class="text-sm leading-7 text-[var(--nm-fg-secondary)]/75 dark:text-neutral-400">{stepHints[index] ?? stepHints[0]}</p>
+              <h2 class="text-xl font-semibold text-[var(--nm-fg-secondary)] dark:text-[var(--nm-inverse-fg)] md:text-2xl">{article.data.title}</h2>
+              <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))] dark:text-neutral-400">{article.data.description}</p>
               <a
                 href={`/articles/${article.slug}`}
-                class="inline-flex w-fit items-center justify-center rounded-full bg-[#D42B2B] px-5 py-2.5 text-sm font-semibold text-[#FAFAF8] transition hover:bg-[#b82424]"
+                class="inline-flex w-fit items-center justify-center rounded-full bg-[var(--nm-accent)] px-5 py-2.5 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]"
               >
                 לקריאת המאמר
               </a>

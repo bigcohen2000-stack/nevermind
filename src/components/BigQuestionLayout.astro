@@ -38,10 +38,10 @@ const readContextLine = buildArticleReadContextLine({ tags, articleTitle });
 ---
 
 <section
-  class="bq-root text-right text-[clamp(1.05rem,1rem+0.35vw,1.2rem)] leading-[1.8] text-[#1A1A1A] dark:text-[#F5F5F5] [letter-spacing:0]"
+  class="bq-root text-right text-[clamp(1.05rem,1rem+0.35vw,1.2rem)] leading-[1.8] text-[var(--nm-fg)] dark:text-[var(--nm-fg)] [letter-spacing:0]"
   aria-labelledby="bq-heading"
 >
-  <h2 id="bq-heading" class="text-[clamp(1.35rem,1.15rem+1vw,1.75rem)] font-semibold text-[#1A1A1A] dark:text-[#FAFAF8] [letter-spacing:0]">
+  <h2 id="bq-heading" class="text-[clamp(1.35rem,1.15rem+1vw,1.75rem)] font-semibold text-[var(--nm-fg)] dark:text-[var(--nm-inverse-fg)] [letter-spacing:0]">
     עצור רגע לפני ששולחים שאלה
   </h2>
 
@@ -51,17 +51,17 @@ const readContextLine = buildArticleReadContextLine({ tags, articleTitle });
 
   <!-- Method of Opposites -->
   <div
-    class="bq-opposites mt-8 overflow-hidden rounded-2xl border border-[#1A1A1A]/10 shadow-sm dark:border-white/10"
+    class="bq-opposites mt-8 overflow-hidden rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] shadow-sm dark:border-white/10"
     role="region"
     aria-label="תרגיל שאל את ההפך"
   >
-    <p class="border-b border-[#1A1A1A]/10 bg-[#FAFAF8] px-4 py-3 text-center text-[clamp(0.95rem,0.9rem+0.2vw,1.05rem)] font-semibold text-[#1A1A1A] dark:border-white/10 dark:bg-[#111] dark:text-[#FAFAF8]">
+    <p class="border-b border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3 text-center text-[clamp(0.95rem,0.9rem+0.2vw,1.05rem)] font-semibold text-[var(--nm-fg)] dark:border-white/10 dark:bg-[#111] dark:text-[var(--nm-inverse-fg)]">
       שאל את ההפך
     </p>
     <div class="grid md:grid-cols-2">
       <div
-        class="bq-opposites__red min-h-[9rem] border-b border-[#1A1A1A]/10 p-5 md:border-b-0 md:border-e dark:border-white/10"
-        style="background: linear-gradient(165deg, rgba(212, 43, 43, 0.14) 0%, rgba(212, 43, 43, 0.06) 100%);"
+        class="bq-opposites__red min-h-[9rem] border-b border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] p-5 md:border-b-0 md:border-e dark:border-white/10"
+        style="background: linear-gradient(165deg, rgba(249, 115, 22, 0.14) 0%, rgba(249, 115, 22, 0.06) 100%);"
       >
         <p class="text-[0.7rem] font-bold uppercase text-[#B91C1C] [letter-spacing:0] dark:text-[#FCA5A5]">מה נוטה לצאת ממני</p>
         <p class="mt-3">
@@ -72,7 +72,7 @@ const readContextLine = buildArticleReadContextLine({ tags, articleTitle });
         class="bq-opposites__navy min-h-[9rem] p-5"
         style="background: linear-gradient(165deg, rgba(29, 53, 87, 0.16) 0%, rgba(29, 53, 87, 0.06) 100%);"
       >
-        <p class="text-[0.7rem] font-bold uppercase text-[#1D3557] [letter-spacing:0] dark:text-[#93C5FD]">מה קורה אם הופכים</p>
+        <p class="text-[0.7rem] font-bold uppercase text-[var(--nm-fg-secondary)] [letter-spacing:0] dark:text-[#93C5FD]">מה קורה אם הופכים</p>
         <p class="mt-3">
           אם הייתי אומר את ההפך בקול שקט — מה היה משתנה? לא צריך תשובה נכונה; צריך כיוון אחר לנסות.
         </p>
@@ -81,8 +81,8 @@ const readContextLine = buildArticleReadContextLine({ tags, articleTitle });
   </div>
 
   <!-- Glossary (dfn + CSS tooltip) -->
-  <div class="mt-8 rounded-2xl border border-[#1A1A1A]/10 bg-white/60 px-4 py-5 dark:border-white/10 dark:bg-white/5">
-    <p class="mb-3 text-[clamp(1rem,0.95rem+0.2vw,1.1rem)] font-medium text-[#1A1A1A]/90 dark:text-[#FAFAF8]/90">
+  <div class="mt-8 rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/60 px-4 py-5 dark:border-white/10 dark:bg-white/5">
+    <p class="mb-3 text-[clamp(1rem,0.95rem+0.2vw,1.1rem)] font-medium text-[color-mix(in_srgb,var(--nm-fg)_90%,var(--nm-bg))] dark:text-[var(--nm-inverse-fg)]/90">
       שני מילים שעוזרות לי לא לאבד את עצמי בטקסט:
     </p>
     <ul class="flex flex-wrap gap-x-3 gap-y-2">
@@ -110,7 +110,7 @@ const readContextLine = buildArticleReadContextLine({ tags, articleTitle });
     <p class="text-[clamp(1rem,0.95rem+0.25vw,1.15rem)] font-medium text-[#064E3B] dark:text-[#A7F3D0]">
       משפט אחד בשבילך — בלי טפסים ומיילים, רק שיחה בוואטסאפ כשתרצה:
     </p>
-    <p class="text-[#1A1A1A]/85 dark:text-[#FAFAF8]/85">
+    <p class="text-[color-mix(in_srgb,var(--nm-fg)_85%,var(--nm-bg))] dark:text-[var(--nm-inverse-fg)]/85">
       אם הייתי מפסיק/ת לפחד מ־
       <input
         data-bq-fear
@@ -118,7 +118,7 @@ const readContextLine = buildArticleReadContextLine({ tags, articleTitle });
         name="fear_blank"
         autocomplete="off"
         placeholder="למשל: להישאר בלי תשובה"
-        class="mx-1 inline-block min-w-[8rem] max-w-full rounded-lg border border-[#1A1A1A]/15 bg-white/90 px-2 py-1 text-[1em] text-[#1A1A1A] placeholder:text-[#1A1A1A]/40 focus:border-[#128C7E]/50 focus:outline-none focus:ring-2 focus:ring-[#128C7E]/20 dark:border-white/15 dark:bg-[#0a0a0a] dark:text-[#FAFAF8]"
+        class="mx-1 inline-block min-w-[8rem] max-w-full rounded-lg border border-[color-mix(in_srgb,var(--nm-fg)_15%,transparent)] bg-white/90 px-2 py-1 text-[1em] text-[var(--nm-fg)] placeholder:text-[color-mix(in_srgb,var(--nm-fg)_40%,var(--nm-bg))] focus:border-[#128C7E]/50 focus:outline-none focus:ring-2 focus:ring-[#128C7E]/20 dark:border-white/15 dark:bg-[#0a0a0a] dark:text-[var(--nm-inverse-fg)]"
       />
       , הייתי
       <input
@@ -127,7 +127,7 @@ const readContextLine = buildArticleReadContextLine({ tags, articleTitle });
         name="would_blank"
         autocomplete="off"
         placeholder="למשל: מבקש/ת עזרה אחת קטנה"
-        class="mx-1 inline-block min-w-[8rem] max-w-full rounded-lg border border-[#1A1A1A]/15 bg-white/90 px-2 py-1 text-[1em] text-[#1A1A1A] placeholder:text-[#1A1A1A]/40 focus:border-[#128C7E]/50 focus:outline-none focus:ring-2 focus:ring-[#128C7E]/20 dark:border-white/15 dark:bg-[#0a0a0a] dark:text-[#FAFAF8]"
+        class="mx-1 inline-block min-w-[8rem] max-w-full rounded-lg border border-[color-mix(in_srgb,var(--nm-fg)_15%,transparent)] bg-white/90 px-2 py-1 text-[1em] text-[var(--nm-fg)] placeholder:text-[color-mix(in_srgb,var(--nm-fg)_40%,var(--nm-bg))] focus:border-[#128C7E]/50 focus:outline-none focus:ring-2 focus:ring-[#128C7E]/20 dark:border-white/15 dark:bg-[#0a0a0a] dark:text-[var(--nm-inverse-fg)]"
       />
       .
     </p>
@@ -137,7 +137,7 @@ const readContextLine = buildArticleReadContextLine({ tags, articleTitle });
       data-label-pending="מלאו את שני הריבועים — ואז נפתחת שיחה מיידית עם יקיר"
       data-label-ready="שלח ליקיר לקבלת תובנה"
       disabled
-      class="bq-fill-wa-btn w-full rounded-full px-5 py-3 text-[clamp(1rem,0.95rem+0.2vw,1.1rem)] font-semibold text-white transition md:w-auto [letter-spacing:0]"
+      class="bq-fill-wa-btn w-full rounded-full px-5 py-3 text-[clamp(1rem,0.95rem+0.2vw,1.1rem)] font-semibold transition-colors duration-200 md:w-auto [letter-spacing:0]"
     >
       מלאו את שני הריבועים — ואז נפתחת שיחה מיידית עם יקיר
     </button>
@@ -145,7 +145,7 @@ const readContextLine = buildArticleReadContextLine({ tags, articleTitle });
 
   <!-- Context WhatsApp -->
   <div class="mt-8 rounded-2xl border border-[#128C7E]/20 bg-[#DCFCE7]/35 p-5 dark:border-[#128C7E]/30 dark:bg-[#14532D]/20">
-    <p class="mb-4 text-[clamp(1rem,0.95rem+0.2vw,1.1rem)] font-medium text-[#1A1A1A] dark:text-[#FAFAF8]/90">
+    <p class="mb-4 text-[clamp(1rem,0.95rem+0.2vw,1.1rem)] font-medium text-[var(--nm-fg)] dark:text-[var(--nm-inverse-fg)]/90">
       או שאפשר פשוט לפתוח שיחה — וברירת המחדל כבר תזכיר לי
       <span class="font-semibold text-[#075E54] dark:text-[#6EE7B7]">איזה נושא קראת</span>.
     </p>
@@ -210,8 +210,13 @@ const readContextLine = buildArticleReadContextLine({ tags, articleTitle });
 
   .bq-root .bq-fill-wa-btn {
     background-color: #128c7e;
+    color: #ffffff;
     opacity: 0.48;
     cursor: not-allowed;
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease,
+      opacity 0.2s ease;
   }
 
   .bq-root .bq-fill-wa-btn:not(:disabled) {

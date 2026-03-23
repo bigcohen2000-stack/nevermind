@@ -1,4 +1,4 @@
-﻿---
+---
 import appConfig from "../config/appConfig.json";
 
 interface Props {
@@ -41,13 +41,13 @@ const initialMonthPhrase = toMonthPhrase(initialWorkDays);
   data-cost-of-no
   data-phone={phone}
   data-base-message={baseMessage}
-  class="not-prose rounded-[2.2rem] border border-[#1A1A1A]/10 bg-white/90 p-6 text-right text-[#1A1A1A] shadow-[0_26px_70px_rgba(26,26,26,0.08)] backdrop-blur-sm md:p-8"
+  class="not-prose rounded-[2.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 p-6 text-right text-[var(--nm-fg)] shadow-[0_26px_70px_rgba(26,26,26,0.08)] backdrop-blur-sm md:p-8"
   aria-label="מחשבון מחיר חוסר ההחלטה"
 >
   <div class="space-y-3">
-    <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">מחיר חוסר ההחלטה</p>
+    <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">מחיר חוסר ההחלטה</p>
     <h2 class="text-[clamp(1.8rem,1.4rem+1vw,2.6rem)] font-semibold leading-[1.08]">כמה קשב אתה כבר שורף על אותו בלבול?</h2>
-    <p class="max-w-3xl text-sm leading-7 text-[#1A1A1A]/68">
+    <p class="max-w-3xl text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
       זה לא חישוב כלכלי. זה מדד לזמן, קשב ותנועה שלא קרתה. לפעמים המחיר של "עוד קצת לחשוב" כבר גדול יותר מהבחירה עצמה.
     </p>
   </div>
@@ -63,18 +63,18 @@ const initialMonthPhrase = toMonthPhrase(initialWorkDays);
         step="1"
         value={defaultHours}
         inputmode="numeric"
-        class="w-full rounded-[1.4rem] border border-[#1A1A1A]/12 bg-[#FAFAF8] px-4 py-4 text-right text-lg font-semibold text-[#1A1A1A] outline-none transition duration-300 focus:border-[#D42B2B]/35 focus:ring-2 focus:ring-[#D42B2B]/12"
+        class="w-full rounded-[1.4rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-4 text-right text-lg font-semibold text-[var(--nm-fg)] outline-none transition duration-300 focus:border-[color-mix(in_srgb,var(--nm-accent)_35%,transparent)] focus:ring-2 focus:ring-[color-mix(in_srgb,var(--nm-accent)_16%,transparent)]"
       />
-      <p class="text-xs leading-6 text-[#1A1A1A]/52">אפשר להכניס כל מספר בין {minHours} ל־{maxHours} שעות.</p>
+      <p class="text-xs leading-6 text-[var(--nm-fg)]/52">אפשר להכניס כל מספר בין {minHours} ל־{maxHours} שעות.</p>
     </label>
 
-    <div class="rounded-[1.8rem] border border-[#D42B2B]/12 bg-[#FFF7F6] p-5 md:p-6">
-      <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">התוצאה</p>
+    <div class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-accent)_14%,transparent)] bg-[#FFF7F6] p-5 md:p-6">
+      <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">התוצאה</p>
       <div class="mt-4 space-y-4">
         <p data-cost-year-hours class="text-[clamp(2.15rem,1.8rem+1.2vw,3.3rem)] font-semibold leading-none">
           זה שווה ל־{initialYearHours} שעות בשנה.
         </p>
-        <p data-cost-workdays class="text-[1.05rem] leading-8 text-[#1A1A1A]/76">
+        <p data-cost-workdays class="text-[1.05rem] leading-8 text-[color-mix(in_srgb,var(--nm-fg)_76%,var(--nm-bg))]">
           במונחי עבודה: הפסדת {initialMonthPhrase} רק על בלבול.
         </p>
       </div>
@@ -84,7 +84,7 @@ const initialMonthPhrase = toMonthPhrase(initialWorkDays);
         href={defaultHref}
         target="_blank"
         rel="noreferrer"
-        class="mt-6 inline-flex items-center justify-center rounded-full bg-[#D42B2B] px-6 py-3 text-sm font-semibold text-[#FAFAF8] transition duration-300 hover:translate-y-[-1px] hover:bg-[#bc2727] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D42B2B]/20"
+        class="mt-6 inline-flex items-center justify-center rounded-full bg-[var(--nm-accent)] px-6 py-3 text-sm font-semibold text-[var(--nm-on-accent)] transition duration-300 hover:translate-y-[-1px] hover:bg-[var(--nm-accent-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color-mix(in_srgb,var(--nm-accent)_25%,transparent)]"
       >
         {ctaLabel}
       </a>

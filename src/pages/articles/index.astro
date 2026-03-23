@@ -1,4 +1,4 @@
-﻿---
+---
 import { getCollection } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
 
@@ -15,7 +15,7 @@ const difficultyConfig: Record<DifficultyKey, { label: string; tone: string }> =
   },
   deep: {
     label: "חקירה עמוקה",
-    tone: "bg-[#1A1A1A] text-[#FAFAF8] border-[#1A1A1A]",
+    tone: "bg-[var(--nm-inverse)] text-[var(--nm-inverse-fg)] border-[color-mix(in_srgb,var(--nm-fg)_22%,transparent)]",
   },
 };
 
@@ -55,48 +55,48 @@ const tags = Array.from(tagSet);
     <header class="space-y-4">
       <div class="flex flex-wrap items-end justify-between gap-4">
         <div class="space-y-4 text-right">
-          <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[#D42B2B]">מרכז החקירה</p>
-          <h1 class="text-[clamp(2.2rem,1.7rem+2vw,3.2rem)] font-semibold text-[#1A1A1A]">
+          <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--nm-accent)]">מרכז החקירה</p>
+          <h1 class="text-[clamp(2.2rem,1.7rem+2vw,3.2rem)] font-semibold text-[var(--nm-fg)]">
             מאמרים
           </h1>
-          <p class="text-[clamp(1.05rem,1rem+0.35vw,1.4rem)] text-[#1A1A1A]/70">
+          <p class="text-[clamp(1.05rem,1rem+0.35vw,1.4rem)] text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">
             ספריית עומק חיה למי שרוצה פחות רעש, יותר דיוק, וכניסה מסודרת לרעיונות שלא נשארים על פני השטח.
           </p>
         </div>
-        <button type="button" data-random-article-trigger class="inline-flex items-center justify-center rounded-full border border-[#D42B2B]/14 bg-[#FFF4F3] px-5 py-3 text-sm font-semibold text-[#D42B2B] transition hover:bg-[#ffe7e5]">
+        <button type="button" data-random-article-trigger class="inline-flex items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-accent)_18%,transparent)] bg-[var(--nm-tint)] px-5 py-3 text-sm font-semibold text-[var(--nm-accent)] transition hover:bg-[var(--nm-tint-strong)]">
           הפתע אותי עם כיוון אקראי
         </button>
       </div>
     </header>
 
     <div class="space-y-3">
-      <p class="text-right text-sm leading-7 text-[#1A1A1A]/60">
+      <p class="text-right text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_60%,var(--nm-bg))]">
         אפשר להתחיל מהכול, או להיכנס דרך נושא אחד ברור ולהעמיק ממנו.
       </p>
       <div class="flex flex-wrap gap-3">
-      <button type="button" data-filter="all" aria-pressed="true" class="rounded-full border border-[#1A1A1A]/10 bg-white/70 px-4 py-2 text-[clamp(0.85rem,0.82rem+0.2vw,1rem)] text-[#1A1A1A]/70 transition-colors duration-300 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A]/20">הכל</button>
+      <button type="button" data-filter="all" aria-pressed="true" class="rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/70 px-4 py-2 text-[clamp(0.85rem,0.82rem+0.2vw,1rem)] text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))] transition-colors duration-300 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color-mix(in_srgb,var(--nm-fg)_22%,transparent)]">הכל</button>
       {tags.map((tag) => (
-        <button type="button" data-filter={tag} aria-pressed="false" class="rounded-full border border-[#1A1A1A]/10 bg-white/70 px-4 py-2 text-[clamp(0.85rem,0.82rem+0.2vw,1rem)] text-[#1A1A1A]/70 transition-colors duration-300 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A]/20">{tag}</button>
+        <button type="button" data-filter={tag} aria-pressed="false" class="rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/70 px-4 py-2 text-[clamp(0.85rem,0.82rem+0.2vw,1rem)] text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))] transition-colors duration-300 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color-mix(in_srgb,var(--nm-fg)_22%,transparent)]">{tag}</button>
       ))}
     </div>
 
     <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
       {articles.map((article) => (
-        <a href={`/articles/${article.slug}`} data-article-card data-tags={article.tags.join(",")} class="group flex h-full flex-col justify-between gap-6 rounded-3xl border border-white/70 bg-white/70 p-6 shadow-sm backdrop-blur-md transition-all duration-500 ease-out hover:scale-[1.01] focus-visible:scale-[1.01] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A]/20">
+        <a href={`/articles/${article.slug}`} data-article-card data-tags={article.tags.join(",")} class="group flex h-full flex-col justify-between gap-6 rounded-3xl border border-white/70 bg-white/70 p-6 shadow-sm backdrop-blur-md transition-all duration-500 ease-out hover:scale-[1.01] focus-visible:scale-[1.01] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color-mix(in_srgb,var(--nm-fg)_22%,transparent)]">
           <div class="space-y-4">
             <div class="flex flex-wrap items-center justify-between gap-3">
               <span class={`inline-flex rounded-full border px-3 py-1 text-xs font-semibold ${article.difficultyTone}`}>{article.difficultyLabel}</span>
-              <span class="text-[clamp(0.8rem,0.78rem+0.2vw,0.95rem)] text-[#1A1A1A]/50">{article.date.toLocaleDateString("he-IL")}</span>
+              <span class="text-[clamp(0.8rem,0.78rem+0.2vw,0.95rem)] text-[color-mix(in_srgb,var(--nm-fg)_50%,var(--nm-bg))]">{article.date.toLocaleDateString("he-IL")}</span>
             </div>
             <div class="space-y-3">
-              <h2 transition:name={`article-${article.transitionId}`} class="text-[clamp(1.3rem,1.1rem+0.6vw,1.7rem)] font-semibold text-[#1A1A1A]">{article.title}</h2>
-              {article.description && <p class="text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] text-[#1A1A1A]/65">{article.description}</p>}
+              <h2 transition:name={`article-${article.transitionId}`} class="text-[clamp(1.3rem,1.1rem+0.6vw,1.7rem)] font-semibold text-[var(--nm-fg)]">{article.title}</h2>
+              {article.description && <p class="text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] text-[var(--nm-fg)]/65">{article.description}</p>}
             </div>
           </div>
           {article.tags.length > 0 && (
-            <div class="flex flex-wrap gap-2 text-[clamp(0.8rem,0.78rem+0.2vw,0.95rem)] text-[#1A1A1A]/55">
+            <div class="flex flex-wrap gap-2 text-[clamp(0.8rem,0.78rem+0.2vw,0.95rem)] text-[color-mix(in_srgb,var(--nm-fg)_55%,var(--nm-bg))]">
               {article.tags.map((tag) => (
-                <span class="rounded-full border border-[#1A1A1A]/10 bg-white/70 px-3 py-1">{tag}</span>
+                <span class="rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/70 px-3 py-1">{tag}</span>
               ))}
             </div>
           )}

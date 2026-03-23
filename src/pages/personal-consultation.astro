@@ -1,18 +1,18 @@
-﻿---
+---
 import Layout from "../layouts/Layout.astro";
 import ServiceCard from "../components/ServiceCard.astro";
 import ThoughtShiftProof from "../components/ThoughtShiftProof.astro";
 import CostOfNoCalculator from "../components/CostOfNoCalculator.astro";
 import DecisionSimulator from "../components/DecisionSimulator.astro";
 import WhyThisIsNotForYou from "../components/WhyThisIsNotForYou.astro";
-import { findServiceById, servicesThoughtShifts, servicesTrust, type FlatService } from "../lib/services";
+import { findServiceById, servicesThoughtShifts, type FlatService } from "../lib/services";
 
-const consultationService = findServiceById("phone-consult");
-const subscriptionService = findServiceById("merpeset-subscription");
+const consultationService = findServiceById("phone-perspective");
+const subscriptionService = findServiceById("retainer-subscription");
 const authorityService = findServiceById("podcast-mic");
 
 const fallbackConsultation: FlatService = {
-  id: "phone-consult",
+  id: "phone-perspective",
   title: "שיחת מיקוד 20 דקות",
   subtitle: "להפריד עובדה מפירוש - עכשיו",
   description: "שיחה קצרה ומדויקת למצב שבו אתה צריך בהירות עכשיו, לא בעוד חודש.",
@@ -27,7 +27,7 @@ const fallbackConsultation: FlatService = {
 };
 
 const fallbackSubscription: FlatService = {
-  id: "merpeset-subscription",
+  id: "retainer-subscription",
   title: "מנוי מרפסת - Retainer",
   subtitle: "המסלול הקבוע שלך להתפתחות אמיתית",
   description: "שני מפגשים בחודש וליווי וואטסאפ יומי למי שצריך עומק מתמשך ולא רק תשובה רגעית.",
@@ -121,34 +121,34 @@ const benefits = [
 ---
 
 <Layout title={pageTitle} description={pageDescription}>
-  <section class="mx-auto max-w-6xl space-y-20 px-4 pb-20 text-[#1A1A1A]">
-    <header class="grid gap-10 rounded-[2.2rem] border border-[#1A1A1A]/10 bg-white/82 px-6 py-10 shadow-[0_24px_80px_rgba(26,26,26,0.06)] md:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] md:px-10 md:py-14">
+  <section class="mx-auto max-w-6xl space-y-20 px-4 pb-20 text-[var(--nm-fg)]">
+    <header class="grid gap-10 rounded-[2.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/82 px-6 py-10 shadow-[0_24px_80px_rgba(26,26,26,0.06)] md:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] md:px-10 md:py-14">
       <div class="space-y-6 text-right">
-        <p class="text-sm font-semibold uppercase tracking-[0.24em] text-[#D42B2B]">ייעוץ אישי | השם לא משנה</p>
-        <h1 class="text-[clamp(2.5rem,2rem+2vw,4.7rem)] font-semibold leading-[1.02] text-[#1A1A1A]">
+        <p class="text-sm font-semibold uppercase tracking-[0.24em] text-[var(--nm-accent)]">ייעוץ אישי | השם לא משנה</p>
+        <h1 class="text-[clamp(2.5rem,2rem+2vw,4.7rem)] font-semibold leading-[1.02] text-[var(--nm-fg)]">
           ייעוץ אישי הוא לא המטרה, הוא הדרך. לאן הדרך שלך לוקחת?
         </h1>
-        <p class="max-w-3xl text-[clamp(1rem,0.96rem+0.35vw,1.18rem)] leading-8 text-[#1A1A1A]/72">
+        <p class="max-w-3xl text-[clamp(1rem,0.96rem+0.35vw,1.18rem)] leading-8 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
           אם אתה מרגיש שנתקעת בצומת בחיים, בתוך קשר, מול החלטה, או מול רעש פנימי שלא נותן לך לנשום, אתה לא חייב עוד תוכן. אתה צריך בהירות. בשיחה אחת קצרה אנחנו מפרידים בין מה שקרה, למה שאתה מספר לעצמך, ולמה שבאמת צריך לקרות עכשיו.
         </p>
-        <p class="max-w-3xl text-sm leading-7 text-[#1A1A1A]/60">
+        <p class="max-w-3xl text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_60%,var(--nm-bg))]">
           השם לא משנה | עצה אחת משנה הכל
         </p>
         <div class="flex flex-wrap justify-end gap-3 pt-2">
-          <a href={pricingHref} class="inline-flex items-center justify-center rounded-full bg-[#D42B2B] px-6 py-3 text-sm font-semibold text-[#FAFAF8] transition hover:bg-[#b82424]">
+          <a href={pricingHref} class="inline-flex items-center justify-center rounded-full bg-[var(--nm-accent)] px-6 py-3 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]">
             כן, אני רוצה להתחיל
           </a>
-          <a href="/intake/" class="inline-flex items-center justify-center rounded-full border border-[#1A1A1A]/10 bg-white px-6 py-3 text-sm font-semibold text-[#1A1A1A]/78 transition hover:bg-[#FAFAF8]">
+          <a href="/intake/" class="inline-flex items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white px-6 py-3 text-sm font-semibold text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))] transition hover:bg-[var(--nm-surface-muted)]">
             אני עוד לא בטוח, תן לי כיוון קצר
           </a>
         </div>
       </div>
 
-      <aside class="rounded-[1.9rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] p-6 text-right">
-        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">מה קורה בשיחה</p>
+      <aside class="rounded-[1.9rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-6 text-right">
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">מה קורה בשיחה</p>
         <ul class="mt-5 space-y-4">
           {proofItems.map((item) => (
-            <li class="rounded-[1.3rem] border border-[#1A1A1A]/10 bg-white px-4 py-3 text-sm leading-7 text-[#1A1A1A]/72">{item}</li>
+            <li class="rounded-[1.3rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white px-4 py-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">{item}</li>
           ))}
         </ul>
       </aside>
@@ -156,19 +156,19 @@ const benefits = [
 
     <section class="space-y-6 text-right">
       <div class="space-y-3">
-        <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[#D42B2B]">עמודי התווך</p>
-        <h2 class="text-[clamp(1.9rem,1.5rem+1vw,2.8rem)] font-semibold text-[#1A1A1A]">זה לא עוד ייעוץ. זו דרך חשיבה.</h2>
+        <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--nm-accent)]">עמודי התווך</p>
+        <h2 class="text-[clamp(1.9rem,1.5rem+1vw,2.8rem)] font-semibold text-[var(--nm-fg)]">זה לא עוד ייעוץ. זו דרך חשיבה.</h2>
       </div>
       <div class="grid gap-5 md:grid-cols-3">
         {pillars.map((pillar) => (
-          <article class="rounded-[1.8rem] border border-[#1A1A1A]/10 border-l-4 border-l-[#D42B2B] bg-white/82 p-5 shadow-[0_18px_50px_rgba(26,26,26,0.04)] transition duration-300 hover:scale-[1.02] hover:shadow-[0_24px_70px_rgba(26,26,26,0.08)]">
+          <article class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] border-l-4 border-l-[var(--nm-accent)] bg-white/82 p-5 shadow-[0_18px_50px_rgba(26,26,26,0.04)] transition duration-300 hover:scale-[1.02] hover:shadow-[0_24px_70px_rgba(26,26,26,0.08)]">
             <div class="flex items-center justify-end gap-3">
-              <h3 class="text-xl font-semibold text-[#1A1A1A]">{pillar.title}</h3>
-              <span class="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[#D42B2B]/18 bg-[#FFF4F3] text-lg font-semibold text-[#D42B2B]">
+              <h3 class="text-xl font-semibold text-[var(--nm-fg)]">{pillar.title}</h3>
+              <span class="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)] bg-[var(--nm-tint)] text-lg font-semibold text-[var(--nm-accent)]">
                 {pillar.icon}
               </span>
             </div>
-            <p class="mt-4 text-sm leading-7 text-[#1A1A1A]/68">{pillar.text}</p>
+            <p class="mt-4 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">{pillar.text}</p>
           </article>
         ))}
       </div>
@@ -176,41 +176,41 @@ const benefits = [
 
     <section class="space-y-6 text-right">
       <div class="space-y-3">
-        <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[#D42B2B]">תהליך הייעוץ</p>
-        <h2 class="text-[clamp(1.9rem,1.5rem+1vw,2.8rem)] font-semibold text-[#1A1A1A]">איך זה עובד בפועל?</h2>
+        <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--nm-accent)]">תהליך הייעוץ</p>
+        <h2 class="text-[clamp(1.9rem,1.5rem+1vw,2.8rem)] font-semibold text-[var(--nm-fg)]">איך זה עובד בפועל?</h2>
       </div>
       <div class="grid gap-5 md:grid-cols-3">
         {processSteps.map((step, index) => (
-          <article class="rounded-[1.8rem] border border-[#1A1A1A]/10 border-l-4 border-l-[#D42B2B] bg-white/82 p-5 shadow-[0_18px_50px_rgba(26,26,26,0.04)] transition duration-300 hover:scale-[1.02] hover:shadow-[0_24px_70px_rgba(26,26,26,0.08)]">
-            <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">0{index + 1}</p>
-            <h3 class="mt-3 text-xl font-semibold text-[#1A1A1A]">{step.title}</h3>
-            <p class="mt-3 text-sm leading-7 text-[#1A1A1A]/68">{step.text}</p>
+          <article class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] border-l-4 border-l-[var(--nm-accent)] bg-white/82 p-5 shadow-[0_18px_50px_rgba(26,26,26,0.04)] transition duration-300 hover:scale-[1.02] hover:shadow-[0_24px_70px_rgba(26,26,26,0.08)]">
+            <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">0{index + 1}</p>
+            <h3 class="mt-3 text-xl font-semibold text-[var(--nm-fg)]">{step.title}</h3>
+            <p class="mt-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">{step.text}</p>
           </article>
         ))}
       </div>
     </section>
 
-    <section class="grid gap-6 rounded-[2rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] px-6 py-8 md:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] md:px-10">
+    <section class="grid gap-6 rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-6 py-8 md:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] md:px-10">
       <div class="space-y-3 text-right">
-        <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[#D42B2B]">למי זה נכון</p>
-        <h2 class="text-2xl font-semibold text-[#1A1A1A]">לא לכל אחד. כן למי שכבר מבין שהבעיה היא לא מחסור במידע.</h2>
+        <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--nm-accent)]">למי זה נכון</p>
+        <h2 class="text-2xl font-semibold text-[var(--nm-fg)]">לא לכל אחד. כן למי שכבר מבין שהבעיה היא לא מחסור במידע.</h2>
       </div>
-      <div class="space-y-4 text-right text-sm leading-8 text-[#1A1A1A]/70">
+      <div class="space-y-4 text-right text-sm leading-8 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">
         <p>זה נכון למי שמרגיש שהוא מסתובב סביב אותו צומת יותר מדי זמן. למי ששומע את עצמו מסביר, מצדיק, דוחה, ומתעייף מהקול שלו עצמו.</p>
         <p>זה נכון גם למי שלא מחפש יד מחזיקה, אלא מישהו שיכול לחתוך דרך הערפל ולהראות את המבנה. לא מה נעים לשמוע. מה נכון לראות.</p>
       </div>
     </section>
 
-    <section class="space-y-6 rounded-[2rem] border border-[#1A1A1A]/10 bg-white/86 px-6 py-8 shadow-[0_18px_60px_rgba(26,26,26,0.04)] md:px-10">
+    <section class="space-y-6 rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/86 px-6 py-8 shadow-[0_18px_60px_rgba(26,26,26,0.04)] md:px-10">
       <div class="space-y-3 text-right">
-        <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[#D42B2B]">הערך הסופי</p>
-        <h2 class="text-[clamp(1.9rem,1.5rem+1vw,2.8rem)] font-semibold text-[#1A1A1A]">מערכת הפעלה חדשה לחשיבה</h2>
+        <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--nm-accent)]">הערך הסופי</p>
+        <h2 class="text-[clamp(1.9rem,1.5rem+1vw,2.8rem)] font-semibold text-[var(--nm-fg)]">מערכת הפעלה חדשה לחשיבה</h2>
       </div>
       <div class="grid gap-5 md:grid-cols-3">
         {benefits.map((benefit) => (
-          <article class="rounded-[1.8rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] p-5 text-right">
-            <h3 class="text-xl font-semibold text-[#1A1A1A]">{benefit.title}</h3>
-            <p class="mt-3 text-sm leading-7 text-[#1A1A1A]/68">{benefit.text}</p>
+          <article class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-5 text-right">
+            <h3 class="text-xl font-semibold text-[var(--nm-fg)]">{benefit.title}</h3>
+            <p class="mt-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">{benefit.text}</p>
           </article>
         ))}
       </div>
@@ -235,16 +235,16 @@ const benefits = [
 
     <section id="pricing" class="space-y-6 text-right">
       <div class="space-y-3">
-        <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[#D42B2B]">מסלולי עבודה</p>
-        <h2 class="text-[clamp(2rem,1.6rem+1vw,3rem)] font-semibold text-[#1A1A1A]">תבחר את עומק ההתקדמות שמתאים לך עכשיו</h2>
-        <p class="max-w-3xl text-sm leading-7 text-[#1A1A1A]/70">אם אתה צריך בהירות עכשיו, תתחיל קצר. אם אתה מחפש מסלול מתמשך או מהלך עם השפעה חיצונית, תבחר את השלב שמחזיק את זה נכון.</p>
+        <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--nm-accent)]">מסלולי עבודה</p>
+        <h2 class="text-[clamp(2rem,1.6rem+1vw,3rem)] font-semibold text-[var(--nm-fg)]">תבחר את עומק ההתקדמות שמתאים לך עכשיו</h2>
+        <p class="max-w-3xl text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">אם אתה צריך בהירות עכשיו, תתחיל קצר. אם אתה מחפש מסלול מתמשך או מהלך עם השפעה חיצונית, תבחר את השלב שמחזיק את זה נכון.</p>
       </div>
       <div class="grid gap-6 lg:grid-cols-3">
         {featuredServices.map((featuredService) => (
-          <ServiceCard service={featuredService} disclaimer={servicesTrust.disclaimer} />
+          <ServiceCard service={featuredService} />
         ))}
       </div>
-      <div class="rounded-[1.6rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] px-5 py-4 text-right text-sm leading-7 text-[#1A1A1A]/66">
+      <div class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-5 py-4 text-right text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_66%,var(--nm-bg))]">
         התשלום מבוצע במערכת Grow המאובטחת בתקן המחמיר ביותר.
       </div>
     </section>

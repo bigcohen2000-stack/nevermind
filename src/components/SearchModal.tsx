@@ -1,4 +1,4 @@
-﻿import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type SearchResult = {
   url: string;
@@ -118,7 +118,7 @@ export default function SearchModal() {
   return (
     <div
       data-search-modal
-      className="fixed inset-0 z-[60] flex items-center justify-center bg-[#1A1A1A]/20 backdrop-blur-sm"
+      className="fixed inset-0 z-[60] flex items-center justify-center bg-[var(--nm-inverse)]/20 backdrop-blur-sm"
       role="dialog"
       aria-modal="true"
       aria-labelledby="search-title"
@@ -131,14 +131,14 @@ export default function SearchModal() {
         <div className="flex items-center justify-between">
           <h2
             id="search-title"
-            className="text-[clamp(1.2rem,1.05rem+0.6vw,1.6rem)] font-semibold text-[#1A1A1A]"
+            className="text-[clamp(1.2rem,1.05rem+0.6vw,1.6rem)] font-semibold text-[var(--nm-fg)]"
           >
             חיפוש
           </h2>
           <button
             type="button"
             onClick={() => setIsOpen(false)}
-            className="rounded-full border border-[#1A1A1A]/10 bg-white/70 px-3 py-1 text-[clamp(0.8rem,0.75rem+0.2vw,0.95rem)] text-[#1A1A1A]/70 transition-colors duration-300 hover:bg-white"
+            className="rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/70 px-3 py-1 text-[clamp(0.8rem,0.75rem+0.2vw,0.95rem)] text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))] transition-colors duration-300 hover:bg-white"
           >
             סגור
           </button>
@@ -150,7 +150,7 @@ export default function SearchModal() {
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder="מה אתה מחפש כרגע?"
-            className="w-full rounded-2xl border border-[#1A1A1A]/10 bg-white/80 px-4 py-3 text-right text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] text-[#1A1A1A] outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A]/20"
+            className="w-full rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/80 px-4 py-3 text-right text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] text-[var(--nm-fg)] outline-none focus-visible:ring-2 focus-visible:ring-[color-mix(in_srgb,var(--nm-fg)_22%,transparent)]"
             dir="rtl"
             aria-label="שדה חיפוש"
           />
@@ -158,19 +158,19 @@ export default function SearchModal() {
 
         <div className="mt-4 space-y-3">
           {isLoading && (
-            <p className="text-[clamp(0.85rem,0.8rem+0.2vw,1rem)] text-[#1A1A1A]/60">
+            <p className="text-[clamp(0.85rem,0.8rem+0.2vw,1rem)] text-[color-mix(in_srgb,var(--nm-fg)_60%,var(--nm-bg))]">
               מחפש עבורך...
             </p>
           )}
 
           {!isLoading && query && results.length === 0 && (
             <div className="space-y-3">
-              <p className="text-[clamp(0.85rem,0.8rem+0.2vw,1rem)] text-[#1A1A1A]/60">
+              <p className="text-[clamp(0.85rem,0.8rem+0.2vw,1rem)] text-[color-mix(in_srgb,var(--nm-fg)_60%,var(--nm-bg))]">
                 אולי השאלה היא לא איפה לחפש, אלא מה באמת מבקש להיראות.
               </p>
               <a
                 href="/articles"
-                className="inline-flex items-center justify-center rounded-full border border-[#1A1A1A]/10 bg-white/70 px-4 py-2 text-[clamp(0.85rem,0.8rem+0.2vw,1rem)] text-[#1A1A1A]/70 transition-colors duration-300 hover:bg-white"
+                className="inline-flex items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/70 px-4 py-2 text-[clamp(0.85rem,0.8rem+0.2vw,1rem)] text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))] transition-colors duration-300 hover:bg-white"
               >
                 להתחיל לחקור
               </a>
@@ -182,13 +182,13 @@ export default function SearchModal() {
               <li key={result.url}>
                 <a
                   href={result.url}
-                  className="block rounded-2xl border border-[#1A1A1A]/10 bg-white/70 px-4 py-3 transition-colors duration-300 hover:bg-white"
+                  className="block rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/70 px-4 py-3 transition-colors duration-300 hover:bg-white"
                 >
-                  <p className="text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] font-semibold text-[#1A1A1A]">
+                  <p className="text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] font-semibold text-[var(--nm-fg)]">
                     {result.title}
                   </p>
                   <p
-                    className="mt-1 text-[clamp(0.85rem,0.8rem+0.2vw,1rem)] text-[#1A1A1A]/60"
+                    className="mt-1 text-[clamp(0.85rem,0.8rem+0.2vw,1rem)] text-[color-mix(in_srgb,var(--nm-fg)_60%,var(--nm-bg))]"
                     dangerouslySetInnerHTML={{ __html: result.excerpt }}
                   />
                 </a>

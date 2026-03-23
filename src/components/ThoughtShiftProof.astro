@@ -1,4 +1,4 @@
-﻿---
+---
 import type { ThoughtShift } from "../lib/services";
 
 interface Props {
@@ -16,27 +16,27 @@ const {
 
 <section class="space-y-6 text-right">
   <div class="space-y-3">
-    <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[#D42B2B]">{eyebrow}</p>
-    <h2 class="text-[clamp(1.9rem,1.5rem+1vw,2.8rem)] font-semibold text-[#1A1A1A]">{heading}</h2>
-    <p class="max-w-3xl text-sm leading-7 text-[#1A1A1A]/68">
+    <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--nm-accent)]">{eyebrow}</p>
+    <h2 class="text-[clamp(1.9rem,1.5rem+1vw,2.8rem)] font-semibold text-[var(--nm-fg)]">{heading}</h2>
+    <p class="max-w-3xl text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
       לא "המלצה" כללית, אלא מעבר חד בין מנגנון ישן לאופן חשיבה מדויק יותר שנבנה מתוך הייעוץ.
     </p>
   </div>
 
   <div class="grid gap-5 lg:grid-cols-3">
     {items.map((item) => (
-      <article class="overflow-hidden rounded-[1.9rem] border border-[#1A1A1A]/10 bg-white/84 shadow-[0_18px_50px_rgba(26,26,26,0.05)]">
-        <header class="border-b border-[#1A1A1A]/8 bg-[#FAFAF8] px-5 py-4">
-          <h3 class="text-lg font-semibold text-[#1A1A1A]">{item.title}</h3>
+      <article class="overflow-hidden rounded-[1.9rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/84 shadow-[0_18px_50px_rgba(26,26,26,0.05)]">
+        <header class="border-b border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] bg-[var(--nm-surface-muted)] px-5 py-4">
+          <h3 class="text-lg font-semibold text-[var(--nm-fg)]">{item.title}</h3>
         </header>
-        <div class="grid gap-px bg-[#1A1A1A]/8 md:grid-cols-2">
+        <div class="grid gap-px bg-[var(--nm-inverse)]/8 md:grid-cols-2">
           <div class="space-y-3 bg-white px-5 py-5">
-            <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#1A1A1A]/45">דפוס ישן</p>
-            <p class="text-sm leading-7 text-[#1A1A1A]/64">{item.before}</p>
+            <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[color-mix(in_srgb,var(--nm-fg)_45%,var(--nm-bg))]">דפוס ישן</p>
+            <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_64%,var(--nm-bg))]">{item.before}</p>
           </div>
-          <div class="space-y-3 bg-[#FFF4F3] px-5 py-5">
-            <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">דפוס NeverMind</p>
-            <p class="text-sm leading-7 text-[#1A1A1A]/82">{item.after}</p>
+          <div class="space-y-3 bg-[var(--nm-tint)] px-5 py-5">
+            <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">דפוס NeverMind</p>
+            <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_82%,var(--nm-bg))]">{item.after}</p>
           </div>
         </div>
       </article>

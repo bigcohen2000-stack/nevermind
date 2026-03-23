@@ -1,4 +1,4 @@
-﻿---
+---
 import Layout from "../layouts/Layout.astro";
 import SubscribeBanner from "../components/SubscribeBanner.astro";
 
@@ -8,31 +8,31 @@ const web3formsKey = "94b32b6c-7590-4ac6-b8b4-1bc73dd2e5c8";
 <Layout title="מה המצב עכשיו?" description="רגע שקט לבדוק מה באמת קורה כאן עכשיו.">
   <section class="mx-auto flex min-h-[70vh] max-w-3xl flex-col items-center justify-center gap-6 text-center">
     <div class="flex items-center justify-center gap-3">
-      <h1 class="nm-breathe text-[clamp(2.2rem,1.7rem+2.2vw,3.4rem)] font-semibold text-[#1A1A1A]">
+      <h1 class="nm-breathe text-[clamp(2.2rem,1.7rem+2.2vw,3.4rem)] font-semibold text-[var(--nm-fg)]">
         מה המצב עכשיו?
       </h1>
       <span aria-hidden="true" class="nm-status-dot"></span>
     </div>
-    <p class="text-[clamp(1rem,0.95rem+0.35vw,1.3rem)] text-[#1A1A1A]/65">
+    <p class="text-[clamp(1rem,0.95rem+0.35vw,1.3rem)] text-[var(--nm-fg)]/65">
       בלי טכניקה, בלי רעש, בלי ניסיון לתקן. רק לעצור ולבדוק מה באמת קורה כאן עכשיו.
     </p>
     <a
       href={whatsappGroupUrl}
       target="_blank"
       rel="noreferrer"
-      class="rounded-full border border-[#1A1A1A]/10 bg-white/70 px-6 py-3 text-[clamp(0.95rem,0.9rem+0.3vw,1.1rem)] text-[#1A1A1A]/80 transition-colors duration-300 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A]/20"
+      class="rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/70 px-6 py-3 text-[clamp(0.95rem,0.9rem+0.3vw,1.1rem)] text-[var(--nm-fg)]/80 transition-colors duration-300 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color-mix(in_srgb,var(--nm-fg)_22%,transparent)]"
     >
       להצטרפות לעדכונים השקטים של NeverMind
     </a>
   </section>
 
   <section class="mx-auto mt-[clamp(3rem,6vw,5rem)] max-w-2xl space-y-6">
-    <h2 class="text-center text-[clamp(1.4rem,1.15rem+1vw,2rem)] font-semibold text-[#1A1A1A]">
+    <h2 class="text-center text-[clamp(1.4rem,1.15rem+1vw,2rem)] font-semibold text-[var(--nm-fg)]">
       אפשר גם להשאיר הודעה
     </h2>
     <form
       data-contact-form
-      class="space-y-4 rounded-3xl border border-[#1A1A1A]/10 bg-white/70 p-6"
+      class="space-y-4 rounded-3xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/70 p-6"
       action="https://api.web3forms.com/submit"
       method="POST"
     >
@@ -47,7 +47,7 @@ const web3formsKey = "94b32b6c-7590-4ac6-b8b4-1bc73dd2e5c8";
         aria-hidden="true"
       />
       <div class="space-y-2 text-right">
-        <label class="text-[clamp(0.9rem,0.85rem+0.2vw,1.05rem)] text-[#1A1A1A]/70" for="name">
+        <label class="text-[clamp(0.9rem,0.85rem+0.2vw,1.05rem)] text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]" for="name">
           שם מלא
         </label>
         <input
@@ -55,11 +55,11 @@ const web3formsKey = "94b32b6c-7590-4ac6-b8b4-1bc73dd2e5c8";
           name="name"
           type="text"
           required
-          class="w-full rounded-2xl border border-[#1A1A1A]/20 bg-white/80 px-4 py-3 text-right text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] text-[#1A1A1A] outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A]/20"
+          class="w-full rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_20%,transparent)] bg-white/80 px-4 py-3 text-right text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] text-[var(--nm-fg)] outline-none focus-visible:ring-2 focus-visible:ring-[color-mix(in_srgb,var(--nm-fg)_22%,transparent)]"
         />
       </div>
       <div class="space-y-2 text-right">
-        <label class="text-[clamp(0.9rem,0.85rem+0.2vw,1.05rem)] text-[#1A1A1A]/70" for="email">
+        <label class="text-[clamp(0.9rem,0.85rem+0.2vw,1.05rem)] text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]" for="email">
           אימייל
         </label>
         <input
@@ -67,11 +67,11 @@ const web3formsKey = "94b32b6c-7590-4ac6-b8b4-1bc73dd2e5c8";
           name="email"
           type="email"
           required
-          class="w-full rounded-2xl border border-[#1A1A1A]/20 bg-white/80 px-4 py-3 text-right text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] text-[#1A1A1A] outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A]/20"
+          class="w-full rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_20%,transparent)] bg-white/80 px-4 py-3 text-right text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] text-[var(--nm-fg)] outline-none focus-visible:ring-2 focus-visible:ring-[color-mix(in_srgb,var(--nm-fg)_22%,transparent)]"
         />
       </div>
       <div class="space-y-2 text-right">
-        <label class="text-[clamp(0.9rem,0.85rem+0.2vw,1.05rem)] text-[#1A1A1A]/70" for="message">
+        <label class="text-[clamp(0.9rem,0.85rem+0.2vw,1.05rem)] text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]" for="message">
           הודעה
         </label>
         <textarea
@@ -79,19 +79,19 @@ const web3formsKey = "94b32b6c-7590-4ac6-b8b4-1bc73dd2e5c8";
           name="message"
           rows="4"
           required
-          class="w-full rounded-2xl border border-[#1A1A1A]/20 bg-white/80 px-4 py-3 text-right text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] text-[#1A1A1A] outline-none focus-visible:ring-2 focus-visible:ring-[#1A1A1A]/20"
+          class="w-full rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_20%,transparent)] bg-white/80 px-4 py-3 text-right text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] text-[var(--nm-fg)] outline-none focus-visible:ring-2 focus-visible:ring-[color-mix(in_srgb,var(--nm-fg)_22%,transparent)]"
         ></textarea>
       </div>
       <button
         type="submit"
-        class="w-full rounded-full border border-[#1A1A1A]/10 bg-white px-5 py-3 text-[clamp(0.95rem,0.9rem+0.3vw,1.1rem)] text-[#1A1A1A]/80 transition-colors duration-300 hover:bg-white/90"
+        class="w-full rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white px-5 py-3 text-[clamp(0.95rem,0.9rem+0.3vw,1.1rem)] text-[var(--nm-fg)]/80 transition-colors duration-300 hover:bg-white/90"
       >
         שליחה
       </button>
       <p
         data-form-status
         aria-live="polite"
-        class="text-center text-[clamp(0.85rem,0.8rem+0.2vw,1rem)] text-[#1A1A1A]/60 opacity-0 transition-opacity duration-300"
+        class="text-center text-[clamp(0.85rem,0.8rem+0.2vw,1rem)] text-[color-mix(in_srgb,var(--nm-fg)_60%,var(--nm-bg))] opacity-0 transition-opacity duration-300"
       >
         תודה, ההודעה עברה.
       </p>

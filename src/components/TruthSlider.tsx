@@ -1,4 +1,4 @@
-﻿import { useId, useState } from "react";
+import { useId, useState } from "react";
 
 const oldPoints = [
   "כיבוי סימפטומים במקום הקשבה",
@@ -22,12 +22,12 @@ export default function TruthSlider() {
       className="w-full space-y-6"
     >
       <div className="space-y-3">
-        <p className="text-[clamp(0.85rem,0.8rem+0.25vw,1rem)] text-[#1A1A1A]/55">
+        <p className="text-[clamp(0.85rem,0.8rem+0.25vw,1rem)] text-[color-mix(in_srgb,var(--nm-fg)_55%,var(--nm-bg))]">
           אמת בתנועה
         </p>
         <h2
           id={`${sliderId}-title`}
-          className="text-[clamp(1.8rem,1.45rem+1.4vw,2.6rem)] font-semibold text-[#1A1A1A]"
+          className="text-[clamp(1.8rem,1.45rem+1.4vw,2.6rem)] font-semibold text-[var(--nm-fg)]"
         >
           הדרך הישנה מול דרך NeverMind
         </h2>
@@ -38,7 +38,7 @@ export default function TruthSlider() {
           aria-hidden="true"
           className="grid gap-8 md:grid-cols-2 grayscale blur-[0.6px]"
         >
-          <div className="space-y-4 text-[#1A1A1A]/45">
+          <div className="space-y-4 text-[color-mix(in_srgb,var(--nm-fg)_45%,var(--nm-bg))]">
             <h3 className="text-[clamp(1.2rem,1.05rem+0.6vw,1.6rem)] font-semibold">
               הדרך הישנה
             </h3>
@@ -51,7 +51,7 @@ export default function TruthSlider() {
               ))}
             </ul>
           </div>
-          <div className="space-y-4 text-[#1A1A1A]/45">
+          <div className="space-y-4 text-[color-mix(in_srgb,var(--nm-fg)_45%,var(--nm-bg))]">
             <h3 className="text-[clamp(1.2rem,1.05rem+0.6vw,1.6rem)] font-semibold">
               דרך NeverMind
             </h3>
@@ -107,8 +107,8 @@ export default function TruthSlider() {
           style={{ left: `${value}%` }}
         >
           <div className="relative h-full -translate-x-1/2">
-            <span className="block h-full w-px bg-[#1A1A1A]/25" />
-            <span className="absolute left-1/2 top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#1A1A1A]/25 bg-white/90" />
+            <span className="block h-full w-px bg-[var(--nm-inverse)]/25" />
+            <span className="absolute left-1/2 top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_25%,transparent)] bg-white/90" />
           </div>
         </div>
 
@@ -121,7 +121,7 @@ export default function TruthSlider() {
       <div className="flex flex-col gap-3">
         <label
           htmlFor={sliderId}
-          className="text-[clamp(0.9rem,0.85rem+0.25vw,1.05rem)] text-[#1A1A1A]/60"
+          className="text-[clamp(0.9rem,0.85rem+0.25vw,1.05rem)] text-[color-mix(in_srgb,var(--nm-fg)_60%,var(--nm-bg))]"
         >
           הזזת ההשוואה
         </label>
@@ -132,7 +132,7 @@ export default function TruthSlider() {
           max={100}
           value={value}
           onChange={(event) => setValue(Number(event.target.value))}
-          className="h-1 w-full cursor-ew-resize accent-[#1A1A1A]/70"
+          className="h-1 w-full cursor-ew-resize accent-[var(--nm-inverse)]/70"
           aria-valuemin={0}
           aria-valuemax={100}
           aria-valuenow={value}

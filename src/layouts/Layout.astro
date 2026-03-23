@@ -7,6 +7,7 @@ import SearchModal from "../components/SearchModal";
 import WhatsAppButton from "../components/WhatsAppButton.astro";
 import WhisperBanner from "../components/WhisperBanner.astro";
 import appConfig from "../config/appConfig.json";
+import { disclaimerLong } from "../lib/services";
 
 const {
   title,
@@ -230,52 +231,11 @@ const navItems = [
     <script is:inline type="application/ld+json" set:html={JSON.stringify(schemas)}></script>
     <ClientRouter />
 
-    <style is:global>
-      :root {
-        --nm-bg: #f9f8f6;
-        --nm-text: #1a1a1a;
-        --nm-grid: rgba(29, 53, 87, 0.08);
-      }
-
-      body[data-whisper-banner-state="hidden"] {
-        --nm-nav-top: 1.5rem;
-      }
-
-      body[data-whisper-banner-state="shown"] {
-        --nm-nav-top: 4.5rem;
-      }
-
-      body {
-        background-color: var(--nm-bg);
-        color: var(--nm-text);
-        font-family: "Assistant Variable", sans-serif;
-        transition: background-color 0.3s ease;
-      }
-
-      body.is-focus-mode [data-nav],
-      body.is-focus-mode [data-footer],
-      body.is-focus-mode [data-whatsapp],
-      body.is-focus-mode [data-scroll-top] {
-        display: none !important;
-      }
-
-      body::before {
-        content: "";
-        position: fixed;
-        inset: 0;
-        background-image: linear-gradient(var(--nm-grid) 0.5px, transparent 0.5px),
-          linear-gradient(90deg, var(--nm-grid) 0.5px, transparent 0.5px);
-        background-size: 36px 36px;
-        opacity: 0.3;
-        pointer-events: none;
-        z-index: 0;
-      }
-    </style>
   </head>
-  <body data-whisper-banner-state="hidden" class="min-h-screen antialiased selection:bg-neutral-200">
+  <body data-whisper-banner-state="hidden" class="min-h-screen antialiased selection:bg-[color-mix(in_srgb,var(--nm-accent)_18%,var(--nm-bg))] selection:text-[var(--nm-fg)]">
     <a
       href="#main-content"
-      class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:rounded-md focus:bg-white focus:px-4 focus:py-2 focus:text-black shadow-xl"
+      class="sr-only transition-colors duration-200 focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:rounded-md focus:bg-[var(--nm-bg-canvas)] focus:px-4 focus:py-2 focus:text-[var(--nm-fg)] focus:ring-2 focus:ring-[color-mix(in_srgb,var(--nm-accent)_35%,transparent)] shadow-xl"
     >
       דלג לתוכן הראשי
     </a>
@@ -283,14 +243,14 @@ const navItems = [
     <WhisperBanner />
 
     <nav data-nav class="fixed inset-x-0 top-[var(--nm-nav-top,1.5rem)] z-50 flex justify-center px-4 transition-[top] duration-300">
-      <div class="flex flex-wrap items-center justify-center gap-3 rounded-full border border-[#1A1A1A]/10 bg-white/88 px-5 py-3 shadow-[0_14px_34px_rgba(26,26,26,0.08)] backdrop-blur-md">
+      <div class="flex flex-wrap items-center justify-center gap-3 rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/88 px-5 py-3 shadow-[0_14px_34px_rgba(26,26,26,0.08)] backdrop-blur-md">
         {navItems.map((item) => (
-          <a href={item.href} class="text-sm font-semibold text-[#1A1A1A]/82 transition hover:text-[#D42B2B]">{item.label}</a>
+          <a href={item.href} class="text-sm font-semibold text-[color-mix(in_srgb,var(--nm-fg)_82%,var(--nm-bg))] transition-colors duration-200 hover:text-[var(--nm-accent)]">{item.label}</a>
         ))}
         <button
           type="button"
           data-random-article-trigger
-          class="rounded-full bg-[#D42B2B] px-4 py-2 text-sm font-semibold text-[#FAFAF8] transition hover:bg-[#bc2727]"
+          class="rounded-full bg-[var(--nm-accent)] px-4 py-2 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]"
         >
           הפתע אותי
         </button>
@@ -298,7 +258,7 @@ const navItems = [
           id="search-trigger"
           data-search-trigger
           aria-label="פתח חיפוש"
-          class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#1A1A1A]/10 bg-[#FAFAF8] text-[#1A1A1A]/78 transition hover:border-[#D42B2B]/20 hover:text-[#D42B2B]"
+          class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))] transition-colors duration-200 hover:border-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)] hover:text-[var(--nm-accent)]"
         >
           <Search className="h-4 w-4" />
         </button>
@@ -309,12 +269,15 @@ const navItems = [
       <slot />
     </main>
 
-    <footer data-footer class="mt-20 border-t border-[#1A1A1A]/10 px-6 py-12">
+    <footer data-footer class="mt-20 border-t border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] px-6 py-12">
       <div class="mx-auto flex max-w-6xl flex-col gap-6">
         <div class="flex flex-col items-center justify-between gap-6 md:flex-row">
           <div class="space-y-2 text-center md:text-right">
-            <p class="text-sm text-[#1A1A1A]/60">© {new Date().getFullYear()} NeverMind | ע.מ. 301773289</p>
-            <p class="text-xs text-[#1A1A1A]/45">האתר מאובטח SSL | סליקה מאושרת ומאובטחת דרך Grow</p>
+            <p class="text-sm text-[color-mix(in_srgb,var(--nm-fg)_60%,var(--nm-bg))]">© {new Date().getFullYear()} NeverMind | ע.מ. 301773289</p>
+            <p class="text-xs text-[color-mix(in_srgb,var(--nm-fg)_45%,var(--nm-bg))]">האתר מאובטח SSL | סליקה מאושרת ומאובטחת דרך Grow</p>
+            <p class="max-w-3xl whitespace-pre-line text-xs leading-relaxed text-[color-mix(in_srgb,var(--nm-fg)_48%,var(--nm-bg))]">
+              {disclaimerLong}
+            </p>
           </div>
           <div class="flex items-center gap-3">
             {socialLinks.map(({ label, href, mark }) => (
@@ -323,12 +286,12 @@ const navItems = [
                 target="_blank"
                 rel="noreferrer"
                 aria-label={label}
-                class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#1A1A1A]/10 bg-white/70 text-sm font-semibold text-[#1A1A1A]/72 transition hover:border-[#D42B2B]/20 hover:text-[#D42B2B]"
+                class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/70 text-sm font-semibold text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))] transition hover:border-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)] hover:text-[var(--nm-accent)]"
               >
                 <span aria-hidden="true">{mark}</span>
               </a>
             ))}
-            <a href="https://tally.so/r/3N0x0q" class="text-sm font-semibold text-[#1A1A1A]/70 transition hover:text-[#D42B2B]">יצירת קשר</a>
+            <a href="https://tally.so/r/3N0x0q" class="text-sm font-semibold text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))] transition-colors duration-200 hover:text-[var(--nm-accent)]">יצירת קשר</a>
           </div>
         </div>
       </div>
@@ -369,8 +332,33 @@ const navItems = [
           if (target) window.location.href = target;
         };
 
+        const formatAvailabilityDateHebrew = (isoString) => {
+          const date = new Date(isoString);
+          if (Number.isNaN(date.getTime())) return "";
+          const days = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
+          const day = date.getDay();
+          const prefix = day === 6 ? 'מוצ"ש' : `יום ${days[day]}`;
+          const hours = date.getHours().toString().padStart(2, "0");
+          const minutes = date.getMinutes().toString().padStart(2, "0");
+          return `עודכן ${prefix} ${hours}:${minutes}`;
+        };
+
+        const refreshAvailabilityLines = () => {
+          document.querySelectorAll("[data-nm-availability]").forEach((el) => {
+            const spotsRaw = el.getAttribute("data-spots");
+            const updatedAt = el.getAttribute("data-updated-at")?.trim();
+            const label = (el.getAttribute("data-label") || "נותרו").trim();
+            const spots = spotsRaw != null ? Number(spotsRaw) : NaN;
+            if (!Number.isFinite(spots) || !updatedAt) return;
+            const unit = spots === 1 ? "מקום" : "מקומות";
+            const datePart = formatAvailabilityDateHebrew(updatedAt);
+            el.textContent = datePart ? `${label} ${spots} ${unit} · ${datePart}` : `${label} ${spots} ${unit}`;
+          });
+        };
+
         searchTriggers.forEach((trigger) => trigger.addEventListener("click", onSearchClick));
         randomTriggers.forEach((trigger) => trigger.addEventListener("click", onRandomClick));
+        refreshAvailabilityLines();
 
         window.__nmLayoutCleanup = () => {
           searchTriggers.forEach((trigger) => trigger.removeEventListener("click", onSearchClick));

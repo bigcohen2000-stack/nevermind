@@ -1,4 +1,4 @@
-﻿---
+---
 import siteSettings from "../config/siteSettings.json";
 
 const banner = siteSettings.whisperBanner;
@@ -14,14 +14,14 @@ const dismissKey = "nm-whisper-banner-dismissed-at";
   data-banner-cta-href={banner.ctaHref}
   data-banner-dismiss-hours={String(banner.dismissHours || 24)}
   data-banner-contextual-offers={JSON.stringify(banner.contextualOffers || [])}
-  class="fixed inset-x-0 top-0 z-[70] hidden border-b border-white/10 bg-[#1A1A1A] text-[#FAFAF8]"
+  class="fixed inset-x-0 top-0 z-[70] hidden border-b border-white/10 bg-[var(--nm-inverse)] text-[var(--nm-inverse-fg)]"
 >
   <div class="mx-auto flex min-h-11 max-w-7xl items-center justify-center gap-3 px-4 py-2 text-center text-sm leading-6">
-    <p data-whisper-message class="font-medium text-[#FAFAF8]/88">{banner.message}</p>
+    <p data-whisper-message class="font-medium text-[var(--nm-inverse-fg)]/88">{banner.message}</p>
     <a
       data-whisper-cta
       href={banner.ctaHref}
-      class="shrink-0 text-sm font-semibold text-[#D42B2B] transition hover:text-[#f16262]"
+      class="shrink-0 text-sm font-semibold text-[var(--nm-accent)] transition hover:text-[#f16262]"
     >
       {banner.ctaLabel}
     </a>
@@ -29,7 +29,7 @@ const dismissKey = "nm-whisper-banner-dismissed-at";
       type="button"
       data-whisper-close
       aria-label="סגור את הודעת הפס העליון"
-      class="absolute left-4 top-1/2 inline-flex -translate-y-1/2 items-center justify-center rounded-full border border-white/12 px-2.5 py-1 text-xs font-semibold text-[#FAFAF8]/70 transition hover:text-white"
+      class="absolute left-4 top-1/2 inline-flex -translate-y-1/2 items-center justify-center rounded-full border border-white/12 px-2.5 py-1 text-xs font-semibold text-[var(--nm-inverse-fg)]/70 transition-colors duration-200 hover:text-[var(--nm-inverse-fg)]"
     >
       סגור
     </button>

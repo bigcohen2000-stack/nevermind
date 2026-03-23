@@ -13,7 +13,7 @@ const posterUrl = `https://i.ytimg.com/vi/${youtubeId}/hqdefault.jpg`;
 ---
 
 <div class="nm-video-player text-right" dir="rtl">
-  <div class="overflow-hidden rounded-2xl border border-[#1A1A1A]/10 bg-black shadow-sm">
+  <div class="overflow-hidden rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-black shadow-sm">
     <div class="nm-video-shell" data-video-shell>
       <button
         type="button"
@@ -33,15 +33,15 @@ const posterUrl = `https://i.ytimg.com/vi/${youtubeId}/hqdefault.jpg`;
 
   {
     points.length > 0 && (
-      <details class="group mt-4 rounded-2xl border border-[#1A1A1A]/10 bg-white/80 text-right shadow-sm open:border-[#1A1A1A]/18">
-        <summary class="cursor-pointer list-none rounded-2xl px-4 py-3 text-[clamp(1rem,0.95rem+0.25vw,1.15rem)] font-semibold leading-[1.8] text-[#1A1A1A] transition-colors marker:content-none [&::-webkit-details-marker]:hidden">
+      <details class="group mt-4 rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/80 text-right shadow-sm open:border-[color-mix(in_srgb,var(--nm-fg)_18%,transparent)]">
+        <summary class="cursor-pointer list-none rounded-2xl px-4 py-3 text-[clamp(1rem,0.95rem+0.25vw,1.15rem)] font-semibold leading-[1.8] text-[var(--nm-fg)] transition-colors marker:content-none [&::-webkit-details-marker]:hidden">
           <span class="inline-flex w-full items-center justify-between gap-3">
             <span>סיכום מהיר: עיקרי הדברים מתוך הווידאו</span>
-            <span class="text-sm font-normal text-[#1A1A1A]/50 transition group-open:rotate-180" aria-hidden="true">⌃</span>
+            <span class="text-sm font-normal text-[color-mix(in_srgb,var(--nm-fg)_50%,var(--nm-bg))] transition group-open:rotate-180" aria-hidden="true">⌃</span>
           </span>
         </summary>
-        <div class="border-t border-[#1A1A1A]/10 px-4 pb-4 pt-2">
-          <ul class="list-disc space-y-2 pr-5 text-[clamp(1rem,0.95rem+0.2vw,1.12rem)] leading-[1.8] text-[#1A1A1A]/88">
+        <div class="border-t border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] px-4 pb-4 pt-2">
+          <ul class="list-disc space-y-2 pr-5 text-[clamp(1rem,0.95rem+0.2vw,1.12rem)] leading-[1.8] text-[color-mix(in_srgb,var(--nm-fg)_88%,var(--nm-bg))]">
             {points.map((point) => (
               <li>{point}</li>
             ))}
@@ -107,10 +107,10 @@ const posterUrl = `https://i.ytimg.com/vi/${youtubeId}/hqdefault.jpg`;
     width: 4rem;
     height: 4rem;
     border-radius: 999px;
-    background: rgba(212, 43, 43, 0.92);
+    background: rgba(249, 115, 22, 0.92);
     font-size: 1.5rem;
     line-height: 1;
-    box-shadow: 0 18px 35px rgba(212, 43, 43, 0.28);
+    box-shadow: 0 18px 35px rgba(249, 115, 22, 0.28);
   }
 
   .nm-video-title {

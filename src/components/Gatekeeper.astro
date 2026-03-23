@@ -10,27 +10,27 @@ interface Props {
 const {
   phone = appConfig.contact.whatsAppNumber,
   fallbackHref = "/articles/",
-  fallbackLabel = "мчшеа оаош фъез мфрй щйзд",
+  fallbackLabel = "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ",
 } = Astro.props;
 
 const goals = [
-  { id: "clarity", label: "бйшеш айщй огейч", hint: "ощде ъчет еарй шецд мшаеъ аеъе рчй", score: 24, reason: "доишд осфйч згд лгй щщйзд ъелм мдъочг бвштйп тцое." },
-  { id: "decision", label: "чбмъ дзмид", hint: "йщ цеоъ еарй ма шецд мдощйк мдсъебб сбйбе", score: 22, reason: "йщ лап оечг бшеш йзсйъ, вн ан деа тгййп ма фъеш." },
-  { id: "business", label: "лйееп тсчй / очцетй", hint: "арй цшйк згеъ сбйб одмк, ойчег ае зсн", score: 26, reason: "лйееп тсчй деа бгшк лмм реща щафщш могег тмйе бдйшеъ йщйшд." },
-  { id: "not-sure", label: "арй тгййп ма биез", hint: "йщ трййп, абм тег ма бшеш мй од баоъ дреща", score: 6, reason: "лщдреща тег ма бшеш, щйзд реид мдъбжбж тм рйсез бочен тм одеъ." },
+  { id: "clarity", label: "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ", hint: "пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ", score: 24, reason: "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ." },
+  { id: "decision", label: "пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ", hint: "пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ", score: 22, reason: "пїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ." },
+  { id: "business", label: "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ / пїЅпїЅпїЅпїЅпїЅпїЅ", hint: "пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅ", score: 26, reason: "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ." },
+  { id: "not-sure", label: "пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ", hint: "пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ", score: 6, reason: "пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ." },
 ];
 
 const budgets = [
-  { id: "under-500", label: "тг 500 щШз", score: 2, reason: "диеез джд ма оъайн лшвт мосмемйн дайщййн щдаъш олееп амйдн." },
-  { id: "500-1500", label: "500–1,500 щШз", score: 12, reason: "йщ лап дъаод змчйъ бмбг, ъмей бойгъ дгйеч щм дреща." },
-  { id: "1500-3000", label: "1,500–3,000 щШз", score: 24, reason: "диеез джд лбш оъайн мосмемйн щбдн щйзд йлемд мдйеъ огейчъ ещйоещйъ." },
-  { id: "3000-plus", label: "3,000+ щШз", score: 28, reason: "йщ лап войщеъ щоафщшъ дъаод аойъйъ мосмем тбегд шцйрй." },
+  { id: "under-500", label: "пїЅпїЅ 500 пїЅпїЅпїЅ", score: 2, reason: "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ." },
+  { id: "500-1500", label: "500пїЅ1,500 пїЅпїЅпїЅ", score: 12, reason: "пїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ." },
+  { id: "1500-3000", label: "1,500пїЅ3,000 пїЅпїЅпїЅ", score: 24, reason: "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ." },
+  { id: "3000-plus", label: "3,000+ пїЅпїЅпїЅ", score: 28, reason: "пїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ." },
 ];
 
 const stages = [
-  { id: "browsing", label: "шч бегч лшвт", score: 4, reason: "лщайп тгййп дзмид фрйойъ, тгйу мдъзйм озчйшд щчид ема ощйзд." },
-  { id: "active", label: "обйп аъ дтрййп ешецд мгбш", score: 20, reason: "йщ лап оелреъ осфчъ лгй щщйзд ъелм мййцш ъретд." },
-  { id: "urgent", label: "йщ ощде гзеу еарй цшйк бдйшеъ чшебд", score: 24, reason: "гзйфеъ тн оегтеъ мцешк ббдйшеъ дйа айргйчцйд иебд мдъаод." },
+  { id: "browsing", label: "пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ", score: 4, reason: "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ." },
+  { id: "active", label: "пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ", score: 20, reason: "пїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ." },
+  { id: "urgent", label: "пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ", score: 24, reason: "пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ." },
 ];
 
 const maxScore =
@@ -45,37 +45,37 @@ const maxScore =
   data-fallback-href={fallbackHref}
   data-fallback-label={fallbackLabel}
   data-max-score={maxScore}
-  class="mx-auto max-w-3xl rounded-[2.5rem] border border-[#1A1A1A]/10 bg-white/86 p-6 shadow-[0_30px_90px_rgba(26,26,26,0.08)] backdrop-blur-md md:p-8"
+  class="mx-auto max-w-3xl rounded-[2.5rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/86 p-6 shadow-[0_30px_90px_rgba(26,26,26,0.08)] backdrop-blur-md md:p-8"
 >
   <header class="space-y-4 text-right">
-    <p class="text-sm font-semibold uppercase tracking-[0.24em] text-[#D42B2B]">Gatekeeper</p>
-    <h1 class="text-[clamp(2rem,1.4rem+2vw,3.3rem)] font-semibold leading-[1.05] text-[#1A1A1A]">мфрй щйзд, рзгг тм од баоъ огебш.</h1>
-    <p class="max-w-2xl text-[1rem] leading-8 text-[#1A1A1A]/70">
-      жд ма щамеп ашек. жд сйреп чцш щобдйш ан рлеп мгбш тлщйе, етм од рлеп мгбш. ан айп дъаод,
-      тгйу мвмеъ аъ жд лап ема азшй щйзд ма огейчъ.
+    <p class="text-sm font-semibold uppercase tracking-[0.24em] text-[var(--nm-accent)]">Gatekeeper</p>
+    <h1 class="text-[clamp(2rem,1.4rem+2vw,3.3rem)] font-semibold leading-[1.05] text-[var(--nm-fg)]">пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ.</h1>
+    <p class="max-w-2xl text-[1rem] leading-8 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">
+      пїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ. пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ. пїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ,
+      пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ.
     </p>
   </header>
 
   <div class="mt-8 flex gap-2" aria-hidden="true">
-    <span data-step-dot="1" class="h-1 flex-1 rounded-full bg-[#D42B2B]"></span>
-    <span data-step-dot="2" class="h-1 flex-1 rounded-full bg-[#1A1A1A]/10"></span>
-    <span data-step-dot="3" class="h-1 flex-1 rounded-full bg-[#1A1A1A]/10"></span>
+    <span data-step-dot="1" class="h-1 flex-1 rounded-full bg-[var(--nm-accent)]"></span>
+    <span data-step-dot="2" class="h-1 flex-1 rounded-full bg-[var(--nm-inverse)]/10"></span>
+    <span data-step-dot="3" class="h-1 flex-1 rounded-full bg-[var(--nm-inverse)]/10"></span>
   </div>
 
   <div class="mt-8 space-y-8">
     <section data-step-panel="1" class="space-y-6">
       <div class="space-y-2 text-right">
-        <p class="text-sm font-semibold text-[#D42B2B]">щмб 1 оъек 3</p>
-        <h2 class="text-2xl font-semibold text-[#1A1A1A]">ой аъд, етм од аъд шецд мгбш?</h2>
+        <p class="text-sm font-semibold text-[var(--nm-accent)]">пїЅпїЅпїЅ 1 пїЅпїЅпїЅпїЅ 3</p>
+        <h2 class="text-2xl font-semibold text-[var(--nm-fg)]">пїЅпїЅ пїЅпїЅпїЅ, пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ?</h2>
       </div>
 
       <label class="block space-y-2 text-right">
-        <span class="text-sm font-semibold text-[#1A1A1A]">щн</span>
-        <input data-name-input type="text" placeholder="айк мчшеа мк?" class="w-full rounded-[1.4rem] border border-[#1A1A1A]/12 bg-[#FAFAF8] px-5 py-4 text-right text-base text-[#1A1A1A] outline-none transition focus:border-[#D42B2B]/40 focus:ring-2 focus:ring-[#D42B2B]/15" />
+        <span class="text-sm font-semibold text-[var(--nm-fg)]">пїЅпїЅ</span>
+        <input data-name-input type="text" placeholder="пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ?" class="w-full rounded-[1.4rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-[var(--nm-surface-muted)] px-5 py-4 text-right text-base text-[var(--nm-fg)] outline-none transition focus:border-[color-mix(in_srgb,var(--nm-accent)_40%,transparent)] focus:ring-2 focus:ring-[color-mix(in_srgb,var(--nm-accent)_20%,transparent)]" />
       </label>
 
       <div class="space-y-3 text-right">
-        <p class="text-sm font-semibold text-[#1A1A1A]">оишд</p>
+        <p class="text-sm font-semibold text-[var(--nm-fg)]">пїЅпїЅпїЅпїЅ</p>
         <div class="grid gap-3">
           {goals.map((goal) => (
             <button
@@ -84,10 +84,10 @@ const maxScore =
               data-goal-id={goal.id}
               data-goal-score={goal.score}
               data-goal-reason={goal.reason}
-              class="gate-option rounded-[1.5rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] px-5 py-4 text-right transition hover:border-[#D42B2B]/25 hover:bg-white"
+              class="gate-option rounded-[1.5rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-5 py-4 text-right transition hover:border-[color-mix(in_srgb,var(--nm-accent)_28%,transparent)] hover:bg-white"
             >
-              <span class="block text-base font-semibold text-[#1A1A1A]">{goal.label}</span>
-              <span class="mt-1 block text-sm leading-7 text-[#1A1A1A]/62">{goal.hint}</span>
+              <span class="block text-base font-semibold text-[var(--nm-fg)]">{goal.label}</span>
+              <span class="mt-1 block text-sm leading-7 text-[var(--nm-fg)]/62">{goal.hint}</span>
             </button>
           ))}
         </div>
@@ -96,8 +96,8 @@ const maxScore =
 
     <section data-step-panel="2" class="hidden space-y-6">
       <div class="space-y-2 text-right">
-        <p class="text-sm font-semibold text-[#D42B2B]">щмб 2 оъек 3</p>
-        <h2 class="text-2xl font-semibold text-[#1A1A1A]">од иеез ддщчтд щрлеп мк лшвт?</h2>
+        <p class="text-sm font-semibold text-[var(--nm-accent)]">пїЅпїЅпїЅ 2 пїЅпїЅпїЅпїЅ 3</p>
+        <h2 class="text-2xl font-semibold text-[var(--nm-fg)]">пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ?</h2>
       </div>
       <div class="grid gap-3 text-right">
         {budgets.map((budget) => (
@@ -107,19 +107,19 @@ const maxScore =
             data-budget-id={budget.id}
             data-budget-score={budget.score}
             data-budget-reason={budget.reason}
-            class="gate-option rounded-[1.5rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] px-5 py-4 text-right transition hover:border-[#D42B2B]/25 hover:bg-white"
+            class="gate-option rounded-[1.5rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-5 py-4 text-right transition hover:border-[color-mix(in_srgb,var(--nm-accent)_28%,transparent)] hover:bg-white"
           >
-            <span class="block text-base font-semibold text-[#1A1A1A]">{budget.label}</span>
+            <span class="block text-base font-semibold text-[var(--nm-fg)]">{budget.label}</span>
           </button>
         ))}
       </div>
-      <button type="button" data-back-step="1" class="text-sm font-semibold text-[#1A1A1A]/60 transition hover:text-[#1A1A1A]">зжшд мщмб дчегн</button>
+      <button type="button" data-back-step="1" class="text-sm font-semibold text-[color-mix(in_srgb,var(--nm-fg)_60%,var(--nm-bg))] transition hover:text-[var(--nm-fg)]">пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ</button>
     </section>
 
     <section data-step-panel="3" class="hidden space-y-6">
       <div class="space-y-2 text-right">
-        <p class="text-sm font-semibold text-[#D42B2B]">щмб 3 оъек 3</p>
-        <h2 class="text-2xl font-semibold text-[#1A1A1A]">байжд щмб аъд роца тлщйе?</h2>
+        <p class="text-sm font-semibold text-[var(--nm-accent)]">пїЅпїЅпїЅ 3 пїЅпїЅпїЅпїЅ 3</p>
+        <h2 class="text-2xl font-semibold text-[var(--nm-fg)]">пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ?</h2>
       </div>
       <div class="grid gap-3 text-right">
         {stages.map((stage) => (
@@ -129,28 +129,28 @@ const maxScore =
             data-stage-id={stage.id}
             data-stage-score={stage.score}
             data-stage-reason={stage.reason}
-            class="gate-option rounded-[1.5rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] px-5 py-4 text-right transition hover:border-[#D42B2B]/25 hover:bg-white"
+            class="gate-option rounded-[1.5rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-5 py-4 text-right transition hover:border-[color-mix(in_srgb,var(--nm-accent)_28%,transparent)] hover:bg-white"
           >
-            <span class="block text-base font-semibold text-[#1A1A1A]">{stage.label}</span>
+            <span class="block text-base font-semibold text-[var(--nm-fg)]">{stage.label}</span>
           </button>
         ))}
       </div>
-      <button type="button" data-back-step="2" class="text-sm font-semibold text-[#1A1A1A]/60 transition hover:text-[#1A1A1A]">зжшд мщмб дчегн</button>
+      <button type="button" data-back-step="2" class="text-sm font-semibold text-[color-mix(in_srgb,var(--nm-fg)_60%,var(--nm-bg))] transition hover:text-[var(--nm-fg)]">пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ</button>
     </section>
 
-    <section data-result-panel class="hidden rounded-[1.8rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] p-6 text-right">
-      <p data-result-badge class="text-sm font-semibold uppercase tracking-[0.18em] text-[#D42B2B]">ъецад</p>
-      <div class="mt-4 overflow-hidden rounded-full bg-[#1A1A1A]/8">
-        <div data-score-bar class="h-2 w-0 rounded-full bg-[#D42B2B] transition-all duration-500"></div>
+    <section data-result-panel class="hidden rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-6 text-right">
+      <p data-result-badge class="text-sm font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">пїЅпїЅпїЅпїЅпїЅ</p>
+      <div class="mt-4 overflow-hidden rounded-full bg-[var(--nm-inverse)]/8">
+        <div data-score-bar class="h-2 w-0 rounded-full bg-[var(--nm-accent)] transition-all duration-500"></div>
       </div>
-      <p data-score-text class="mt-3 text-sm font-semibold text-[#1A1A1A]/70"></p>
-      <h2 data-result-title class="mt-3 text-2xl font-semibold text-[#1A1A1A]"></h2>
-      <p data-result-text class="mt-3 max-w-2xl text-base leading-8 text-[#1A1A1A]/70"></p>
-      <ul data-reasons-list class="mt-5 space-y-2 text-sm leading-7 text-[#1A1A1A]/68"></ul>
+      <p data-score-text class="mt-3 text-sm font-semibold text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]"></p>
+      <h2 data-result-title class="mt-3 text-2xl font-semibold text-[var(--nm-fg)]"></h2>
+      <p data-result-text class="mt-3 max-w-2xl text-base leading-8 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]"></p>
+      <ul data-reasons-list class="mt-5 space-y-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]"></ul>
       <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
-        <a data-whatsapp-link target="_blank" rel="noreferrer" class="hidden items-center justify-center rounded-full bg-[#1A1A1A] px-6 py-3 text-sm font-semibold text-[#FAFAF8] transition hover:bg-black">мтбеш мееаисаф</a>
-        <a data-fallback-link class="hidden items-center justify-center rounded-full border border-[#1A1A1A]/10 bg-white px-6 py-3 text-sm font-semibold text-[#1A1A1A] transition hover:bg-[#ffffff]">мчшйад щчид бочен жд</a>
-        <button type="button" data-reset-gatekeeper class="rounded-full border border-[#1A1A1A]/10 bg-white px-6 py-3 text-sm font-semibold text-[#1A1A1A]/70 transition hover:bg-[#ffffff]">мдъзйм озгщ</button>
+        <a data-whatsapp-link target="_blank" rel="noreferrer" class="hidden items-center justify-center rounded-full bg-[var(--nm-inverse)] px-6 py-3 text-sm font-semibold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-inverse-hover)]">пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ</a>
+        <a data-fallback-link class="hidden items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white px-6 py-3 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[#ffffff]">пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ</a>
+        <button type="button" data-reset-gatekeeper class="rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white px-6 py-3 text-sm font-semibold text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))] transition hover:bg-[#ffffff]">пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ</button>
       </div>
     </section>
   </div>
@@ -180,7 +180,7 @@ const maxScore =
 
     const phone = root.dataset.phone || "972555634035";
     const fallbackHref = root.dataset.fallbackHref || "/articles/";
-    const fallbackLabel = root.dataset.fallbackLabel || "мтбеш моаош фъез бочен щйзд";
+    const fallbackLabel = root.dataset.fallbackLabel || "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ";
     const maxScore = Number(root.dataset.maxScore || 78);
     const nameInput = root.querySelector("[data-name-input]");
     const panels = Array.from(root.querySelectorAll("[data-step-panel]"));
@@ -204,8 +204,8 @@ const maxScore =
       });
       dots.forEach((dot, index) => {
         if (!(dot instanceof HTMLElement)) return;
-        dot.classList.toggle("bg-[#D42B2B]", index < step);
-        dot.classList.toggle("bg-[#1A1A1A]/10", index >= step);
+        dot.classList.toggle("bg-[var(--nm-accent)]", index < step);
+        dot.classList.toggle("bg-[var(--nm-inverse)]/10", index >= step);
       });
       if (resultPanel instanceof HTMLElement) resultPanel.classList.add("hidden");
     };
@@ -220,7 +220,7 @@ const maxScore =
     };
 
     const buildWhatsAppHref = () => {
-      const safeName = state.name || "мма щн";
+      const safeName = state.name || "пїЅпїЅпїЅ пїЅпїЅ";
       const text = `Hi, I'm ${safeName}, I'm interested in ${state.goal} and I'm at the ${state.stage} stage.`;
       return `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
     };
@@ -229,7 +229,7 @@ const maxScore =
       if (!(reasonsList instanceof HTMLElement)) return;
       const reasons = [state.goalReason, state.budgetReason, state.stageReason].filter(Boolean);
       reasonsList.innerHTML = reasons
-        .map((reason) => `<li class="rounded-2xl border border-[#1A1A1A]/8 bg-white/70 px-4 py-3">${reason}</li>`)
+        .map((reason) => `<li class="rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] bg-white/70 px-4 py-3">${reason}</li>`)
         .join("");
     };
 
@@ -237,8 +237,8 @@ const maxScore =
       panels.forEach((panel) => panel instanceof HTMLElement && panel.classList.add("hidden"));
       dots.forEach((dot) => {
         if (!(dot instanceof HTMLElement)) return;
-        dot.classList.remove("bg-[#D42B2B]");
-        dot.classList.add("bg-[#1A1A1A]/10");
+        dot.classList.remove("bg-[var(--nm-accent)]");
+        dot.classList.add("bg-[var(--nm-inverse)]/10");
       });
 
       if (!(resultPanel instanceof HTMLElement) || !(resultBadge instanceof HTMLElement) || !(scoreBar instanceof HTMLElement) || !(scoreText instanceof HTMLElement) || !(resultTitle instanceof HTMLElement) || !(resultText instanceof HTMLElement) || !(whatsappLink instanceof HTMLAnchorElement) || !(fallbackLink instanceof HTMLAnchorElement)) {
@@ -250,13 +250,13 @@ const maxScore =
       const tier = getTier();
       const scorePercent = Math.max(0, Math.min(100, (score / maxScore) * 100));
       scoreBar.style.width = `${scorePercent}%`;
-      scoreText.textContent = `цйеп дъаод: ${score} / ${maxScore}`;
+      scoreText.textContent = `пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ: ${score} / ${maxScore}`;
       renderReasons();
 
       if (tier === "fit") {
-        resultBadge.textContent = "дъаод вбедд";
-        resultTitle.textContent = "жд ршад лое щйзд щлгай мчййн.";
-        resultText.textContent = "доишд, дъчцйб едщмб щмк осфйч бшешйн лгй мтбеш мщйзд чцшд еогейчъ бмй мбжбж жоп тм рйсез озгщ щм дбтйд.";
+        resultBadge.textContent = "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ";
+        resultTitle.textContent = "пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ.";
+        resultText.textContent = "пїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ.";
         whatsappLink.href = buildWhatsAppHref();
         whatsappLink.classList.remove("hidden");
         whatsappLink.classList.add("inline-flex");
@@ -266,9 +266,9 @@ const maxScore =
       }
 
       if (tier === "partial") {
-        resultBadge.textContent = "дъаод змчйъ";
-        resultTitle.textContent = "йщ трййп, абм тгйу мзгг тег чцъ мфрй щйзд.";
-        resultText.textContent = "лшвт йщ дъаод змчйъ бмбг. тгйу мтбеш чегн гшк оаош фъез, еаж ан йдйд цешк, мзжеш мщйзд оочен зг йеъш.";
+        resultBadge.textContent = "пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ";
+        resultTitle.textContent = "пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ.";
+        resultText.textContent = "пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ, пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ.";
         fallbackLink.href = fallbackHref;
         fallbackLink.textContent = fallbackLabel;
         fallbackLink.classList.remove("hidden");
@@ -278,9 +278,9 @@ const maxScore =
         return;
       }
 
-      resultBadge.textContent = "ма оъайн лшвт";
-      resultTitle.textContent = "лшвт жд ма ршад лое дъаод мщйзд.";
-      resultText.textContent = "жд ма аеош щайп трййп. жд шч аеош щрлеп йеъш мдъзйм очшйад щчид ае озйгег тцой мфрй отбш мщйзд йщйшд.";
+      resultBadge.textContent = "пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ";
+      resultTitle.textContent = "пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ.";
+      resultText.textContent = "пїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ. пїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ.";
       fallbackLink.href = fallbackHref;
       fallbackLink.textContent = fallbackLabel;
       fallbackLink.classList.remove("hidden");
