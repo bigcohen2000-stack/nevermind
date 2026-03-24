@@ -86,7 +86,7 @@ const tags = Array.from(tagSet);
           <div class="space-y-4">
             <div class="flex flex-wrap items-center justify-between gap-3">
               <span class={`inline-flex rounded-full border px-3 py-1 text-xs font-semibold ${article.difficultyTone}`}>{article.difficultyLabel}</span>
-              <span class="text-[clamp(0.8rem,0.78rem+0.2vw,0.95rem)] text-[color-mix(in_srgb,var(--nm-fg)_50%,var(--nm-bg))]">{article.date.toLocaleDateString("he-IL")}</span>
+              <span data-iso-date={article.date.toISOString()} class="text-[clamp(0.8rem,0.78rem+0.2vw,0.95rem)] text-[color-mix(in_srgb,var(--nm-fg)_50%,var(--nm-bg))]">{article.date.toLocaleDateString("he-IL")}</span>
             </div>
             <div class="space-y-3">
               <h2 transition:name={`article-${article.transitionId}`} class="text-[clamp(1.3rem,1.1rem+0.6vw,1.7rem)] font-semibold text-[var(--nm-fg)]">{article.title}</h2>

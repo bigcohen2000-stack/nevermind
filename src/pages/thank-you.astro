@@ -143,31 +143,38 @@ const nextMoves = [
 
     <section class="space-y-5 rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-transparent p-10 shadow-[0_18px_42px_color-mix(in_srgb,var(--nm-fg)_5%,transparent)]">
       <h3 class="text-[clamp(1.2rem,1.05rem+0.7vw,1.6rem)] font-semibold text-[var(--nm-fg)]">רוצה לקבל את התובנות למייל או לשאול משהו אחר?</h3>
-      <form action="https://api.web3forms.com/submit" method="POST" class="mx-auto max-w-2xl space-y-6">
+      <form id="thank-you-form" action="https://api.web3forms.com/submit" method="POST" class="mx-auto max-w-2xl space-y-6">
         <input type="hidden" name="access_key" value="94b32b6c-7590-4ac6-b8b4-1bc73dd2e5c8" />
         <input type="hidden" name="subject" value="פנייה מעמוד תודה | השם לא משנה" />
         <input type="hidden" name="page" value="thank-you" />
         <input type="text" name="botcheck" style="display:none" tabindex="-1" autocomplete="off" aria-hidden="true" />
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
           <input
+            id="thank-you-name"
             type="text"
             name="name"
             placeholder="שם מלא"
             required
+            autocomplete="name"
             class="border-b border-[color-mix(in_srgb,var(--nm-fg)_22%,transparent)] bg-transparent p-2 text-[var(--nm-fg)] outline-none focus:border-[var(--nm-accent)]"
           />
           <input
+            id="thank-you-email"
             type="email"
             name="email"
             placeholder="אימייל"
             required
+            autocomplete="email"
             class="border-b border-[color-mix(in_srgb,var(--nm-fg)_22%,transparent)] bg-transparent p-2 text-[var(--nm-fg)] outline-none focus:border-[var(--nm-accent)]"
           />
         </div>
+        <p id="thank-you-email-status" class="text-xs font-semibold text-[color-mix(in_srgb,var(--nm-fg)_62%,var(--nm-bg))]"></p>
         <textarea
+          id="thank-you-message"
           name="message"
           placeholder="מה על המוח שלך כרגע?"
           required
+          autocomplete="off"
           class="h-32 w-full border-b border-[color-mix(in_srgb,var(--nm-fg)_22%,transparent)] bg-transparent p-2 text-[var(--nm-fg)] outline-none focus:border-[var(--nm-accent)]"
         ></textarea>
         <button
@@ -179,4 +186,61 @@ const nextMoves = [
       </form>
     </section>
   </section>
+
+  <script is:inline>
+    document.addEventListener("astro:page-load", () => {
+      const form = document.getElementById("thank-you-form");
+      if (!(form instanceof HTMLFormElement)) return;
+      const nameInput = document.getElementById("thank-you-name");
+      const emailInput = document.getElementById("thank-you-email");
+      const messageInput = document.getElementById("thank-you-message");
+      const emailStatus = document.getElementById("thank-you-email-status");
+      if (!(nameInput instanceof HTMLInputElement)) return;
+      if (!(emailInput instanceof HTMLInputElement)) return;
+      if (!(messageInput instanceof HTMLTextAreaElement)) return;
+      if (!(emailStatus instanceof HTMLElement)) return;
+
+      const storageKey = "nm-thankyou-draft";
+      const saveDraft = () => {
+        const draft = {
+          name: nameInput.value,
+          email: emailInput.value,
+          message: messageInput.value,
+        };
+        localStorage.setItem(storageKey, JSON.stringify(draft));
+      };
+      const restoreDraft = () => {
+        try {
+          const raw = localStorage.getItem(storageKey);
+          if (!raw) return;
+          const draft = JSON.parse(raw);
+          if (typeof draft.name === "string") nameInput.value = draft.name;
+          if (typeof draft.email === "string") emailInput.value = draft.email;
+          if (typeof draft.message === "string") messageInput.value = draft.message;
+        } catch {}
+      };
+      const validateEmail = () => {
+        const value = emailInput.value.trim();
+        if (!value) {
+          emailStatus.textContent = "";
+          return;
+        }
+        const ok = emailInput.checkValidity();
+        emailStatus.textContent = ok ? "Email is valid ✅" : "כתובת אימייל לא תקינה";
+      };
+
+      restoreDraft();
+      validateEmail();
+      [nameInput, emailInput, messageInput].forEach((field) => {
+        field.addEventListener("input", () => {
+          saveDraft();
+          if (field === emailInput) validateEmail();
+        });
+      });
+
+      form.addEventListener("submit", () => {
+        localStorage.removeItem(storageKey);
+      });
+    });
+  </script>
 </Layout>

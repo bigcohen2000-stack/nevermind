@@ -1,5 +1,2 @@
-﻿User-agent: *
-Allow: /
-Disallow: /admin
-Disallow: /intake
-Sitemap: https://www.nevermind.co.il/sitemap-index.xml
+User-agent: *
+Disallow: /

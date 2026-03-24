@@ -10,7 +10,10 @@ export default function LiteYouTubeEmbed({
   title = "סרטון וידאו",
 }: LiteYouTubeEmbedProps) {
   const [isLoaded, setIsLoaded] = useState(false);
-  const thumbnail = `https://i.ytimg.com/vi_webp/${videoId}/sddefault.webp`;
+  const saveData = typeof navigator !== "undefined" && Boolean((navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData);
+  const thumbnail = saveData
+    ? `https://i.ytimg.com/vi/${videoId}/mqdefault.jpg`
+    : `https://i.ytimg.com/vi_webp/${videoId}/sddefault.webp`;
 
   const loadIframe = () => {
     setIsLoaded(true);
@@ -20,7 +23,7 @@ export default function LiteYouTubeEmbed({
     return (
       <div className="relative aspect-video w-full overflow-hidden rounded-xl">
         <iframe
-          src={`https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`}
+          src={`https://www.youtube-nocookie.com/embed/${videoId}?rel=0&modestbranding=1${saveData ? "" : "&autoplay=1"}`}
           title={title}
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen

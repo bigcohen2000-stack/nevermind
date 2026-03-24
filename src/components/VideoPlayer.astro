@@ -8,7 +8,7 @@ interface Props {
 const { youtubeId, title = "סרטון וידאו", videoSummaryPoints = [] } = Astro.props;
 const points = videoSummaryPoints.map((point) => String(point).trim()).filter(Boolean);
 const playLabel = `הפעלת וידאו: ${title}`;
-const embedUrl = `https://www.youtube-nocookie.com/embed/${youtubeId}?rel=0&modestbranding=1&autoplay=1`;
+const embedUrl = `https://www.youtube-nocookie.com/embed/${youtubeId}?rel=0&modestbranding=1`;
 const posterUrl = `https://i.ytimg.com/vi/${youtubeId}/hqdefault.jpg`;
 ---
 
@@ -20,6 +20,7 @@ const posterUrl = `https://i.ytimg.com/vi/${youtubeId}/hqdefault.jpg`;
         class="nm-video-trigger"
         data-video-trigger
         data-embed-url={embedUrl}
+        data-youtube-id={youtubeId}
         aria-label={playLabel}
       >
         <img src={posterUrl} alt={title} loading="lazy" width="1280" height="720" class="nm-video-poster" />
@@ -133,7 +134,12 @@ const posterUrl = `https://i.ytimg.com/vi/${youtubeId}/hqdefault.jpg`;
         const label = trigger.getAttribute('aria-label') || '';
         if (!shell || !embedUrl) return;
 
-        shell.innerHTML = `<iframe src="${embedUrl}" title="${label}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>`;
+        const youtubeId = trigger.getAttribute('data-youtube-id');
+        const saveData = document.documentElement.getAttribute("data-save-data") === "true";
+        const finalEmbedUrl = saveData
+          ? `https://www.youtube-nocookie.com/embed/${youtubeId}?rel=0&modestbranding=1`
+          : `${embedUrl}&autoplay=1`;
+        shell.innerHTML = `<iframe src="${finalEmbedUrl}" title="${label}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>`;
       });
     });
   };

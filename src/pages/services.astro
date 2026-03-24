@@ -1,389 +1,349 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import appConfig from "../config/appConfig.json";
-import { buildWhatsAppHref } from "../lib/services";
+import {
+  servicesHero,
+  servicesStages,
+  servicesThoughtShifts,
+  servicesTrust,
+  buildWhatsAppHref,
+  type ServiceStage
+} from "../lib/services";
 
-const wizardOptions = {
-  personal: [
-    {
-      id: "phone20",
-      title: "טלפון (20 דק')",
-      description: "טעימה ממוקדת. הפרדת עובדות מפירושים וזיקוק צעד אחד ברור לביצוע.",
-      price: "650 ש\"ח",
-    },
-    {
-      id: "clinic",
-      title: "קליניקה (מודיעין)",
-      description: "עבודת תשתית. מרחב בטוח לחקירה עמוקה של דפוסי מחשבה ופחדים ללא תיעוד.",
-      price: "950 ש\"ח",
-    },
-    {
-      id: "clientSpace",
-      title: "הגעה ללקוח",
-      description: "בטריטוריה שלך. חקירה ללא פשרות בתנאים שנוחים לך.",
-      price: "1,450 ש\"ח",
-    },
-  ],
-  group: [
-    {
-      id: "studioSingle",
-      title: "אולפן (חד פעמי)",
-      description: "נוכחות פיזית בחקירה פעילה. להרגיש את הדינמיקה לפני שמתחייבים.",
-      price: "1,250 ש\"ח",
-    },
-    {
-      id: "learningGroup",
-      title: "קבוצת למידה",
-      description: "הנדסת התודעה. 4 מפגשי עומק בחודש. מיועד למי שמוכן להטיל ספק בהכל.",
-      price: "2,200 ש\"ח",
-    },
-  ],
-} as const;
-const waPhone = appConfig.contact.whatsAppNumber;
+const visibleStages = servicesStages.filter((stage) => Array.isArray(stage.services) && stage.services.length > 0);
+const stageStartingPrices = Object.fromEntries(
+  visibleStages.map((stage) => [
+    stage.stage_id,
+    Math.min(...stage.services.map((service) => Number(service.price_full || 0))),
+  ])
+);
 ---
 
-<Layout
-  title="בחירת מסלול | השם לא משנה"
-  description="אשף בחירה קצר שמוביל למסלול חקירה מתאים, עם הסבר ברור וללא עומס."
->
-  <section class="mx-auto max-w-5xl space-y-10 px-4 pb-20 text-[var(--nm-fg)]">
+<Layout title="בחירת מסלול | השם לא משנה" description="אשף בחירה נקי ומדורג לבחירת פורמט ושירות מתאים.">
+  <section class="mx-auto max-w-6xl space-y-10 px-4 pb-20 text-[var(--nm-fg)]">
     <header class="space-y-4 text-right">
       <p class="text-sm font-semibold uppercase tracking-[0.24em] text-[var(--nm-accent)]">בחירה מודרכת</p>
-      <h1 class="text-[clamp(2rem,1.5rem+2vw,3.6rem)] font-semibold leading-[1.05]">מהי נקודת המפגש הנוכחית שלך?</h1>
+      <h1 class="text-[clamp(2rem,1.5rem+2vw,3.6rem)] font-semibold leading-[1.05]">{servicesHero.title}</h1>
       <p class="max-w-3xl text-[clamp(1rem,0.95rem+0.25vw,1.18rem)] leading-8 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
-        עונים על כמה שאלות קצרות, ומקבלים שיבוץ מדויק למסלול שמתאים לנקודה שבה אתם נמצאים עכשיו.
+        {servicesHero.subtitle}
       </p>
     </header>
 
     <article
       id="nm-services-wizard"
-      class="fixed inset-0 z-40 space-y-6 overflow-y-auto rounded-none border-0 bg-[var(--nm-bg-canvas)] p-6 tracking-tight shadow-none md:static md:inset-auto md:rounded-[2rem] md:border md:border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] md:bg-[var(--nm-bg-canvas)]/95 md:p-10 md:shadow-[0_24px_70px_color-mix(in_srgb,var(--nm-fg)_5%,transparent)]"
+      data-services-stages={JSON.stringify(visibleStages)}
+      class="space-y-6 rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)]/95 p-6 tracking-tight shadow-[0_22px_60px_color-mix(in_srgb,var(--nm-fg)_5%,transparent)] md:p-10"
     >
+      <div class="flex items-center justify-between gap-4">
+        <button
+          id="wizard-back"
+          type="button"
+          class="inline-flex min-h-[44px] items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-transparent px-4 py-2 text-sm font-semibold text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))] transition hover:bg-[var(--nm-surface-muted)]"
+        >
+          חזור
+        </button>
+        <div class="space-y-1 text-left">
+          <p id="wizard-step-label" class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">שלב 1</p>
+          <p id="wizard-breadcrumb" class="text-xs text-[color-mix(in_srgb,var(--nm-fg)_62%,var(--nm-bg))]">מסגרת</p>
+        </div>
+      </div>
+
       <div class="flex gap-2" aria-hidden="true">
         <span data-step-dot="1" class="h-1 flex-1 rounded-full bg-[var(--nm-accent)]"></span>
         <span data-step-dot="2" class="h-1 flex-1 rounded-full bg-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)]"></span>
         <span data-step-dot="3" class="h-1 flex-1 rounded-full bg-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)]"></span>
       </div>
 
-      <section data-step-panel="1" class="space-y-4 text-right">
-        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">שלב 1</p>
-        <h2 class="text-2xl font-semibold">בחר כיוון עבודה</h2>
-        <div class="grid gap-3 sm:grid-cols-2">
-          <button type="button" data-focus="personal" class="rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-4 text-right transition hover:border-[color-mix(in_srgb,var(--nm-accent)_30%,transparent)] hover:bg-[var(--nm-bg-canvas)]">
-            <span class="block text-base font-semibold">אני מחפש פתרון נקודתי</span>
-            <span class="mt-2 block text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">מוביל לתיאום שיחה טלפונית ממוקדת (Short-term focus).</span>
-          </button>
-          <button type="button" data-focus="group" class="rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-4 text-right transition hover:border-[color-mix(in_srgb,var(--nm-accent)_30%,transparent)] hover:bg-[var(--nm-bg-canvas)]">
-            <span class="block text-base font-semibold">אני רוצה ללמוד את השפה</span>
-            <span class="mt-2 block text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">מוביל למסלול ליווי או קבוצה (Long-term infrastructure).</span>
-          </button>
+      <section data-step-panel="1" class="wizard-panel space-y-6 text-right">
+        <h2 class="text-2xl font-semibold">בחר מסגרת עבודה</h2>
+        <div class="grid gap-4 md:grid-cols-3">
+          {visibleStages.map((stage: ServiceStage) => (
+            <button
+              type="button"
+              data-stage-id={stage.stage_id}
+              class="group min-h-[170px] rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[color-mix(in_srgb,var(--nm-bg-canvas)_68%,transparent)] p-6 text-right backdrop-blur-md transition duration-300 hover:border-[color-mix(in_srgb,var(--nm-accent)_24%,transparent)] hover:bg-[color-mix(in_srgb,var(--nm-bg-canvas)_82%,transparent)]"
+            >
+              <span class="block text-[1.15rem] font-semibold text-[var(--nm-fg)]">{stage.stage_name}</span>
+              <span class="mt-3 block text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">{stage.target_audience}</span>
+              <span class="mt-4 block text-xs font-semibold text-[color-mix(in_srgb,var(--nm-fg)_62%,var(--nm-bg))]">
+                החל מ־{Number(stageStartingPrices[stage.stage_id] || 0).toLocaleString("he-IL")} ₪
+              </span>
+            </button>
+          ))}
         </div>
       </section>
 
-      <section data-step-panel="2" class="hidden space-y-4 text-right">
-        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">שלב 2</p>
+      <section data-step-panel="2" class="wizard-panel hidden space-y-6 text-right">
         <h2 id="wizard-step2-title" class="text-2xl font-semibold"></h2>
-        <div id="wizard-personal-signal" class="hidden rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-10 tracking-tight shadow-[0_16px_36px_color-mix(in_srgb,var(--nm-fg)_5%,transparent)]">
-          <p class="text-sm font-semibold text-[var(--nm-fg)]">מה המנגנון הדומיננטי כרגע?</p>
-          <div class="mt-3 flex flex-wrap gap-2">
-            <button type="button" data-signal="fear-break" class="rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-[var(--nm-surface-muted)] px-3 py-2 text-xs font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-bg-canvas)]">פחד להשתגע</button>
-            <button type="button" data-signal="general" class="rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-[var(--nm-surface-muted)] px-3 py-2 text-xs font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-bg-canvas)]">מנגנון אחר</button>
-          </div>
+        <div id="wizard-step2-options" class="grid gap-4"></div>
+        <div id="wizard-step2-skeleton" class="hidden grid gap-3">
+          <div class="skeleton h-20"></div>
+          <div class="skeleton h-20"></div>
         </div>
-        <div id="wizard-step2-options" class="grid gap-3 sm:grid-cols-2"></div>
-        <div class="rounded-xl bg-[var(--nm-surface-muted)] px-3 py-2 text-xs font-semibold text-[color-mix(in_srgb,var(--nm-fg)_65%,var(--nm-bg))]">
-          הפרדת עובדות מפירושים | מרחב נטול שיפוטיות | חקירה עובדתית | דיסקרטיות מוחלטת
-        </div>
-        <button type="button" data-back-step="1" class="text-sm font-semibold text-[color-mix(in_srgb,var(--nm-fg)_64%,var(--nm-bg))]">חזרה</button>
+        <p id="wizard-step2-empty" class="hidden rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3 text-sm text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+          כרגע אין מסלולים זמינים לנתיב הזה. אפשר לחזור ולבחור כיוון אחר.
+        </p>
+        <p id="wizard-step2-error" class="hidden rounded-2xl border border-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)] bg-[var(--nm-tint)] px-4 py-3 text-sm text-[var(--nm-fg)]">
+          קרתה תקלה זמנית בטעינת האפשרויות. נסה לרענן או לחזור לשלב קודם.
+        </p>
       </section>
 
-      <section data-step-panel="3" class="hidden space-y-4 text-right">
-        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">שלב 3</p>
-        <h2 class="text-2xl font-semibold">המלצה מותאמת</h2>
+      <section data-step-panel="3" class="wizard-panel hidden space-y-4 text-right">
+        <h2 class="text-2xl font-semibold">כרטיס סיכום</h2>
         <div class="rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)] bg-[var(--nm-tint)] p-10 tracking-tight shadow-[0_18px_40px_color-mix(in_srgb,var(--nm-fg)_5%,transparent)]">
-          <p class="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--nm-accent)]">המסלול שנבחר עבורך</p>
+          <p class="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--nm-accent)]">הזמנה להמשך</p>
           <h3 id="wizard-track-title" class="mt-2 text-xl font-semibold text-[var(--nm-fg)]"></h3>
-          <p id="wizard-track-focus" class="mt-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_75%,var(--nm-bg))]"></p>
-          <p class="mt-4 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--nm-accent)]">למה זה מתאים</p>
-          <p id="wizard-track-why" class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_75%,var(--nm-bg))]"></p>
-          <label class="mt-4 flex items-start gap-3 rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-4 text-right text-xs leading-6 text-[var(--nm-fg)]">
-            <input id="wizard-friction-check" type="checkbox" class="mt-1 h-4 w-4 shrink-0 accent-[var(--nm-accent)]" />
-            <span>אני מבין שזהו מרחב של חקירה עובדתית ולא טיפול תומך, ואני מוכן לשמוע דברים שלא יהיה לי נעים לשמוע.</span>
-          </label>
-          <label class="mt-3 block text-right">
-            <span class="mb-2 block text-xs font-semibold text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">הנושא שאני רוצה לפרק</span>
-            <textarea id="wizard-topic-input" rows="2" class="w-full rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] px-4 py-3 text-right text-sm text-[var(--nm-fg)] outline-none focus:ring-2 focus:ring-[color-mix(in_srgb,var(--nm-accent)_20%,transparent)]"></textarea>
-          </label>
-          <a id="wizard-wa-cta" href={buildWhatsAppHref("היי יקיר, עברתי את ה-Wizard באתר NeverMind.")} target="_blank" rel="noreferrer" aria-disabled="true" class="mt-5 pointer-events-none inline-flex rounded-full bg-[var(--nm-accent)] px-5 py-4 text-base font-semibold text-[var(--nm-on-accent)] opacity-45 transition hover:bg-[var(--nm-accent-hover)]">
-            מעבר לתיאום ושיבוץ
+          <p id="wizard-track-subtitle" class="mt-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_76%,var(--nm-bg))]"></p>
+          <p id="wizard-track-description" class="mt-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_74%,var(--nm-bg))]"></p>
+          <ul id="wizard-track-features" class="mt-5 space-y-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))]"></ul>
+          <p class="mt-4 text-xs leading-6 text-[color-mix(in_srgb,var(--nm-fg)_66%,var(--nm-bg))]">{servicesTrust.disclaimer_short}</p>
+          <a id="wizard-main-cta" href="#" target="_blank" rel="noreferrer" class="mt-6 inline-flex min-h-[44px] items-center justify-center rounded-full bg-[var(--nm-inverse)] px-6 py-3 text-sm font-semibold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-inverse-hover)]">
+            המשך
           </a>
-          <a id="wizard-wa-question" href={buildWhatsAppHref("יש לי שאלה נקודתית לפני שאני בוחר מסלול.")} target="_blank" rel="noreferrer" class="mt-3 inline-flex rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-transparent px-5 py-3 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-bg-canvas)]">
+          <a id="wizard-secondary-cta" href="#" target="_blank" rel="noreferrer" class="mt-3 inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-transparent px-5 py-3 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-bg-canvas)]">
             יש לי שאלה נקודתית לפני שאני בוחר
           </a>
-        </div>
-        <div class="flex gap-3">
-          <button type="button" data-back-step="2" class="text-sm font-semibold text-[color-mix(in_srgb,var(--nm-fg)_64%,var(--nm-bg))]">חזרה</button>
-          <button type="button" data-restart class="text-sm font-semibold text-[var(--nm-accent)]">התחל מחדש</button>
         </div>
       </section>
     </article>
 
-    <section class="space-y-3 rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)]/90 p-10 tracking-tight shadow-[0_16px_36px_color-mix(in_srgb,var(--nm-fg)_5%,transparent)] text-right">
-      <h2 class="text-xl font-semibold">כל המסלולים בקצרה</h2>
-      <div class="grid gap-3 md:grid-cols-2">
-        {[...wizardOptions.personal, ...wizardOptions.group].map((track) => (
-          <div class="rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-10 tracking-tight shadow-[0_16px_36px_color-mix(in_srgb,var(--nm-fg)_5%,transparent)]">
-            <p class="text-sm font-semibold text-[var(--nm-fg)]">{track.title}</p>
-            <p class="mt-2 text-xs leading-6 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">{track.description}</p>
-          </div>
+    <section class="space-y-5 rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)]/90 p-10 tracking-tight shadow-[0_16px_36px_color-mix(in_srgb,var(--nm-fg)_5%,transparent)] text-right">
+      <h2 class="text-xl font-semibold">Perspective</h2>
+      <div class="grid gap-4 md:grid-cols-2">
+        {servicesThoughtShifts.map((shift) => (
+          <article class="rounded-[1.4rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-6">
+            <p class="text-sm font-semibold text-[var(--nm-fg)]">{shift.title}</p>
+            <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">לפני: {shift.before}</p>
+            <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_82%,var(--nm-bg))]">אחרי: {shift.after}</p>
+          </article>
         ))}
       </div>
     </section>
-
-    <section class="rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)]/90 p-10 tracking-tight shadow-[0_16px_36px_color-mix(in_srgb,var(--nm-fg)_5%,transparent)] text-right">
-      <h2 class="text-xl font-semibold">שאלה נפוצה</h2>
-      <p class="mt-3 text-sm font-semibold text-[var(--nm-fg)]">מה אם אני מרגיש שאני עומד להשתגע?</p>
-      <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_74%,var(--nm-bg))]">
-        זה המקום המדויק עבורך. אנחנו לא מדביקים הגדרות - אנחנו מתבוננים במנגנון שיוצר את הפחד הזה עד שהוא מאבד מכוחו.
-      </p>
-    </section>
-
-    <section class="rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)] bg-[var(--nm-tint)] p-10 tracking-tight shadow-[0_16px_36px_color-mix(in_srgb,var(--nm-fg)_5%,transparent)] text-right">
-      <p class="text-sm leading-7 text-[var(--nm-fg)]">לפני שאתה שולח הודעה: הצג את עצמך ואת הסוגיה בחדות. אני מאשר פגישות רק למי שבאמת מוכן לעבודה.</p>
-      <a
-        href={buildWhatsAppHref("שלום, מציג את עצמי ואת הסוגיה בצורה ממוקדת כדי לבדוק התאמה למסלול.")}
-        target="_blank"
-        rel="noreferrer"
-        data-thankyou-redirect
-        class="mt-4 inline-flex rounded-full bg-[var(--nm-accent)] px-5 py-3 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]"
-      >
-        פתיחת שיחה בוואטסאפ
-      </a>
-    </section>
   </section>
 
-  <script is:inline define:vars={{ waPhone }}>
+  <script is:inline>
     document.addEventListener("astro:page-load", () => {
       const root = document.getElementById("nm-services-wizard");
       if (!(root instanceof HTMLElement)) return;
-      const thankYouPath = "/thank-you/";
 
-      const options = {
-        personal: [
-          {
-            id: "phone20",
-            title: "טלפון (20 דק')",
-            description: "טעימה ממוקדת. הפרדת עובדות מפירושים וזיקוק צעד אחד ברור לביצוע.",
-            price: "650 ש\"ח",
-          },
-          {
-            id: "clinic",
-            title: "קליניקה (מודיעין)",
-            description: "עבודת תשתית. מרחב בטוח לחקירה עמוקה של דפוסי מחשבה ופחדים ללא תיעוד.",
-            price: "950 ש\"ח",
-          },
-          {
-            id: "clientSpace",
-            title: "הגעה ללקוח",
-            description: "בטריטוריה שלך. חקירה ללא פשרות בתנאים שנוחים לך.",
-            price: "1,450 ש\"ח",
-          },
-        ],
-        group: [
-          {
-            id: "studioSingle",
-            title: "אולפן (חד פעמי)",
-            description: "נוכחות פיזית בחקירה פעילה. להרגיש את הדינמיקה לפני שמתחייבים.",
-            price: "1,250 ש\"ח",
-          },
-          {
-            id: "learningGroup",
-            title: "קבוצת למידה",
-            description: "הנדסת התודעה. 4 מפגשי עומק בחודש. מיועד למי שמוכן להטיל ספק בהכל.",
-            price: "2,200 ש\"ח",
-          },
-        ],
-      };
-
-      let focus = "personal";
-      let selectedOption = options.personal[0];
+      const stages = JSON.parse(root.getAttribute("data-services-stages") || "[]");
+      let currentStep = 1;
+      let selectedStage = null;
+      let selectedService = null;
 
       const dots = Array.from(root.querySelectorAll("[data-step-dot]"));
       const panels = Array.from(root.querySelectorAll("[data-step-panel]"));
+      const stepLabel = root.querySelector("#wizard-step-label");
+      const breadcrumbNode = root.querySelector("#wizard-breadcrumb");
+      const backButton = root.querySelector("#wizard-back");
       const step2TitleNode = root.querySelector("#wizard-step2-title");
       const step2OptionsNode = root.querySelector("#wizard-step2-options");
-      const personalSignalNode = root.querySelector("#wizard-personal-signal");
-      const titleNode = root.querySelector("#wizard-track-title");
-      const focusNode = root.querySelector("#wizard-track-focus");
-      const whyNode = root.querySelector("#wizard-track-why");
-      const ctaNode = root.querySelector("#wizard-wa-cta");
-      const questionNode = root.querySelector("#wizard-wa-question");
-      const frictionCheck = root.querySelector("#wizard-friction-check");
-      const topicNode = root.querySelector("#wizard-topic-input");
-      let personalSignal = "general";
+      const step2Skeleton = root.querySelector("#wizard-step2-skeleton");
+      const step2EmptyNode = root.querySelector("#wizard-step2-empty");
+      const step2ErrorNode = root.querySelector("#wizard-step2-error");
+      const summaryTitle = root.querySelector("#wizard-track-title");
+      const summarySubtitle = root.querySelector("#wizard-track-subtitle");
+      const summaryDescription = root.querySelector("#wizard-track-description");
+      const summaryFeatures = root.querySelector("#wizard-track-features");
+      const mainCta = root.querySelector("#wizard-main-cta");
+      const secondaryCta = root.querySelector("#wizard-secondary-cta");
 
-      const pulseHaptic = () => {
-        if ("vibrate" in navigator) navigator.vibrate(12);
-      };
+      const toMoney = (value) => `${Number(value || 0).toLocaleString("he-IL")} ₪`;
 
       const setStep = (step) => {
+        currentStep = step;
         panels.forEach((panel) => {
           if (!(panel instanceof HTMLElement)) return;
           panel.classList.toggle("hidden", panel.dataset.stepPanel !== String(step));
+          panel.classList.add("wizard-fade-in");
         });
         dots.forEach((dot, index) => {
           if (!(dot instanceof HTMLElement)) return;
           dot.classList.toggle("bg-[var(--nm-accent)]", index < step);
           dot.classList.toggle("bg-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)]", index >= step);
         });
-        pulseHaptic();
+        if (stepLabel instanceof HTMLElement) stepLabel.textContent = `שלב ${step}`;
+        if (breadcrumbNode instanceof HTMLElement) {
+          if (step === 1) breadcrumbNode.textContent = "מסגרת";
+          if (step === 2 && selectedStage) breadcrumbNode.textContent = `מסגרת > ${selectedStage.stage_name}`;
+          if (step === 3 && selectedService) breadcrumbNode.textContent = `מסגרת > שירות > ${selectedService.title}`;
+        }
+        if (backButton instanceof HTMLButtonElement) {
+          backButton.disabled = step === 1;
+          backButton.classList.toggle("opacity-40", step === 1);
+        }
       };
 
-      const renderStep2 = () => {
+      const renderStageServices = () => {
         if (!(step2TitleNode instanceof HTMLElement) || !(step2OptionsNode instanceof HTMLElement)) return;
-        if (focus === "personal") {
-          step2TitleNode.textContent = "בחר מסלול נקודתי";
-          if (personalSignalNode instanceof HTMLElement) personalSignalNode.classList.remove("hidden");
-        } else {
-          step2TitleNode.textContent = "בחר מסלול תשתיתי";
-          if (personalSignalNode instanceof HTMLElement) personalSignalNode.classList.add("hidden");
+        if (!selectedStage) return;
+
+        step2TitleNode.textContent = selectedStage.stage_name || "";
+        if (step2ErrorNode instanceof HTMLElement) step2ErrorNode.classList.add("hidden");
+        const services = Array.isArray(selectedStage.services) ? selectedStage.services : [];
+        if (!services.length) {
+          step2OptionsNode.innerHTML = "";
+          if (step2EmptyNode instanceof HTMLElement) step2EmptyNode.classList.remove("hidden");
+          return;
         }
 
-        const list = options[focus] || [];
-        step2OptionsNode.innerHTML = list
-          .map(
-            (item) =>
-              `<button type="button" data-option-id="${item.id}" class="rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-4 text-right transition hover:border-[color-mix(in_srgb,var(--nm-accent)_30%,transparent)] hover:bg-[var(--nm-bg-canvas)]">
-                <span class="block text-base font-semibold text-[var(--nm-fg)]">${item.title}</span>
-                <span class="mt-2 block text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">${item.description}</span>
-              </button>`,
-          )
+        if (step2EmptyNode instanceof HTMLElement) step2EmptyNode.classList.add("hidden");
+        if (step2Skeleton instanceof HTMLElement) step2Skeleton.classList.remove("hidden");
+        if (step2OptionsNode instanceof HTMLElement) step2OptionsNode.classList.add("hidden");
+        step2OptionsNode.innerHTML = services
+          .map((service) => {
+            const badges = Array.isArray(service.badges) ? service.badges : [];
+            const badgeIcon = (badge) => {
+              const source = String(badge || "").toLowerCase();
+              if (source.includes("טלפון")) return "📞";
+              if (source.includes("קבוצה")) return "👥";
+              if (source.includes("צילום")) return "🎥";
+              if (source.includes("דיסקרט")) return "🔒";
+              if (source.includes("ללא")) return "•";
+              return "•";
+            };
+            const scarcity =
+              service.availability && typeof service.availability.spots_left === "number"
+                ? `<p class="mt-2 text-xs text-[color-mix(in_srgb,var(--nm-fg)_58%,var(--nm-bg))]">נותרו ${service.availability.spots_left} מקומות כרגע</p>`
+                : "";
+            return `<button type="button" data-service-id="${service.id}" class="w-full rounded-[1.4rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] px-5 py-5 text-right transition hover:border-[color-mix(in_srgb,var(--nm-accent)_24%,transparent)] hover:bg-[var(--nm-surface-muted)]">
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <p class="text-base font-semibold text-[var(--nm-fg)]">${service.title || ""}</p>
+                  <p class="mt-1 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">${service.subtitle || ""}</p>
+                </div>
+                <p class="text-sm font-semibold text-[var(--nm-accent)]">${toMoney(service.price_full)}</p>
+              </div>
+              <div class="mt-3 flex flex-wrap justify-end gap-2">
+                ${badges.map((badge) => `<span class="rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-2.5 py-1 text-xs font-semibold text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">${badgeIcon(badge)} ${badge}</span>`).join("")}
+              </div>
+              ${scarcity}
+            </button>`;
+          })
           .join("");
 
-        step2OptionsNode.querySelectorAll("[data-option-id]").forEach((btn) => {
-          btn.addEventListener("click", () => {
-            if (!(btn instanceof HTMLElement)) return;
-            const item = list.find((row) => row.id === btn.dataset.optionId);
-            if (!item) return;
-            selectedOption = item;
-            renderResult();
-            setStep(3);
-            pulseHaptic();
-          });
-        });
-      };
-
-      const renderResult = () => {
-        const item = selectedOption;
-        if (titleNode instanceof HTMLElement) titleNode.textContent = item.title;
-        if (focusNode instanceof HTMLElement) focusNode.textContent = item.description;
-        if (whyNode instanceof HTMLElement) {
-          if (focus === "personal" && personalSignal === "fear-break") {
-            whyNode.textContent = "המסלול הזה נבחר כי הוא מאפשר פירוק של מנגנון הפחד בסביבה נטולת הגדרות רפואיות.";
-          } else if (focus === "group") {
-            whyNode.textContent = "המסלול נבחר כדי שתוכל לראות את המנגנון פועל אצל אחרים לפני שאתה ניגש לפירוק האישי שלך.";
-          } else {
-            whyNode.textContent = "מיועד להפרדת רעשי הרקע מהעובדות, במטרה להבין שמעולם לא הייתה בעיה - או שאין בעיה עם זה שיש בעיה.";
-          }
-        }
-        if (ctaNode instanceof HTMLAnchorElement) {
-          const userTopic =
-            topicNode instanceof HTMLTextAreaElement && topicNode.value.trim()
-              ? topicNode.value.trim()
-              : "[כאן המשתמש יכתוב]";
-          const message = `היי יקיר, עברתי את ה-Wizard באתר NeverMind. המסלול שנבחר עבורי הוא ${item.title}. הנושא שאני רוצה לפרק הוא: ${userTopic}. אני מבין שזהו מרחב חקירה ולא טיפול.`;
-          ctaNode.href = `https://wa.me/${waPhone}?text=${encodeURIComponent(message)}`;
-          ctaNode.textContent = `מעבר לתיאום ושיבוץ - ${item.price}`;
-        }
-        if (questionNode instanceof HTMLAnchorElement) {
-          const qMsg = `[Lead | Source: מסלולים | Page: שירותים]\nמחשבה אחת נקייה – ישר לוואטסאפ\n\nיש לי שאלה נקודתית לפני שאני בוחר: ${item.title}`;
-          questionNode.href = `https://wa.me/${waPhone}?text=${encodeURIComponent(qMsg)}`;
-        }
-      };
-
-      root.querySelectorAll("[data-focus]").forEach((btn) => {
-        btn.addEventListener("click", () => {
-          if (!(btn instanceof HTMLElement)) return;
-          focus = btn.dataset.focus || "personal";
-          personalSignal = "general";
-          renderStep2();
-          setStep(2);
-          pulseHaptic();
-        });
-      });
-      if (personalSignalNode instanceof HTMLElement) {
-        personalSignalNode.querySelectorAll("[data-signal]").forEach((btn) => {
-          btn.addEventListener("click", () => {
-            if (!(btn instanceof HTMLElement)) return;
-            personalSignal = btn.dataset.signal || "general";
-            pulseHaptic();
-          });
-        });
-      }
-      root.querySelectorAll("[data-back-step]").forEach((btn) => {
-        btn.addEventListener("click", () => {
-          if (!(btn instanceof HTMLElement)) return;
-          setStep(Number(btn.dataset.backStep || 1));
-        });
-      });
-      const restart = root.querySelector("[data-restart]");
-      restart?.addEventListener("click", () => {
-        focus = "personal";
-        selectedOption = options.personal[0];
-        renderStep2();
-        setStep(1);
-        pulseHaptic();
-      });
-
-      const syncFriction = () => {
-        if (!(ctaNode instanceof HTMLAnchorElement) || !(frictionCheck instanceof HTMLInputElement)) return;
-        const enabled = frictionCheck.checked;
-        ctaNode.classList.toggle("pointer-events-none", !enabled);
-        ctaNode.classList.toggle("opacity-45", !enabled);
-        ctaNode.setAttribute("aria-disabled", enabled ? "false" : "true");
-      };
-      if (frictionCheck instanceof HTMLInputElement) {
-        frictionCheck.addEventListener("change", () => {
-          syncFriction();
-          pulseHaptic();
-        });
-      }
-      if (topicNode instanceof HTMLTextAreaElement) {
-        topicNode.addEventListener("input", renderResult);
-      }
-
-      const scheduleThankYouRedirect = () => {
         window.setTimeout(() => {
-          window.location.href = thankYouPath;
+          if (step2Skeleton instanceof HTMLElement) step2Skeleton.classList.add("hidden");
+          if (step2OptionsNode instanceof HTMLElement) step2OptionsNode.classList.remove("hidden");
+          step2OptionsNode.querySelectorAll("[data-service-id]").forEach((button, idx) => {
+            if (!(button instanceof HTMLElement)) return;
+            button.style.animationDelay = `${idx * 60}ms`;
+            button.classList.add("wizard-stagger-item");
+          });
         }, 180);
+
+        step2OptionsNode.querySelectorAll("[data-service-id]").forEach((button) => {
+          button.addEventListener("click", () => {
+            if (!(button instanceof HTMLElement)) return;
+            const serviceId = button.dataset.serviceId;
+            selectedService = services.find((service) => service.id === serviceId) || null;
+            if (!selectedService) return;
+            renderSummary();
+            setStep(3);
+          });
+        });
       };
 
-      [ctaNode, questionNode].forEach((node) => {
-        if (!(node instanceof HTMLAnchorElement)) return;
-        node.setAttribute("data-thankyou-redirect", "true");
+      const renderSummary = () => {
+        if (!selectedService) return;
+        if (summaryTitle instanceof HTMLElement) summaryTitle.textContent = selectedService.title || "";
+        if (summarySubtitle instanceof HTMLElement) summarySubtitle.textContent = selectedService.subtitle || "";
+        if (summaryDescription instanceof HTMLElement) summaryDescription.textContent = selectedService.description || "";
+
+        if (summaryFeatures instanceof HTMLElement) {
+          const list = Array.isArray(selectedService.features) ? selectedService.features : [];
+          summaryFeatures.innerHTML = list
+            .map((feature) => {
+              const text = typeof feature === "string" ? feature : feature?.text || "";
+              return `<li>• ${text}</li>`;
+            })
+            .join("");
+        }
+
+        if (mainCta instanceof HTMLAnchorElement) {
+          mainCta.href = selectedService.payment_link || "#";
+          mainCta.textContent = selectedService.payment_cta || `מעבר להמשך - ${toMoney(selectedService.price_full)}`;
+          mainCta.target = "_blank";
+        }
+        if (secondaryCta instanceof HTMLAnchorElement) {
+          const waMessage = `[Lead | Source: שירותים | Page: ${selectedStage?.stage_name || "מסלולים"}]\nמחשבה אחת נקייה – ישר לוואטסאפ\n\nיש לי שאלה על ${selectedService.title} (${toMoney(selectedService.price_full)}).`;
+          secondaryCta.href = buildWhatsAppHref(waMessage);
+        }
+      };
+
+      root.querySelectorAll("[data-stage-id]").forEach((button) => {
+        button.addEventListener("click", () => {
+          if (!(button instanceof HTMLElement)) return;
+          const stageId = button.dataset.stageId;
+          selectedStage = stages.find((stage) => stage.stage_id === stageId) || null;
+          selectedService = null;
+          renderStageServices();
+          setStep(2);
+        });
       });
 
-      document.querySelectorAll("[data-thankyou-redirect]").forEach((node) => {
-        node.addEventListener("click", (event) => {
-          const target = event.currentTarget;
-          if (!(target instanceof HTMLAnchorElement)) return;
-          if (target.id === "wizard-wa-cta" && target.getAttribute("aria-disabled") === "true") {
-            event.preventDefault();
-            return;
+      if (backButton instanceof HTMLButtonElement) {
+        backButton.addEventListener("click", () => {
+          if (currentStep === 3) return setStep(2);
+          if (currentStep === 2) {
+            selectedStage = null;
+            selectedService = null;
+            return setStep(1);
           }
-          scheduleThankYouRedirect();
         });
-      });
+      }
 
-      root.querySelectorAll("form").forEach((form) => {
-        form.addEventListener("submit", () => {
-          scheduleThankYouRedirect();
-        });
-      });
-
-      renderStep2();
       setStep(1);
-      syncFriction();
+      document.body.classList.add("is-focus-mode");
+      window.addEventListener("pagehide", () => {
+        document.body.classList.remove("is-focus-mode");
+      });
     });
   </script>
+
+  <style>
+    .wizard-panel {
+      opacity: 1;
+      transform: translateY(0);
+      transition:
+        opacity 220ms ease,
+        transform 220ms ease;
+    }
+
+    .wizard-panel.hidden {
+      opacity: 0;
+      transform: translateY(10px);
+      pointer-events: none;
+    }
+
+    .wizard-fade-in {
+      animation: wizard-fade-in 220ms ease;
+    }
+
+    .wizard-stagger-item {
+      opacity: 0;
+      animation: wizard-card-stagger 320ms ease forwards;
+    }
+
+    @keyframes wizard-fade-in {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes wizard-card-stagger {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
 </Layout>

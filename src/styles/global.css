@@ -115,7 +115,7 @@ html[lang="he"] {
 
 body {
   font-family: "Assistant Variable", system-ui, sans-serif;
-  font-size: 1.125rem;
+  font-size: 1rem;
   line-height: 1.7;
   letter-spacing: 0;
   -webkit-font-smoothing: antialiased;
@@ -125,6 +125,70 @@ body {
   transition:
     background-color 0.25s ease,
     color 0.25s ease;
+}
+
+/* Prevent hidden target behind fixed header */
+:target {
+  scroll-margin-top: 80px;
+}
+
+/* Reusable loading placeholder */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--nm-fg) 8%, var(--nm-bg-canvas));
+  border-radius: 1rem;
+}
+
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--nm-bg-canvas) 70%, transparent),
+    transparent
+  );
+  animation: nm-skeleton-shimmer 1.2s infinite;
+}
+
+@keyframes nm-skeleton-shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Minimum touch target for controls */
+a,
+button,
+input[type="button"],
+input[type="submit"],
+input[type="reset"] {
+  min-height: 44px;
+}
+
+button,
+[role="button"],
+a.inline-flex,
+a[aria-label] {
+  min-width: 44px;
+}
+
+/* Motion safe baseline */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 body[data-whisper-banner-state="hidden"] {

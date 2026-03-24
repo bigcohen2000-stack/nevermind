@@ -29,7 +29,12 @@ const siteTitle = appConfig.site.name;
 const siteDescription = "מרחב חקירה שקט לבהירות, דיוק רגשי והבנה בגובה העיניים.";
 const siteUrl = appConfig.site.url;
 const pageTitle = title ? `${title} | ${siteTitle}` : siteTitle;
-const pageDescription = description ?? frontmatter?.description ?? siteDescription;
+const trimMetaDescription = (value: string) => {
+  const normalized = String(value || "").trim().replace(/\s+/g, " ");
+  if (normalized.length <= 155) return normalized;
+  return `${normalized.slice(0, 152).trimEnd()}...`;
+};
+const pageDescription = trimMetaDescription(description ?? frontmatter?.description ?? siteDescription);
 const pageUrl = Astro.url ? new URL(Astro.url.pathname, siteUrl).toString() : siteUrl;
 const ogImage = image || (frontmatter?.image ? new URL(frontmatter.image, siteUrl).toString() : `${siteUrl}/og.jpg`);
 
@@ -215,7 +220,7 @@ const navItems = [
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{pageTitle}</title>
     <meta name="description" content={pageDescription} />
-    {effectiveNoIndex && <meta name="robots" content="noindex,nofollow,noarchive" />}
+    <meta name="robots" content="noindex, nofollow" />
     <link rel="canonical" href={pageUrl} />
 
     <meta property="og:site_name" content={siteTitle} />
@@ -369,6 +374,11 @@ const navItems = [
           if (target) window.location.href = target;
         };
 
+        const saveDataMode = Boolean(navigator.connection && navigator.connection.saveData);
+        if (saveDataMode) {
+          document.documentElement.setAttribute("data-save-data", "true");
+        }
+
         const formatAvailabilityDateHebrew = (isoString) => {
           const date = new Date(isoString);
           if (Number.isNaN(date.getTime())) return "";
@@ -397,9 +407,73 @@ const navItems = [
         randomTriggers.forEach((trigger) => trigger.addEventListener("click", onRandomClick));
         refreshAvailabilityLines();
 
+        const scrollStorageKey = `nm-scroll:${window.location.pathname}`;
+        const savedScroll = Number(sessionStorage.getItem(scrollStorageKey));
+        if (Number.isFinite(savedScroll) && savedScroll > 0) {
+          window.requestAnimationFrame(() => window.scrollTo(0, savedScroll));
+        }
+        const persistScroll = () => {
+          sessionStorage.setItem(scrollStorageKey, String(window.scrollY || 0));
+        };
+        window.addEventListener("scroll", persistScroll, { passive: true });
+        window.addEventListener("beforeunload", persistScroll);
+
+        const formatIsoDates = () => {
+          document.querySelectorAll("[data-iso-date]").forEach((el) => {
+            const raw = el.getAttribute("data-iso-date");
+            if (!raw) return;
+            const date = new Date(raw);
+            if (Number.isNaN(date.getTime())) return;
+            const formatted = new Intl.DateTimeFormat("he-IL", {
+              year: "numeric",
+              month: "2-digit",
+              day: "2-digit",
+              timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+            }).format(date);
+            el.textContent = formatted;
+          });
+        };
+        formatIsoDates();
+
+        const showCopyFeedback = (trigger) => {
+          const original = trigger.textContent || "";
+          trigger.textContent = "✓ הועתק";
+          window.setTimeout(() => {
+            trigger.textContent = original;
+          }, 2000);
+        };
+        const copyToClipboard = async (text) => {
+          if (!text) return false;
+          try {
+            await navigator.clipboard.writeText(text);
+            return true;
+          } catch {
+            return false;
+          }
+        };
+        document.querySelectorAll("[data-copy-text]").forEach((trigger) => {
+          trigger.addEventListener("click", async () => {
+            const value = trigger.getAttribute("data-copy-text");
+            const ok = await copyToClipboard(value || "");
+            if (ok) showCopyFeedback(trigger);
+          });
+        });
+
+        window.addEventListener("nm:focus-target", (event) => {
+          const selector = event?.detail?.selector;
+          if (!selector) return;
+          const target = document.querySelector(selector);
+          if (!(target instanceof HTMLElement)) return;
+          target.setAttribute("tabindex", "-1");
+          target.focus({ preventScroll: true });
+          target.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+
         window.__nmLayoutCleanup = () => {
           searchTriggers.forEach((trigger) => trigger.removeEventListener("click", onSearchClick));
           randomTriggers.forEach((trigger) => trigger.removeEventListener("click", onRandomClick));
+          window.removeEventListener("scroll", persistScroll);
+          window.removeEventListener("beforeunload", persistScroll);
         };
       });
     </script>

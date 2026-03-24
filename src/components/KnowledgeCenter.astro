@@ -57,6 +57,9 @@ const inquiries = [
     </div>
 
     <div id="knowledge-search-status" class="mt-4 text-right text-sm text-[color-mix(in_srgb,var(--nm-fg)_62%,var(--nm-bg))]"></div>
+    <p id="knowledge-search-error" class="mt-3 hidden rounded-xl border border-[color-mix(in_srgb,var(--nm-accent)_24%,transparent)] bg-[var(--nm-tint)] px-4 py-3 text-right text-sm text-[var(--nm-fg)]">
+      החיפוש לא זמין כרגע. אפשר לרענן את העמוד ולנסות שוב.
+    </p>
 
     <div id="knowledge-empty-state" class="mt-6 space-y-4">
       <p class="text-sm font-semibold text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">מומלץ עבורך כרגע</p>
@@ -83,12 +86,14 @@ const inquiries = [
       const status = document.getElementById("knowledge-search-status");
       const resultsList = document.getElementById("knowledge-search-results");
       const emptyState = document.getElementById("knowledge-empty-state");
+      const errorState = document.getElementById("knowledge-search-error");
       const inquiryButtons = Array.from(document.querySelectorAll("[data-kc-inquiry]"));
 
       if (!(input instanceof HTMLInputElement)) return;
       if (!(status instanceof HTMLElement)) return;
       if (!(resultsList instanceof HTMLElement)) return;
       if (!(emptyState instanceof HTMLElement)) return;
+      if (!(errorState instanceof HTMLElement)) return;
 
       let isPagefindReady = false;
       let activeRun = 0;
@@ -131,6 +136,7 @@ const inquiries = [
         const runId = activeRun;
 
         if (!trimmed) {
+          errorState.classList.add("hidden");
           status.textContent =
             "מה מעסיק אותך כרגע? התחל לכתוב, או בחר אחת מהשאלות כדי לראות מה נחשף.";
           resultsList.innerHTML = "";
@@ -140,6 +146,7 @@ const inquiries = [
 
         status.textContent = "מחפשים מה מתאים…";
         emptyState.classList.add("hidden");
+        errorState.classList.add("hidden");
 
         try {
           await loadPagefind();
@@ -172,7 +179,8 @@ const inquiries = [
           );
         } catch {
           if (runId !== activeRun) return;
-          status.textContent = "החיפוש לא זמין כרגע. רגע והמסלול יתבהר שוב.";
+          status.textContent = "";
+          errorState.classList.remove("hidden");
           resultsList.innerHTML = "";
         }
       };
