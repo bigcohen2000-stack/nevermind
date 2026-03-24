@@ -247,7 +247,7 @@ const navItems = [
     <WhisperBanner />
 
     <nav data-nav class="fixed inset-x-0 top-[var(--nm-nav-top,1.5rem)] z-50 flex justify-center px-4 transition-[top] duration-300">
-      <div class="flex flex-wrap items-center justify-center gap-3 rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/88 px-5 py-3 shadow-[0_14px_34px_rgba(26,26,26,0.08)] backdrop-blur-md">
+      <div class="flex flex-wrap items-center justify-center gap-3 rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)]/92 px-5 py-3 shadow-[0_14px_34px_color-mix(in_srgb,var(--nm-fg)_8%,transparent)] backdrop-blur-md">
         {navItems.map((item) => (
           <a href={item.href} class="text-sm font-semibold text-[color-mix(in_srgb,var(--nm-fg)_82%,var(--nm-bg))] transition-colors duration-200 hover:text-[var(--nm-accent)]">{item.label}</a>
         ))}
@@ -261,7 +261,7 @@ const navItems = [
         <button
           id="search-trigger"
           data-search-trigger
-          aria-label="חיפוש במרכז הידע — מה מעסיק אותך כרגע?"
+          aria-label="חיפוש במרכז הידע | מה מעסיק אותך כרגע?"
           class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))] transition-colors duration-200 hover:border-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)] hover:text-[var(--nm-accent)]"
         >
           <Search className="h-4 w-4" />
@@ -305,21 +305,21 @@ const navItems = [
           <a
             href="/forbidden-library/"
             class="transition-colors duration-200 hover:text-[var(--nm-accent)]"
-            title="הספרייה האסורה — תוכן לחקירה"
+            title="הספרייה האסורה | תוכן לחקירה"
           >
             הספרייה האסורה
           </a>
           <a
             href="/root-problem-tree/"
             class="transition-colors duration-200 hover:text-[var(--nm-accent)]"
-            title="עץ שורש הבעיה — כלי חשיבה"
+            title="עץ שורש הבעיה | כלי חשיבה"
           >
             עץ שורש הבעיה
           </a>
           <a
             href="/accessibility/"
             class="transition-colors duration-200 hover:text-[var(--nm-accent)]"
-            title="הצהרת נגישות — השם לא משנה"
+            title="הצהרת נגישות | השם לא משנה"
           >
             הצהרת נגישות
           </a>

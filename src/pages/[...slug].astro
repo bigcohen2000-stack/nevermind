@@ -13,6 +13,7 @@ import SkepticBox from "../components/SkepticBox.astro";
 import ConceptCallout from "../components/ConceptCallout.astro";
 import BottomLineSummary from "../components/BottomLineSummary.astro";
 import PremiumLock from "../components/PremiumLock.astro";
+import PremiumBreak from "../components/PremiumBreak.astro";
 import RevealInsight from "../components/RevealInsight.astro";
 import ReflectionQuestions from "../components/ReflectionQuestions.astro";
 import LogicalQuestionBox from "../components/LogicalQuestionBox.astro";
@@ -131,6 +132,7 @@ const difficultyKey: DifficultyKey =
         : "beginner";
 const difficultyMeta = difficultyConfig[difficultyKey];
 const showBottomLine = wordCount >= 900 && Boolean(bottomLine);
+const showPremiumBreak = difficultyKey === "deep" || wordCount >= 1400;
 const primaryTag = tags[0] ?? "הנקודה הזאת";
 const tagPromptMap: Record<string, string> = {
   חופש: "איפה אתה עדיין מוותר על חופש פנימי כדי לא לשלם מחיר חיצוני?",
@@ -413,6 +415,7 @@ const components = {
       >
         <Content components={components} />
       </div>
+      {showPremiumBreak && <PremiumBreak wizardHref="/services/" />}
 
       <section class="mx-auto max-w-[72ch]">
         <ReflectionQuestions title={title} questions={reflectionQuestions} whatsappHref={reflectionWhatsAppUrl} />

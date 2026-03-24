@@ -3,8 +3,8 @@ import Layout from "../../layouts/Layout.astro";
 import appConfig from "../../config/appConfig.json";
 import { formatMoney, servicesAddOns } from "../../lib/services";
 
-const pageTitle = "מחולל Mega-Prompt";
-const pageDescription = "כלי פנימי ליצירת פרומפטים, preview, validation וזרימת publish למאמרי MDX.";
+const pageTitle = "עורך חכם ומנוע תיקוף";
+const pageDescription = "כתיבה ידנית בוטיקית עם תיקוף איכות, הזרקת רכיבים וייצוא MDX נקי.";
 const githubFolderBase = `https://github.com/${appConfig.github.owner}/${appConfig.github.repo}/tree/${appConfig.github.branch}/${appConfig.github.articlesPath}`;
 const githubRepoLabel = `${appConfig.github.owner}/${appConfig.github.repo}`;
 const documentationService = servicesAddOns.find((service) => service.id === "summary-ai") ?? servicesAddOns[0];
@@ -33,17 +33,178 @@ const upsellPreviewText = documentationService
   </style>
   <section class="mx-auto max-w-7xl space-y-10 px-4 pb-12 text-[var(--nm-fg)]">
     <header class="max-w-4xl space-y-5 text-right">
-      <p class="text-sm font-semibold uppercase tracking-[0.26em] text-[var(--nm-accent)]">
-        מחולל פנימי
-      </p>
+      <p class="text-sm font-semibold uppercase tracking-[0.26em] text-[var(--nm-accent)]">עורך תוכן פנימי</p>
       <h1 class="text-[clamp(2.4rem,1.8rem+2vw,4.1rem)] font-semibold leading-[1.04]">
-        מחולל Mega-Prompt למאמרי MDX
+        עורך חכם ומנוע תיקוף למאמרי MDX
       </h1>
       <p class="max-w-3xl text-[clamp(1rem,0.94rem+0.3vw,1.18rem)] leading-8 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
-        מזינים טקסט גולמי, הקשר של קישורים פנימיים, והעדפות תוכן. הכלי מחזיר פרומפט אחד כבד ומדויק,
-        ואז מאפשר להדביק את ה־MDX שחזר מהמודל ולבדוק תצוגה לפני commit ל־GitHub.
+        כותבים ידנית, מקבלים בדיקת איכות חיה, ומזריקים רכיבים מוכנים בלחיצה.
+        בלי מחולל אוטומטי, עם שליטה מלאה בטון ובאיכות.
       </p>
     </header>
+
+    <section
+      id="smart-editor-root"
+      class="grid gap-6 rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)]/95 p-10 tracking-tight shadow-[0_24px_70px_color-mix(in_srgb,var(--nm-fg)_5%,transparent)] lg:grid-cols-12"
+    >
+      <div class="space-y-4 lg:col-span-7">
+        <h2 class="text-xl font-semibold text-[var(--nm-fg)]">טופס הזנה</h2>
+        <label class="block space-y-2 text-right">
+          <span class="text-sm font-semibold text-[var(--nm-fg)]">כותרת המאמר</span>
+          <input id="se-title" type="text" class="w-full rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3 text-right text-[var(--nm-fg)] outline-none focus:ring-2 focus:ring-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)]" />
+          <span id="se-title-len" class="text-xs text-[color-mix(in_srgb,var(--nm-fg)_55%,var(--nm-bg))]">0 תווים</span>
+        </label>
+        <label class="block space-y-2 text-right">
+          <span class="text-sm font-semibold text-[var(--nm-fg)]">קישור נקי</span>
+          <input id="se-slug" dir="ltr" type="text" placeholder="clean-article-link" class="w-full rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3 text-left text-[var(--nm-fg)] outline-none focus:ring-2 focus:ring-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)]" />
+        </label>
+        <label class="block space-y-2 text-right">
+          <span class="text-sm font-semibold text-[var(--nm-fg)]">תקציר מדויק למנועי חיפוש ולוואטסאפ</span>
+          <textarea id="se-desc" rows="3" class="w-full rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3 text-right text-[var(--nm-fg)] outline-none focus:ring-2 focus:ring-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)]"></textarea>
+        </label>
+        <label class="block space-y-2 text-right">
+          <span class="text-sm font-semibold text-[var(--nm-fg)]">תגיות (מופרדות בפסיק)</span>
+          <input id="se-tags" type="text" placeholder="בחירה, בהירות, חקירה" class="w-full rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3 text-right text-[var(--nm-fg)] outline-none focus:ring-2 focus:ring-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)]" />
+        </label>
+        <label class="block space-y-2 text-right">
+          <span class="text-sm font-semibold text-[var(--nm-fg)]">גוף המאמר (Markdown)</span>
+          <textarea id="se-body" rows="16" dir="ltr" class="w-full rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-[var(--nm-code-bg)] px-4 py-3 text-left font-mono text-sm text-[var(--nm-code-fg)] outline-none focus:ring-2 focus:ring-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)]"></textarea>
+        </label>
+      </div>
+
+      <aside class="space-y-4 lg:col-span-5">
+        <h2 class="text-xl font-semibold text-[var(--nm-fg)]">פאנל איכות וכלים</h2>
+        <div class="space-y-2 rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-10 tracking-tight shadow-[0_18px_44px_color-mix(in_srgb,var(--nm-fg)_5%,transparent)]">
+          <p class="text-sm font-semibold text-[var(--nm-fg)]">הזרקת רכיבים</p>
+          <div class="grid grid-cols-1 gap-2">
+            <button type="button" data-se-inject="inquiry" class="rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_14%,transparent)] bg-[var(--nm-bg-canvas)] px-3 py-2 text-sm font-semibold text-[var(--nm-fg)]">הוסף InquiryBox</button>
+            <button type="button" data-se-inject="premium" class="rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_14%,transparent)] bg-[var(--nm-bg-canvas)] px-3 py-2 text-sm font-semibold text-[var(--nm-fg)]">הוסף PremiumBlock</button>
+            <button type="button" data-se-inject="wa" class="rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_14%,transparent)] bg-[var(--nm-bg-canvas)] px-3 py-2 text-sm font-semibold text-[var(--nm-fg)]">הוסף WhatsAppButton</button>
+            <button type="button" data-se-inject="truth" class="rounded-full bg-[var(--nm-accent)] px-3 py-2 text-sm font-semibold text-[var(--nm-on-accent)]">הוסף TruthSlider + JSON</button>
+          </div>
+        </div>
+        <div class="space-y-2 rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-10 tracking-tight shadow-[0_18px_44px_color-mix(in_srgb,var(--nm-fg)_5%,transparent)]">
+          <p class="text-sm font-semibold text-[var(--nm-fg)]">בדיקות חיות (QA)</p>
+          <ul id="se-qa-list" class="space-y-2 text-sm text-[var(--nm-fg)]"></ul>
+        </div>
+        <button id="se-copy-mdx" type="button" class="w-full rounded-full bg-[var(--nm-inverse)] px-4 py-3 text-sm font-semibold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-inverse-hover)]">
+          העתק MDX תקין ללוח
+        </button>
+        <p id="se-status" class="text-right text-xs text-[color-mix(in_srgb,var(--nm-fg)_60%,var(--nm-bg))]">מוכן לעריכה.</p>
+      </aside>
+    </section>
+
+    <script is:inline>
+      document.addEventListener("astro:page-load", () => {
+        const title = document.getElementById("se-title");
+        const slug = document.getElementById("se-slug");
+        const desc = document.getElementById("se-desc");
+        const tags = document.getElementById("se-tags");
+        const body = document.getElementById("se-body");
+        const titleLen = document.getElementById("se-title-len");
+        const qaList = document.getElementById("se-qa-list");
+        const status = document.getElementById("se-status");
+        const copyBtn = document.getElementById("se-copy-mdx");
+        if (
+          !(title instanceof HTMLInputElement) ||
+          !(slug instanceof HTMLInputElement) ||
+          !(desc instanceof HTMLTextAreaElement) ||
+          !(tags instanceof HTMLInputElement) ||
+          !(body instanceof HTMLTextAreaElement) ||
+          !(titleLen instanceof HTMLElement) ||
+          !(qaList instanceof HTMLElement) ||
+          !(status instanceof HTMLElement) ||
+          !(copyBtn instanceof HTMLButtonElement)
+        ) {
+          return;
+        }
+
+        const truthTemplate = `\n<TruthSlider />\n\n\`\`\`json\n{\n  "component": "TruthSlider",\n  "data": {\n    "myth": "הפירוש שהמוח שלך נצמד אליו כרגע",\n    "fact": "העובדה היבשה כפי שהיא במציאות",\n    "theShift": "הנקודה שבה הכל מתפרק"\n  }\n}\n\`\`\`\n`;
+
+        const blocks = {
+          inquiry: "\n<InquiryBox title=\"שאלה לחקירה\" />\n",
+          premium: "\n<PremiumBlock />\n",
+          wa: "\n<WhatsAppButton variant=\"inline\" />\n",
+          truth: truthTemplate,
+        };
+
+        const renderQa = () => {
+          const errors = [];
+          const t = title.value.trim();
+          const d = desc.value.trim();
+          const b = body.value.trim();
+
+          titleLen.textContent = `${t.length} תווים`;
+          if (t.length < 10) errors.push("❌ הכותרת קצרה מדי (מינימום 10 תווים).");
+          if (d.length < 30) errors.push("❌ התקציר קצר מדי - דרוש משפט ברור למנועי חיפוש.");
+          if (b.length < 400) errors.push("❌ תוכן המאמר דל מדי לפרסום.");
+
+          const emDashCount = (b.match(/—/g) || []).length;
+          if (emDashCount >= 3) {
+            errors.push("❌ הטקסט נראה רובוטי מדי. נקה סימני AI לפני פרסום.");
+          }
+          const genericBullets = (b.match(/^\s*[-*]\s+/gm) || []).length;
+          if (genericBullets >= 6) {
+            errors.push("❌ הטקסט נראה רובוטי מדי. נקה סימני AI לפני פרסום.");
+          }
+          if (/^(בעידן|במציאות של היום|בעולם שבו|המאמר הזה|נסכם)/m.test(b)) {
+            errors.push("❌ הטקסט נראה רובוטי מדי. נקה סימני AI לפני פרסום.");
+          }
+
+          const bannedLexicon = /(עזרה|תמיכה|טיפול|ייעוץ|ריפוי)/g;
+          if (bannedLexicon.test(b) || bannedLexicon.test(t) || bannedLexicon.test(d)) {
+            errors.push("❌ שפת הטקסט חורגת מהקו: השתמש בחקירה, פירוק, זיהוי מנגנונים והפרדת עובדות.");
+          }
+
+          qaList.innerHTML = (errors.length ? errors : ["✅ הכל נראה תקין לפרסום ראשוני."])
+            .map((line) => `<li class="rounded-xl bg-[var(--nm-bg-canvas)] px-3 py-2">${line}</li>`)
+            .join("");
+          copyBtn.disabled = errors.length > 0;
+        };
+
+        const insertAtCursor = (txt) => {
+          const start = body.selectionStart ?? body.value.length;
+          const end = body.selectionEnd ?? body.value.length;
+          body.value = `${body.value.slice(0, start)}${txt}${body.value.slice(end)}`;
+          const nextPos = start + txt.length;
+          body.selectionStart = nextPos;
+          body.selectionEnd = nextPos;
+          body.focus();
+          renderQa();
+        };
+
+        document.querySelectorAll("[data-se-inject]").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            if (!(btn instanceof HTMLElement)) return;
+            const key = btn.dataset.seInject;
+            const block = blocks[key];
+            if (!block) return;
+            insertAtCursor(block);
+          });
+        });
+
+        const buildFinalMdx = () => {
+          const cleanTags = tags.value
+            .split(",")
+            .map((x) => x.trim())
+            .filter(Boolean)
+            .map((x) => `"${x.replace(/"/g, '\\"')}"`);
+          return `---\ntitle: "${title.value.trim().replace(/"/g, '\\"')}"\nslug: "${slug.value.trim()}"\ndescription: "${desc.value.trim().replace(/"/g, '\\"')}"\ntags: [${cleanTags.join(", ")}]\ndraft: true\n---\n\n${body.value.trim()}\n`;
+        };
+
+        copyBtn.addEventListener("click", async () => {
+          try {
+            await navigator.clipboard.writeText(buildFinalMdx());
+            status.textContent = "הקובץ הועתק ללוח.";
+          } catch {
+            status.textContent = "העתקה נכשלה. נסה שוב בדפדפן מאובטח (HTTPS).";
+          }
+        });
+
+        [title, slug, desc, tags, body].forEach((el) => el.addEventListener("input", renderQa));
+        renderQa();
+      });
+    </script>
 
     <!-- Phase 1 (nevermind-cursor-spec): SRT → MDX pipeline — section בלבד, ללא שינוי schema/routing -->
     <section

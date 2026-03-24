@@ -39,8 +39,8 @@ const inquiries = [
         id="knowledge-search-input"
         type="search"
         placeholder="מה מעסיק אותך כרגע?"
-        class="w-full rounded-[1.5rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-white px-5 py-4 text-right text-[clamp(1.05rem,1rem+0.3vw,1.2rem)] text-[var(--nm-fg)] outline-none transition focus:border-[color-mix(in_srgb,var(--nm-accent)_38%,transparent)] focus:ring-2 focus:ring-[color-mix(in_srgb,var(--nm-accent)_18%,transparent)]"
-        aria-label="מה מעסיק אותך כרגע? — חיפוש במרכז הידע של NeverMind"
+        class="w-full rounded-[1.5rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-[var(--nm-bg-canvas)] px-5 py-4 text-right text-[clamp(1.05rem,1rem+0.3vw,1.2rem)] text-[var(--nm-fg)] outline-none transition focus:border-[color-mix(in_srgb,var(--nm-accent)_38%,transparent)] focus:ring-2 focus:ring-[color-mix(in_srgb,var(--nm-accent)_18%,transparent)]"
+        aria-label="מה מעסיק אותך כרגע? | חיפוש במרכז הידע של השם לא משנה"
       />
     </div>
 
@@ -49,7 +49,7 @@ const inquiries = [
         <button
           type="button"
           data-kc-inquiry={inquiry}
-          class="rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-3 py-1.5 text-sm font-semibold text-[color-mix(in_srgb,var(--nm-fg)_76%,var(--nm-bg))] transition hover:border-[color-mix(in_srgb,var(--nm-accent)_28%,transparent)] hover:bg-white"
+          class="rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-3 py-1.5 text-sm font-semibold text-[color-mix(in_srgb,var(--nm-fg)_76%,var(--nm-bg))] transition hover:border-[color-mix(in_srgb,var(--nm-accent)_28%,transparent)] hover:bg-[var(--nm-bg-canvas)]"
         >
           {inquiry}
         </button>

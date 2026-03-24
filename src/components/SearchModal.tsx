@@ -155,9 +155,9 @@ export default function SearchModal() {
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder="מה מעסיק אותך כרגע?"
-            className="w-full rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/80 px-4 py-3 text-right text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] text-[var(--nm-fg)] outline-none focus-visible:ring-2 focus-visible:ring-[color-mix(in_srgb,var(--nm-fg)_22%,transparent)]"
+            className="w-full rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)]/85 px-4 py-3 text-right text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] text-[var(--nm-fg)] outline-none focus-visible:ring-2 focus-visible:ring-[color-mix(in_srgb,var(--nm-fg)_22%,transparent)]"
             dir="rtl"
-            aria-label="מה מעסיק אותך כרגע? — חיפוש במרכז הידע של NeverMind"
+            aria-label="מה מעסיק אותך כרגע? | חיפוש במרכז הידע של השם לא משנה"
           />
         </div>
 

@@ -56,12 +56,12 @@ html[data-nm-a11y-font="xl"] body {
 
 /* נגישות: ניגודיות גבוהה */
 html[data-nm-a11y-contrast="high"] {
-  --nm-fg: #0a0a0a;
+  --nm-fg: #1a1a1a;
   --nm-fg-secondary: #1a1a1a;
-  --nm-bg: #ffffff;
-  --nm-bg-canvas: #ffffff;
-  --nm-surface-muted: #f0f0ee;
-  --nm-grid: color-mix(in srgb, #1a1a1a 12%, transparent);
+  --nm-bg: #fafaf8;
+  --nm-bg-canvas: #fafaf8;
+  --nm-surface-muted: color-mix(in srgb, var(--nm-fg) 8%, var(--nm-bg));
+  --nm-grid: color-mix(in srgb, var(--nm-fg) 12%, transparent);
 }
 html[data-nm-a11y-contrast="high"] body {
   background-color: var(--nm-bg);

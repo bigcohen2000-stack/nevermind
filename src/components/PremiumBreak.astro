@@ -1,0 +1,41 @@
+---
+interface Props {
+  wizardHref?: string;
+}
+
+const { wizardHref = "/services/" } = Astro.props;
+---
+
+<section class="nm-premium-break my-10 rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)]/95 p-10 text-right shadow-[0_22px_48px_color-mix(in_srgb,var(--nm-fg)_5%,transparent)]">
+  <div class="nm-premium-break__fog" aria-hidden="true"></div>
+  <p class="text-sm font-semibold uppercase tracking-[0.16em] text-[var(--nm-accent)]">Premium Break</p>
+  <p class="mt-3 text-[clamp(1rem,0.95rem+0.2vw,1.1rem)] leading-8 text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))]">
+    החלק הבא דורש נכונות להטיל ספק במובן מאליו. הוא זמין לתלמידי המסלולים או לאחר שיחת היכרות.
+  </p>
+  <a
+    href={wizardHref}
+    class="mt-5 inline-flex rounded-full bg-[var(--nm-accent)] px-6 py-3 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]"
+  >
+    אני רוצה להמשיך בחקירה
+  </a>
+</section>
+
+<style>
+  .nm-premium-break {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .nm-premium-break__fog {
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 7rem;
+    background: linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--nm-bg-canvas) 95%, transparent),
+      color-mix(in srgb, var(--nm-bg-canvas) 0%, transparent)
+    );
+    backdrop-filter: blur(7px);
+    pointer-events: none;
+  }
+</style>
