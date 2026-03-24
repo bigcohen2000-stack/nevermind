@@ -154,6 +154,7 @@ const waPhone = appConfig.contact.whatsAppNumber;
         href={buildWhatsAppHref("שלום, מציג את עצמי ואת הסוגיה בצורה ממוקדת כדי לבדוק התאמה למסלול.")}
         target="_blank"
         rel="noreferrer"
+        data-thankyou-redirect
         class="mt-4 inline-flex rounded-full bg-[var(--nm-accent)] px-5 py-3 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]"
       >
         פתיחת שיחה בוואטסאפ
@@ -165,6 +166,7 @@ const waPhone = appConfig.contact.whatsAppNumber;
     document.addEventListener("astro:page-load", () => {
       const root = document.getElementById("nm-services-wizard");
       if (!(root instanceof HTMLElement)) return;
+      const thankYouPath = "/thank-you/";
 
       const options = {
         personal: [
@@ -349,6 +351,35 @@ const waPhone = appConfig.contact.whatsAppNumber;
       if (topicNode instanceof HTMLTextAreaElement) {
         topicNode.addEventListener("input", renderResult);
       }
+
+      const scheduleThankYouRedirect = () => {
+        window.setTimeout(() => {
+          window.location.href = thankYouPath;
+        }, 180);
+      };
+
+      [ctaNode, questionNode].forEach((node) => {
+        if (!(node instanceof HTMLAnchorElement)) return;
+        node.setAttribute("data-thankyou-redirect", "true");
+      });
+
+      document.querySelectorAll("[data-thankyou-redirect]").forEach((node) => {
+        node.addEventListener("click", (event) => {
+          const target = event.currentTarget;
+          if (!(target instanceof HTMLAnchorElement)) return;
+          if (target.id === "wizard-wa-cta" && target.getAttribute("aria-disabled") === "true") {
+            event.preventDefault();
+            return;
+          }
+          scheduleThankYouRedirect();
+        });
+      });
+
+      root.querySelectorAll("form").forEach((form) => {
+        form.addEventListener("submit", () => {
+          scheduleThankYouRedirect();
+        });
+      });
 
       renderStep2();
       setStep(1);

@@ -2,33 +2,35 @@
 import Layout from "../layouts/Layout.astro";
 import appConfig from "../config/appConfig.json";
 
-const pageTitle = "גישת פרימיום";
-const pageDescription = "הזן את קוד הגישה כדי לפתוח תוכן פרימיום לפי ההגדרות באתר.";
+const pageTitle = "אזור חקירה אישי";
+const pageDescription = "הזנת סיסמה לגישת פרימיום לאזור החקירה האישי.";
 const premiumAccess = appConfig.premiumAccess;
 ---
 
 <Layout title={pageTitle} description={pageDescription} noIndex={true}>
   <section class="mx-auto max-w-2xl space-y-8 px-4 pb-16 text-right text-[var(--nm-fg)]">
     <header class="space-y-4">
-      <p class="text-sm font-semibold uppercase tracking-[0.24em] text-[var(--nm-accent)]">Premium Access</p>
-      <h1 class="text-[clamp(2.2rem,1.6rem+2vw,3.5rem)] font-semibold leading-[1.05]">גישה לתוכן הפרימיום</h1>
-      <p class="text-[1rem] leading-8 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">{premiumAccess.helperText}</p>
+      <p class="text-sm font-semibold uppercase tracking-[0.24em] text-[var(--nm-accent)]">Personal Area</p>
+      <h1 class="text-[clamp(2.2rem,1.6rem+2vw,3.5rem)] font-semibold leading-[1.05]">כניסה לאזור החקירה האישי</h1>
+      <p class="text-[1rem] leading-8 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
+        הסיסמה מתקבלת ידנית בוואטסאפ לאחר אישור. כאן רק מזינים אותה כדי לפתוח את התוכן.
+      </p>
     </header>
 
     <section class="rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/86 p-6 shadow-[0_24px_80px_rgba(26,26,26,0.06)]">
       <div class="space-y-5">
         <label class="block space-y-2">
-          <span class="text-sm font-semibold text-[var(--nm-fg)]">קוד גישה</span>
+          <span class="text-sm font-semibold text-[var(--nm-fg)]">סיסמה</span>
           <input id="premium-code" type="password" dir="ltr" class="w-full rounded-[1.4rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-[var(--nm-surface-muted)] px-5 py-4 text-left text-base text-[var(--nm-fg)] outline-none transition-colors duration-200 focus:border-[color-mix(in_srgb,var(--nm-accent)_40%,transparent)] focus:ring-2 focus:ring-[color-mix(in_srgb,var(--nm-accent)_20%,transparent)]" placeholder="NM-ACCESS-2026" />
         </label>
 
         <div class="flex flex-col gap-3 sm:flex-row sm:justify-end">
-          <button id="unlock-premium" type="button" class="inline-flex items-center justify-center rounded-full bg-[var(--nm-inverse)] px-6 py-3 text-sm font-semibold text-[var(--nm-inverse-fg)] transition-colors duration-200 hover:bg-[var(--nm-inverse-hover)]">פתח גישה</button>
-          <a href="/services/" class="inline-flex items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white px-6 py-3 text-sm font-semibold text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))] transition-colors duration-200 hover:bg-[var(--nm-surface-muted)]">חזרה לשירותים</a>
+          <button id="unlock-premium" type="button" class="inline-flex items-center justify-center rounded-full bg-[var(--nm-inverse)] px-6 py-3 text-sm font-semibold text-[var(--nm-inverse-fg)] transition-colors duration-200 hover:bg-[var(--nm-inverse-hover)]">כניסה לאזור</button>
+          <a href="/services/" class="inline-flex items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white px-6 py-3 text-sm font-semibold text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))] transition-colors duration-200 hover:bg-[var(--nm-surface-muted)]">חזרה למסלולים</a>
         </div>
 
         <div id="premium-access-status" class="rounded-[1.4rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
-          לאחר אימות הקוד תישמר גישה לכ־{premiumAccess.sessionHours} שעות בדפדפן זה. אפשר לסגור ולחזור בלי להזין שוב.
+          אחרי הזנת סיסמה תקפה, הגישה נשמרת לכ־{premiumAccess.sessionHours} שעות בדפדפן זה.
         </div>
       </div>
     </section>
@@ -46,6 +48,42 @@ const premiumAccess = appConfig.premiumAccess;
       const returnTo = new URL(window.location.href).searchParams.get("returnTo") || "/articles/";
       const codes = Array.isArray(premiumAccess?.codes) ? premiumAccess.codes : [];
       const sessionHours = Number(premiumAccess?.sessionHours || 168);
+      const encoder = new TextEncoder();
+
+      const deriveHash = async (password, salt, iterations) => {
+        if (!password || !salt || !Number.isFinite(iterations)) return "";
+        const keyMaterial = await crypto.subtle.importKey("raw", encoder.encode(password), "PBKDF2", false, ["deriveBits"]);
+        const bits = await crypto.subtle.deriveBits(
+          {
+            name: "PBKDF2",
+            salt: encoder.encode(salt),
+            iterations: Math.max(10000, Number(iterations)),
+            hash: "SHA-256",
+          },
+          keyMaterial,
+          256,
+        );
+        return Array.from(new Uint8Array(bits))
+          .map((value) => value.toString(16).padStart(2, "0"))
+          .join("");
+      };
+
+      const resolveMatchedCode = async (entered) => {
+        for (const item of codes) {
+          const stillValid = !item.expiresAt || Date.parse(item.expiresAt) > Date.now();
+          if (!stillValid) continue;
+
+          // Backward compatibility: if a plain value still exists, allow it.
+          if (typeof item.value === "string" && item.value === entered) return item;
+
+          if (typeof item.valueHash === "string" && typeof item.salt === "string") {
+            const expectedHash = item.valueHash.toLowerCase();
+            const computed = await deriveHash(entered, item.salt, Number(item.iterations || 120000));
+            if (computed && computed === expectedHash) return item;
+          }
+        }
+        return null;
+      };
 
       const writeSession = (matched) => {
         const now = Date.now();
@@ -62,14 +100,15 @@ const premiumAccess = appConfig.premiumAccess;
         );
       };
 
-      unlockButton.addEventListener("click", () => {
+      unlockButton.addEventListener("click", async () => {
         const entered = codeInput.value.trim();
         if (!entered) {
           status.textContent = "נא להזין קוד גישה.";
           return;
         }
 
-        const matched = codes.find((item) => item.value === entered && (!item.expiresAt || Date.parse(item.expiresAt) > Date.now()));
+        status.textContent = "בודק סיסמה...";
+        const matched = await resolveMatchedCode(entered);
         if (!matched) {
           status.textContent = "הקוד אינו תקף או שפג תוקפו.";
           return;

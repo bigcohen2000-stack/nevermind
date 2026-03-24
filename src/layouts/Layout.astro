@@ -236,7 +236,11 @@ const navItems = [
     <ClientRouter />
 
   </head>
-  <body data-whisper-banner-state="hidden" class="min-h-screen antialiased selection:bg-[color-mix(in_srgb,var(--nm-accent)_18%,var(--nm-bg))] selection:text-[var(--nm-fg)]">
+  <body
+    data-whisper-banner-state="hidden"
+    style="background-color:#FAFAF8;color:#1A1A1A"
+    class="min-h-screen antialiased selection:bg-[color-mix(in_srgb,var(--nm-accent)_18%,var(--nm-bg))] selection:text-[var(--nm-fg)]"
+  >
     <a
       href="#main-content"
       class="sr-only transition-colors duration-200 focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:rounded-md focus:bg-[var(--nm-bg-canvas)] focus:px-4 focus:py-2 focus:text-[var(--nm-fg)] focus:ring-2 focus:ring-[color-mix(in_srgb,var(--nm-accent)_35%,transparent)] shadow-xl"
@@ -246,28 +250,30 @@ const navItems = [
 
     <WhisperBanner />
 
-    <nav data-nav class="fixed inset-x-0 top-[var(--nm-nav-top,1.5rem)] z-50 flex justify-center px-4 transition-[top] duration-300">
-      <div class="flex flex-wrap items-center justify-center gap-3 rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)]/92 px-5 py-3 shadow-[0_14px_34px_color-mix(in_srgb,var(--nm-fg)_8%,transparent)] backdrop-blur-md">
-        {navItems.map((item) => (
-          <a href={item.href} class="text-sm font-semibold text-[color-mix(in_srgb,var(--nm-fg)_82%,var(--nm-bg))] transition-colors duration-200 hover:text-[var(--nm-accent)]">{item.label}</a>
-        ))}
-        <button
-          type="button"
-          data-random-article-trigger
-          class="rounded-full bg-[var(--nm-accent)] px-4 py-2 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]"
-        >
-          הפתע אותי
-        </button>
-        <button
-          id="search-trigger"
-          data-search-trigger
-          aria-label="חיפוש במרכז הידע | מה מעסיק אותך כרגע?"
-          class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))] transition-colors duration-200 hover:border-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)] hover:text-[var(--nm-accent)]"
-        >
-          <Search className="h-4 w-4" />
-        </button>
-      </div>
-    </nav>
+    <header>
+      <nav data-nav class="fixed inset-x-0 top-[var(--nm-nav-top,1.5rem)] z-50 flex justify-center px-4 transition-[top] duration-300" aria-label="ניווט ראשי">
+        <div class="flex flex-wrap items-center justify-center gap-3 rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)]/92 px-5 py-3 shadow-[0_14px_34px_color-mix(in_srgb,var(--nm-fg)_8%,transparent)] backdrop-blur-md">
+          {navItems.map((item) => (
+            <a href={item.href} class="text-sm font-semibold text-[color-mix(in_srgb,var(--nm-fg)_82%,var(--nm-bg))] transition-colors duration-200 hover:text-[var(--nm-accent)]">{item.label}</a>
+          ))}
+          <button
+            type="button"
+            data-random-article-trigger
+            class="rounded-full bg-[var(--nm-accent)] px-4 py-2 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]"
+          >
+            הפתע אותי
+          </button>
+          <button
+            id="search-trigger"
+            data-search-trigger
+            aria-label="חיפוש במרכז הידע | מה מעסיק אותך כרגע?"
+            class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))] transition-colors duration-200 hover:border-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)] hover:text-[var(--nm-accent)]"
+          >
+            <Search className="h-4 w-4" />
+          </button>
+        </div>
+      </nav>
+    </header>
 
     <main id="main-content" class="relative z-10 mx-auto w-full max-w-6xl px-6 pb-20 pt-32">
       <slot />
@@ -337,7 +343,7 @@ const navItems = [
     <SearchModal client:idle />
     <A11yWidget />
 
-    <script is:inline define:vars={{ randomArticlePaths }}>
+    <script is:inline defer define:vars={{ randomArticlePaths }}>
       document.addEventListener("astro:page-load", () => {
         if (window.__nmLayoutCleanup) {
           window.__nmLayoutCleanup();

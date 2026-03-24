@@ -24,6 +24,38 @@ import appConfig from "../../config/appConfig.json";
     </article>
   </div>
 
+  <section class="space-y-4 rounded-[1.5rem] border border-[color-mix(in_srgb,var(--nm-accent)_20%,transparent)] bg-[var(--nm-tint)] p-5 text-right">
+    <header class="space-y-2">
+      <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">Premium Password Rotation</p>
+      <h3 class="text-xl font-semibold text-[var(--nm-fg)]">החלפת סיסמת פרימיום מהירה</h3>
+      <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
+        הסיסמה לא נשמרת בטקסט גלוי. הכלי מייצר hash ומכניס אותו ישירות ל־<code>premiumAccess.codes</code> בתוך ה־JSON.
+      </p>
+    </header>
+
+    <div class="grid gap-4 md:grid-cols-2">
+      <label class="block space-y-2">
+        <span class="text-sm font-semibold text-[var(--nm-fg)]">תווית לקוד</span>
+        <input id="premium-rotate-label" type="text" value="Access 2026" class="w-full rounded-[1rem] border border-[color-mix(in_srgb,var(--nm-fg)_14%,transparent)] bg-white/70 px-4 py-3 text-sm outline-none focus:border-[color-mix(in_srgb,var(--nm-accent)_35%,transparent)]" />
+      </label>
+      <label class="block space-y-2">
+        <span class="text-sm font-semibold text-[var(--nm-fg)]">תוקף (ISO, אופציונלי)</span>
+        <input id="premium-rotate-expiry" type="text" placeholder="2026-12-31T23:59:59+02:00" class="w-full rounded-[1rem] border border-[color-mix(in_srgb,var(--nm-fg)_14%,transparent)] bg-white/70 px-4 py-3 text-sm outline-none focus:border-[color-mix(in_srgb,var(--nm-accent)_35%,transparent)]" />
+      </label>
+    </div>
+    <label class="block space-y-2">
+      <span class="text-sm font-semibold text-[var(--nm-fg)]">סיסמה חדשה</span>
+      <input id="premium-rotate-password" type="password" placeholder="הקלד סיסמה חדשה" class="w-full rounded-[1rem] border border-[color-mix(in_srgb,var(--nm-fg)_14%,transparent)] bg-white/70 px-4 py-3 text-sm outline-none focus:border-[color-mix(in_srgb,var(--nm-accent)_35%,transparent)]" />
+    </label>
+    <div class="flex flex-col gap-3 sm:flex-row sm:justify-end">
+      <button id="premium-generate-password" type="button" class="inline-flex items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-white px-5 py-3 text-sm font-semibold text-[var(--nm-fg)] transition hover:border-[color-mix(in_srgb,var(--nm-accent)_30%,transparent)]">צור סיסמה אוטומטית</button>
+      <button id="premium-rotate-apply" type="button" class="inline-flex items-center justify-center rounded-full bg-[var(--nm-accent)] px-5 py-3 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]">החלף סיסמה בתוך JSON</button>
+    </div>
+    <p id="premium-rotate-status" class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
+      אחרי ההחלפה לחץ "שמור לקובץ האמיתי" כדי לעדכן את <code>appConfig.json</code>.
+    </p>
+  </section>
+
   <label class="block space-y-2 text-right">
     <span class="text-sm font-semibold text-[var(--nm-fg)]">appConfig.json</span>
     <textarea
@@ -56,6 +88,12 @@ import appConfig from "../../config/appConfig.json";
     const copyButton = document.getElementById("copy-app-config-json");
     const exportButton = document.getElementById("export-app-config-json");
     const status = document.getElementById("app-config-file-status");
+    const rotatePasswordInput = document.getElementById("premium-rotate-password");
+    const rotateLabelInput = document.getElementById("premium-rotate-label");
+    const rotateExpiryInput = document.getElementById("premium-rotate-expiry");
+    const rotateGenerateButton = document.getElementById("premium-generate-password");
+    const rotateApplyButton = document.getElementById("premium-rotate-apply");
+    const rotateStatus = document.getElementById("premium-rotate-status");
 
     if (!(input instanceof HTMLTextAreaElement)) return;
     if (!(pickButton instanceof HTMLButtonElement)) return;
@@ -63,6 +101,12 @@ import appConfig from "../../config/appConfig.json";
     if (!(copyButton instanceof HTMLButtonElement)) return;
     if (!(exportButton instanceof HTMLButtonElement)) return;
     if (!(status instanceof HTMLElement)) return;
+    if (!(rotatePasswordInput instanceof HTMLInputElement)) return;
+    if (!(rotateLabelInput instanceof HTMLInputElement)) return;
+    if (!(rotateExpiryInput instanceof HTMLInputElement)) return;
+    if (!(rotateGenerateButton instanceof HTMLButtonElement)) return;
+    if (!(rotateApplyButton instanceof HTMLButtonElement)) return;
+    if (!(rotateStatus instanceof HTMLElement)) return;
 
     let fileHandle = null;
 
@@ -79,6 +123,37 @@ import appConfig from "../../config/appConfig.json";
         throw new Error("appConfig.json לא כולל github/contact כנדרש.");
       }
       return parsed;
+    };
+
+    const randomHex = (bytes = 16) => {
+      const array = new Uint8Array(bytes);
+      crypto.getRandomValues(array);
+      return Array.from(array)
+        .map((value) => value.toString(16).padStart(2, "0"))
+        .join("");
+    };
+
+    const deriveHash = async (password, salt, iterations) => {
+      const encoder = new TextEncoder();
+      const keyMaterial = await crypto.subtle.importKey("raw", encoder.encode(password), "PBKDF2", false, ["deriveBits"]);
+      const bits = await crypto.subtle.deriveBits(
+        { name: "PBKDF2", salt: encoder.encode(salt), iterations, hash: "SHA-256" },
+        keyMaterial,
+        256,
+      );
+      return Array.from(new Uint8Array(bits))
+        .map((value) => value.toString(16).padStart(2, "0"))
+        .join("");
+    };
+
+    const generatedPassword = () => {
+      const topics = ["Reality", "Signal", "Clarity", "Focus", "Logic", "Pattern", "Fact", "Shift"];
+      const actions = ["Check", "Align", "Observe", "Decode", "Map", "Split", "Sync", "Anchor"];
+      const separators = ["-", "_"];
+      const pick = (list) => list[Math.floor(Math.random() * list.length)];
+      const year = String(new Date().getFullYear());
+      const token = Math.floor(100 + Math.random() * 900);
+      return `${pick(topics)}${pick(separators)}${pick(actions)}${pick(separators)}${year}${token}`;
     };
 
     copyButton.addEventListener("click", async () => {
@@ -140,6 +215,61 @@ import appConfig from "../../config/appConfig.json";
         status.textContent = error instanceof Error ? error.message : "השמירה הישירה נכשלה.";
         pulse(saveButton, "השמירה נכשלה", "שמור לקובץ האמיתי");
       }
+    });
+
+    rotateApplyButton.addEventListener("click", async () => {
+      const password = rotatePasswordInput.value.trim();
+      if (password.length < 10) {
+        rotateStatus.textContent = "בחר סיסמה ארוכה יותר (לפחות 10 תווים).";
+        return;
+      }
+
+      try {
+        const parsed = validate();
+        const salt = randomHex(16);
+        const iterations = 120000;
+        const valueHash = await deriveHash(password, salt, iterations);
+        const label = rotateLabelInput.value.trim() || "Manual Access";
+        const expiresAt = rotateExpiryInput.value.trim();
+        const nextCode = {
+          label,
+          valueHash,
+          salt,
+          iterations,
+          hashAlgo: "PBKDF2-SHA256",
+          ...(expiresAt ? { expiresAt } : {}),
+        };
+
+        if (!parsed.premiumAccess || typeof parsed.premiumAccess !== "object") {
+          parsed.premiumAccess = {};
+        }
+        parsed.premiumAccess.enabled = true;
+        parsed.premiumAccess.codes = [nextCode];
+
+        input.value = JSON.stringify(parsed, null, 2);
+        rotatePasswordInput.value = "";
+        rotateStatus.textContent = "הסיסמה הוחלפה בתוך ה־JSON. עכשיו שמור לקובץ האמיתי.";
+        pulse(rotateApplyButton, "הסיסמה הוחלפה", "החלף סיסמה בתוך JSON");
+      } catch (error) {
+        rotateStatus.textContent = error instanceof Error ? error.message : "החלפת הסיסמה נכשלה.";
+        pulse(rotateApplyButton, "החלפה נכשלה", "החלף סיסמה בתוך JSON");
+      }
+    });
+
+    rotateGenerateButton.addEventListener("click", async () => {
+      const value = generatedPassword();
+      rotatePasswordInput.value = value;
+      rotatePasswordInput.type = "text";
+      rotateStatus.textContent = "נוצרה סיסמה לוגית קלה לזכירה. אפשר להחליף, ואז להעתיק ידנית לוואטסאפ.";
+      try {
+        await navigator.clipboard.writeText(value);
+        pulse(rotateGenerateButton, "נוצר והועתק", "צור סיסמה אוטומטית");
+      } catch {
+        pulse(rotateGenerateButton, "נוצר", "צור סיסמה אוטומטית");
+      }
+      window.setTimeout(() => {
+        rotatePasswordInput.type = "password";
+      }, 12000);
     });
   });
 </script>

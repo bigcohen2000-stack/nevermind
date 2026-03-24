@@ -10,6 +10,9 @@ export default defineConfig({
   site: "https://www.nevermind.co.il",
   publicDir: "./public",
   output: "static",
+  build: {
+    format: "directory",
+  },
   compressHTML: true,
   prefetch: {
     prefetchAll: true,
@@ -59,6 +62,9 @@ export default defineConfig({
   vite: {
     plugins: [tailwindcss()],
     build: {
+      minify: "esbuild",
+      cssMinify: true,
+      sourcemap: false,
       rollupOptions: {
         output: {
           manualChunks: {

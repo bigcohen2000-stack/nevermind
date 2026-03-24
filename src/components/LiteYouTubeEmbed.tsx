@@ -55,7 +55,7 @@ export default function LiteYouTubeEmbed({
       />
       <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
         <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[var(--nm-accent)] shadow-xl transition-transform group-hover:scale-110">
-          <svg className="ml-1 h-8 w-8 text-[var(--nm-on-accent)]" viewBox="0 0 24 24" fill="currentColor">
+          <svg className="ml-1 h-8 w-8 text-[var(--nm-on-accent)]" viewBox="0 0 24 24" fill="currentColor" width="32" height="32" aria-hidden="true">
             <path d="M8 5v14l11-7z" />
           </svg>
         </div>

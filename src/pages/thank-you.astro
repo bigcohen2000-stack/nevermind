@@ -1,0 +1,182 @@
+---
+import Layout from "../layouts/Layout.astro";
+import appConfig from "../config/appConfig.json";
+import { buildWhatsAppHref } from "../lib/services";
+
+const waMessage = "היי יקיר, אני רוצה לקבל סיסמה לאזור החקירה האישי ולפתוח גישת פרימיום.";
+const waHref = buildWhatsAppHref(waMessage, appConfig.contact.whatsAppNumber);
+const source = Astro.url.searchParams.get("source")?.trim() || "";
+const purchaseState = Astro.url.searchParams.get("purchase")?.trim() || "";
+const isExistingBuyer = purchaseState === "existing";
+const heroTitle = isExistingBuyer ? "נקלט. ממשיכים לשלב העומק הבא." : "נשלח. הפרוטוקול בדרך אליך.";
+const heroSubtitle = isExistingBuyer
+  ? "כבר בוצעה רכישה. לכן אין כאן הטבה חוזרת על אותו מוצר."
+  : "השלב הבא פתוח. אפשר לבחור הרחבה שמתאימה לנקודת המפגש הנוכחית.";
+const offerLine = "הגישה נפתחת עם סיסמה אישית שנשלחת ידנית בוואטסאפ.";
+const perks = [
+  {
+    title: "הספרייה האסורה",
+    description: "מאמרים שמפרקים מנגנונים בלי קישוטים.",
+    href: "/forbidden-library/",
+  },
+  {
+    title: "עץ שורש הבעיה",
+    description: "מפת עומק לזיהוי הסיבה ולא רק הסימפטום.",
+    href: "/root-problem-tree/",
+  },
+  {
+    title: "הגדרות מחדש",
+    description: "מונחי יסוד בשפה ישירה שמכריחה דיוק.",
+    href: "/glossary/",
+  },
+];
+const nextMoves = [
+  {
+    title: "מסלול עומק משלים",
+    description: "המשך ישיר לרוכשים קיימים. בלי כפילות במוצר שכבר נרכש.",
+    href: "/services/",
+    cta: "פתיחת המשך מדויק",
+  },
+  {
+    title: "שאלת עומק שבועית",
+    description: "נקודת חקירה אחת שמחזיקה פוקוס לאורך שבוע מלא.",
+    href: "/questions/",
+    cta: "בחירת שאלה לשבוע",
+  },
+  {
+    title: "מפת מנגנון אישית",
+    description: "תרגום מצב נוכחי למפה פשוטה: עובדה. פירוש. פעולה.",
+    href: "/root-problem-tree/",
+    cta: "בניית מפת מנגנון",
+  },
+];
+---
+
+<Layout title="תודה | השם לא משנה" description="הפנייה נקלטה. אפשר להמשיך לחקירה הבאה כבר עכשיו.">
+  <section class="mx-auto max-w-4xl space-y-12 px-4 pb-20 text-right tracking-tight">
+    <section class="space-y-6 rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-10 shadow-[0_20px_44px_color-mix(in_srgb,var(--nm-fg)_5%,transparent)]">
+      <p class="text-6xl leading-none" aria-hidden="true">✅</p>
+      <h1 class="text-[clamp(2rem,1.7rem+1.6vw,3rem)] font-semibold leading-tight text-[var(--nm-fg)]">{heroTitle}</h1>
+      <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">{heroSubtitle}</p>
+      {source && <p class="text-xs font-semibold text-[color-mix(in_srgb,var(--nm-fg)_58%,var(--nm-bg))]">מקור הגעה: {source}</p>}
+      <div class="grid gap-4 md:grid-cols-3">
+        {perks.map((perk) => (
+          <a
+            href={perk.href}
+            class="rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_18%,transparent)] bg-white p-6 transition hover:border-[color-mix(in_srgb,var(--nm-accent)_30%,transparent)]"
+            title={`${perk.title} | מתנה לאחר שליחת הפנייה`}
+          >
+            <p class="text-base font-semibold text-[var(--nm-fg)]">{perk.title}</p>
+            <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">{perk.description}</p>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <section class="relative overflow-hidden rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_22%,transparent)] bg-[var(--nm-inverse)] p-10 text-[var(--nm-inverse-fg)] shadow-[0_22px_48px_color-mix(in_srgb,var(--nm-fg)_5%,transparent)]">
+      <img
+        src="/images/ghost-preview.webp"
+        alt=""
+        aria-hidden="true"
+        width="1600"
+        height="900"
+        class="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-20"
+        loading="lazy"
+        decoding="async"
+      />
+      <div class="pointer-events-none absolute inset-0 bg-[#1A1A1A]/85 backdrop-blur-2xl"></div>
+      <div class="relative z-10 space-y-5">
+        <p class="text-3xl leading-none" aria-hidden="true">🔑</p>
+        <h2 class="text-[clamp(1.5rem,1.3rem+1vw,2.2rem)] font-semibold">אזור חקירה אישי - פתיחה מהירה</h2>
+        <p class="text-[clamp(1rem,0.95rem+0.25vw,1.15rem)] leading-8 text-[color-mix(in_srgb,var(--nm-inverse-fg)_84%,var(--nm-inverse))]">
+          מרחב דיגיטלי פרטי לריכוז תובנות, הפרדת עובדות מהחיים שלך, וגישה ישירה לחומרים מתקדמים.
+        </p>
+        <p class="text-sm font-semibold uppercase tracking-[0.14em] text-[color-mix(in_srgb,var(--nm-inverse-fg)_88%,var(--nm-inverse))]">
+          {offerLine}
+        </p>
+        <p class="text-xs leading-6 text-[color-mix(in_srgb,var(--nm-inverse-fg)_82%,var(--nm-inverse))]">
+          אין הרשמה פתוחה מהאתר. רק אחרי אישור ידני תקבל סיסמה לגישה.
+        </p>
+        {isExistingBuyer && (
+          <p class="text-xs leading-6 text-[color-mix(in_srgb,var(--nm-inverse-fg)_82%,var(--nm-inverse))]">
+            כדי לשמור על הוגנות, אין הטבה נוספת על מוצר שכבר נרכש.
+          </p>
+        )}
+        <a
+          href={waHref}
+          target="_blank"
+          rel="noreferrer"
+          class="inline-flex w-fit rounded-full bg-[var(--nm-accent)] px-6 py-3 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]"
+          title="בקשת סיסמה לאזור חקירה אישי בוואטסאפ"
+        >
+          בקשת סיסמה בוואטסאפ
+        </a>
+        <a
+          href="/premium-access/"
+          class="inline-flex w-fit rounded-full border border-[color-mix(in_srgb,var(--nm-inverse-fg)_24%,transparent)] bg-transparent px-6 py-3 text-sm font-semibold text-[var(--nm-inverse-fg)] transition hover:bg-[color-mix(in_srgb,var(--nm-inverse-fg)_8%,transparent)]"
+          title="מעבר למסך הזנת סיסמה"
+        >
+          כבר יש לי סיסמה
+        </a>
+      </div>
+    </section>
+
+    <section class="space-y-5 rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-10 shadow-[0_18px_42px_color-mix(in_srgb,var(--nm-fg)_5%,transparent)]">
+      <h3 class="text-[clamp(1.2rem,1.05rem+0.7vw,1.6rem)] font-semibold text-[var(--nm-fg)]">מה ממשיכים מכאן</h3>
+      <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">
+        רעיונות להמשך עניין אצל מי שכבר ביצע רכישה, בלי להציע שוב את אותו מוצר.
+      </p>
+      <div class="grid gap-4 md:grid-cols-3">
+        {nextMoves.map((item) => (
+          <a
+            href={item.href}
+            class="rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_14%,transparent)] bg-[var(--nm-surface-muted)] p-6 transition hover:border-[color-mix(in_srgb,var(--nm-accent)_30%,transparent)]"
+            title={`${item.title} | המשך אחרי רכישה`}
+          >
+            <p class="text-base font-semibold text-[var(--nm-fg)]">{item.title}</p>
+            <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">{item.description}</p>
+            <p class="mt-3 text-xs font-semibold text-[var(--nm-accent)]">{item.cta}</p>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <section class="space-y-5 rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-transparent p-10 shadow-[0_18px_42px_color-mix(in_srgb,var(--nm-fg)_5%,transparent)]">
+      <h3 class="text-[clamp(1.2rem,1.05rem+0.7vw,1.6rem)] font-semibold text-[var(--nm-fg)]">רוצה לקבל את התובנות למייל או לשאול משהו אחר?</h3>
+      <form action="https://api.web3forms.com/submit" method="POST" class="mx-auto max-w-2xl space-y-6">
+        <input type="hidden" name="access_key" value="94b32b6c-7590-4ac6-b8b4-1bc73dd2e5c8" />
+        <input type="hidden" name="subject" value="פנייה מעמוד תודה | השם לא משנה" />
+        <input type="hidden" name="page" value="thank-you" />
+        <input type="text" name="botcheck" style="display:none" tabindex="-1" autocomplete="off" aria-hidden="true" />
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <input
+            type="text"
+            name="name"
+            placeholder="שם מלא"
+            required
+            class="border-b border-[color-mix(in_srgb,var(--nm-fg)_22%,transparent)] bg-transparent p-2 text-[var(--nm-fg)] outline-none focus:border-[var(--nm-accent)]"
+          />
+          <input
+            type="email"
+            name="email"
+            placeholder="אימייל"
+            required
+            class="border-b border-[color-mix(in_srgb,var(--nm-fg)_22%,transparent)] bg-transparent p-2 text-[var(--nm-fg)] outline-none focus:border-[var(--nm-accent)]"
+          />
+        </div>
+        <textarea
+          name="message"
+          placeholder="מה על המוח שלך כרגע?"
+          required
+          class="h-32 w-full border-b border-[color-mix(in_srgb,var(--nm-fg)_22%,transparent)] bg-transparent p-2 text-[var(--nm-fg)] outline-none focus:border-[var(--nm-accent)]"
+        ></textarea>
+        <button
+          type="submit"
+          class="w-full rounded-full bg-[var(--nm-inverse)] px-5 py-4 text-sm font-bold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-accent)]"
+        >
+          שליחה למערכת
+        </button>
+      </form>
+    </section>
+  </section>
+</Layout>

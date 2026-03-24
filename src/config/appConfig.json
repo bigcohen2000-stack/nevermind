@@ -1,4 +1,4 @@
-﻿{
+{
     "site":  {
                  "name":  "NeverMind",
                  "url":  "https://www.nevermind.co.il"
@@ -20,7 +20,10 @@
                           "codes":  [
                                         {
                                             "label":  "Access 2026",
-                                            "value":  "NM-ACCESS-2026",
+                                            "valueHash":  "ea1a359e6b6c10396acf8d68ce9d970e99a0ae091fc59aab0902004650440827",
+                                            "salt":  "1dc587813fc7148795922f7f8caec354",
+                                            "iterations":  120000,
+                                            "hashAlgo":  "PBKDF2-SHA256",
                                             "expiresAt":  "2026-12-31T23:59:59+02:00"
                                         }
                                     ]
