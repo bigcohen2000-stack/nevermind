@@ -27,6 +27,7 @@ export type StageService = ServiceStage["services"][number] & {
   social_proof?: string | null;
   whatsapp_template?: string | null;
   features?: Array<string | { text?: string; icon?: string }>;
+  friendly_note?: string;
 };
 export type AddOn = ServicesConfig["add_ons"][number];
 export type ThoughtShift = ServicesConfig["trust_elements"]["thought_shifts"][number];
@@ -77,6 +78,13 @@ export const featureIcons: Record<string, string> = {
 
 export const servicesCurrency = servicesConfig.currency;
 export const servicesTaxLabel = servicesConfig.tax_label;
+const DEFAULT_CONTENT_GAP_MESSAGE =
+  "חיפשתי בארכיון, וראיתי שעוד לא יצא לי להקליט או לכתוב משהו ספציפי על זה. זה דווקא מעניין, אם תרצה נוכל לדבר על זה רגע יחד. לפעמים ככה נולדים התכנים הכי טובים כאן, וזה נוגע גם לאחרים. אפשר גם באנונימיות מלאה, מה שנוח לך. מה דעתך?";
+
+export const servicesContentGapMessage =
+  (servicesConfig as Record<string, unknown>).content_gap_message?.toString?.()?.trim() ||
+  DEFAULT_CONTENT_GAP_MESSAGE;
+
 export const servicesHero = servicesConfig.hero;
 export const servicesStages = servicesConfig.funnel_stages as ServiceStage[];
 export const servicesAddOns = servicesConfig.add_ons;
@@ -105,6 +113,14 @@ export const findServiceById = (id: string) => flattenVisibleServices().find((se
 
 export const buildWhatsAppHref = (message: string) =>
   `https://wa.me/${appConfig.contact.whatsAppNumber}?text=${encodeURIComponent(message)}`;
+
+/** וואטסאפ בסוף מאמר: ניסוח שימור קצר + כותרת + קישור */
+export function buildRetentionArticleWhatsAppHref(articleTitle: string, articleUrl: string): string {
+  const t = String(articleTitle || "").trim() || "מאמר";
+  const u = String(articleUrl || "").trim();
+  const body = u ? `אם זה הזיז משהו - בוא נדבר על זה\n\n${t}\n${u}` : `אם זה הזיז משהו - בוא נדבר על זה\n\n${t}`;
+  return buildWhatsAppHref(body);
+}
 
 /** שאלה לפני התחלה — שם השירות משובץ בהודעה (מקודד ל־URL) */
 export function buildServicePreStartWhatsAppHref(serviceName: string): string {

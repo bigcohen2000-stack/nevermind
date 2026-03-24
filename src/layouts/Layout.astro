@@ -2,13 +2,44 @@
 import "../styles/global.css";
 import { getCollection } from "astro:content";
 import { ClientRouter } from "astro:transitions";
-import { Search } from "lucide-react";
 import A11yWidget from "../components/A11yWidget.astro";
 import SearchModal from "../components/SearchModal";
 import WhatsAppButton from "../components/WhatsAppButton.astro";
 import WhisperBanner from "../components/WhisperBanner.astro";
 import appConfig from "../config/appConfig.json";
+import siteSettings from "../config/siteSettings.json";
 import { disclaimerLong } from "../lib/services";
+
+type StagingBannerCfg = { enabled?: boolean; message?: string };
+type SeoCfg = { allowIndexing?: boolean };
+type BrandCfg = {
+  logoPath?: string;
+  defaultOgImagePath?: string;
+  themeColor?: string;
+  backgroundColor?: string;
+};
+type ContactCfg = {
+  whatsAppNumber?: string;
+  email?: string;
+  phoneDisplay?: string;
+  phoneTel?: string;
+};
+
+const stagingCfg = (siteSettings as { stagingBanner?: StagingBannerCfg }).stagingBanner;
+const seoCfg = (siteSettings as { seo?: SeoCfg }).seo;
+const brandCfg = (siteSettings as { brand?: BrandCfg }).brand ?? {};
+const stagingEnabled = Boolean(stagingCfg?.enabled);
+const siteAllowsIndexing = seoCfg?.allowIndexing === true;
+const stagingMessage =
+  typeof stagingCfg?.message === "string" && stagingCfg.message.trim().length > 0
+    ? stagingCfg.message.trim()
+    : "האתר בהרצה";
+const navTopClass = stagingEnabled
+  ? "top-[calc(var(--nm-staging-banner-height)+var(--nm-nav-top,1.5rem))]"
+  : "top-[var(--nm-nav-top,1.5rem)]";
+const mainPadTopClass = stagingEnabled
+  ? "pt-[calc(var(--nm-staging-banner-height)+var(--nm-nav-top,1.5rem)+6.25rem)]"
+  : "pt-32";
 
 const {
   title,
@@ -28,6 +59,31 @@ const waSlug = typeof waArticleSlug === "string" ? waArticleSlug.trim() : "";
 const siteTitle = appConfig.site.name;
 const siteDescription = "מרחב חקירה שקט לבהירות, דיוק רגשי והבנה בגובה העיניים.";
 const siteUrl = appConfig.site.url;
+const siteUrlSlash = siteUrl.endsWith("/") ? siteUrl : `${siteUrl}/`;
+const logoPath =
+  typeof brandCfg.logoPath === "string" && brandCfg.logoPath.startsWith("/")
+    ? brandCfg.logoPath
+    : "/images/LOGO.svg";
+const defaultOgPath =
+  typeof brandCfg.defaultOgImagePath === "string" && brandCfg.defaultOgImagePath.startsWith("/")
+    ? brandCfg.defaultOgImagePath
+    : "/og.jpg";
+const pwaThemeColor = typeof brandCfg.themeColor === "string" ? brandCfg.themeColor : "#092038";
+const contact = appConfig.contact as ContactCfg;
+const waDigits = String(contact.whatsAppNumber ?? "").replace(/\D/g, "");
+const telHref =
+  typeof contact.phoneTel === "string" && contact.phoneTel.trim().length > 0
+    ? contact.phoneTel.trim()
+    : waDigits
+      ? `+${waDigits}`
+      : "";
+const phoneLabel =
+  typeof contact.phoneDisplay === "string" && contact.phoneDisplay.trim().length > 0
+    ? contact.phoneDisplay.trim()
+    : waDigits.length >= 5 && waDigits.startsWith("972")
+      ? `+972 ${waDigits.slice(3, 5)}-${waDigits.slice(5)}`
+      : telHref;
+const emailStr = typeof contact.email === "string" ? contact.email.trim() : "";
 const pageTitle = title ? `${title} | ${siteTitle}` : siteTitle;
 const trimMetaDescription = (value: string) => {
   const normalized = String(value || "").trim().replace(/\s+/g, " ");
@@ -36,13 +92,32 @@ const trimMetaDescription = (value: string) => {
 };
 const pageDescription = trimMetaDescription(description ?? frontmatter?.description ?? siteDescription);
 const pageUrl = Astro.url ? new URL(Astro.url.pathname, siteUrl).toString() : siteUrl;
-const ogImage = image || (frontmatter?.image ? new URL(frontmatter.image, siteUrl).toString() : `${siteUrl}/og.jpg`);
+const defaultOgAbsolute = new URL(defaultOgPath.replace(/^\//, ""), siteUrlSlash).toString();
+const resolveOgImage = (): string => {
+  if (typeof image === "string" && image.trim().length > 0) {
+    const t = image.trim();
+    if (t.startsWith("http://") || t.startsWith("https://")) return t;
+    return new URL(t.replace(/^\//, ""), siteUrlSlash).toString();
+  }
+  if (frontmatter?.image) {
+    return new URL(String(frontmatter.image).replace(/^\//, ""), siteUrlSlash).toString();
+  }
+  return defaultOgAbsolute;
+};
+const ogImage = resolveOgImage();
+const showOgRasterDimensions =
+  ogImage === defaultOgAbsolute && /\.(jpe?g|png|webp)$/i.test(defaultOgPath);
+const ogImageAlt = frontmatter?.title ? String(frontmatter.title) : pageTitle;
+const clientLogUrl = (import.meta.env.PUBLIC_CLIENT_LOG_URL ?? "").trim();
+const logoAbsolute = new URL(logoPath.replace(/^\//, ""), siteUrlSlash).toString();
 
 const organizationSchema = {
   "@context": "https://schema.org",
   "@type": "Organization",
   name: siteTitle,
   url: siteUrl,
+  logo: logoAbsolute,
+  image: logoAbsolute,
   description: siteDescription,
   inLanguage: "he-IL",
 };
@@ -60,6 +135,22 @@ const websiteSchema = {
   },
 };
 
+const professionalServiceSchema = {
+  "@context": "https://schema.org",
+  "@type": "ProfessionalService",
+  name: siteTitle,
+  url: new URL("services/", siteUrlSlash).toString(),
+  image: logoAbsolute,
+  description: siteDescription,
+  inLanguage: "he-IL",
+  areaServed: { "@type": "Country", name: "IL" },
+  provider: {
+    "@type": "Organization",
+    name: siteTitle,
+    url: siteUrl,
+  },
+};
+
 const normalizeSegment = (segment: string) => {
   const map: Record<string, string> = {
     articles: "מאמרים",
@@ -71,7 +162,7 @@ const normalizeSegment = (segment: string) => {
     glossary: "הגדרות מחדש",
     questions: "שאלות קצרות",
     intake: "טופס הכנה לשיחה",
-    "personal-consultation": "ייעוץ אישי",
+    "personal-consultation": "שיחה אישית",
     "premium-access": "גישת פרימיום",
     journey: "מסלולי בהירות",
     "root-problem-tree": "עץ שורש הבעיה",
@@ -84,7 +175,7 @@ const normalizeSegment = (segment: string) => {
 
 const pathName = Astro.url?.pathname ?? "/";
 const shouldNoIndexByPath = pathName.startsWith("/admin/");
-const effectiveNoIndex = noIndex || shouldNoIndexByPath;
+const effectiveNoIndex = noIndex || shouldNoIndexByPath || !siteAllowsIndexing;
 const pathSegments = pathName.split("/").filter(Boolean);
 const breadcrumbItems = [{ name: "בית", item: siteUrl }];
 let runningUrl = siteUrl.replace(/\/$/, "");
@@ -194,7 +285,15 @@ const videoObjectSchema =
       }
     : null;
 
-const schemas = [organizationSchema, websiteSchema, breadcrumbSchema, articleSchema, videoObjectSchema, faqSchema].filter(Boolean);
+const schemas = [
+  organizationSchema,
+  websiteSchema,
+  professionalServiceSchema,
+  breadcrumbSchema,
+  articleSchema,
+  videoObjectSchema,
+  faqSchema,
+].filter(Boolean);
 const randomArticlePaths = (await getCollection("articles", ({ data }) => data.draft !== true)).map((entry) => `/articles/${entry.slug}`);
 
 const socialLinks = [
@@ -220,8 +319,17 @@ const navItems = [
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{pageTitle}</title>
     <meta name="description" content={pageDescription} />
-    <meta name="robots" content="noindex, nofollow" />
+    <meta
+      name="robots"
+      content={effectiveNoIndex ? "noindex, nofollow" : "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"}
+    />
     <link rel="canonical" href={pageUrl} />
+
+    <link rel="icon" href={logoPath} type="image/svg+xml" />
+    <link rel="apple-touch-icon" href={logoPath} />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="theme-color" content={pwaThemeColor} />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
     <meta property="og:site_name" content={siteTitle} />
     <meta property="og:title" content={pageTitle} />
@@ -229,6 +337,13 @@ const navItems = [
     <meta property="og:type" content="website" />
     <meta property="og:url" content={pageUrl} />
     <meta property="og:image" content={ogImage} />
+    <meta property="og:image:alt" content={ogImageAlt} />
+    {showOgRasterDimensions ? (
+      <>
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+      </>
+    ) : null}
     <meta property="og:locale" content="he_IL" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={pageTitle} />
@@ -243,20 +358,39 @@ const navItems = [
   </head>
   <body
     data-whisper-banner-state="hidden"
-    style="background-color:#FAFAF8;color:#1A1A1A"
-    class="min-h-screen antialiased selection:bg-[color-mix(in_srgb,var(--nm-accent)_18%,var(--nm-bg))] selection:text-[var(--nm-fg)]"
+    class={`min-h-screen bg-[var(--nm-bg)] text-[var(--nm-fg)] antialiased selection:bg-[color-mix(in_srgb,var(--nm-accent)_18%,var(--nm-bg))] selection:text-[var(--nm-fg)]`}
   >
     <a
       href="#main-content"
-      class="sr-only transition-colors duration-200 focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:rounded-md focus:bg-[var(--nm-bg-canvas)] focus:px-4 focus:py-2 focus:text-[var(--nm-fg)] focus:ring-2 focus:ring-[color-mix(in_srgb,var(--nm-accent)_35%,transparent)] shadow-xl"
+      class="sr-only transition-colors duration-200 focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[110] focus:rounded-md focus:bg-[var(--nm-bg-canvas)] focus:px-4 focus:py-2 focus:text-[var(--nm-fg)] focus:ring-2 focus:ring-[color-mix(in_srgb,var(--nm-accent)_35%,transparent)] shadow-xl"
     >
       דלג לתוכן הראשי
     </a>
 
+    {stagingEnabled ? (
+      <div
+        role="status"
+        aria-live="polite"
+        class="fixed inset-x-0 top-0 z-[100] flex min-h-[var(--nm-staging-banner-height)] items-center justify-center gap-3 bg-[var(--nm-accent)] px-4 py-3 text-center shadow-[0_4px_24px_color-mix(in_srgb,var(--nm-fg)_12%,transparent)]"
+      >
+        <span
+          class="size-3 shrink-0 rounded-full bg-[var(--nm-on-accent)] ring-2 ring-[color-mix(in_srgb,var(--nm-on-accent)_55%,transparent)]"
+          aria-hidden="true"
+        />
+        <p class="text-[clamp(1.2rem,1.05rem+1vw,1.85rem)] font-bold leading-tight text-[var(--nm-on-accent)]">
+          {stagingMessage}
+        </p>
+      </div>
+    ) : null}
+
     <WhisperBanner />
 
     <header>
-      <nav data-nav class="fixed inset-x-0 top-[var(--nm-nav-top,1.5rem)] z-50 flex justify-center px-4 transition-[top] duration-300" aria-label="ניווט ראשי">
+      <nav
+        data-nav
+        class={`fixed inset-x-0 z-50 flex justify-center px-4 transition-[top] duration-300 ${navTopClass}`}
+        aria-label="ניווט ראשי"
+      >
         <div class="flex flex-wrap items-center justify-center gap-3 rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)]/92 px-5 py-3 shadow-[0_14px_34px_color-mix(in_srgb,var(--nm-fg)_8%,transparent)] backdrop-blur-md">
           {navItems.map((item) => (
             <a href={item.href} class="text-sm font-semibold text-[color-mix(in_srgb,var(--nm-fg)_82%,var(--nm-bg))] transition-colors duration-200 hover:text-[var(--nm-accent)]">{item.label}</a>
@@ -274,13 +408,19 @@ const navItems = [
             aria-label="חיפוש במרכז הידע | מה מעסיק אותך כרגע?"
             class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))] transition-colors duration-200 hover:border-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)] hover:text-[var(--nm-accent)]"
           >
-            <Search className="h-4 w-4" />
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="11" cy="11" r="8" />
+              <path d="m21 21-4.3-4.3" />
+            </svg>
           </button>
         </div>
       </nav>
     </header>
 
-    <main id="main-content" class="relative z-10 mx-auto w-full max-w-6xl px-6 pb-20 pt-32">
+    <main
+      id="main-content"
+      class={`relative z-10 mx-auto w-full max-w-6xl px-6 pb-20 ${mainPadTopClass}`}
+    >
       <slot />
     </main>
 
@@ -292,6 +432,35 @@ const navItems = [
               © {new Date().getFullYear()} NeverMind | הכל מתחיל ונגמר בראש.
             </p>
             <p class="text-xs text-[color-mix(in_srgb,var(--nm-fg)_45%,var(--nm-bg))]">האתר מאובטח SSL | סליקה מאושרת דרך Grow</p>
+            <div class="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-sm text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))] md:justify-end">
+              {emailStr ? (
+                <a href={`mailto:${emailStr}`} class="font-semibold underline-offset-2 hover:text-[var(--nm-accent)] hover:underline">
+                  {emailStr}
+                </a>
+              ) : null}
+              {emailStr && telHref ? <span class="text-[color-mix(in_srgb,var(--nm-fg)_40%,var(--nm-bg))]">·</span> : null}
+              {telHref ? (
+                <a
+                  href={`tel:${telHref.replace(/\s/g, "")}`}
+                  class="font-semibold underline-offset-2 hover:text-[var(--nm-accent)] hover:underline"
+                >
+                  {phoneLabel}
+                </a>
+              ) : null}
+              {waDigits ? (
+                <>
+                  {(emailStr || telHref) ? <span class="text-[color-mix(in_srgb,var(--nm-fg)_40%,var(--nm-bg))]">·</span> : null}
+                  <a
+                    href={`https://wa.me/${waDigits}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    class="font-semibold underline-offset-2 hover:text-[var(--nm-accent)] hover:underline"
+                  >
+                    וואטסאפ
+                  </a>
+                </>
+              ) : null}
+            </div>
             <p class="max-w-3xl whitespace-pre-line text-xs leading-relaxed text-[color-mix(in_srgb,var(--nm-fg)_48%,var(--nm-bg))]">
               {disclaimerLong}
             </p>
@@ -476,6 +645,51 @@ const navItems = [
           window.removeEventListener("beforeunload", persistScroll);
         };
       });
+    </script>
+
+    <script is:inline define:vars={{ clientLogUrl }}>
+      (() => {
+        const url = typeof clientLogUrl === "string" ? clientLogUrl.trim() : "";
+        if (!url) return;
+        const send = (payload) => {
+          try {
+            fetch(url, {
+              method: "POST",
+              mode: "cors",
+              credentials: "omit",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload),
+              keepalive: true,
+            }).catch(() => {});
+          } catch {
+            /* ignore */
+          }
+        };
+        window.addEventListener("error", (event) => {
+          send({
+            k: "error",
+            m: String(event.message || "").slice(0, 500),
+            f: String(event.filename || "").split("/").pop() || "",
+            l: event.lineno ?? null,
+            c: event.colno ?? null,
+            p: typeof location !== "undefined" ? location.pathname : "",
+          });
+        });
+        window.addEventListener("unhandledrejection", (event) => {
+          const reason = event.reason;
+          const text =
+            typeof reason === "string"
+              ? reason
+              : reason && typeof reason.message === "string"
+                ? reason.message
+                : "unhandledrejection";
+          send({
+            k: "rejection",
+            m: String(text).slice(0, 500),
+            p: typeof location !== "undefined" ? location.pathname : "",
+          });
+        });
+      })();
     </script>
   </body>
 </html>

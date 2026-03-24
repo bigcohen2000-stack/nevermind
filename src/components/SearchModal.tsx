@@ -1,39 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-
-type SearchResult = {
-  url: string;
-  title: string;
-  excerpt: string;
-};
-
-declare global {
-  interface Window {
-    pagefind?: {
-      search: (query: string) => Promise<{
-        results: { data: () => Promise<{ url: string; meta: { title: string }; excerpt: string }> }[];
-      }>;
-    };
-  }
-}
-
-const loadPagefind = () =>
-  new Promise<void>((resolve, reject) => {
-    if (window.pagefind) {
-      resolve();
-      return;
-    }
-
-    const script = document.createElement("script");
-    script.src = "/pagefind/pagefind.js";
-    script.onload = () => resolve();
-    script.onerror = () => reject();
-    document.head.appendChild(script);
-  });
+import { runPagefindSearch, type PagefindSearchResult } from "../lib/pagefind-client";
 
 export default function SearchModal() {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState<SearchResult[]>([]);
+  const [results, setResults] = useState<PagefindSearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -84,20 +55,13 @@ export default function SearchModal() {
     const runSearch = async () => {
       try {
         setIsLoading(true);
-        await loadPagefind();
-        const search = await window.pagefind?.search(query);
-        const data = await Promise.all(
-          (search?.results ?? []).slice(0, 6).map((result) => result.data())
-        );
-
+        const next = await runPagefindSearch(query, 6);
         if (!cancelled) {
-          setResults(
-            data.map((item) => ({
-              url: item.url,
-              title: item.meta?.title ?? "",
-              excerpt: item.excerpt ?? "",
-            }))
-          );
+          setResults(next);
+        }
+      } catch {
+        if (!cancelled) {
+          setResults([]);
         }
       } finally {
         if (!cancelled) {

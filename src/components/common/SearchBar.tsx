@@ -1,5 +1,3 @@
-import { Search } from "lucide-react";
-
 interface SearchBarProps {
   placeholder?: string;
   value: string;
@@ -13,7 +11,19 @@ export function SearchBar({
 }: SearchBarProps) {
   return (
     <label className="flex w-full items-center gap-2 rounded-full bg-white/5 px-4 py-2 text-sm text-white focus-within:ring-2 focus-within:ring-brand-accent">
-      <Search className="h-4 w-4 text-white/70" aria-hidden="true" />
+      <svg
+        className="h-4 w-4 shrink-0 text-white/70"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+      >
+        <circle cx="11" cy="11" r="8" />
+        <path d="m21 21-4.3-4.3" />
+      </svg>
       <span className="sr-only">חיפוש</span>
       <input
         value={value}

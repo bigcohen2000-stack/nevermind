@@ -43,6 +43,7 @@ const ignoredPathExtensions = [
   ".ico",
   ".xml",
   ".json",
+  ".webmanifest",
   ".txt",
   ".pdf",
   ".woff",

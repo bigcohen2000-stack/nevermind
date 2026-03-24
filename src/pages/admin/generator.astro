@@ -41,6 +41,26 @@ const pageDescription = "אשף 3 שלבים ליצירת Master Prompt מדוי
           <span class="text-sm font-semibold">Aha! Moment</span>
           <textarea id="wiz-aha" rows="3" placeholder="מה הדבר האחד שהם חייבים להבין?" class="w-full rounded-[1rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-transparent px-4 py-3 outline-none focus:border-[color-mix(in_srgb,var(--nm-accent)_35%,transparent)]"></textarea>
         </label>
+        <label class="block space-y-2">
+          <span class="text-sm font-semibold">Bottom line (שורת תחתית, frontmatter bottomLine)</span>
+          <textarea id="wiz-bottom-line" rows="2" placeholder="משפט אחד או שניים שסוגרים את המסר" class="w-full rounded-[1rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-transparent px-4 py-3 outline-none focus:border-[color-mix(in_srgb,var(--nm-accent)_35%,transparent)]"></textarea>
+        </label>
+        <label class="block space-y-2">
+          <span class="text-sm font-semibold">Inversion / עומק (אופציונלי, frontmatter inversionNote)</span>
+          <textarea id="wiz-inversion" rows="2" placeholder="זוויות היפוך, ספקנות, שכבת מועדון" class="w-full rounded-[1rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-transparent px-4 py-3 outline-none focus:border-[color-mix(in_srgb,var(--nm-accent)_35%,transparent)]"></textarea>
+        </label>
+        <label class="flex cursor-pointer items-center gap-3 rounded-[1rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-4 py-3">
+          <input id="wiz-is-premium" type="checkbox" class="size-4 accent-[var(--nm-accent)]" />
+          <span class="text-sm font-semibold">תוכן פרימיום (isPremium)</span>
+        </label>
+        <label class="block space-y-2">
+          <span class="text-sm font-semibold">רמת עומק ב-MDX (difficultyLevel)</span>
+          <select id="wiz-difficulty" class="w-full rounded-[1rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-transparent px-4 py-3 outline-none focus:border-[color-mix(in_srgb,var(--nm-accent)_35%,transparent)]">
+            <option value="beginner">מתחילים (beginner)</option>
+            <option value="advanced">מתקדמים (advanced)</option>
+            <option value="deep">עומק / קהילה (deep)</option>
+          </select>
+        </label>
         <div class="grid gap-4 md:grid-cols-2">
           <label class="block space-y-2">
             <span class="text-sm font-semibold">Clean Link (Slug)</span>
@@ -48,6 +68,7 @@ const pageDescription = "אשף 3 שלבים ליצירת Master Prompt מדוי
           </label>
           <label class="block space-y-2">
             <span class="text-sm font-semibold">Marketing Summary</span>
+            <span class="block text-xs text-[color-mix(in_srgb,var(--nm-fg)_52%,var(--nm-bg))]">ממופה ל-description ב-frontmatter</span>
             <input id="wiz-summary" type="text" placeholder="תקציר קצר ומדויק" class="w-full rounded-[1rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-transparent px-4 py-3 outline-none focus:border-[color-mix(in_srgb,var(--nm-accent)_35%,transparent)]" />
           </label>
         </div>
@@ -80,9 +101,21 @@ const pageDescription = "אשף 3 שלבים ליצירת Master Prompt מדוי
           <input id="wiz-tags" type="text" placeholder="בהירות, בחירה, פירוק" class="w-full rounded-[1rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-transparent px-4 py-3 outline-none focus:border-[color-mix(in_srgb,var(--nm-accent)_35%,transparent)]" />
         </label>
         <label class="block space-y-2">
+          <span class="text-sm font-semibold">YouTube ID (אופציונלי, 11 תווים)</span>
+          <input id="wiz-youtube" type="text" placeholder="dQw4w9WgXcQ" dir="ltr" maxlength="11" class="w-full rounded-[1rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-transparent px-4 py-3 text-left outline-none focus:border-[color-mix(in_srgb,var(--nm-accent)_35%,transparent)]" />
+        </label>
+        <label class="block space-y-2">
           <span class="text-sm font-semibold">Draft Body (Markdown, optional)</span>
           <textarea id="wiz-body" rows="6" placeholder="טיוטת גוף המאמר (אופציונלי)" class="w-full rounded-[1rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-transparent px-4 py-3 outline-none focus:border-[color-mix(in_srgb,var(--nm-accent)_35%,transparent)]"></textarea>
         </label>
+        <p id="wiz-word-count" class="text-xs font-semibold text-[color-mix(in_srgb,var(--nm-fg)_55%,var(--nm-bg))]">מילים בטיוטה: 0</p>
+        <div
+          id="wiz-preflight"
+          class="rounded-[1rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3 text-xs leading-6 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]"
+          aria-live="polite"
+        >
+          בדיקות לפני שלב 3 יופיעו כאן (אזהרות בלבד, לא חוסמות).
+        </div>
       </section>
 
       <section data-step="3" class="wizard-step hidden space-y-4">
@@ -92,7 +125,7 @@ const pageDescription = "אשף 3 שלבים ליצירת Master Prompt מדוי
         </button>
         <label class="block space-y-2">
           <span class="text-sm font-semibold">Master Prompt</span>
-          <textarea id="wiz-output" rows="8" readonly class="w-full rounded-[1rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3 text-left leading-7 outline-none"></textarea>
+          <textarea id="wiz-output" rows="12" readonly class="w-full rounded-[1rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3 text-left leading-7 outline-none"></textarea>
         </label>
         <button id="wiz-copy" type="button" class="inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-transparent px-6 py-3 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]">
           Copy to Clipboard
@@ -114,7 +147,62 @@ const pageDescription = "אשף 3 שלבים ליצירת Master Prompt מדוי
     </article>
   </section>
 
-  <script is:inline>
+  <script>
+    import { glossaryConcepts } from "../../data/glossary";
+
+    function buildGlossaryAllowedSet(): Set<string> {
+      const s = new Set<string>();
+      for (const c of glossaryConcepts) {
+        s.add(c.title.trim().toLowerCase());
+        for (const t of c.tags) s.add(String(t).trim().toLowerCase());
+        for (const k of c.keywords) s.add(String(k).trim().toLowerCase());
+      }
+      return s;
+    }
+
+    const glossaryAllowed = buildGlossaryAllowedSet();
+    const YOUTUBE_ID_RE = /^[a-zA-Z0-9_-]{11}$/;
+    const WORD_WARN = 900;
+    const WORD_DEEP = 1400;
+
+    function countWords(raw: string): number {
+      return raw
+        .trim()
+        .split(/\s+/)
+        .filter((w) => w.length > 0).length;
+    }
+
+    function runPreflight(data: {
+      tags: string;
+      youtubeId: string;
+      body: string;
+    }): string[] {
+      const warnings: string[] = [];
+      const yt = data.youtubeId.trim();
+      if (yt && !YOUTUBE_ID_RE.test(yt)) {
+        warnings.push("מזהה YouTube לא תקין (צפוי בדיוק 11 תווים, אותיות מספרים מקף תחתון).");
+      }
+      const tagParts = data.tags
+        .split(/[,،]/)
+        .map((t) => t.trim())
+        .filter(Boolean);
+      for (const t of tagParts) {
+        if (!glossaryAllowed.has(t.toLowerCase())) {
+          warnings.push(`התג "${t}" לא נמצא במילות המפתח של הגלוסה. כדאי לבדוק איות או להוסיף למאמר רק אם זה מכוון.`);
+        }
+      }
+      const wc = countWords(data.body);
+      if (wc > 0 && wc < 120) {
+        warnings.push(`מעט מילים בטיוטה (${wc}). אם זה מכוון, בסדר.`);
+      }
+      if (wc >= WORD_DEEP) {
+        warnings.push(`הטיוטה ארוכה (${wc} מילים). זה מתאים בדרך כלל ל-deep / מחקר מלא.`);
+      } else if (wc >= WORD_WARN) {
+        warnings.push(`הטיוטה מעל ${WORD_WARN} מילים. שקול difficultyLevel: advanced או deep.`);
+      }
+      return warnings;
+    }
+
     document.addEventListener("astro:page-load", () => {
       const root = document.getElementById("nm-article-wizard");
       if (!(root instanceof HTMLElement)) return;
@@ -132,15 +220,51 @@ const pageDescription = "אשף 3 שלבים ליצירת Master Prompt מדוי
       const topic = document.getElementById("wiz-topic");
       const audience = document.getElementById("wiz-audience");
       const aha = document.getElementById("wiz-aha");
+      const bottomLine = document.getElementById("wiz-bottom-line");
+      const inversion = document.getElementById("wiz-inversion");
+      const isPremium = document.getElementById("wiz-is-premium");
+      const difficulty = document.getElementById("wiz-difficulty");
       const slug = document.getElementById("wiz-slug");
       const summary = document.getElementById("wiz-summary");
       const tone = document.getElementById("wiz-tone");
       const points = document.getElementById("wiz-points");
       const length = document.getElementById("wiz-length");
       const tags = document.getElementById("wiz-tags");
+      const youtube = document.getElementById("wiz-youtube");
       const body = document.getElementById("wiz-body");
+      const wordCountEl = document.getElementById("wiz-word-count");
+      const preflightEl = document.getElementById("wiz-preflight");
 
       let current = 1;
+
+      const collectData = () => ({
+        topic: topic instanceof HTMLInputElement ? topic.value.trim() : "",
+        audience: audience instanceof HTMLSelectElement ? audience.value : "",
+        aha: aha instanceof HTMLTextAreaElement ? aha.value.trim() : "",
+        bottomLine: bottomLine instanceof HTMLTextAreaElement ? bottomLine.value.trim() : "",
+        inversionNote: inversion instanceof HTMLTextAreaElement ? inversion.value.trim() : "",
+        isPremium: isPremium instanceof HTMLInputElement ? isPremium.checked : false,
+        difficultyLevel: difficulty instanceof HTMLSelectElement ? difficulty.value : "beginner",
+        slug: slug instanceof HTMLInputElement ? slug.value.trim() : "",
+        summary: summary instanceof HTMLInputElement ? summary.value.trim() : "",
+        tone: tone instanceof HTMLSelectElement ? tone.value : "",
+        points: points instanceof HTMLTextAreaElement ? points.value : "",
+        length: length instanceof HTMLSelectElement ? length.value : "",
+        tags: tags instanceof HTMLInputElement ? tags.value.trim() : "",
+        youtubeId: youtube instanceof HTMLInputElement ? youtube.value.trim() : "",
+        body: body instanceof HTMLTextAreaElement ? body.value : "",
+      });
+
+      function updateWordCountAndPreflight() {
+        const data = collectData();
+        const wc = countWords(data.body);
+        if (wordCountEl) wordCountEl.textContent = `מילים בטיוטה: ${wc}`;
+        if (preflightEl && current === 2) {
+          const w = runPreflight(data);
+          preflightEl.textContent =
+            w.length > 0 ? ["בדיקות (אזהרות בלבד):", ...w.map((x) => `• ${x}`)].join("\n") : "אין אזהרות בבדיקה האוטומטית. אפשר להמשיך.";
+        }
+      }
 
       const render = () => {
         steps.forEach((step, idx) => step.classList.toggle("hidden", idx + 1 !== current));
@@ -148,20 +272,13 @@ const pageDescription = "אשף 3 שלבים ליצירת Master Prompt מדוי
         if (stepLabel instanceof HTMLElement) stepLabel.textContent = `שלב ${current} מתוך 3`;
         if (backBtn instanceof HTMLButtonElement) backBtn.disabled = current === 1;
         if (nextBtn instanceof HTMLButtonElement) nextBtn.classList.toggle("hidden", current === 3);
+        if (current === 2) updateWordCountAndPreflight();
       };
 
-      const collectData = () => ({
-        topic: topic instanceof HTMLInputElement ? topic.value.trim() : "",
-        audience: audience instanceof HTMLSelectElement ? audience.value : "",
-        aha: aha instanceof HTMLTextAreaElement ? aha.value.trim() : "",
-        slug: slug instanceof HTMLInputElement ? slug.value.trim() : "",
-        summary: summary instanceof HTMLInputElement ? summary.value.trim() : "",
-        tone: tone instanceof HTMLSelectElement ? tone.value : "",
-        points: points instanceof HTMLTextAreaElement ? points.value : "",
-        length: length instanceof HTMLSelectElement ? length.value : "",
-        tags: tags instanceof HTMLInputElement ? tags.value.trim() : "",
-        body: body instanceof HTMLTextAreaElement ? body.value : "",
-      });
+      const depthBlock = `[Depth layers for NeverMind]
+- Level 1 (beginner): plain language, clarity at a level a smart reader can follow without jargon.
+- Level 2 (advanced): eye-level, precise, professional but still clean.
+- Level 3 (deep / club): radical doubt, ontological inquiry, and the Inversion Method (flip default assumptions).`;
 
       const buildPrompt = () => {
         const data = collectData();
@@ -171,7 +288,19 @@ const pageDescription = "אשף 3 שלבים ליצירת Master Prompt מדוי
           .map((line) => line.trim())
           .filter(Boolean)
           .join(", ");
-        return `[Role: Strategic Content Expert]\n[Context: NeverMind Project]\nAct as a high-end content strategist for NeverMind. Write an article about ${data.topic || "[Topic]"} for ${data.audience || "[Audience]"}. The core insight is ${data.aha || "[Aha Moment]"}. Style: ${data.tone || "[Tone]"}. Ensure it includes ${normalizedPoints || "[Key Points]"}. Optional context: slug=${data.slug || "[Slug]"}, summary=${data.summary || "[Summary]"}, tags=${data.tags || "[Tags]"}. Follow the brand identity: zero fluff, focus on thought-shifts, and use the ${data.length || "[Length]"} format.\n[Output Instructions: Markdown, no fluff, focus on Thought-Shifts]`;
+        const inv = data.inversionNote ? ` Inversion / depth notes: ${data.inversionNote}.` : "";
+        const bl = data.bottomLine ? ` Bottom line for the reader: ${data.bottomLine}.` : "";
+        return `[Role: Strategic Content Expert]
+[Context: NeverMind Project]
+Act as a high-end content strategist for NeverMind. Write an article about ${data.topic || "[Topic]"} for ${data.audience || "[Audience]"}. The core insight is ${data.aha || "[Aha Moment]"}.${bl}${inv}
+Frontmatter targets: description (summary)=${data.summary || "[Summary]"}; slug=${data.slug || "[Slug]"}; tags=[${data.tags || "[Tags]"}]; isPremium=${data.isPremium}; difficultyLevel=${data.difficultyLevel}; youtubeId=${data.youtubeId || "[optional]"}; bottomLine=${data.bottomLine || "[optional]"}; inversionNote=${data.inversionNote || "[optional]"}.
+Style: ${data.tone || "[Tone]"}. Ensure the piece includes: ${normalizedPoints || "[Key Points]"}. Length intent: ${data.length || "[Length]"}. Draft body (if any) should be refined, not duplicated blindly:
+[DRAFT_BODY_START]
+${data.body.trim() || "[no draft yet]"}
+[DRAFT_BODY_END]
+${depthBlock}
+Follow the brand identity: zero fluff, focus on thought-shifts, NeverMind voice (direct, analytical, no filler).
+[Output Instructions: Markdown; no fluff; focus on Thought-Shifts; structure for web reading.]`;
       };
 
       backBtn?.addEventListener("click", () => {
@@ -180,6 +309,7 @@ const pageDescription = "אשף 3 שלבים ליצירת Master Prompt מדוי
       });
 
       nextBtn?.addEventListener("click", () => {
+        if (current === 2) updateWordCountAndPreflight();
         current = Math.min(3, current + 1);
         render();
       });
@@ -194,7 +324,7 @@ const pageDescription = "אשף 3 שלבים ליצירת Master Prompt מדוי
         try {
           await navigator.clipboard.writeText(output.value);
           const original = copyBtn.textContent || "Copy to Clipboard";
-          copyBtn.textContent = "✓ הועתק";
+          copyBtn.textContent = "הועתק";
           window.setTimeout(() => {
             copyBtn.textContent = original;
           }, 2000);
@@ -208,17 +338,25 @@ const pageDescription = "אשף 3 שלבים ליצירת Master Prompt מדוי
         try {
           const raw = localStorage.getItem(storageKey);
           if (!raw) return;
-          const data = JSON.parse(raw);
-          if (topic instanceof HTMLInputElement) topic.value = data.topic || "";
-          if (audience instanceof HTMLSelectElement) audience.value = data.audience || "Beginners";
-          if (aha instanceof HTMLTextAreaElement) aha.value = data.aha || "";
-          if (slug instanceof HTMLInputElement) slug.value = data.slug || "";
-          if (summary instanceof HTMLInputElement) summary.value = data.summary || "";
-          if (tone instanceof HTMLSelectElement) tone.value = data.tone || "Provocative";
-          if (points instanceof HTMLTextAreaElement) points.value = data.points || "";
-          if (length instanceof HTMLSelectElement) length.value = data.length || "Short Post";
-          if (tags instanceof HTMLInputElement) tags.value = data.tags || "";
-          if (body instanceof HTMLTextAreaElement) body.value = data.body || "";
+          const data = JSON.parse(raw) as Record<string, unknown>;
+          if (topic instanceof HTMLInputElement) topic.value = String(data.topic ?? "");
+          if (audience instanceof HTMLSelectElement) audience.value = String(data.audience ?? "Beginners");
+          if (aha instanceof HTMLTextAreaElement) aha.value = String(data.aha ?? "");
+          if (bottomLine instanceof HTMLTextAreaElement) bottomLine.value = String(data.bottomLine ?? "");
+          if (inversion instanceof HTMLTextAreaElement) inversion.value = String(data.inversionNote ?? "");
+          if (isPremium instanceof HTMLInputElement) isPremium.checked = Boolean(data.isPremium);
+          if (difficulty instanceof HTMLSelectElement) {
+            const d = String(data.difficultyLevel ?? "beginner");
+            difficulty.value = ["beginner", "advanced", "deep"].includes(d) ? d : "beginner";
+          }
+          if (slug instanceof HTMLInputElement) slug.value = String(data.slug ?? "");
+          if (summary instanceof HTMLInputElement) summary.value = String(data.summary ?? "");
+          if (tone instanceof HTMLSelectElement) tone.value = String(data.tone ?? "Provocative");
+          if (points instanceof HTMLTextAreaElement) points.value = String(data.points ?? "");
+          if (length instanceof HTMLSelectElement) length.value = String(data.length ?? "Short Post");
+          if (tags instanceof HTMLInputElement) tags.value = String(data.tags ?? "");
+          if (youtube instanceof HTMLInputElement) youtube.value = String(data.youtubeId ?? "");
+          if (body instanceof HTMLTextAreaElement) body.value = String(data.body ?? "");
         } catch {
           // no-op
         }
@@ -227,17 +365,42 @@ const pageDescription = "אשף 3 שלבים ליצירת Master Prompt מדוי
       const persistDraft = () => {
         localStorage.setItem(storageKey, JSON.stringify(collectData()));
       };
-      [topic, audience, aha, slug, summary, tone, points, length, tags, body].forEach((field) => {
-        field?.addEventListener("input", persistDraft);
+
+      const fields: (Element | null)[] = [
+        topic,
+        audience,
+        aha,
+        bottomLine,
+        inversion,
+        isPremium,
+        difficulty,
+        slug,
+        summary,
+        tone,
+        points,
+        length,
+        tags,
+        youtube,
+        body,
+      ];
+      fields.forEach((field) => {
+        field?.addEventListener("input", () => {
+          persistDraft();
+          updateWordCountAndPreflight();
+        });
+        field?.addEventListener("change", () => {
+          persistDraft();
+          updateWordCountAndPreflight();
+        });
       });
 
       saveBtn?.addEventListener("click", async () => {
         const payload = collectData();
         persistDraft();
         let savedViaHook = false;
-        if (typeof window.__nmGeneratorSave === "function") {
+        if (typeof (window as unknown as { __nmGeneratorSave?: (p: unknown) => Promise<void> }).__nmGeneratorSave === "function") {
           try {
-            await window.__nmGeneratorSave(payload);
+            await (window as unknown as { __nmGeneratorSave: (p: unknown) => Promise<void> }).__nmGeneratorSave(payload);
             savedViaHook = true;
           } catch {
             savedViaHook = false;

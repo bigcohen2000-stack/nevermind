@@ -10,7 +10,10 @@
                    "articlesPath":  "src/content/articles"
                },
     "contact":  {
-                    "whatsAppNumber":  "972555634035"
+                    "whatsAppNumber":  "972555634035",
+                    "email":  "mail@nevermind.co.il",
+                    "phoneDisplay":  "+972 55-563-4035",
+                    "phoneTel":  "+972555634035"
                 },
     "premiumAccess":  {
                           "enabled":  true,

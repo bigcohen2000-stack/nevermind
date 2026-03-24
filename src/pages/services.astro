@@ -1,349 +1,279 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import { glossaryConcepts } from "../data/glossary";
+import appConfig from "../config/appConfig.json";
 import {
   servicesHero,
-  servicesStages,
-  servicesThoughtShifts,
-  servicesTrust,
-  buildWhatsAppHref,
-  type ServiceStage
+  servicesContentGapMessage,
+  flattenVisibleServices,
+  resolveServiceAction,
+  formatMoney,
 } from "../lib/services";
 
-const visibleStages = servicesStages.filter((stage) => Array.isArray(stage.services) && stage.services.length > 0);
-const stageStartingPrices = Object.fromEntries(
-  visibleStages.map((stage) => [
-    stage.stage_id,
-    Math.min(...stage.services.map((service) => Number(service.price_full || 0))),
-  ])
-);
+const services = flattenVisibleServices();
+const popularTags = glossaryConcepts.slice(0, 6).map((c) => ({
+  label: c.title,
+  searchQuery: (c.keywords && c.keywords[0]) || c.title,
+}));
+const waNumber = String(appConfig.contact.whatsAppNumber ?? "").replace(/\D/g, "");
 ---
 
-<Layout title="בחירת מסלול | השם לא משנה" description="אשף בחירה נקי ומדורג לבחירת פורמט ושירות מתאים.">
-  <section class="mx-auto max-w-6xl space-y-10 px-4 pb-20 text-[var(--nm-fg)]">
-    <header class="space-y-4 text-right">
-      <p class="text-sm font-semibold uppercase tracking-[0.24em] text-[var(--nm-accent)]">בחירה מודרכת</p>
-      <h1 class="text-[clamp(2rem,1.5rem+2vw,3.6rem)] font-semibold leading-[1.05]">{servicesHero.title}</h1>
-      <p class="max-w-3xl text-[clamp(1rem,0.95rem+0.25vw,1.18rem)] leading-8 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+<Layout
+  title="מרחב גילוי | NeverMind"
+  description="חיפוש בארכיון התכנים ודרכים להעמיק בשיחה, בלי אשף שלבים."
+>
+  <section class="mx-auto max-w-6xl space-y-12 px-4 py-16 text-[var(--nm-fg)] md:py-20">
+    <header class="space-y-8 text-center">
+      <h1 class="text-[clamp(2rem,1.5rem+2.2vw,3.5rem)] font-semibold leading-[1.08] tracking-tight">
+        {servicesHero.title}
+      </h1>
+      <p class="mx-auto max-w-2xl text-[clamp(1rem,0.95rem+0.25vw,1.15rem)] leading-8 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
         {servicesHero.subtitle}
       </p>
-    </header>
 
-    <article
-      id="nm-services-wizard"
-      data-services-stages={JSON.stringify(visibleStages)}
-      class="space-y-6 rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)]/95 p-6 tracking-tight shadow-[0_22px_60px_color-mix(in_srgb,var(--nm-fg)_5%,transparent)] md:p-10"
-    >
-      <div class="flex items-center justify-between gap-4">
-        <button
-          id="wizard-back"
-          type="button"
-          class="inline-flex min-h-[44px] items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-transparent px-4 py-2 text-sm font-semibold text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))] transition hover:bg-[var(--nm-surface-muted)]"
+      <div class="mx-auto max-w-2xl space-y-3 text-right">
+        <label
+          for="discovery-search"
+          class="block text-[clamp(1rem,0.95rem+0.3vw,1.12rem)] font-semibold leading-7 text-[var(--nm-fg)]"
         >
-          חזור
-        </button>
-        <div class="space-y-1 text-left">
-          <p id="wizard-step-label" class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">שלב 1</p>
-          <p id="wizard-breadcrumb" class="text-xs text-[color-mix(in_srgb,var(--nm-fg)_62%,var(--nm-bg))]">מסגרת</p>
+          יש משהו שמעסיק אותך? בוא נראה מה יש לנו בארכיון על זה.
+        </label>
+        <div class="relative">
+          <input
+            id="discovery-search"
+            type="search"
+            autocomplete="off"
+            placeholder="למשל: בהירות, זוגיות, לחץ…"
+            dir="rtl"
+            class="w-full rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] px-5 py-4 pr-12 text-right text-[clamp(1.05rem,1rem+0.25vw,1.2rem)] text-[var(--nm-fg)] shadow-[0_20px_50px_color-mix(in_srgb,var(--nm-fg)_5%,transparent)] outline-none transition focus-visible:border-[color-mix(in_srgb,var(--nm-accent)_28%,transparent)] focus-visible:ring-2 focus-visible:ring-[color-mix(in_srgb,var(--nm-accent)_18%,transparent)]"
+            aria-label="חיפוש בארכיון NeverMind"
+          />
+          <span
+            class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[color-mix(in_srgb,var(--nm-fg)_35%,var(--nm-bg))]"
+            aria-hidden="true"
+          >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Zm0-2a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11Z"
+                fill="currentColor"></path>
+              <path
+                d="M15.446 15.854 20 20.408l-1.408 1.408-4.554-4.554 1.408-1.408Z"
+                fill="currentColor"></path>
+            </svg>
+          </span>
         </div>
       </div>
 
-      <div class="flex gap-2" aria-hidden="true">
-        <span data-step-dot="1" class="h-1 flex-1 rounded-full bg-[var(--nm-accent)]"></span>
-        <span data-step-dot="2" class="h-1 flex-1 rounded-full bg-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)]"></span>
-        <span data-step-dot="3" class="h-1 flex-1 rounded-full bg-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)]"></span>
-      </div>
-
-      <section data-step-panel="1" class="wizard-panel space-y-6 text-right">
-        <h2 class="text-2xl font-semibold">בחר מסגרת עבודה</h2>
-        <div class="grid gap-4 md:grid-cols-3">
-          {visibleStages.map((stage: ServiceStage) => (
+      <div class="flex flex-wrap items-center justify-center gap-2">
+        <span class="w-full text-center text-sm text-[color-mix(in_srgb,var(--nm-fg)_45%,var(--nm-bg))] sm:w-auto">נושאים מהגלוסר:</span>
+        {
+          popularTags.map(({ label, searchQuery }) => (
             <button
               type="button"
-              data-stage-id={stage.stage_id}
-              class="group min-h-[170px] rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[color-mix(in_srgb,var(--nm-bg-canvas)_68%,transparent)] p-6 text-right backdrop-blur-md transition duration-300 hover:border-[color-mix(in_srgb,var(--nm-accent)_24%,transparent)] hover:bg-[color-mix(in_srgb,var(--nm-bg-canvas)_82%,transparent)]"
+              data-discovery-tag={searchQuery}
+              class="rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[color-mix(in_srgb,var(--nm-bg-canvas)_90%,transparent)] px-3 py-1.5 text-sm font-semibold text-[var(--nm-accent)] transition hover:border-[color-mix(in_srgb,var(--nm-accent)_24%,transparent)] hover:bg-[var(--nm-surface-muted)]"
             >
-              <span class="block text-[1.15rem] font-semibold text-[var(--nm-fg)]">{stage.stage_name}</span>
-              <span class="mt-3 block text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">{stage.target_audience}</span>
-              <span class="mt-4 block text-xs font-semibold text-[color-mix(in_srgb,var(--nm-fg)_62%,var(--nm-bg))]">
-                החל מ־{Number(stageStartingPrices[stage.stage_id] || 0).toLocaleString("he-IL")} ₪
-              </span>
+              #{label}
             </button>
-          ))}
-        </div>
-      </section>
-
-      <section data-step-panel="2" class="wizard-panel hidden space-y-6 text-right">
-        <h2 id="wizard-step2-title" class="text-2xl font-semibold"></h2>
-        <div id="wizard-step2-options" class="grid gap-4"></div>
-        <div id="wizard-step2-skeleton" class="hidden grid gap-3">
-          <div class="skeleton h-20"></div>
-          <div class="skeleton h-20"></div>
-        </div>
-        <p id="wizard-step2-empty" class="hidden rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3 text-sm text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
-          כרגע אין מסלולים זמינים לנתיב הזה. אפשר לחזור ולבחור כיוון אחר.
-        </p>
-        <p id="wizard-step2-error" class="hidden rounded-2xl border border-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)] bg-[var(--nm-tint)] px-4 py-3 text-sm text-[var(--nm-fg)]">
-          קרתה תקלה זמנית בטעינת האפשרויות. נסה לרענן או לחזור לשלב קודם.
-        </p>
-      </section>
-
-      <section data-step-panel="3" class="wizard-panel hidden space-y-4 text-right">
-        <h2 class="text-2xl font-semibold">כרטיס סיכום</h2>
-        <div class="rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)] bg-[var(--nm-tint)] p-10 tracking-tight shadow-[0_18px_40px_color-mix(in_srgb,var(--nm-fg)_5%,transparent)]">
-          <p class="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--nm-accent)]">הזמנה להמשך</p>
-          <h3 id="wizard-track-title" class="mt-2 text-xl font-semibold text-[var(--nm-fg)]"></h3>
-          <p id="wizard-track-subtitle" class="mt-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_76%,var(--nm-bg))]"></p>
-          <p id="wizard-track-description" class="mt-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_74%,var(--nm-bg))]"></p>
-          <ul id="wizard-track-features" class="mt-5 space-y-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))]"></ul>
-          <p class="mt-4 text-xs leading-6 text-[color-mix(in_srgb,var(--nm-fg)_66%,var(--nm-bg))]">{servicesTrust.disclaimer_short}</p>
-          <a id="wizard-main-cta" href="#" target="_blank" rel="noreferrer" class="mt-6 inline-flex min-h-[44px] items-center justify-center rounded-full bg-[var(--nm-inverse)] px-6 py-3 text-sm font-semibold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-inverse-hover)]">
-            המשך
-          </a>
-          <a id="wizard-secondary-cta" href="#" target="_blank" rel="noreferrer" class="mt-3 inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-transparent px-5 py-3 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-bg-canvas)]">
-            יש לי שאלה נקודתית לפני שאני בוחר
-          </a>
-        </div>
-      </section>
-    </article>
-
-    <section class="space-y-5 rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)]/90 p-10 tracking-tight shadow-[0_16px_36px_color-mix(in_srgb,var(--nm-fg)_5%,transparent)] text-right">
-      <h2 class="text-xl font-semibold">Perspective</h2>
-      <div class="grid gap-4 md:grid-cols-2">
-        {servicesThoughtShifts.map((shift) => (
-          <article class="rounded-[1.4rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-6">
-            <p class="text-sm font-semibold text-[var(--nm-fg)]">{shift.title}</p>
-            <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">לפני: {shift.before}</p>
-            <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_82%,var(--nm-bg))]">אחרי: {shift.after}</p>
-          </article>
-        ))}
+          ))
+        }
       </div>
-    </section>
+    </header>
+
+    <div id="discovery-results" class="hidden grid-cols-1 gap-12 lg:grid-cols-2">
+      <div class="space-y-6">
+        <div class="border-b border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] pb-3">
+          <h2 class="text-xs font-bold uppercase tracking-[0.2em] text-[color-mix(in_srgb,var(--nm-fg)_45%,var(--nm-bg))]">
+            מהארכיון
+          </h2>
+        </div>
+        <p id="discovery-archive-status" class="hidden text-sm text-[color-mix(in_srgb,var(--nm-fg)_55%,var(--nm-bg))]"></p>
+        <div id="discovery-archive-list" class="space-y-3"></div>
+      </div>
+
+      <div class="space-y-6">
+        <div class="border-b border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] pb-3">
+          <h2 class="text-xs font-bold uppercase tracking-[0.2em] text-[var(--nm-accent)]">
+            רוצה לפרק את זה יחד?
+          </h2>
+          <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
+            אלו הדרכים שבהן אנחנו יכולים לשבת על זה.
+          </p>
+        </div>
+        <div class="grid gap-4">
+          {
+            services.map((service) => {
+              const action = resolveServiceAction(service);
+              const note = service.friendly_note?.trim() || service.subtitle || "";
+              return (
+                <div class="group rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-6 shadow-[0_12px_32px_color-mix(in_srgb,var(--nm-fg)_4%,transparent)] transition hover:border-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)]">
+                  <div class="flex flex-wrap items-start justify-between gap-3">
+                    <h3 class="text-lg font-semibold text-[var(--nm-fg)]">{service.title}</h3>
+                    <span class="text-sm font-semibold text-[color-mix(in_srgb,var(--nm-fg)_55%,var(--nm-bg))]">
+                      {formatMoney(service.price_full)}
+                    </span>
+                  </div>
+                  {note ? (
+                    <p class="mt-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">{note}</p>
+                  ) : null}
+                  <a
+                    href={action.href}
+                    {...(action.external ? { target: "_blank", rel: "noreferrer" } : {})}
+                    class="mt-5 inline-flex min-h-[44px] items-center gap-2 text-sm font-bold text-[var(--nm-accent)] underline-offset-4 transition group-hover:underline"
+                  >
+                    {action.label}
+                  </a>
+                </div>
+              );
+            })
+          }
+        </div>
+      </div>
+    </div>
+
+    <div
+      id="discovery-gap"
+      class="hidden mx-auto max-w-2xl rounded-3xl border-2 border-dashed border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-[color-mix(in_srgb,var(--nm-bg-canvas)_96%,transparent)] px-6 py-10 text-center"
+    >
+      <p id="discovery-gap-text" class="text-lg leading-8 text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))]"></p>
+      <a
+        id="discovery-gap-wa"
+        href="#"
+        class="mt-8 inline-flex min-h-[48px] items-center justify-center gap-2 rounded-full bg-[var(--nm-inverse)] px-8 py-3 text-sm font-semibold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-inverse-hover)]"
+      >
+        נדבר בוואטסאפ?
+      </a>
+    </div>
   </section>
 
-  <script is:inline>
+  <script
+    define:vars={{
+      contentGapMessage: servicesContentGapMessage,
+      waNumber,
+    }}
+  >
+    import { runPagefindSearch } from "../lib/pagefind-client";
+
+    const MIN_LEN = 2;
+    const DEBOUNCE_MS = 320;
+    const LIMIT = 6;
+
+    function escapeHtml(text) {
+      return String(text ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function waHrefForTopic(topic) {
+      const t = String(topic || "").trim() || "הנושא שחיפשתי";
+      const body = `היי יקיר, חיפשתי באתר על ${t} ולא מצאתי, אשמח לדבר על זה.`;
+      return `https://wa.me/${waNumber}?text=${encodeURIComponent(body)}`;
+    }
+
     document.addEventListener("astro:page-load", () => {
-      const root = document.getElementById("nm-services-wizard");
-      if (!(root instanceof HTMLElement)) return;
+      const input = document.getElementById("discovery-search");
+      const resultsEl = document.getElementById("discovery-results");
+      const gapEl = document.getElementById("discovery-gap");
+      const gapText = document.getElementById("discovery-gap-text");
+      const gapWa = document.getElementById("discovery-gap-wa");
+      const listEl = document.getElementById("discovery-archive-list");
+      const statusEl = document.getElementById("discovery-archive-status");
 
-      const stages = JSON.parse(root.getAttribute("data-services-stages") || "[]");
-      let currentStep = 1;
-      let selectedStage = null;
-      let selectedService = null;
+      if (
+        !(input instanceof HTMLInputElement) ||
+        !(resultsEl instanceof HTMLElement) ||
+        !(gapEl instanceof HTMLElement) ||
+        !(gapText instanceof HTMLElement) ||
+        !(gapWa instanceof HTMLAnchorElement) ||
+        !(listEl instanceof HTMLElement) ||
+        !(statusEl instanceof HTMLElement)
+      ) {
+        return;
+      }
 
-      const dots = Array.from(root.querySelectorAll("[data-step-dot]"));
-      const panels = Array.from(root.querySelectorAll("[data-step-panel]"));
-      const stepLabel = root.querySelector("#wizard-step-label");
-      const breadcrumbNode = root.querySelector("#wizard-breadcrumb");
-      const backButton = root.querySelector("#wizard-back");
-      const step2TitleNode = root.querySelector("#wizard-step2-title");
-      const step2OptionsNode = root.querySelector("#wizard-step2-options");
-      const step2Skeleton = root.querySelector("#wizard-step2-skeleton");
-      const step2EmptyNode = root.querySelector("#wizard-step2-empty");
-      const step2ErrorNode = root.querySelector("#wizard-step2-error");
-      const summaryTitle = root.querySelector("#wizard-track-title");
-      const summarySubtitle = root.querySelector("#wizard-track-subtitle");
-      const summaryDescription = root.querySelector("#wizard-track-description");
-      const summaryFeatures = root.querySelector("#wizard-track-features");
-      const mainCta = root.querySelector("#wizard-main-cta");
-      const secondaryCta = root.querySelector("#wizard-secondary-cta");
+      let debounceTimer = 0;
+      let requestId = 0;
 
-      const toMoney = (value) => `${Number(value || 0).toLocaleString("he-IL")} ₪`;
+      function hideAll() {
+        resultsEl.classList.add("hidden");
+        resultsEl.classList.remove("grid");
+        gapEl.classList.add("hidden");
+        listEl.innerHTML = "";
+        statusEl.classList.add("hidden");
+        statusEl.textContent = "";
+      }
 
-      const setStep = (step) => {
-        currentStep = step;
-        panels.forEach((panel) => {
-          if (!(panel instanceof HTMLElement)) return;
-          panel.classList.toggle("hidden", panel.dataset.stepPanel !== String(step));
-          panel.classList.add("wizard-fade-in");
-        });
-        dots.forEach((dot, index) => {
-          if (!(dot instanceof HTMLElement)) return;
-          dot.classList.toggle("bg-[var(--nm-accent)]", index < step);
-          dot.classList.toggle("bg-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)]", index >= step);
-        });
-        if (stepLabel instanceof HTMLElement) stepLabel.textContent = `שלב ${step}`;
-        if (breadcrumbNode instanceof HTMLElement) {
-          if (step === 1) breadcrumbNode.textContent = "מסגרת";
-          if (step === 2 && selectedStage) breadcrumbNode.textContent = `מסגרת > ${selectedStage.stage_name}`;
-          if (step === 3 && selectedService) breadcrumbNode.textContent = `מסגרת > שירות > ${selectedService.title}`;
-        }
-        if (backButton instanceof HTMLButtonElement) {
-          backButton.disabled = step === 1;
-          backButton.classList.toggle("opacity-40", step === 1);
-        }
-      };
-
-      const renderStageServices = () => {
-        if (!(step2TitleNode instanceof HTMLElement) || !(step2OptionsNode instanceof HTMLElement)) return;
-        if (!selectedStage) return;
-
-        step2TitleNode.textContent = selectedStage.stage_name || "";
-        if (step2ErrorNode instanceof HTMLElement) step2ErrorNode.classList.add("hidden");
-        const services = Array.isArray(selectedStage.services) ? selectedStage.services : [];
-        if (!services.length) {
-          step2OptionsNode.innerHTML = "";
-          if (step2EmptyNode instanceof HTMLElement) step2EmptyNode.classList.remove("hidden");
+      async function runQuery(raw) {
+        const q = raw.trim();
+        if (q.length < MIN_LEN) {
+          hideAll();
           return;
         }
 
-        if (step2EmptyNode instanceof HTMLElement) step2EmptyNode.classList.add("hidden");
-        if (step2Skeleton instanceof HTMLElement) step2Skeleton.classList.remove("hidden");
-        if (step2OptionsNode instanceof HTMLElement) step2OptionsNode.classList.add("hidden");
-        step2OptionsNode.innerHTML = services
-          .map((service) => {
-            const badges = Array.isArray(service.badges) ? service.badges : [];
-            const badgeIcon = (badge) => {
-              const source = String(badge || "").toLowerCase();
-              if (source.includes("טלפון")) return "📞";
-              if (source.includes("קבוצה")) return "👥";
-              if (source.includes("צילום")) return "🎥";
-              if (source.includes("דיסקרט")) return "🔒";
-              if (source.includes("ללא")) return "•";
-              return "•";
-            };
-            const scarcity =
-              service.availability && typeof service.availability.spots_left === "number"
-                ? `<p class="mt-2 text-xs text-[color-mix(in_srgb,var(--nm-fg)_58%,var(--nm-bg))]">נותרו ${service.availability.spots_left} מקומות כרגע</p>`
-                : "";
-            return `<button type="button" data-service-id="${service.id}" class="w-full rounded-[1.4rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] px-5 py-5 text-right transition hover:border-[color-mix(in_srgb,var(--nm-accent)_24%,transparent)] hover:bg-[var(--nm-surface-muted)]">
-              <div class="flex items-start justify-between gap-3">
-                <div>
-                  <p class="text-base font-semibold text-[var(--nm-fg)]">${service.title || ""}</p>
-                  <p class="mt-1 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">${service.subtitle || ""}</p>
-                </div>
-                <p class="text-sm font-semibold text-[var(--nm-accent)]">${toMoney(service.price_full)}</p>
-              </div>
-              <div class="mt-3 flex flex-wrap justify-end gap-2">
-                ${badges.map((badge) => `<span class="rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-2.5 py-1 text-xs font-semibold text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">${badgeIcon(badge)} ${badge}</span>`).join("")}
-              </div>
-              ${scarcity}
-            </button>`;
-          })
+        const myId = ++requestId;
+        gapEl.classList.add("hidden");
+        resultsEl.classList.remove("hidden");
+        resultsEl.classList.add("grid");
+        statusEl.classList.remove("hidden");
+        statusEl.textContent = "מחפשים בארכיון…";
+        listEl.innerHTML = "";
+
+        let rows = [];
+        try {
+          rows = await runPagefindSearch(q, LIMIT);
+        } catch {
+          rows = [];
+        }
+
+        if (myId !== requestId) return;
+
+        statusEl.classList.add("hidden");
+        statusEl.textContent = "";
+
+        if (rows.length === 0) {
+          resultsEl.classList.add("hidden");
+          resultsEl.classList.remove("grid");
+          gapEl.classList.remove("hidden");
+          gapText.textContent = contentGapMessage;
+          gapWa.href = waHrefForTopic(q);
+          return;
+        }
+
+        gapEl.classList.add("hidden");
+        listEl.innerHTML = rows
+          .map(
+            (r) => `<a href="${escapeHtml(r.url)}" class="block rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[color-mix(in_srgb,var(--nm-bg-canvas)_88%,transparent)] px-4 py-4 text-right transition hover:border-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)] hover:bg-[var(--nm-surface-muted)]"><p class="font-semibold text-[var(--nm-fg)]">${escapeHtml(r.title)}</p><div class="mt-1 text-sm leading-6 text-[color-mix(in_srgb,var(--nm-fg)_62%,var(--nm-bg))]">${r.excerpt}</div></a>`
+          )
           .join("");
-
-        window.setTimeout(() => {
-          if (step2Skeleton instanceof HTMLElement) step2Skeleton.classList.add("hidden");
-          if (step2OptionsNode instanceof HTMLElement) step2OptionsNode.classList.remove("hidden");
-          step2OptionsNode.querySelectorAll("[data-service-id]").forEach((button, idx) => {
-            if (!(button instanceof HTMLElement)) return;
-            button.style.animationDelay = `${idx * 60}ms`;
-            button.classList.add("wizard-stagger-item");
-          });
-        }, 180);
-
-        step2OptionsNode.querySelectorAll("[data-service-id]").forEach((button) => {
-          button.addEventListener("click", () => {
-            if (!(button instanceof HTMLElement)) return;
-            const serviceId = button.dataset.serviceId;
-            selectedService = services.find((service) => service.id === serviceId) || null;
-            if (!selectedService) return;
-            renderSummary();
-            setStep(3);
-          });
-        });
-      };
-
-      const renderSummary = () => {
-        if (!selectedService) return;
-        if (summaryTitle instanceof HTMLElement) summaryTitle.textContent = selectedService.title || "";
-        if (summarySubtitle instanceof HTMLElement) summarySubtitle.textContent = selectedService.subtitle || "";
-        if (summaryDescription instanceof HTMLElement) summaryDescription.textContent = selectedService.description || "";
-
-        if (summaryFeatures instanceof HTMLElement) {
-          const list = Array.isArray(selectedService.features) ? selectedService.features : [];
-          summaryFeatures.innerHTML = list
-            .map((feature) => {
-              const text = typeof feature === "string" ? feature : feature?.text || "";
-              return `<li>• ${text}</li>`;
-            })
-            .join("");
-        }
-
-        if (mainCta instanceof HTMLAnchorElement) {
-          mainCta.href = selectedService.payment_link || "#";
-          mainCta.textContent = selectedService.payment_cta || `מעבר להמשך - ${toMoney(selectedService.price_full)}`;
-          mainCta.target = "_blank";
-        }
-        if (secondaryCta instanceof HTMLAnchorElement) {
-          const waMessage = `[Lead | Source: שירותים | Page: ${selectedStage?.stage_name || "מסלולים"}]\nמחשבה אחת נקייה – ישר לוואטסאפ\n\nיש לי שאלה על ${selectedService.title} (${toMoney(selectedService.price_full)}).`;
-          secondaryCta.href = buildWhatsAppHref(waMessage);
-        }
-      };
-
-      root.querySelectorAll("[data-stage-id]").forEach((button) => {
-        button.addEventListener("click", () => {
-          if (!(button instanceof HTMLElement)) return;
-          const stageId = button.dataset.stageId;
-          selectedStage = stages.find((stage) => stage.stage_id === stageId) || null;
-          selectedService = null;
-          renderStageServices();
-          setStep(2);
-        });
-      });
-
-      if (backButton instanceof HTMLButtonElement) {
-        backButton.addEventListener("click", () => {
-          if (currentStep === 3) return setStep(2);
-          if (currentStep === 2) {
-            selectedStage = null;
-            selectedService = null;
-            return setStep(1);
-          }
-        });
       }
 
-      setStep(1);
-      document.body.classList.add("is-focus-mode");
-      window.addEventListener("pagehide", () => {
-        document.body.classList.remove("is-focus-mode");
+      function scheduleRun() {
+        window.clearTimeout(debounceTimer);
+        debounceTimer = window.setTimeout(() => runQuery(input.value), DEBOUNCE_MS);
+      }
+
+      input.addEventListener("input", scheduleRun);
+      input.addEventListener("search", scheduleRun);
+
+      document.querySelectorAll("[data-discovery-tag]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          if (!(btn instanceof HTMLElement)) return;
+          const tag = btn.dataset.discoveryTag || "";
+          input.value = tag;
+          window.clearTimeout(debounceTimer);
+          void runQuery(tag);
+        });
       });
+
+      const params = new URLSearchParams(window.location.search);
+      const fromUrl = (params.get("topic") || params.get("q") || "").trim();
+      if (fromUrl.length >= MIN_LEN) {
+        input.value = fromUrl;
+        window.clearTimeout(debounceTimer);
+        void runQuery(fromUrl);
+      }
     });
   </script>
-
-  <style>
-    .wizard-panel {
-      opacity: 1;
-      transform: translateY(0);
-      transition:
-        opacity 220ms ease,
-        transform 220ms ease;
-    }
-
-    .wizard-panel.hidden {
-      opacity: 0;
-      transform: translateY(10px);
-      pointer-events: none;
-    }
-
-    .wizard-fade-in {
-      animation: wizard-fade-in 220ms ease;
-    }
-
-    .wizard-stagger-item {
-      opacity: 0;
-      animation: wizard-card-stagger 320ms ease forwards;
-    }
-
-    @keyframes wizard-fade-in {
-      from {
-        opacity: 0;
-        transform: translateY(8px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    @keyframes wizard-card-stagger {
-      from {
-        opacity: 0;
-        transform: translateY(10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-  </style>
 </Layout>

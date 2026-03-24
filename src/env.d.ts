@@ -1,5 +1,13 @@
 /// <reference types="astro/client" />
 
+interface ImportMetaEnv {
+  readonly PUBLIC_CLIENT_LOG_URL?: string;
+}
+
+interface ImportMeta {
+  readonly env: ImportMetaEnv;
+}
+
 declare namespace astroHTML.JSX {
   interface IntrinsicElements {
     "lite-youtube": {

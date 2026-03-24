@@ -28,6 +28,8 @@ const articles = defineCollection({
     draft: z.boolean().default(false),
     workflowStatus: z.enum(["writing", "review", "ready", "published"]).optional(),
     difficultyLevel: z.enum(["beginner", "advanced", "deep"]).optional(),
+    /** שכבת עומק: זוויות היפוך / ספקנות (אופציונלי, מוצג במאמר אם קיים) */
+    inversionNote: z.string().optional(),
     reflectionQuestions: z.array(z.string()).length(3).optional(),
     /** slugs או כותרות מושגים לקישור לגלוסה */
     relatedConcepts: z.array(z.string()).optional(),

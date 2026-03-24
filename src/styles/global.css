@@ -44,6 +44,8 @@
 
   --nm-grid: color-mix(in srgb, var(--color-text-primary) 6%, transparent);
   --nm-nav-top: 1.5rem;
+  /* באנר "בהרצה" בראש כל עמוד (Layout) */
+  --nm-staging-banner-height: 3.5rem;
 }
 
 /* נגישות: הגדלת טקסט (A11yWidget) */

@@ -1,7 +1,6 @@
 ---
 import { getCollection } from "astro:content";
 import Layout from "../layouts/Layout.astro";
-import { Star } from "lucide-react";
 import ThoughtShiftProof from "../components/ThoughtShiftProof.astro";
 import LogicCanvas from "../components/LogicCanvas.astro";
 import KnowledgeCenter from "../components/KnowledgeCenter.astro";
@@ -85,7 +84,7 @@ const stageCards = servicesStages
     </section>
   </section>
 
-  <section class="mx-auto max-w-7xl border-t border-neutral-200 px-6 py-20 md:py-24">
+  <section class="mx-auto max-w-7xl border-t border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-6 py-20 md:py-24">
     <ThoughtShiftProof
       items={servicesThoughtShifts}
       heading="לא עוד המלצה. שינוי במבנה החשיבה."
@@ -111,7 +110,12 @@ const stageCards = servicesStages
           title={`לקריאת המאמר: ${article.data.title}`}
           class="group block rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)]/90 p-6 backdrop-blur-md transition-all duration-300 hover:border-[color-mix(in_srgb,var(--nm-accent)_28%,transparent)] md:p-8"
         >
-          <div class="mb-4 flex items-center gap-2 text-[var(--nm-accent)]"><Star className="h-4 w-4" /><span class="text-xs font-semibold uppercase tracking-[0.16em]">חקירה שקטה</span></div>
+          <div class="mb-4 flex items-center gap-2 text-[var(--nm-accent)]">
+            <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+            </svg>
+            <span class="text-xs font-semibold uppercase tracking-[0.16em]">חקירה שקטה</span>
+          </div>
           <h3 class="mb-4 text-xl font-bold text-[var(--nm-fg)] decoration-[color-mix(in_srgb,var(--nm-fg)_35%,transparent)] underline-offset-4 group-hover:underline md:text-2xl">{article.data.title}</h3>
           <p class="mb-6 text-base text-[color-mix(in_srgb,var(--nm-fg)_65%,var(--nm-bg))]">{article.data.description}</p>
           <span class="inline-block border-b border-[var(--nm-fg)] pb-0.5 text-sm font-semibold text-[var(--nm-fg)]">לקריאה שקטה ←</span>
