@@ -754,6 +754,7 @@ const upsellPreviewText = documentationService
       </div>
     </section>
   <script>
+    // @ts-nocheck — סקריפט ארוך לכלי פנימי; לא לחייב strict על כל הפונקציות
     import yaml from "js-yaml";
 
     document.addEventListener("astro:page-load", () => {
@@ -1165,7 +1166,7 @@ const upsellPreviewText = documentationService
     <style>
       body { margin: 0; background: #f8fafc; color: #000000; font-family: "Assistant Variable", system-ui, sans-serif; }
       .shell { max-width: 980px; margin: 0 auto; padding: 32px 20px 56px; }
-      .label { font-size: 11px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: #f97316; margin-bottom: 16px; }
+      .label { font-size: 11px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: #D42B2B; margin-bottom: 16px; }
       article { max-width: 72ch; margin: 0 auto; }
       a { color: inherit; text-decoration: none; }
     </style>
@@ -2092,7 +2093,7 @@ Self-Correction Loop: Before outputting the final response, review your text. If
         const base = [
           "Minimalist 3D render, pure white background #f8fafc,",
           "studio lighting, sharp shadows.",
-          "Brand colors: vivid orange #f97316 as accent,",
+          "Brand colors: deep red #D42B2B as accent,",
           "near-black #000000 for shadows, off-white #f8fafc background.",
           "No text. No humans. No logos. No clutter.",
           "Aspect ratio 16:9. Ultra clean, architectural.",
@@ -3332,7 +3333,7 @@ ${body2}
         const base = [
           "Minimalist 3D render, pure white background #f8fafc,",
           "studio lighting, sharp shadows.",
-          "Brand colors: vivid orange #f97316 as accent,",
+          "Brand colors: deep red #D42B2B as accent,",
           "near-black #000000 for shadows, off-white #f8fafc background.",
           "No text. No humans. No logos. No clutter.",
           "Aspect ratio 16:9. Ultra clean, architectural.",

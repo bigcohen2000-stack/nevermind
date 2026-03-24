@@ -55,37 +55,37 @@ const defaultNode = problemRootNodes[0];
 
               <defs>
                 <linearGradient id="problemCard" x1="0" x2="1">
-                  <stop offset="0%" stop-color="#ffffff" />
-                  <stop offset="100%" stop-color="#fff8f7" />
+                  <stop offset="0%" stop-color="var(--nm-bg-canvas)" />
+                  <stop offset="100%" stop-color="color-mix(in srgb, var(--nm-accent) 5%, var(--nm-bg-canvas))" />
                 </linearGradient>
               </defs>
 
-              <line x1="550" y1="190" x2="250" y2="420" stroke="rgba(26,26,26,0.14)" stroke-width="3" />
-              <line x1="550" y1="190" x2="550" y2="420" stroke="rgba(26,26,26,0.14)" stroke-width="3" />
-              <line x1="550" y1="190" x2="850" y2="420" stroke="rgba(26,26,26,0.14)" stroke-width="3" />
+              <line x1="550" y1="190" x2="250" y2="420" stroke="color-mix(in srgb, var(--nm-fg) 14%, transparent)" stroke-width="3" />
+              <line x1="550" y1="190" x2="550" y2="420" stroke="color-mix(in srgb, var(--nm-fg) 14%, transparent)" stroke-width="3" />
+              <line x1="550" y1="190" x2="850" y2="420" stroke="color-mix(in srgb, var(--nm-fg) 14%, transparent)" stroke-width="3" />
 
               <g>
-                <rect x="320" y="70" rx="34" ry="34" width="460" height="140" fill="url(#problemCard)" stroke="rgba(212,43,43,0.22)" stroke-width="3" />
-                <text x="550" y="130" text-anchor="middle" font-size="20" font-weight="600" fill="#f97316">הבעיה הגלויה</text>
-                <text data-svg-problem-label x="550" y="172" text-anchor="middle" font-size="38" font-weight="700" fill="#000000">{defaultNode.shortLabel}</text>
+                <rect x="320" y="70" rx="34" ry="34" width="460" height="140" fill="url(#problemCard)" stroke="color-mix(in srgb, var(--nm-accent) 22%, transparent)" stroke-width="3" />
+                <text x="550" y="130" text-anchor="middle" font-size="20" font-weight="600" fill="var(--nm-accent)">הבעיה הגלויה</text>
+                <text data-svg-problem-label x="550" y="172" text-anchor="middle" font-size="38" font-weight="700" fill="var(--nm-fg)">{defaultNode.shortLabel}</text>
               </g>
 
               <g data-svg-root-card="0">
-                <rect x="70" y="420" rx="30" ry="30" width="360" height="210" fill="#ffffff" stroke="rgba(26,26,26,0.1)" stroke-width="2" />
-                <text data-svg-root-title="0" x="250" y="485" text-anchor="middle" font-size="27" font-weight="700" fill="#000000">{defaultNode.roots[0].title}</text>
-                <text data-svg-root-description="0" x="250" y="535" text-anchor="middle" font-size="18" fill="rgba(26,26,26,0.66)"><tspan x="250" dy="0">{defaultNode.roots[0].description}</tspan></text>
+                <rect x="70" y="420" rx="30" ry="30" width="360" height="210" fill="var(--nm-bg-canvas)" stroke="color-mix(in srgb, var(--nm-fg) 10%, transparent)" stroke-width="2" />
+                <text data-svg-root-title="0" x="250" y="485" text-anchor="middle" font-size="27" font-weight="700" fill="var(--nm-fg)">{defaultNode.roots[0].title}</text>
+                <text data-svg-root-description="0" x="250" y="535" text-anchor="middle" font-size="18" fill="color-mix(in srgb, var(--nm-fg) 66%, var(--nm-bg-canvas))"><tspan x="250" dy="0">{defaultNode.roots[0].description}</tspan></text>
               </g>
 
               <g data-svg-root-card="1">
-                <rect x="370" y="420" rx="30" ry="30" width="360" height="210" fill="#ffffff" stroke="rgba(26,26,26,0.1)" stroke-width="2" />
-                <text data-svg-root-title="1" x="550" y="485" text-anchor="middle" font-size="27" font-weight="700" fill="#000000">{defaultNode.roots[1].title}</text>
-                <text data-svg-root-description="1" x="550" y="535" text-anchor="middle" font-size="18" fill="rgba(26,26,26,0.66)"><tspan x="550" dy="0">{defaultNode.roots[1].description}</tspan></text>
+                <rect x="370" y="420" rx="30" ry="30" width="360" height="210" fill="var(--nm-bg-canvas)" stroke="color-mix(in srgb, var(--nm-fg) 10%, transparent)" stroke-width="2" />
+                <text data-svg-root-title="1" x="550" y="485" text-anchor="middle" font-size="27" font-weight="700" fill="var(--nm-fg)">{defaultNode.roots[1].title}</text>
+                <text data-svg-root-description="1" x="550" y="535" text-anchor="middle" font-size="18" fill="color-mix(in srgb, var(--nm-fg) 66%, var(--nm-bg-canvas))"><tspan x="550" dy="0">{defaultNode.roots[1].description}</tspan></text>
               </g>
 
               <g data-svg-root-card="2">
-                <rect x="670" y="420" rx="30" ry="30" width="360" height="210" fill="#ffffff" stroke="rgba(26,26,26,0.1)" stroke-width="2" />
-                <text data-svg-root-title="2" x="850" y="485" text-anchor="middle" font-size="27" font-weight="700" fill="#000000">{defaultNode.roots[2].title}</text>
-                <text data-svg-root-description="2" x="850" y="535" text-anchor="middle" font-size="18" fill="rgba(26,26,26,0.66)"><tspan x="850" dy="0">{defaultNode.roots[2].description}</tspan></text>
+                <rect x="670" y="420" rx="30" ry="30" width="360" height="210" fill="var(--nm-bg-canvas)" stroke="color-mix(in srgb, var(--nm-fg) 10%, transparent)" stroke-width="2" />
+                <text data-svg-root-title="2" x="850" y="485" text-anchor="middle" font-size="27" font-weight="700" fill="var(--nm-fg)">{defaultNode.roots[2].title}</text>
+                <text data-svg-root-description="2" x="850" y="535" text-anchor="middle" font-size="18" fill="color-mix(in srgb, var(--nm-fg) 66%, var(--nm-bg-canvas))"><tspan x="850" dy="0">{defaultNode.roots[2].description}</tspan></text>
               </g>
             </svg>
           </div>
@@ -93,7 +93,7 @@ const defaultNode = problemRootNodes[0];
 
         <section class="grid gap-4 md:grid-cols-3" data-root-cards>
           {defaultNode.roots.map((root, index) => (
-            <article class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/86 p-5 shadow-[0_18px_50px_rgba(26,26,26,0.05)]" data-root-card={index}>
+            <article class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)]/90 p-5 shadow-[0_18px_50px_color-mix(in_srgb,var(--nm-fg)_5%,transparent)]" data-root-card={index}>
               <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">שורש {index + 1}</p>
               <h3 class="mt-3 text-xl font-semibold text-[var(--nm-fg)]" data-root-title={index}>{root.title}</h3>
               <p class="mt-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]" data-root-description={index}>{root.description}</p>
@@ -158,13 +158,20 @@ const defaultNode = problemRootNodes[0];
             if (svgRootCard instanceof SVGGElement) {
               const rect = svgRootCard.querySelector("rect");
               if (rect) {
-                rect.setAttribute("stroke", index === 1 ? "rgba(212,43,43,0.22)" : "rgba(26,26,26,0.1)");
+                rect.setAttribute(
+                  "stroke",
+                  index === 1 ? "color-mix(in srgb, var(--nm-accent) 22%, transparent)" : "color-mix(in srgb, var(--nm-fg) 10%, transparent)",
+                );
               }
             }
 
             if (card instanceof HTMLElement) {
-              card.style.background = index === 1 ? "#FFF7F6" : "rgba(255,255,255,0.86)";
-              card.style.borderColor = index === 1 ? "rgba(212,43,43,0.16)" : "rgba(26,26,26,0.1)";
+              card.style.background =
+                index === 1
+                  ? "color-mix(in srgb, var(--nm-accent) 6%, var(--nm-bg-canvas))"
+                  : "color-mix(in srgb, var(--nm-bg-canvas) 86%, transparent)";
+              card.style.borderColor =
+                index === 1 ? "color-mix(in srgb, var(--nm-accent) 16%, transparent)" : "color-mix(in srgb, var(--nm-fg) 10%, transparent)";
             }
           });
         };

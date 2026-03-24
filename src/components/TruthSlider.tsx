@@ -72,7 +72,7 @@ export default function TruthSlider() {
           style={{ clipPath: `inset(0 ${100 - value}% 0 0)` }}
         >
           <div className="grid gap-8 md:grid-cols-2">
-            <div className="space-y-4 text-[#2A1C12]">
+            <div className="space-y-4 text-[var(--nm-fg)]">
               <h3 className="text-[clamp(1.2rem,1.05rem+0.6vw,1.6rem)] font-semibold">
                 הדרך הישנה
               </h3>
@@ -85,7 +85,7 @@ export default function TruthSlider() {
                 ))}
               </ul>
             </div>
-            <div className="space-y-4 text-[#2A1C12]">
+            <div className="space-y-4 text-[var(--nm-fg)]">
               <h3 className="text-[clamp(1.2rem,1.05rem+0.6vw,1.6rem)] font-semibold">
                 דרך NeverMind
               </h3>

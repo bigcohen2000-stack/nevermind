@@ -26,10 +26,11 @@ const inquiries = [
 >
   <div class="rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/92 p-6 shadow-[0_24px_70px_rgba(26,26,26,0.06)] md:p-8">
     <header class="space-y-3 text-right">
-      <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--nm-accent)]">NeverMind Knowledge Center</p>
-      <h2 class="text-[clamp(1.8rem,1.5rem+1.2vw,2.6rem)] font-semibold text-[var(--nm-fg)]">חיפוש שמתחיל גילוי, לא רק התאמה</h2>
+      <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--nm-accent)]">גילוי</p>
+      <h2 class="text-[clamp(1.8rem,1.5rem+1.2vw,2.6rem)] font-semibold text-[var(--nm-fg)]">מרכז הידע של NeverMind</h2>
+      <p class="max-w-3xl text-[clamp(1rem,0.95rem+0.3vw,1.15rem)] font-semibold leading-8 text-[var(--nm-fg)]">מה מעסיק אותך כרגע?</p>
       <p class="max-w-3xl text-[clamp(1rem,0.95rem+0.3vw,1.15rem)] leading-8 text-[color-mix(in_srgb,var(--nm-fg)_66%,var(--nm-bg))]">
-        כתוב שאלה אמיתית, או בחר אחת מהשאלות הנפוצות. המערכת מחזירה את המאמרים הכי רלוונטיים עכשיו.
+        נסה לחפש: בהירות, פרדוקס, או איך פותרים בעיית שורש.
       </p>
     </header>
 
@@ -37,9 +38,9 @@ const inquiries = [
       <input
         id="knowledge-search-input"
         type="search"
-        placeholder="מה אתה רוצה להבין עכשיו?"
+        placeholder="מה מעסיק אותך כרגע?"
         class="w-full rounded-[1.5rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-white px-5 py-4 text-right text-[clamp(1.05rem,1rem+0.3vw,1.2rem)] text-[var(--nm-fg)] outline-none transition focus:border-[color-mix(in_srgb,var(--nm-accent)_38%,transparent)] focus:ring-2 focus:ring-[color-mix(in_srgb,var(--nm-accent)_18%,transparent)]"
-        aria-label="חיפוש ב-Knowledge Center"
+        aria-label="מה מעסיק אותך כרגע? — חיפוש במרכז הידע של NeverMind"
       />
     </div>
 
@@ -63,9 +64,9 @@ const inquiries = [
         {featured.map((item) => (
           <a
             href={item.href}
-            class="group rounded-[1.4rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white px-4 py-4 text-right transition hover:border-[color-mix(in_srgb,#1E3A8A_32%,transparent)] hover:bg-[color-mix(in_srgb,#1E3A8A_5%,white)]"
+            class="group rounded-[1.4rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white px-4 py-4 text-right transition hover:border-[color-mix(in_srgb,var(--nm-accent)_32%,transparent)] hover:bg-[var(--nm-tint)]"
           >
-            <p class="text-sm font-semibold text-[#1E3A8A]">מומלץ עבורך כרגע</p>
+            <p class="text-sm font-semibold text-[var(--nm-accent)]">מומלץ עבורך כרגע</p>
             <h3 class="mt-2 text-[1.05rem] font-semibold text-[var(--nm-fg)]">{item.title}</h3>
             <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_64%,var(--nm-bg))]">{item.description}</p>
           </a>
@@ -114,7 +115,7 @@ const inquiries = [
           .map(
             (item) => `
               <li>
-                <a href="${item.url}" class="block rounded-[1.25rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white px-4 py-3 text-right transition hover:border-[color-mix(in_srgb,#1E3A8A_30%,transparent)] hover:bg-[color-mix(in_srgb,#1E3A8A_5%,white)]">
+                <a href="${item.url}" class="block rounded-[1.25rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white px-4 py-3 text-right transition hover:border-[color-mix(in_srgb,var(--nm-accent)_30%,transparent)] hover:bg-[var(--nm-tint)]">
                   <p class="text-[1rem] font-semibold text-[var(--nm-fg)]">${item.title || ""}</p>
                   <p class="mt-1 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_66%,var(--nm-bg))]">${item.excerpt || ""}</p>
                 </a>
@@ -130,13 +131,14 @@ const inquiries = [
         const runId = activeRun;
 
         if (!trimmed) {
-          status.textContent = "התחל משאלה קצרה, או לחץ על אחת השאלות הנפוצות.";
+          status.textContent =
+            "מה מעסיק אותך כרגע? התחל לכתוב, או בחר אחת מהשאלות כדי לראות מה נחשף.";
           resultsList.innerHTML = "";
           emptyState.classList.remove("hidden");
           return;
         }
 
-        status.textContent = "מחפש עבורך...";
+        status.textContent = "מחפשים מה מתאים…";
         emptyState.classList.add("hidden");
 
         try {
@@ -146,7 +148,7 @@ const inquiries = [
           if (runId !== activeRun) return;
 
           if (!data.length) {
-            status.textContent = "לא נמצאו תוצאות מדויקות. נסה לנסח אחרת או לבחור שאלה נפוצה.";
+            status.textContent = "עדיין לא נחשף התאמה חדה. אפשר לנסח אחרת או לבחור שאלה מהרשימה — לפעמים הגילוי מגיע מהזזה קטנה בשאלה.";
             resultsList.innerHTML = "";
             const gapKey = trimmed.toLowerCase();
             if (!loggedGapQueries.has(gapKey)) {
@@ -160,7 +162,7 @@ const inquiries = [
             return;
           }
 
-          status.textContent = `נמצאו ${data.length} תוצאות רלוונטיות.`;
+          status.textContent = `נחשפו ${data.length} כיוונים רלוונטיים.`;
           renderResults(
             data.map((item) => ({
               url: item.url || "#",
@@ -170,7 +172,7 @@ const inquiries = [
           );
         } catch {
           if (runId !== activeRun) return;
-          status.textContent = "החיפוש לא זמין כרגע. נסה שוב בעוד רגע.";
+          status.textContent = "החיפוש לא זמין כרגע. רגע והמסלול יתבהר שוב.";
           resultsList.innerHTML = "";
         }
       };
@@ -192,7 +194,8 @@ const inquiries = [
       if (Array.isArray(featured) && featured.length === 0) {
         emptyState.classList.add("hidden");
       }
-      status.textContent = "התחל משאלה קצרה, או לחץ על אחת השאלות הנפוצות.";
+      status.textContent =
+        "מה מעסיק אותך כרגע? התחל לכתוב, או בחר אחת מהשאלות כדי לראות מה נחשף.";
     });
   </script>
 </section>

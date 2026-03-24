@@ -1,28 +1,27 @@
 @import "tailwindcss";
 
-/* מצב כהה: class על html או data-theme="dark" */
-@custom-variant dark (&:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *));
-
 /**
- * משתנים סמנטיים — מרוכזים בלבד.
- * שמות תואמים ל־--color-* כפי שביקשת + קידומת nm לשימוש באתר.
+ * פלטת NeverMind / השם לא משנה — בוטיק, ללא Dark Mode.
+ * רקע, טקסט, אדום דגש בלבד (+ נגזרות mix).
  */
 :root {
   color-scheme: light;
 
-  --color-text-primary: #000000;
-  --color-text-secondary: #334155;
-  --color-surface-page: #f8fafc;
-  --color-surface-canvas: #ffffff;
-  --color-surface-muted: #f8fafc;
-  --color-accent: #f97316;
-  --color-accent-hover: #ea580c;
-  --color-on-accent: #000000;
-  --color-inverse-bg: #0f172a;
-  --color-inverse-bg-hover: #020617;
-  --color-inverse-fg: #f1f5f9;
-  --color-code-bg: #0f172a;
-  --color-code-fg: #f1f5f9;
+  /* מקור האמת — #1A1A1A טקסט, #FAFAF8 משטח, #D42B2B דגש */
+  --color-text-primary: #1a1a1a;
+  --color-surface-page: #fafaf8;
+  --color-surface-canvas: #fafaf8;
+  --color-text-secondary: color-mix(in srgb, var(--color-text-primary) 62%, var(--color-surface-page));
+  --color-surface-muted: color-mix(in srgb, var(--color-text-primary) 4%, var(--color-surface-page));
+  --color-accent: #d42b2b;
+  --color-accent-hover: color-mix(in srgb, var(--color-accent) 88%, var(--color-text-primary));
+  --color-on-accent: #fafaf8;
+  /* כפתורים כהים / בלוקי ניגוד — שחור מותג על רקע בהיר */
+  --color-inverse-bg: #1a1a1a;
+  --color-inverse-bg-hover: color-mix(in srgb, var(--color-inverse-bg) 85%, var(--color-accent));
+  --color-inverse-fg: #fafaf8;
+  --color-code-bg: #1a1a1a;
+  --color-code-fg: #fafaf8;
 
   --nm-fg: var(--color-text-primary);
   --nm-fg-secondary: var(--color-text-secondary);
@@ -39,35 +38,44 @@
   --nm-code-bg: var(--color-code-bg);
   --nm-code-fg: var(--color-code-fg);
 
-  --nm-tint: color-mix(in srgb, var(--nm-accent) 11%, var(--nm-bg-canvas));
-  --nm-tint-hover: color-mix(in srgb, var(--nm-accent) 17%, var(--nm-bg-canvas));
-  --nm-tint-strong: color-mix(in srgb, var(--nm-accent) 24%, var(--nm-bg-canvas));
+  --nm-tint: color-mix(in srgb, var(--nm-accent) 9%, var(--nm-bg-canvas));
+  --nm-tint-hover: color-mix(in srgb, var(--nm-accent) 14%, var(--nm-bg-canvas));
+  --nm-tint-strong: color-mix(in srgb, var(--nm-accent) 20%, var(--nm-bg-canvas));
 
-  --nm-grid: color-mix(in srgb, #0f172a 7%, transparent);
+  --nm-grid: color-mix(in srgb, var(--color-text-primary) 6%, transparent);
   --nm-nav-top: 1.5rem;
 }
 
-html.dark,
-html[data-theme="dark"] {
-  color-scheme: dark;
+/* נגישות: הגדלת טקסט (A11yWidget) */
+html[data-nm-a11y-font="lg"] body {
+  font-size: 1.25rem;
+}
+html[data-nm-a11y-font="xl"] body {
+  font-size: 1.375rem;
+}
 
-  --color-text-primary: #f1f5f9;
-  --color-text-secondary: #94a3b8;
-  --color-surface-page: #0f172a;
-  --color-surface-canvas: #1e293b;
-  --color-surface-muted: #1e293b;
-  --color-on-accent: #0f172a;
-  --color-inverse-bg: #f8fafc;
-  --color-inverse-bg-hover: #e2e8f0;
-  --color-inverse-fg: #0f172a;
-  --color-code-bg: #020617;
-  --color-code-fg: #f1f5f9;
+/* נגישות: ניגודיות גבוהה */
+html[data-nm-a11y-contrast="high"] {
+  --nm-fg: #0a0a0a;
+  --nm-fg-secondary: #1a1a1a;
+  --nm-bg: #ffffff;
+  --nm-bg-canvas: #ffffff;
+  --nm-surface-muted: #f0f0ee;
+  --nm-grid: color-mix(in srgb, #1a1a1a 12%, transparent);
+}
+html[data-nm-a11y-contrast="high"] body {
+  background-color: var(--nm-bg);
+  color: var(--nm-fg);
+}
 
-  --nm-tint: color-mix(in srgb, var(--nm-accent) 14%, var(--nm-bg-canvas));
-  --nm-tint-hover: color-mix(in srgb, var(--nm-accent) 20%, var(--nm-bg-canvas));
-  --nm-tint-strong: color-mix(in srgb, var(--nm-accent) 28%, var(--nm-bg-canvas));
-
-  --nm-grid: color-mix(in srgb, #f1f5f9 9%, transparent);
+/* נגישות: הדגשת קישורים */
+html[data-nm-a11y-links="on"] a[href]:where(:not([class*="rounded-full"])) {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+html[data-nm-a11y-links="on"] a[href]:focus-visible {
+  outline-color: var(--nm-accent);
 }
 
 @import "./components.css";

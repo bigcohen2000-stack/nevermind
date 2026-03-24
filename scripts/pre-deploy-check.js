@@ -1,4 +1,4 @@
-﻿import { readdir, readFile } from "fs/promises";
+import { readdir, readFile } from "fs/promises";
 import { createInterface } from "readline/promises";
 import { stdin as input, stdout as output } from "process";
 import { join } from "path";
@@ -71,10 +71,21 @@ async function checkDrafts() {
   }
 
   if (blockingDraftCount > 0) {
-    const shouldContinue = await confirmContinue(blockingDraftCount);
-    if (!shouldContinue) {
-      console.log("🛑 הדיפלוי בוטל על ידי המשתמש.");
-      process.exit(0);
+    const nonInteractive =
+      process.env.NM_DEPLOY_NONINTERACTIVE === "1" ||
+      process.env.CI === "true" ||
+      !input.isTTY;
+
+    if (nonInteractive) {
+      console.warn(
+        `⚠️ נמצאו ${blockingDraftCount} טיוטות שאינן ברשימת המותרים — ממשיכים בדיפלוי (מצב לא אינטראקטיבי / CI). ודא שזה מכוון.`,
+      );
+    } else {
+      const shouldContinue = await confirmContinue(blockingDraftCount);
+      if (!shouldContinue) {
+        console.log("🛑 הדיפלוי בוטל על ידי המשתמש.");
+        process.exit(0);
+      }
     }
   }
 

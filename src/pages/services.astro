@@ -4,12 +4,14 @@ import ServiceCard from "../components/ServiceCard.astro";
 import FloatingCTA from "../components/FloatingCTA.astro";
 import ThoughtShiftProof from "../components/ThoughtShiftProof.astro";
 import {
+  buildServicePreStartWhatsAppHref,
   buildWhatsAppHref,
   disclaimerLong,
   disclaimerShort,
   flattenVisibleServices,
   formatMoney,
   resolveServiceAction,
+  type StageService,
   servicesAddOns,
   servicesAuthoritySection,
   servicesHero,
@@ -27,6 +29,7 @@ const stageCards = servicesStages
   .filter((stage) => stage.primaryService);
 
 const addon = servicesAddOns[0];
+const addonPreStartWaHref = addon ? buildServicePreStartWhatsAppHref(addon.title) : "";
 const subscriptionService = flattenVisibleServices().find((service) => service.id === "retainer-subscription");
 const subscriptionAction = subscriptionService ? resolveServiceAction(subscriptionService) : null;
 const authorityServices = (servicesAuthoritySection?.services ?? []).filter((service) => service.visible !== false);
@@ -55,7 +58,7 @@ const floatingPrimaryHref = subscriptionService
           </div>
 
           <div class="grid gap-6 xl:grid-cols-1">
-            {stage.services.filter((service) => service.visible !== false).map((service) => (
+            {stage.services.filter((service) => service.visible !== false).map((service: StageService) => (
               <ServiceCard
                 service={{
                   ...service,
@@ -105,18 +108,28 @@ const floatingPrimaryHref = subscriptionService
           </div>
           <div class="space-y-2 text-right">
             <p class="text-3xl font-semibold text-[var(--nm-fg)]">{formatMoney(addon.price_full)}</p>
-            <a
-              href={
-                typeof addon.payment_link === "string" && addon.payment_link.trim()
-                  ? addon.payment_link.trim()
-                  : buildWhatsAppHref(`שלום, אני רוצה להוסיף ${addon.title} למסלול שלי. ראיתי שזה ${formatMoney(addon.price_full)} כולל מע״מ.`)
-              }
-              target="_blank"
-              rel="noreferrer"
-              class="inline-flex items-center justify-center rounded-full bg-[var(--nm-accent)] px-5 py-3 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]"
-            >
-              {addon.action_text}
-            </a>
+            <div class="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-stretch sm:justify-start sm:gap-2">
+              <a
+                href={
+                  typeof addon.payment_link === "string" && addon.payment_link.trim()
+                    ? addon.payment_link.trim()
+                    : buildWhatsAppHref(`שלום, אני רוצה להוסיף ${addon.title} למסלול שלי. ראיתי שזה ${formatMoney(addon.price_full)} כולל מע״מ.`)
+                }
+                target="_blank"
+                rel="noreferrer"
+                class="inline-flex min-h-[2.75rem] items-center justify-center rounded-full bg-[var(--nm-accent)] px-5 py-3 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]"
+              >
+                {addon.action_text}
+              </a>
+              <a
+                href={addonPreStartWaHref}
+                target="_blank"
+                rel="noreferrer"
+                class="inline-flex min-h-[2.75rem] items-center justify-center rounded-full border-2 border-[var(--nm-fg)] bg-transparent px-5 py-3 text-sm font-medium text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]"
+              >
+                שאלה לפני שמתחילים?
+              </a>
+            </div>
             <p class="text-center text-xs text-[color-mix(in_srgb,var(--nm-fg)_50%,var(--nm-bg))] md:text-right">
               {disclaimerShort}
             </p>

@@ -35,11 +35,11 @@ type InternalLink = {
 const difficultyConfig = {
   beginner: {
     label: "מתחילים",
-    tone: "bg-[#F4FAF4] text-[#166534] border-[#BBF7D0]/70",
+    tone: "bg-[var(--nm-tint)] text-[var(--nm-fg)] border-[color-mix(in_srgb,var(--nm-accent)_18%,transparent)]",
   },
   advanced: {
     label: "מתקדמים",
-    tone: "bg-[#FFF7ED] text-[#9A3412] border-[#FDBA74]/60",
+    tone: "bg-[var(--nm-tint-strong)] text-[var(--nm-fg)] border-[color-mix(in_srgb,var(--nm-accent)_26%,transparent)]",
   },
   deep: {
     label: "חקירה עמוקה",
@@ -225,8 +225,9 @@ for (const tag of tags) {
   },
   {
     href: "/glossary/",
-    title: "מושגי יסוד",
-    description: "מפת המושגים של NeverMind: אגו, בחירה, עובדה מול פירוש, ובהירות כנקודת התחלה לעומק נוסף.",
+    title: "הגדרות מחדש",
+    description:
+      "כדי להבין אחד את השני באמת, חייבים להסכים על משמעות המילים. כאן נמצא ההסבר הפשוט והנקי למושגים שאנחנו משתמשים בהם, בלי כוונה נסתרת.",
     kind: "page" as const,
   },
   {
@@ -326,7 +327,7 @@ const components = {
         <h1 class="text-[clamp(2.1rem,1.65rem+2vw,4rem)] font-semibold leading-[1.04] text-[var(--nm-fg)]">{title}</h1>
         <section
           aria-label="תקציר המאמר"
-          class="rounded-[1.4rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] border-r-4 border-r-[#D42B2B] bg-white/80 px-5 py-4"
+          class="rounded-[1.4rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] border-r-4 border-r-[var(--nm-accent)] bg-[var(--nm-bg-canvas)]/85 px-5 py-4"
         >
           <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[color-mix(in_srgb,var(--nm-fg)_52%,var(--nm-bg))]">בשתי שורות:</p>
           <p class="mt-2 text-[clamp(1.08rem,1rem+0.35vw,1.35rem)] font-semibold leading-8 text-[color-mix(in_srgb,var(--nm-fg)_80%,var(--nm-bg))]">{description}</p>
@@ -445,7 +446,7 @@ const components = {
         </div>
 
         <div
-          class="rounded-[1.35rem] border border-[#128C7E]/20 bg-[#F0FDF4]/80 p-5 text-right shadow-sm"
+          class="rounded-[1.35rem] border border-[color-mix(in_srgb,var(--nm-accent)_25%,transparent)] bg-[var(--nm-tint)] p-5 text-right shadow-sm"
           aria-label="המשך בוואטסאפ לפי נושא המאמר"
         >
           <p class="mb-4 text-[clamp(0.95rem,0.9rem+0.25vw,1.05rem)] font-medium text-[var(--nm-fg)]">
@@ -787,13 +788,13 @@ const components = {
           const lockCard = document.createElement("section");
           lockCard.className = "nm-premium-card";
           lockCard.innerHTML = `
-            <p style="font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:#D42B2B">Premium</p>
-            <h2 style="margin-top:12px;font-size:1.4rem;font-weight:600;color:#1A1A1A">התוכן שמור לחברי פרימיום</h2>
-            <p style="margin-top:12px;font-size:1rem;line-height:1.8;color:rgba(26,26,26,0.68)">
+            <p style="font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--nm-accent)">Premium</p>
+            <h2 style="margin-top:12px;font-size:1.4rem;font-weight:600;color:var(--nm-fg)">התוכן שמור לחברי פרימיום</h2>
+            <p style="margin-top:12px;font-size:1rem;line-height:1.8;color:color-mix(in srgb,var(--nm-fg) 68%,transparent)">
               המאמר סומן כפרימיום. לגישה מלאה - פנה דרך השירותים.
             </p>
             <div style="margin-top:20px">
-              <a href="/services/" style="display:inline-flex;align-items:center;border-radius:9999px;background:#D42B2B;padding:12px 20px;font-size:14px;font-weight:600;color:white;text-decoration:none">
+              <a href="/services/" style="display:inline-flex;align-items:center;border-radius:9999px;background:var(--nm-accent);padding:12px 20px;font-size:14px;font-weight:600;color:var(--nm-on-accent);text-decoration:none">
                 לשירותים ומחירים
               </a>
             </div>
@@ -814,10 +815,12 @@ const components = {
         }
 
         const accessEnabled = premiumBody.dataset.premiumAccessEnabled === "true";
-        const title = overrides.title || premiumBody.dataset.premiumTitle || "This professional method is reserved for premium members";
+        const title = overrides.title || premiumBody.dataset.premiumTitle || "מכאן הלאה – נכנסים לפרטים";
         const description =
-          overrides.description || premiumBody.dataset.premiumDescription || "המשך התוכן המלא שמור כרגע לחברי פרימיום.";
-        const fallbackCtaLabel = overrides.ctaLabel || premiumBody.dataset.premiumCtaLabel || "לשירותים ומחירים";
+          overrides.description ||
+          premiumBody.dataset.premiumDescription ||
+          "הבסיס תמיד יהיה פתוח לכולם. ההמשך של המאמר הזה מיועד למי שרוצה לקחת את ההבנה צעד אחד קדימה ולהשקיע בתהליך. הגישה פתוחה לחברי המסלול המלא.";
+        const fallbackCtaLabel = overrides.ctaLabel || premiumBody.dataset.premiumCtaLabel || "איך מצטרפים?";
         const fallbackCtaHref = overrides.ctaHref || premiumBody.dataset.premiumCtaHref || "/services/";
         const accessRoute = premiumBody.dataset.premiumAccessRoute || "/premium-access/";
         const helperText =
@@ -825,6 +828,11 @@ const components = {
         const returnTo = encodeURIComponent(window.location.pathname);
         const primaryHref = accessEnabled ? `${accessRoute}?returnTo=${returnTo}` : fallbackCtaHref;
         const primaryLabel = accessEnabled ? "להזין קוד גישה" : fallbackCtaLabel;
+
+        const actionsHtml = accessEnabled
+          ? `<a href="${primaryHref}" class="inline-flex items-center rounded-full bg-[var(--nm-inverse)] px-5 py-3 text-sm font-semibold text-[var(--nm-inverse-fg)] no-underline transition hover:bg-[var(--nm-inverse-hover)]">${primaryLabel}</a>
+            <a href="${fallbackCtaHref}" class="inline-flex items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white px-5 py-3 text-sm font-semibold text-[var(--nm-fg)] no-underline transition hover:bg-[var(--nm-surface-muted)]">${fallbackCtaLabel}</a>`
+          : `<a href="${primaryHref}" class="inline-flex items-center rounded-full bg-[var(--nm-inverse)] px-5 py-3 text-sm font-semibold text-[var(--nm-inverse-fg)] no-underline transition hover:bg-[var(--nm-inverse-hover)]">${primaryLabel}</a>`;
 
         const range = document.createRange();
         if (contentStartRef) {
@@ -846,8 +854,7 @@ const components = {
           <p class="mt-3 text-[1rem] leading-8 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">${description}</p>
           <p class="mt-3 text-sm leading-7 text-[var(--nm-fg)]/56">${helperText}</p>
           <div class="mt-5 flex flex-wrap gap-3">
-            <a href="${primaryHref}" class="inline-flex items-center rounded-full bg-[var(--nm-inverse)] px-5 py-3 text-sm font-semibold text-[var(--nm-inverse-fg)] no-underline transition hover:bg-[var(--nm-inverse-hover)]">${primaryLabel}</a>
-            <a href="${fallbackCtaHref}" class="inline-flex items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white px-5 py-3 text-sm font-semibold text-[var(--nm-fg)] no-underline transition hover:bg-[var(--nm-surface-muted)]">${fallbackCtaLabel}</a>
+            ${actionsHtml}
           </div>
         `;
 

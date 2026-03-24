@@ -45,7 +45,7 @@ const maxScore =
   data-fallback-href={fallbackHref}
   data-fallback-label={fallbackLabel}
   data-max-score={maxScore}
-  class="mx-auto max-w-3xl rounded-[2.5rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/86 p-6 shadow-[0_30px_90px_rgba(26,26,26,0.08)] backdrop-blur-md md:p-8"
+  class="mx-auto max-w-3xl rounded-[2.5rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)]/90 p-6 shadow-[0_30px_90px_color-mix(in_srgb,var(--nm-fg)_8%,transparent)] backdrop-blur-md md:p-8"
 >
   <header class="space-y-4 text-right">
     <p class="text-sm font-semibold uppercase tracking-[0.24em] text-[var(--nm-accent)]">Gatekeeper</p>
@@ -84,7 +84,7 @@ const maxScore =
               data-goal-id={goal.id}
               data-goal-score={goal.score}
               data-goal-reason={goal.reason}
-              class="gate-option rounded-[1.5rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-5 py-4 text-right transition hover:border-[color-mix(in_srgb,var(--nm-accent)_28%,transparent)] hover:bg-white"
+              class="gate-option rounded-[1.5rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-5 py-4 text-right transition hover:border-[color-mix(in_srgb,var(--nm-accent)_28%,transparent)] hover:bg-[var(--nm-bg-canvas)]"
             >
               <span class="block text-base font-semibold text-[var(--nm-fg)]">{goal.label}</span>
               <span class="mt-1 block text-sm leading-7 text-[var(--nm-fg)]/62">{goal.hint}</span>
@@ -107,7 +107,7 @@ const maxScore =
             data-budget-id={budget.id}
             data-budget-score={budget.score}
             data-budget-reason={budget.reason}
-            class="gate-option rounded-[1.5rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-5 py-4 text-right transition hover:border-[color-mix(in_srgb,var(--nm-accent)_28%,transparent)] hover:bg-white"
+            class="gate-option rounded-[1.5rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-5 py-4 text-right transition hover:border-[color-mix(in_srgb,var(--nm-accent)_28%,transparent)] hover:bg-[var(--nm-bg-canvas)]"
           >
             <span class="block text-base font-semibold text-[var(--nm-fg)]">{budget.label}</span>
           </button>
@@ -129,7 +129,7 @@ const maxScore =
             data-stage-id={stage.id}
             data-stage-score={stage.score}
             data-stage-reason={stage.reason}
-            class="gate-option rounded-[1.5rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-5 py-4 text-right transition hover:border-[color-mix(in_srgb,var(--nm-accent)_28%,transparent)] hover:bg-white"
+            class="gate-option rounded-[1.5rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-5 py-4 text-right transition hover:border-[color-mix(in_srgb,var(--nm-accent)_28%,transparent)] hover:bg-[var(--nm-bg-canvas)]"
           >
             <span class="block text-base font-semibold text-[var(--nm-fg)]">{stage.label}</span>
           </button>
@@ -149,8 +149,8 @@ const maxScore =
       <ul data-reasons-list class="mt-5 space-y-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]"></ul>
       <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
         <a data-whatsapp-link target="_blank" rel="noreferrer" class="hidden items-center justify-center rounded-full bg-[var(--nm-inverse)] px-6 py-3 text-sm font-semibold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-inverse-hover)]">����� ��������</a>
-        <a data-fallback-link class="hidden items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white px-6 py-3 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[#ffffff]">������ ���� ����� ��</a>
-        <button type="button" data-reset-gatekeeper class="rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white px-6 py-3 text-sm font-semibold text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))] transition hover:bg-[#ffffff]">������ ����</button>
+        <a data-fallback-link class="hidden items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] px-6 py-3 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]">������ ���� ����� ��</a>
+        <button type="button" data-reset-gatekeeper class="rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] px-6 py-3 text-sm font-semibold text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))] transition hover:bg-[var(--nm-surface-muted)]">������ ����</button>
       </div>
     </section>
   </div>
@@ -229,7 +229,7 @@ const maxScore =
       if (!(reasonsList instanceof HTMLElement)) return;
       const reasons = [state.goalReason, state.budgetReason, state.stageReason].filter(Boolean);
       reasonsList.innerHTML = reasons
-        .map((reason) => `<li class="rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] bg-white/70 px-4 py-3">${reason}</li>`)
+        .map((reason) => `<li class="rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] bg-[color-mix(in_srgb,var(--nm-bg-canvas)_88%,transparent)] px-4 py-3">${reason}</li>`)
         .join("");
     };
 

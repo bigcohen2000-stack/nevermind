@@ -1,0 +1,70 @@
+---
+import Layout from "../layouts/Layout.astro";
+import appConfig from "../config/appConfig.json";
+
+const wa = appConfig.contact.whatsAppNumber;
+const waDisplay = wa.replace(/^972/, "0");
+---
+
+<Layout
+  title="הצהרת נגישות | השם לא משנה"
+  description="הצהרת נגישות לאתר «השם לא משנה» בהתאם לתקן WCAG 2.1 רמה AA וחוק שוויון זכויות לאנשים עם מוגבלות."
+>
+  <article class="mx-auto max-w-3xl space-y-8 pb-16 text-right leading-8 text-[var(--nm-fg)]">
+    <header class="space-y-3">
+      <p class="text-sm font-semibold uppercase tracking-[0.2em] text-[var(--nm-accent)]">נגישות</p>
+      <h1 class="text-[clamp(1.8rem,1.4rem+1.5vw,2.6rem)] font-semibold">הצהרת נגישות</h1>
+      <p class="text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
+        אתר <strong>NeverMind</strong> (<strong>השם לא משנה</strong>) פועל לשיפור חוויית השימוש עבור כלל המשתמשים, כולל אנשים עם
+        מוגבלויות. אנו פועלים בהתאם להנחיות WCAG 2.1 ברמה AA, ולעקרונות חוק שוויון זכויות לאנשים עם מוגבלות, התשע״ח–1998
+        והתקנות הנלוות.
+      </p>
+    </header>
+
+    <section class="space-y-3 rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-6">
+      <h2 class="text-xl font-semibold">מה קיים באתר</h2>
+      <ul class="list-disc space-y-2 pr-5 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+        <li>מבנה כותרות היררכי וסדר קריאה לוגי.</li>
+        <li>ניגודיות צבעים מותאמת בין טקסט לרקע.</li>
+        <li>אפשרות ניווט מקלדת ומיקוד גלוי (<code dir="ltr" class="rounded bg-[var(--nm-surface-muted)] px-1">focus-visible</code>).</li>
+        <li>תמיכה בהגדלת טקסט, ניגודיות גבוהה והדגשת קישורים דרך כפתור הנגישות הצף.</li>
+        <li>תיאורי חלופיים לתמונות משמעותיות, ככל שניתן.</li>
+      </ul>
+    </section>
+
+    <section class="space-y-3">
+      <h2 class="text-xl font-semibold">מגבלות ידועות</h2>
+      <p class="text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+        ייתכן שחלק מהתכנים (למשל קבצים חיצוניים, סרטונים מוטמעים או כלים מצד שלישי) אינם בשליטתנו המלאה. אנו פועלים לצמצום
+        מגבלות אלו ולעדכון שוטף.
+      </p>
+    </section>
+
+    <section class="space-y-3">
+      <h2 class="text-xl font-semibold">יצירת קשר בנושא נגישות</h2>
+      <p class="text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+        אם נתקלתם במכשול נגישות או שאלתם לגבי התאמות — נשמח לשמוע ולטפל בכך במהירות האפשרית.
+      </p>
+      <ul class="space-y-2 text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))]">
+        <li>
+          <strong>וואטסאפ:</strong>
+          <a
+            href={`https://wa.me/${wa}`}
+            class="font-semibold text-[var(--nm-accent)] underline underline-offset-2"
+            title="פתיחת שיחת וואטסאפ — השם לא משנה"
+          >
+            {waDisplay}
+          </a>
+        </li>
+        <li>
+          <strong>אתר:</strong>
+          <a href={appConfig.site.url} class="text-[var(--nm-accent)] underline underline-offset-2" title="אתר השם לא משנה">
+            {appConfig.site.url.replace(/^https?:\/\//, "")}
+          </a>
+        </li>
+      </ul>
+    </section>
+
+    <p class="text-sm text-[color-mix(in_srgb,var(--nm-fg)_55%,var(--nm-bg))]">עודכן לאחרונה: מרץ 2026.</p>
+  </article>
+</Layout>

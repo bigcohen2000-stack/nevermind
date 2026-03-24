@@ -48,16 +48,16 @@ const rows = articles
       score < 50
         ? {
             label: "Critical",
-            tone: "bg-[#FFF4F3] text-[#D42B2B] border-[#D42B2B]/20",
+            tone: "bg-[color-mix(in_srgb,var(--nm-accent)_8%,var(--nm-bg-canvas))] text-[var(--nm-accent)] border-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)]",
           }
         : score < 80
           ? {
               label: "Needs Update",
-              tone: "bg-[#FFFBF0] text-[#B45309] border-[#F59E0B]/20",
+              tone: "bg-[var(--nm-tint-strong)] text-[var(--nm-fg)] border-[color-mix(in_srgb,var(--nm-accent)_24%,transparent)]",
             }
           : {
               label: "Premium Health",
-              tone: "bg-[#EEF2FF] text-[#1E3A8A] border-[#1E3A8A]/20",
+              tone: "bg-[var(--nm-inverse)] text-[var(--nm-inverse-fg)] border-[color-mix(in_srgb,var(--nm-fg)_22%,transparent)]",
             };
 
     const idBase = entry.id.replace(/\.mdx$/i, "");

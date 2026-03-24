@@ -7,11 +7,11 @@ type DifficultyKey = "beginner" | "advanced" | "deep";
 const difficultyConfig: Record<DifficultyKey, { label: string; tone: string }> = {
   beginner: {
     label: "מתחילים",
-    tone: "bg-[#F4FAF4] text-[#166534] border-[#BBF7D0]/70",
+    tone: "bg-[var(--nm-tint)] text-[var(--nm-fg)] border-[color-mix(in_srgb,var(--nm-accent)_18%,transparent)]",
   },
   advanced: {
     label: "מתקדמים",
-    tone: "bg-[#FFF7ED] text-[#9A3412] border-[#FDBA74]/60",
+    tone: "bg-[var(--nm-tint-strong)] text-[var(--nm-fg)] border-[color-mix(in_srgb,var(--nm-accent)_26%,transparent)]",
   },
   deep: {
     label: "חקירה עמוקה",
@@ -55,7 +55,7 @@ const tags = Array.from(tagSet);
     <header class="space-y-4">
       <div class="flex flex-wrap items-end justify-between gap-4">
         <div class="space-y-4 text-right">
-          <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--nm-accent)]">מרכז החקירה</p>
+          <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--nm-accent)]">מרכז הידע של NeverMind</p>
           <h1 class="text-[clamp(2.2rem,1.7rem+2vw,3.2rem)] font-semibold text-[var(--nm-fg)]">
             מאמרים
           </h1>

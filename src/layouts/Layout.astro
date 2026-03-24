@@ -3,6 +3,7 @@ import "../styles/global.css";
 import { getCollection } from "astro:content";
 import { ClientRouter } from "astro:transitions";
 import { Search } from "lucide-react";
+import A11yWidget from "../components/A11yWidget.astro";
 import SearchModal from "../components/SearchModal";
 import WhatsAppButton from "../components/WhatsAppButton.astro";
 import WhisperBanner from "../components/WhisperBanner.astro";
@@ -62,7 +63,7 @@ const normalizeSegment = (segment: string) => {
     training: "הכשרות",
     admin: "ניהול",
     services: "שירותים",
-    glossary: "מושגי יסוד",
+    glossary: "הגדרות מחדש",
     questions: "שאלות קצרות",
     intake: "טופס הכנה לשיחה",
     "personal-consultation": "ייעוץ אישי",
@@ -70,6 +71,7 @@ const normalizeSegment = (segment: string) => {
     journey: "מסלולי בהירות",
     "root-problem-tree": "עץ שורש הבעיה",
     "forbidden-library": "הספרייה האסורה",
+    accessibility: "הצהרת נגישות",
   };
 
   return map[segment] ?? segment;
@@ -200,7 +202,7 @@ const socialLinks = [
 const navItems = [
   { href: "/", label: "בית" },
   { href: "/articles/", label: "מאמרים" },
-  { href: "/glossary/", label: "מושגי יסוד" },
+  { href: "/glossary/", label: "הגדרות מחדש" },
   { href: "/services/", label: "שירותים" },
   { href: "/questions/", label: "שאלות קצרות" },
   { href: "/now/", label: "מה המצב עכשיו" },
@@ -259,7 +261,7 @@ const navItems = [
         <button
           id="search-trigger"
           data-search-trigger
-          aria-label="פתח חיפוש"
+          aria-label="חיפוש במרכז הידע — מה מעסיק אותך כרגע?"
           class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))] transition-colors duration-200 hover:border-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)] hover:text-[var(--nm-accent)]"
         >
           <Search className="h-4 w-4" />
@@ -275,8 +277,10 @@ const navItems = [
       <div class="mx-auto flex max-w-6xl flex-col gap-6">
         <div class="flex flex-col items-center justify-between gap-6 md:flex-row">
           <div class="space-y-2 text-center md:text-right">
-            <p class="text-sm text-[color-mix(in_srgb,var(--nm-fg)_60%,var(--nm-bg))]">© {new Date().getFullYear()} NeverMind | ע.מ. 301773289</p>
-            <p class="text-xs text-[color-mix(in_srgb,var(--nm-fg)_45%,var(--nm-bg))]">האתר מאובטח SSL | סליקה מאושרת ומאובטחת דרך Grow</p>
+            <p class="text-sm text-[color-mix(in_srgb,var(--nm-fg)_60%,var(--nm-bg))]">
+              © {new Date().getFullYear()} NeverMind | הכל מתחיל ונגמר בראש.
+            </p>
+            <p class="text-xs text-[color-mix(in_srgb,var(--nm-fg)_45%,var(--nm-bg))]">האתר מאובטח SSL | סליקה מאושרת דרך Grow</p>
             <p class="max-w-3xl whitespace-pre-line text-xs leading-relaxed text-[color-mix(in_srgb,var(--nm-fg)_48%,var(--nm-bg))]">
               {disclaimerLong}
             </p>
@@ -288,7 +292,7 @@ const navItems = [
                 target="_blank"
                 rel="noreferrer"
                 aria-label={label}
-                class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/70 text-sm font-semibold text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))] transition hover:border-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)] hover:text-[var(--nm-accent)]"
+                class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)]/75 text-sm font-semibold text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))] transition hover:border-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)] hover:text-[var(--nm-accent)]"
               >
                 <span aria-hidden="true">{mark}</span>
               </a>
@@ -298,8 +302,27 @@ const navItems = [
         </div>
         <div class="flex flex-wrap items-center justify-center gap-3 text-sm font-semibold text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))] md:justify-end">
           <span class="text-[color-mix(in_srgb,var(--nm-fg)_50%,var(--nm-bg))]">כלים וחקירה:</span>
-          <a href="/forbidden-library/" class="transition-colors duration-200 hover:text-[var(--nm-accent)]">הספרייה האסורה</a>
-          <a href="/root-problem-tree/" class="transition-colors duration-200 hover:text-[var(--nm-accent)]">עץ שורש הבעיה</a>
+          <a
+            href="/forbidden-library/"
+            class="transition-colors duration-200 hover:text-[var(--nm-accent)]"
+            title="הספרייה האסורה — תוכן לחקירה"
+          >
+            הספרייה האסורה
+          </a>
+          <a
+            href="/root-problem-tree/"
+            class="transition-colors duration-200 hover:text-[var(--nm-accent)]"
+            title="עץ שורש הבעיה — כלי חשיבה"
+          >
+            עץ שורש הבעיה
+          </a>
+          <a
+            href="/accessibility/"
+            class="transition-colors duration-200 hover:text-[var(--nm-accent)]"
+            title="הצהרת נגישות — השם לא משנה"
+          >
+            הצהרת נגישות
+          </a>
         </div>
       </div>
     </footer>
@@ -312,6 +335,7 @@ const navItems = [
       meetingIntent={Boolean(waSlug && waArticleTitle)}
     />
     <SearchModal client:idle />
+    <A11yWidget />
 
     <script is:inline define:vars={{ randomArticlePaths }}>
       document.addEventListener("astro:page-load", () => {

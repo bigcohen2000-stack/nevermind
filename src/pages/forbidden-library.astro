@@ -7,11 +7,11 @@ type DifficultyKey = "beginner" | "advanced" | "deep";
 const difficultyConfig: Record<DifficultyKey, { label: string; tone: string }> = {
   beginner: {
     label: "מתחילים",
-    tone: "bg-[#F4FAF4] text-[#166534] border-[#BBF7D0]/70",
+    tone: "bg-[var(--nm-tint)] text-[var(--nm-fg)] border-[color-mix(in_srgb,var(--nm-accent)_18%,transparent)]",
   },
   advanced: {
     label: "מתקדמים",
-    tone: "bg-[#FFF7ED] text-[#9A3412] border-[#FDBA74]/60",
+    tone: "bg-[var(--nm-tint-strong)] text-[var(--nm-fg)] border-[color-mix(in_srgb,var(--nm-accent)_26%,transparent)]",
   },
   deep: {
     label: "חקירה עמוקה",

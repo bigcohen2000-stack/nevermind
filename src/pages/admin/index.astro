@@ -24,15 +24,15 @@ const formatDate = new Intl.DateTimeFormat("he-IL", {
 const workflowConfig = {
   writing: {
     label: "בכתיבה",
-    tone: "bg-[#FFF7ED] text-[#9A3412] border-[#FDBA74]/60",
+    tone: "bg-[var(--nm-tint)] text-[var(--nm-fg)] border-[color-mix(in_srgb,var(--nm-accent)_20%,transparent)]",
   },
   review: {
     label: "לבדיקה",
-    tone: "bg-[#EFF6FF] text-[#1D4ED8] border-[#BFDBFE]/70",
+    tone: "bg-[var(--nm-surface-muted)] text-[var(--nm-fg)] border-[color-mix(in_srgb,var(--nm-fg)_14%,transparent)]",
   },
   ready: {
     label: "מוכן לפרסום",
-    tone: "bg-[#F4FAF4] text-[#166534] border-[#BBF7D0]/70",
+    tone: "bg-[var(--nm-tint-strong)] text-[var(--nm-fg)] border-[color-mix(in_srgb,var(--nm-accent)_26%,transparent)]",
   },
   published: {
     label: "פורסם",
@@ -45,11 +45,11 @@ type WorkflowKey = keyof typeof workflowConfig;
 const difficultyConfig = {
   beginner: {
     label: "מתחילים",
-    tone: "bg-[#F4FAF4] text-[#166534] border-[#BBF7D0]/70",
+    tone: "bg-[var(--nm-tint)] text-[var(--nm-fg)] border-[color-mix(in_srgb,var(--nm-accent)_18%,transparent)]",
   },
   advanced: {
     label: "מתקדמים",
-    tone: "bg-[#FFF7ED] text-[#9A3412] border-[#FDBA74]/60",
+    tone: "bg-[var(--nm-tint-strong)] text-[var(--nm-fg)] border-[color-mix(in_srgb,var(--nm-accent)_26%,transparent)]",
   },
   deep: {
     label: "חקירה עמוקה",
@@ -96,11 +96,11 @@ const articles = (await getCollection("articles"))
       status: article.data.draft ? "טיוטה" : "באוויר",
       statusTone: article.data.draft
         ? "bg-[var(--nm-tint)] text-[var(--nm-accent)] border-[color-mix(in_srgb,var(--nm-accent)_14%,transparent)]"
-        : "bg-[#F4FAF4] text-[var(--nm-fg)] border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)]",
+        : "bg-[var(--nm-tint)] text-[var(--nm-fg)] border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)]",
       premium: article.data.isPremium ? "כן" : "לא",
       premiumTone: article.data.isPremium
         ? "bg-[var(--nm-inverse)] text-[var(--nm-inverse-fg)] border-[color-mix(in_srgb,var(--nm-fg)_22%,transparent)]"
-        : "bg-white text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))] border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)]",
+        : "bg-[var(--nm-bg-canvas)] text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))] border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)]",
       dateLabel: formatDate.format(article.data.pubDate),
       editHref: `${githubArticleBase}${article.id}`,
       viewHref: `/articles/${slug}/`,

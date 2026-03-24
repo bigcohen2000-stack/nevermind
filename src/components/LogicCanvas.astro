@@ -52,13 +52,13 @@ const videoPoints = Array.isArray(canvas.featuredVideo?.videoSummaryPoints)
     }
     <h1
       id="logic-canvas-title"
-      class="text-[clamp(2rem,1.6rem+2vw,3.4rem)] font-semibold leading-[1.08] text-neutral-900 dark:text-[var(--nm-fg)]"
+      class="text-[clamp(2rem,1.6rem+2vw,3.4rem)] font-semibold leading-[1.08] text-[var(--nm-fg)]"
     >
       {canvas.heroTitle}
     </h1>
     {
       canvas.heroSubtitle && (
-        <p class="max-w-3xl text-[clamp(1.05rem,0.98rem+0.5vw,1.25rem)] leading-relaxed text-neutral-700 dark:text-neutral-300">
+        <p class="max-w-3xl text-[clamp(1.05rem,0.98rem+0.5vw,1.25rem)] leading-relaxed text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
           {canvas.heroSubtitle}
         </p>
       )
@@ -66,20 +66,21 @@ const videoPoints = Array.isArray(canvas.featuredVideo?.videoSummaryPoints)
   </header>
 
   <div class="space-y-4">
-    <h2 class="text-right text-lg font-semibold text-[var(--nm-fg-secondary)] dark:text-[var(--nm-inverse-fg)]">איך אתה מרגיש עכשיו?</h2>
-    <p class="text-right text-sm text-[color-mix(in_srgb,var(--nm-fg-secondary)_75%,var(--nm-bg))] dark:text-neutral-400">ארבעה מסלולי קריאה קצרים — שלושה מאמרים בכל אחד.</p>
+    <h2 class="text-right text-lg font-semibold text-[var(--nm-fg-secondary)]">איך אתה מרגיש עכשיו?</h2>
+    <p class="text-right text-sm text-[color-mix(in_srgb,var(--nm-fg-secondary)_75%,var(--nm-bg))]">ארבעה מסלולי קריאה קצרים — שלושה מאמרים בכל אחד.</p>
     <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
       {
         paths.map((p) => (
           <a
             href={`/journey/${p.id}`}
-            class="group flex flex-col rounded-[1.5rem] border border-[color-mix(in_srgb,var(--nm-fg-secondary)_16%,transparent)] bg-white/90 p-5 text-right shadow-[0_18px_50px_color-mix(in_srgb,var(--nm-fg-secondary)_8%,transparent)] transition hover:border-[color-mix(in_srgb,var(--nm-accent)_35%,transparent)] hover:shadow-[0_22px_60px_color-mix(in_srgb,var(--nm-accent)_12%,transparent)] dark:border-white/10 dark:bg-neutral-900/75"
+            title={p.title}
+            class="group flex flex-col rounded-[1.5rem] border border-[color-mix(in_srgb,var(--nm-fg-secondary)_16%,transparent)] bg-[var(--nm-bg-canvas)]/95 p-5 text-right shadow-[0_18px_50px_color-mix(in_srgb,var(--nm-fg-secondary)_8%,transparent)] transition hover:border-[color-mix(in_srgb,var(--nm-accent)_35%,transparent)] hover:shadow-[0_22px_60px_color-mix(in_srgb,var(--nm-accent)_12%,transparent)]"
           >
             <span class="text-3xl" aria-hidden="true">
               {p.emoji}
             </span>
-            <span class="mt-3 text-base font-semibold text-[var(--nm-fg-secondary)] group-hover:text-[var(--nm-accent)] dark:text-[var(--nm-inverse-fg)]">{p.title}</span>
-            <span class="mt-2 text-sm leading-6 text-[color-mix(in_srgb,var(--nm-fg-secondary)_70%,var(--nm-bg))] dark:text-neutral-400">{p.shortDescription}</span>
+            <span class="mt-3 text-base font-semibold text-[var(--nm-fg-secondary)] group-hover:text-[var(--nm-accent)]">{p.title}</span>
+            <span class="mt-2 text-sm leading-6 text-[color-mix(in_srgb,var(--nm-fg-secondary)_70%,var(--nm-bg))]">{p.shortDescription}</span>
             <span class="mt-4 text-sm font-semibold text-[var(--nm-accent)]">למסלול ←</span>
           </a>
         ))
@@ -90,24 +91,24 @@ const videoPoints = Array.isArray(canvas.featuredVideo?.videoSummaryPoints)
   <div class="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:gap-8">
     <div
       class:list={[
-        "flex flex-col justify-center rounded-[1.75rem] border border-[color-mix(in_srgb,var(--nm-fg-secondary)_14%,transparent)] bg-white p-6 text-right shadow-sm dark:border-white/10 dark:bg-neutral-900/80 lg:min-h-[220px] lg:p-10",
+        "flex flex-col justify-center rounded-[1.75rem] border border-[color-mix(in_srgb,var(--nm-fg-secondary)_14%,transparent)] bg-[var(--nm-bg-canvas)] p-6 text-right shadow-sm lg:min-h-[220px] lg:p-10",
         videoId ? "lg:col-span-6" : "lg:col-span-12",
       ]}
     >
       <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">ציטוט היום</p>
-      <blockquote class="mt-4 text-[clamp(1.15rem,1rem+0.6vw,1.45rem)] font-medium leading-[1.75] text-[var(--nm-fg-secondary)] dark:text-[var(--nm-inverse-fg)]">
+      <blockquote class="mt-4 text-[clamp(1.15rem,1rem+0.6vw,1.45rem)] font-medium leading-[1.75] text-[var(--nm-fg-secondary)]">
         {canvas.dailyQuote.text}
       </blockquote>
       {
         canvas.dailyQuote.attribution && (
-          <footer class="mt-4 text-sm text-[color-mix(in_srgb,var(--nm-fg-secondary)_65%,var(--nm-bg))] dark:text-neutral-400">— {canvas.dailyQuote.attribution}</footer>
+          <footer class="mt-4 text-sm text-[color-mix(in_srgb,var(--nm-fg-secondary)_65%,var(--nm-bg))]">— {canvas.dailyQuote.attribution}</footer>
         )
       }
     </div>
 
     {
       videoId && (
-        <div class="rounded-[1.75rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 p-4 dark:border-white/10 dark:bg-neutral-900/70 lg:col-span-6">
+        <div class="rounded-[1.75rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)]/95 p-4 lg:col-span-6">
           <VideoPlayer youtubeId={videoId} title={videoTitle} videoSummaryPoints={videoPoints} />
         </div>
       )
@@ -122,17 +123,17 @@ const videoPoints = Array.isArray(canvas.featuredVideo?.videoSummaryPoints)
     }
 
     <div
-      class="flex flex-col justify-center rounded-[1.75rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-6 text-right dark:border-white/10 dark:bg-neutral-900/80 lg:col-span-6 lg:p-8"
+      class="flex flex-col justify-center rounded-[1.75rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-6 text-right lg:col-span-6 lg:p-8"
     >
-      <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[color-mix(in_srgb,var(--nm-fg)_55%,var(--nm-bg))] dark:text-neutral-400">שאלה פתוחה</p>
-      <p class="mt-3 text-[clamp(1.05rem,0.98rem+0.35vw,1.2rem)] font-medium leading-relaxed text-[var(--nm-fg)] dark:text-[var(--nm-inverse-fg)]">
+      <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[color-mix(in_srgb,var(--nm-fg)_55%,var(--nm-bg))]">שאלה פתוחה</p>
+      <p class="mt-3 text-[clamp(1.05rem,0.98rem+0.35vw,1.2rem)] font-medium leading-relaxed text-[var(--nm-fg)]">
         {canvas.openQuestion.text}
       </p>
       {
         canvas.openQuestion.href && (
           <a
             href={canvas.openQuestion.href}
-            class="mt-5 inline-flex w-fit rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_15%,transparent)] bg-white px-4 py-2 text-sm font-semibold text-[var(--nm-fg)]/80 transition hover:bg-white dark:border-white/15 dark:bg-neutral-800 dark:text-[var(--nm-inverse-fg)]/88"
+            class="mt-5 inline-flex w-fit rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_15%,transparent)] bg-[var(--nm-bg-canvas)] px-4 py-2 text-sm font-semibold text-[var(--nm-fg)]/80 transition hover:bg-[var(--nm-surface-muted)]"
           >
             להמשך
           </a>

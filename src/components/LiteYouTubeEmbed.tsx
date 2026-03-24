@@ -33,7 +33,7 @@ export default function LiteYouTubeEmbed({
 
   return (
     <div
-      className="lite-youtube group relative aspect-video cursor-pointer overflow-hidden rounded-xl bg-slate-100 shadow-lg"
+      className="lite-youtube group relative aspect-video cursor-pointer overflow-hidden rounded-xl bg-[var(--nm-surface-muted)] shadow-lg"
       onClick={loadIframe}
       onKeyDown={(event) => {
         if (event.key === "Enter" || event.key === " ") {

@@ -3,7 +3,7 @@ const { title = "פירוק מושג", term = "" } = Astro.props;
 const heading = term || title;
 ---
 <aside
-  class="rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[#F3F1EC] p-[clamp(1.25rem,2vw,2rem)] shadow-sm"
+  class="rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-[clamp(1.25rem,2vw,2rem)] shadow-sm"
   role="note"
   aria-label={heading}
 >

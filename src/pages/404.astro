@@ -33,41 +33,58 @@ const recommended = (
   .filter((article): article is { slug: string; title: string; description: string } => article !== null)
   .slice(0, 4);
 ---
-<Layout title="עמוד לא נמצא" description="חיפשת בחוץ, אבל הכול נמצא כאן">
+<Layout
+  title="הגענו למבוי סתום (וזה בסדר)"
+  description="הדף שחיפשת לא נמצא כאן. אולי הוא נמחק, אולי הייתה טעות בקישור, ואולי זו סתם תקלה טכנית."
+>
   <section class="space-y-12">
     <header class="space-y-4 text-center">
       <h1 class="text-[clamp(2.3rem,1.8rem+2.2vw,3.4rem)] font-semibold text-[var(--nm-fg)]">
-        חיפשת בחוץ, אבל הכול לא נמצא כאן
+        הגענו למבוי סתום (וזה בסדר)
       </h1>
       <p
         data-404-message
         class="text-[clamp(1rem,0.95rem+0.35vw,1.3rem)] text-[var(--nm-fg)]/65"
       >
-        כנראה שהכתובת השתנתה. נוכל לעזור לך למצוא את מה שחיפשת.
+        הדף שחיפשת לא נמצא כאן. ייתכן טעות בכתובת, קישור שבור, או תקלה טכנית. אפשר לחזור לדף הבית ולנסות שוב.
       </p>
     </header>
 
-    <div class="mx-auto w-full max-w-2xl">
+    <div class="mx-auto w-full max-w-2xl space-y-4 text-center">
+      <div class="space-y-2 text-right">
+        <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--nm-accent)]">גילוי</p>
+        <h2 class="text-[clamp(1.5rem,1.25rem+1vw,2.1rem)] font-semibold text-[var(--nm-fg)]">מרכז הידע של NeverMind</h2>
+        <p class="text-[clamp(1rem,0.95rem+0.3vw,1.12rem)] font-semibold text-[var(--nm-fg)]">מה מעסיק אותך כרגע?</p>
+        <p class="text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] leading-7 text-[color-mix(in_srgb,var(--nm-fg)_65%,var(--nm-bg))]">
+          נסה לחפש: בהירות, פרדוקס, או איך פותרים בעיית שורש.
+        </p>
+      </div>
       <div class="rounded-3xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/70 p-4">
         <input
           data-pagefind-input
           type="search"
-          placeholder="מה לחפש עכשיו?"
+          placeholder="מה מעסיק אותך כרגע?"
           autofocus
           class="w-full rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/80 px-4 py-3 text-right text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] text-[var(--nm-fg)] outline-none focus-visible:ring-2 focus-visible:ring-[color-mix(in_srgb,var(--nm-fg)_22%,transparent)]"
           dir="rtl"
-          aria-label="חיפוש באתר"
+          aria-label="מה מעסיק אותך כרגע? — חיפוש במרכז הידע של NeverMind"
         />
       </div>
-      <div data-pagefind-results class="mt-4 space-y-3"></div>
+      <div data-pagefind-results class="mt-4 space-y-3 text-right"></div>
     </div>
 
-    <div class="flex justify-center">
+    <div class="flex flex-wrap items-center justify-center gap-3">
       <a
-        href="/articles"
+        href="/"
+        class="inline-flex items-center justify-center rounded-full bg-[var(--nm-accent)] px-6 py-3 text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] font-semibold text-[var(--nm-on-accent)] transition-colors duration-300 hover:bg-[var(--nm-accent-hover)]"
+      >
+        חזרה למציאות (דף הבית)
+      </a>
+      <a
+        href="/#knowledge-center"
         class="inline-flex items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/70 px-6 py-3 text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] text-[var(--nm-fg)]/80 transition-colors duration-300 hover:bg-white"
       >
-        מרכז החקירה
+        מרכז הידע
       </a>
     </div>
 

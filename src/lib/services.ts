@@ -3,7 +3,10 @@ import appConfig from "../config/appConfig.json";
 
 type ServicesConfig = typeof servicesConfig;
 export type PaymentMethod = ServicesConfig["payment_methods"][number];
-export type ServiceStage = ServicesConfig["funnel_stages"][number];
+/** שלב במסלול — כולל social_proof אופציונלי ברמת השלב (מעבר לשירות בודד) */
+export type ServiceStage = ServicesConfig["funnel_stages"][number] & {
+  social_proof?: string | null;
+};
 
 /** זמינות מובנית (תאריך עדכון + מקומות) — תאימות: גם `availability_note` מחרוזת */
 export type ServiceAvailability = {
@@ -75,7 +78,7 @@ export const featureIcons: Record<string, string> = {
 export const servicesCurrency = servicesConfig.currency;
 export const servicesTaxLabel = servicesConfig.tax_label;
 export const servicesHero = servicesConfig.hero;
-export const servicesStages = servicesConfig.funnel_stages;
+export const servicesStages = servicesConfig.funnel_stages as ServiceStage[];
 export const servicesAddOns = servicesConfig.add_ons;
 export const servicesAuthoritySection = ((servicesConfig as Record<string, unknown>).authority_section ??
   null) as AuthoritySection | null;
@@ -102,6 +105,14 @@ export const findServiceById = (id: string) => flattenVisibleServices().find((se
 
 export const buildWhatsAppHref = (message: string) =>
   `https://wa.me/${appConfig.contact.whatsAppNumber}?text=${encodeURIComponent(message)}`;
+
+/** שאלה לפני התחלה — שם השירות משובץ בהודעה (מקודד ל־URL) */
+export function buildServicePreStartWhatsAppHref(serviceName: string): string {
+  const name = serviceName.trim() || "השירות";
+  const preface = buildWhatsAppCrmPreface(name);
+  const message = `${preface}\n\nהיי יקיר, אני קורא עכשיו על ${name} ומשהו שם סיקרן אותי. אפשר לשאול שאלה קטנה לפני שממשיכים?`;
+  return buildWhatsAppHref(message);
+}
 
 /** תאריך/שעה בעברית לשורת זמינות (מבוסס שעון הדפדפן / שרת לפי מחרוזת ISO) */
 export function formatAvailabilityDateHebrew(isoString: string): string {
@@ -178,9 +189,19 @@ export async function notifyServiceInterest(params: {
   }
 }
 
+const WA_CRM_TAGLINE = "מחשבה אחת נקייה – ישר לוואטסאפ";
+
+/** שורת CRM לפרסור: מקור + טון קבוע */
+export function buildWhatsAppCrmPreface(sourceTitle: string): string {
+  const title = String(sourceTitle || "NeverMind").trim() || "NeverMind";
+  return `[Lead | Source: ${title}]\n${WA_CRM_TAGLINE}`;
+}
+
 /** הודעת וואטסאפ אחידה לתיאום פגישה ממאמר */
 export function buildArticleMeetingWhatsAppMessage(params: { title: string; slug: string }): string {
-  return `היי, הגעתי מהמאמר "${params.title}" (${params.slug}) ואני רוצה לתאם פגישה.`;
+  const preface = buildWhatsAppCrmPreface(params.title);
+  const body = `היי, הגעתי מהמאמר "${params.title}" (${params.slug}) ואני רוצה לתאם פגישה.`;
+  return `${preface}\n\n${body}`;
 }
 
 /** טקסט ליד קונטקסטואלי לפי תגית ראשונה מה-frontmatter (או נושא/כותרת גיבוי) */
@@ -193,14 +214,16 @@ export const buildArticleContextLeadMessage = (opts: {
   const firstFromTags = tagList.map((t) => String(t).trim()).find(Boolean) ?? "";
   const topicTrim = (opts.topic ?? "").trim();
   const subjectLabel = topicTrim || firstFromTags;
-  if (subjectLabel) {
-    return `היי יקיר, קראתי את המאמר בנושא ${subjectLabel} ורציתי להתייעץ...`;
-  }
   const titleTrim = (opts.articleTitle ?? "").trim();
-  if (titleTrim) {
-    return `היי יקיר, קראתי את המאמר "${titleTrim}" ורציתי להתייעץ...`;
+  const sourceTitle = titleTrim || subjectLabel || "NeverMind";
+  const preface = buildWhatsAppCrmPreface(sourceTitle);
+  if (subjectLabel) {
+    return `${preface}\n\nהיי יקיר, קראתי את המאמר בנושא ${subjectLabel} ורציתי להתייעץ...`;
   }
-  return "היי יקיר, קראתי מאמר באתר NeverMind ורציתי להתייעץ...";
+  if (titleTrim) {
+    return `${preface}\n\nהיי יקיר, קראתי את המאמר "${titleTrim}" ורציתי להתייעץ...`;
+  }
+  return `${preface}\n\nהיי יקיר, קראתי מאמר באתר NeverMind ורציתי להתייעץ...`;
 };
 
 export const buildArticleContextWhatsAppHref = (
@@ -281,7 +304,6 @@ export function validateSlug(
 
 export const resolveServiceAction = (service: StageService | FlatService) => {
   const actionText = service.payment_cta || service.action_text || `אני רוצה להתקדם עם ${service.title}`;
-  const defaultMessage = `שלום, אני רוצה להתקדם עם ${service.title}. ראיתי את המסלול באתר במחיר ${formatMoney(service.price_full)}. אפשר לשלוח לי את הפרטים המלאים?`;
 
   if (service.payment_flow === "direct" && typeof service.payment_link === "string" && service.payment_link.trim()) {
     return {

@@ -24,7 +24,7 @@ const { title = "מגמות בקהילה", subtitle = "לפי שאלות ופנ�
 ---
 
 <section
-  class="rounded-[1.75rem] border border-[color-mix(in_srgb,var(--nm-fg-secondary)_14%,transparent)] bg-white p-6 text-right shadow-sm sm:p-8"
+  class="rounded-[1.75rem] border border-[color-mix(in_srgb,var(--nm-fg-secondary)_14%,transparent)] bg-[var(--nm-bg-canvas)] p-6 text-right shadow-sm sm:p-8"
   dir="rtl"
   aria-labelledby="trend-graph-heading"
 >
@@ -43,12 +43,12 @@ const { title = "מגמות בקהילה", subtitle = "לפי שאלות ופנ�
             <span
               class:list={[
                 "font-medium text-[var(--nm-fg-secondary)]",
-                item.isHot && "font-semibold text-[#C1121F]",
+                item.isHot && "font-semibold text-[var(--nm-accent)]",
               ]}
             >
               {item.label}
               {item.isHot && (
-                <span class="me-1.5 inline-block rounded border border-[#C1121F]/25 bg-[#C1121F]/08 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#C1121F]">
+                <span class="me-1.5 inline-block rounded border border-[color-mix(in_srgb,var(--nm-accent)_25%,transparent)] bg-[color-mix(in_srgb,var(--nm-accent)_8%,var(--nm-bg-canvas))] px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[var(--nm-accent)]">
                   חם
                 </span>
               )}
@@ -56,20 +56,20 @@ const { title = "מגמות בקהילה", subtitle = "לפי שאלות ופנ�
             <span
               class:list={[
                 "tabular-nums text-[var(--nm-fg-secondary)]/75",
-                item.isHot && "font-semibold text-[#C1121F]",
+                item.isHot && "font-semibold text-[var(--nm-accent)]",
               ]}
             >
               {item.value}%
             </span>
           </div>
           <div
-            class="h-[2px] w-full overflow-hidden rounded-full bg-[#1D3557]/12"
+            class="h-[2px] w-full overflow-hidden rounded-full bg-[color-mix(in_srgb,var(--nm-fg)_12%,var(--nm-bg-canvas))]"
             aria-hidden="true"
           >
             <div
               class:list={[
                 "trend-bar-fill h-[2px] rounded-full",
-                item.isHot ? "bg-[#C1121F]" : "bg-[#1D3557]",
+                item.isHot ? "bg-[var(--nm-accent)]" : "bg-[color-mix(in_srgb,var(--nm-fg)_45%,var(--nm-bg-canvas))]",
               ]}
               style={`width: ${item.value}%; animation-delay: ${index * 75}ms;`}
             />

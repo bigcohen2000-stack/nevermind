@@ -125,7 +125,7 @@ export default function SearchModal() {
       onClick={() => setIsOpen(false)}
     >
       <div
-        className="w-[min(720px,92vw)] rounded-3xl border border-white/70 bg-[#F9F8F6]/95 p-6 shadow-sm"
+        className="w-[min(720px,92vw)] rounded-3xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-6 shadow-sm"
         onClick={(event) => event.stopPropagation()}
       >
         <div className="flex items-center justify-between">
@@ -133,7 +133,7 @@ export default function SearchModal() {
             id="search-title"
             className="text-[clamp(1.2rem,1.05rem+0.6vw,1.6rem)] font-semibold text-[var(--nm-fg)]"
           >
-            חיפוש
+            מרכז הידע של NeverMind
           </h2>
           <button
             type="button"
@@ -144,22 +144,27 @@ export default function SearchModal() {
           </button>
         </div>
 
+        <p className="mt-3 text-right text-[clamp(1rem,0.95rem+0.25vw,1.05rem)] font-semibold text-[var(--nm-fg)]">מה מעסיק אותך כרגע?</p>
+        <p className="mt-1 text-right text-[clamp(0.85rem,0.82rem+0.2vw,1rem)] leading-6 text-[color-mix(in_srgb,var(--nm-fg)_62%,var(--nm-bg))]">
+          נסה לחפש: בהירות, פרדוקס, או איך פותרים בעיית שורש.
+        </p>
+
         <div className="mt-4">
           <input
             ref={inputRef}
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="מה אתה מחפש כרגע?"
+            placeholder="מה מעסיק אותך כרגע?"
             className="w-full rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/80 px-4 py-3 text-right text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] text-[var(--nm-fg)] outline-none focus-visible:ring-2 focus-visible:ring-[color-mix(in_srgb,var(--nm-fg)_22%,transparent)]"
             dir="rtl"
-            aria-label="שדה חיפוש"
+            aria-label="מה מעסיק אותך כרגע? — חיפוש במרכז הידע של NeverMind"
           />
         </div>
 
         <div className="mt-4 space-y-3">
           {isLoading && (
             <p className="text-[clamp(0.85rem,0.8rem+0.2vw,1rem)] text-[color-mix(in_srgb,var(--nm-fg)_60%,var(--nm-bg))]">
-              מחפש עבורך...
+              מחפשים מה מתאים…
             </p>
           )}
 

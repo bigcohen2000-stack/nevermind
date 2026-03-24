@@ -25,8 +25,8 @@ const { term, explanation } = Astro.props as Props;
     list-style: none;
     align-items: center;
     gap: 0.2rem;
-    border-bottom: 1px dashed rgba(249, 115, 22, 0.5);
-    color: #1a1a1a;
+    border-bottom: 1px dashed color-mix(in srgb, var(--nm-accent) 50%, transparent);
+    color: var(--nm-fg);
     font-weight: 600;
   }
 
@@ -41,13 +41,13 @@ const { term, explanation } = Astro.props as Props;
     z-index: 25;
     width: min(20rem, 72vw);
     border-radius: 1rem;
-    border: 1px solid rgba(26, 26, 26, 0.1);
-    background: rgba(255, 255, 255, 0.98);
+    border: 1px solid color-mix(in srgb, var(--nm-fg) 10%, transparent);
+    background: color-mix(in srgb, var(--nm-bg-canvas) 98%, transparent);
     padding: 0.8rem 0.95rem;
-    box-shadow: 0 20px 50px rgba(26, 26, 26, 0.08);
+    box-shadow: 0 20px 50px color-mix(in srgb, var(--nm-fg) 8%, transparent);
     font-size: 0.95rem;
     line-height: 1.8;
-    color: rgba(26, 26, 26, 0.78);
+    color: color-mix(in srgb, var(--nm-fg) 78%, var(--nm-bg-canvas));
   }
 
   .nm-logic-note:not([open]) .nm-logic-note__tooltip {

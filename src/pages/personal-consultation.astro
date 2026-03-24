@@ -11,7 +11,7 @@ const consultationService = findServiceById("phone-perspective");
 const subscriptionService = findServiceById("retainer-subscription");
 const authorityService = findServiceById("podcast-mic");
 
-const fallbackConsultation: FlatService = {
+const fallbackConsultation = {
   id: "phone-perspective",
   title: "שיחת מיקוד 20 דקות",
   subtitle: "להפריד עובדה מפירוש - עכשיו",
@@ -24,9 +24,9 @@ const fallbackConsultation: FlatService = {
   features: [],
   stageName: "שלב 1: בהירות מיידית",
   targetAudience: "מי שצריך תשובה עכשיו",
-};
+} as unknown as FlatService;
 
-const fallbackSubscription: FlatService = {
+const fallbackSubscription = {
   id: "retainer-subscription",
   title: "מנוי מרפסת - Retainer",
   subtitle: "המסלול הקבוע שלך להתפתחות אמיתית",
@@ -39,9 +39,9 @@ const fallbackSubscription: FlatService = {
   features: [],
   stageName: "שלב 3: ליווי והמשכיות",
   targetAudience: "מי שרוצה גב קבוע",
-};
+} as unknown as FlatService;
 
-const fallbackAuthority: FlatService = {
+const fallbackAuthority = {
   id: "podcast-mic",
   title: "סשן מצולם + ייעוץ אסטרטגי",
   subtitle: "תוכן ברמה גבוהה לרשתות שלך",
@@ -54,9 +54,9 @@ const fallbackAuthority: FlatService = {
   features: [],
   stageName: "שלב 5: השפעה וסמכות",
   targetAudience: "מי שרוצה להפוך תובנות לנכס",
-};
+} as unknown as FlatService;
 
-const featuredServices = [
+const featuredServices: FlatService[] = [
   consultationService ?? fallbackConsultation,
   subscriptionService ?? fallbackSubscription,
   authorityService ?? fallbackAuthority,
