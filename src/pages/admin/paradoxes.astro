@@ -1,5 +1,6 @@
 ---
 import Layout from "../../layouts/Layout.astro";
+import { FloatingInput } from "../../components/ui/FloatingInput";
 
 const pageTitle = "Viral Paradox Generator";
 const pageDescription = "כלי פנימי ליצירת 20 פרדוקסים חדים לשיתוף, על בסיס רעיון, כאב או טקסט גולמי.";
@@ -19,15 +20,30 @@ const pageDescription = "כלי פנימי ליצירת 20 פרדוקסים חד
     <div class="grid gap-8 xl:grid-cols-[minmax(0,30rem)_minmax(0,1fr)]">
       <section class="space-y-6 rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/82 p-6 shadow-[0_30px_90px_rgba(26,26,26,0.08)] backdrop-blur-md">
         <div class="space-y-2 text-right">
-          <label for="paradox-raw-text" class="block text-sm font-semibold text-[var(--nm-fg)]">רעיון / טקסט גולמי</label>
+          <p class="text-sm font-semibold text-[var(--nm-fg)]">רעיון / טקסט גולמי</p>
           <p class="text-sm leading-6 text-[color-mix(in_srgb,var(--nm-fg)_60%,var(--nm-bg))]">תיאור של נושא, מתח פנימי, כאב, טענה או תמלול קצר. לא צריך להיות מסודר.</p>
-          <textarea id="paradox-raw-text" rows="14" dir="rtl" class="w-full rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-[var(--nm-surface-muted)] px-5 py-4 text-right text-base leading-7 text-[var(--nm-fg)] outline-none transition focus:border-[color-mix(in_srgb,var(--nm-accent)_40%,transparent)] focus:ring-2 focus:ring-[color-mix(in_srgb,var(--nm-accent)_20%,transparent)]" placeholder="למשל: אנשים מחפשים שליטה, אבל ככל שהם מנסים לשלוט יותר, הם נהיים יותר חרדים."></textarea>
+          <FloatingInput
+            client:load
+            id="paradox-raw-text"
+            label="דוגמה: אנשים מחפשים שליטה, אבל ככל שהם מנסים לשלוט יותר, הם נהיים יותר חרדים"
+            multiline
+            rows={14}
+            dir="rtl"
+            hideValidation={true}
+            className="[&_.nm-floating-control]:bg-[var(--nm-surface-muted)] [&_.nm-floating-control--textarea]:min-h-[20rem]"
+          />
         </div>
 
         <div class="grid gap-4 sm:grid-cols-2">
           <div class="space-y-2 text-right">
-            <label for="paradox-core-topic" class="block text-sm font-semibold text-[var(--nm-fg)]">ציר מרכזי</label>
-            <input id="paradox-core-topic" type="text" dir="rtl" class="w-full rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3 text-right text-base text-[var(--nm-fg)] outline-none transition focus:border-[color-mix(in_srgb,var(--nm-accent)_40%,transparent)] focus:ring-2 focus:ring-[color-mix(in_srgb,var(--nm-accent)_20%,transparent)]" placeholder="למשל: שליטה" />
+            <FloatingInput
+              client:load
+              id="paradox-core-topic"
+              label="ציר מרכזי, למשל שליטה"
+              dir="rtl"
+              hideValidation={true}
+              className="[&_.nm-floating-control]:bg-[var(--nm-surface-muted)]"
+            />
           </div>
           <div class="space-y-2 text-right">
             <label for="paradox-tone" class="block text-sm font-semibold text-[var(--nm-fg)]">טון</label>

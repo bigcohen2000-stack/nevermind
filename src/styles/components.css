@@ -1,5 +1,5 @@
 /**
- * רכיבי צבע בלבד — ללא שינוי מרווחים/טיפוגרפיה/צל/רדיוס.
+ * רכיבי צבע בלבד. ללא שינוי מרווחים/טיפוגרפיה/צל/רדיוס.
  * משתמשים ב־@apply רק על bg/text/border/ring/fill/stroke ו־transition-colors.
  */
 @layer components {

@@ -1,5 +1,6 @@
 ---
 import appConfig from "../config/appConfig.json";
+import { FloatingInput } from "./ui/FloatingInput";
 
 interface Props {
   phone?: string;
@@ -77,12 +78,16 @@ const defaultHref = `https://wa.me/${phone}?text=${encodeURIComponent(baseMessag
           <h3 class="text-xl font-semibold leading-8">מה העובדה נטו?</h3>
           <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_64%,var(--nm-bg))]">בלי הסיפור שסיפרת לעצמך. רק מה קרה בפועל.</p>
         </div>
-        <textarea
-          data-trigger-input="fact"
-          rows="4"
-          class="w-full rounded-[1.4rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-white px-4 py-3 text-right text-sm leading-7 text-[var(--nm-fg)] outline-none transition focus:border-[color-mix(in_srgb,var(--nm-accent)_35%,transparent)] focus:ring-2 focus:ring-[color-mix(in_srgb,var(--nm-accent)_16%,transparent)]"
-          placeholder="למשל: הוא לא ענה לי מאז הבוקר"
-        ></textarea>
+        <FloatingInput
+          client:load
+          id="nm-trigger-fact"
+          label="דוגמה: הוא לא ענה לי מאז הבוקר"
+          multiline
+          rows={4}
+          dataTriggerInput="fact"
+          hideValidation={true}
+          className="[&_.nm-floating-control]:bg-white"
+        />
         <div class="flex justify-between gap-3">
           <button type="button" data-trigger-next="2" class="inline-flex items-center justify-center rounded-full bg-[var(--nm-inverse)] px-5 py-3 text-sm font-semibold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-inverse-hover)]">להמשיך</button>
           <button type="button" data-trigger-close-inline class="text-sm font-semibold text-[var(--nm-fg)]/56 transition hover:text-[var(--nm-fg)]">לעצור כאן</button>
@@ -95,12 +100,16 @@ const defaultHref = `https://wa.me/${phone}?text=${encodeURIComponent(baseMessag
           <h3 class="text-xl font-semibold leading-8">מה הפירוש שהלבשת על העובדה הזו?</h3>
           <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_64%,var(--nm-bg))]">מה כבר החלטת שזה אומר עליך, עליו או על העתיד?</p>
         </div>
-        <textarea
-          data-trigger-input="story"
-          rows="4"
-          class="w-full rounded-[1.4rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-white px-4 py-3 text-right text-sm leading-7 text-[var(--nm-fg)] outline-none transition focus:border-[color-mix(in_srgb,var(--nm-accent)_35%,transparent)] focus:ring-2 focus:ring-[color-mix(in_srgb,var(--nm-accent)_16%,transparent)]"
-          placeholder="למשל: הוא מזלזל בי, אז כנראה שאני לא באמת חשוב"
-        ></textarea>
+        <FloatingInput
+          client:load
+          id="nm-trigger-story"
+          label="דוגמה: הוא מזלזל בי, אז כנראה שאני לא באמת חשוב"
+          multiline
+          rows={4}
+          dataTriggerInput="story"
+          hideValidation={true}
+          className="[&_.nm-floating-control]:bg-white"
+        />
         <div class="flex justify-between gap-3">
           <button type="button" data-trigger-next="3" class="inline-flex items-center justify-center rounded-full bg-[var(--nm-inverse)] px-5 py-3 text-sm font-semibold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-inverse-hover)]">להמשיך</button>
           <button type="button" data-trigger-back="1" class="text-sm font-semibold text-[var(--nm-fg)]/56 transition hover:text-[var(--nm-fg)]">חזרה</button>
@@ -113,12 +122,16 @@ const defaultHref = `https://wa.me/${phone}?text=${encodeURIComponent(baseMessag
           <h3 class="text-xl font-semibold leading-8">מה הרווח הסמוי שלך מלהישאר כועס או פגוע עכשיו?</h3>
           <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_64%,var(--nm-bg))]">לפעמים הכאב מחזיק תחושת צדק, שליטה או הימנעות מהצעד הבא.</p>
         </div>
-        <textarea
-          data-trigger-input="gain"
-          rows="4"
-          class="w-full rounded-[1.4rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-white px-4 py-3 text-right text-sm leading-7 text-[var(--nm-fg)] outline-none transition focus:border-[color-mix(in_srgb,var(--nm-accent)_35%,transparent)] focus:ring-2 focus:ring-[color-mix(in_srgb,var(--nm-accent)_16%,transparent)]"
-          placeholder="למשל: כל עוד אני פגוע, אני לא צריך לדבר ישירות או לבדוק מה באמת קרה"
-        ></textarea>
+        <FloatingInput
+          client:load
+          id="nm-trigger-gain"
+          label="דוגמה: כל עוד אני פגוע, אני לא צריך לדבר ישירות או לבדוק מה באמת קרה"
+          multiline
+          rows={4}
+          dataTriggerInput="gain"
+          hideValidation={true}
+          className="[&_.nm-floating-control]:bg-white"
+        />
         <div class="flex justify-between gap-3">
           <button type="button" data-trigger-finish class="inline-flex items-center justify-center rounded-full bg-[var(--nm-accent)] px-5 py-3 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]">לסיים</button>
           <button type="button" data-trigger-back="2" class="text-sm font-semibold text-[var(--nm-fg)]/56 transition hover:text-[var(--nm-fg)]">חזרה</button>

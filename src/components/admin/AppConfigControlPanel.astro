@@ -1,5 +1,6 @@
 ---
 import appConfig from "../../config/appConfig.json";
+import { FloatingInput } from "../ui/FloatingInput";
 ---
 
 <form id="app-config-form" class="space-y-6 rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/82 p-6 shadow-[0_30px_90px_rgba(26,26,26,0.08)] backdrop-blur-md">
@@ -34,19 +35,30 @@ import appConfig from "../../config/appConfig.json";
     </header>
 
     <div class="grid gap-4 md:grid-cols-2">
-      <label class="block space-y-2">
-        <span class="text-sm font-semibold text-[var(--nm-fg)]">תווית לקוד</span>
-        <input id="premium-rotate-label" type="text" value="Access 2026" class="w-full rounded-[1rem] border border-[color-mix(in_srgb,var(--nm-fg)_14%,transparent)] bg-white/70 px-4 py-3 text-sm outline-none focus:border-[color-mix(in_srgb,var(--nm-accent)_35%,transparent)]" />
-      </label>
-      <label class="block space-y-2">
-        <span class="text-sm font-semibold text-[var(--nm-fg)]">תוקף (ISO, אופציונלי)</span>
-        <input id="premium-rotate-expiry" type="text" placeholder="2026-12-31T23:59:59+02:00" class="w-full rounded-[1rem] border border-[color-mix(in_srgb,var(--nm-fg)_14%,transparent)] bg-white/70 px-4 py-3 text-sm outline-none focus:border-[color-mix(in_srgb,var(--nm-accent)_35%,transparent)]" />
-      </label>
+      <FloatingInput
+        client:load
+        id="premium-rotate-label"
+        label="תווית לקוד"
+        defaultValue="Access 2026"
+        hideValidation={true}
+        className="[&_.nm-floating-control]:bg-white/70"
+      />
+      <FloatingInput
+        client:load
+        id="premium-rotate-expiry"
+        label="תוקף ISO אופציונלי (דוגמה: 2026-12-31T23:59:59+02:00)"
+        hideValidation={true}
+        className="[&_.nm-floating-control]:bg-white/70"
+      />
     </div>
-    <label class="block space-y-2">
-      <span class="text-sm font-semibold text-[var(--nm-fg)]">סיסמה חדשה</span>
-      <input id="premium-rotate-password" type="password" placeholder="הקלד סיסמה חדשה" class="w-full rounded-[1rem] border border-[color-mix(in_srgb,var(--nm-fg)_14%,transparent)] bg-white/70 px-4 py-3 text-sm outline-none focus:border-[color-mix(in_srgb,var(--nm-accent)_35%,transparent)]" />
-    </label>
+    <FloatingInput
+      client:load
+      id="premium-rotate-password"
+      label="סיסמה חדשה"
+      type="password"
+      hideValidation={true}
+      className="[&_.nm-floating-control]:bg-white/70"
+    />
     <div class="flex flex-col gap-3 sm:flex-row sm:justify-end">
       <button id="premium-generate-password" type="button" class="inline-flex items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-white px-5 py-3 text-sm font-semibold text-[var(--nm-fg)] transition hover:border-[color-mix(in_srgb,var(--nm-accent)_30%,transparent)]">צור סיסמה אוטומטית</button>
       <button id="premium-rotate-apply" type="button" class="inline-flex items-center justify-center rounded-full bg-[var(--nm-accent)] px-5 py-3 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]">החלף סיסמה בתוך JSON</button>
@@ -56,16 +68,18 @@ import appConfig from "../../config/appConfig.json";
     </p>
   </section>
 
-  <label class="block space-y-2 text-right">
-    <span class="text-sm font-semibold text-[var(--nm-fg)]">appConfig.json</span>
-    <textarea
-      id="app-config-input"
-      rows="24"
-      spellcheck="false"
-      dir="ltr"
-      class="w-full rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-[var(--nm-code-bg)] px-5 py-4 text-left text-sm leading-7 text-[var(--nm-code-fg)] outline-none transition focus:border-[color-mix(in_srgb,var(--nm-accent)_40%,transparent)] focus:ring-2 focus:ring-[color-mix(in_srgb,var(--nm-accent)_20%,transparent)]"
-    >{JSON.stringify(appConfig, null, 2)}</textarea>
-  </label>
+  <FloatingInput
+    client:load
+    id="app-config-input"
+    label="appConfig.json"
+    multiline
+    rows={24}
+    dir="ltr"
+    spellcheck={false}
+    defaultValue={JSON.stringify(appConfig, null, 2)}
+    hideValidation={true}
+    className="[&_.nm-floating-control--textarea]:min-h-[32rem] [&_.nm-floating-control]:bg-[var(--nm-code-bg)] [&_.nm-floating-control]:font-mono [&_.nm-floating-control]:text-sm [&_.nm-floating-control]:leading-7 [&_.nm-floating-control]:text-[var(--nm-code-fg)]"
+  />
 
   <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:justify-end">
     <button id="pick-app-config-file" type="button" class="inline-flex items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white px-5 py-3 text-sm font-semibold text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))] transition hover:bg-[var(--nm-surface-muted)]">בחר appConfig.json</button>

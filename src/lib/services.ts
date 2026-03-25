@@ -3,12 +3,12 @@ import appConfig from "../config/appConfig.json";
 
 type ServicesConfig = typeof servicesConfig;
 export type PaymentMethod = ServicesConfig["payment_methods"][number];
-/** שלב במסלול — כולל social_proof אופציונלי ברמת השלב (מעבר לשירות בודד) */
+/** שלב במסלול. כולל social_proof אופציונלי ברמת השלב (מעבר לשירות בודד) */
 export type ServiceStage = ServicesConfig["funnel_stages"][number] & {
   social_proof?: string | null;
 };
 
-/** זמינות מובנית (תאריך עדכון + מקומות) — תאימות: גם `availability_note` מחרוזת */
+/** זמינות מובנית (תאריך עדכון + מקומות). תאימות: גם `availability_note` מחרוזת */
 export type ServiceAvailability = {
   spots_left: number;
   updated_at: string;
@@ -47,7 +47,7 @@ export type FlatService = StageService & {
   whatsapp_template?: string | null;
 };
 
-/** גילוי נאות ארוך — מקור: `trust_elements.disclaimer` ב־services.json */
+/** גילוי נאות ארוך. מקור: `trust_elements.disclaimer` ב־services.json */
 export const disclaimerLong =
   (servicesConfig.trust_elements as Record<string, unknown>).disclaimer_full?.toString?.() ||
   (servicesConfig.trust_elements as Record<string, unknown>).disclaimer?.toString?.() ||
@@ -84,6 +84,58 @@ const DEFAULT_CONTENT_GAP_MESSAGE =
 export const servicesContentGapMessage =
   (servicesConfig as Record<string, unknown>).content_gap_message?.toString?.()?.trim() ||
   DEFAULT_CONTENT_GAP_MESSAGE;
+
+export type EngagementSectionCard = {
+  title: string;
+  body: string;
+  ctaHref: string;
+  ctaLabel: string;
+};
+
+export type EngagementSectionsMap = {
+  studio: EngagementSectionCard;
+  talk: EngagementSectionCard;
+  archive: EngagementSectionCard;
+  philosophy: EngagementSectionCard;
+};
+
+const defaultEngagementSections: EngagementSectionsMap = {
+  studio: {
+    title: "אולפן פודקאסט",
+    body: "מגיעים לאולפן פודקאסט אמיתי ונוכחים לשיחה מרתקת על כל תחומי החיים. אפשר לדבר בלי להיות מצולמים - אנונימיות מלאה אם תרצה. אפשר גם לבקש עיוות קול: לטובתך ולטובת כולם - כי אם תרצה לשתף חבר שעובר את אותו הדבר, הסרטונים יעזרו לו בדיוק כמו שעזרו לך.",
+    ctaHref: "/services/#balcony-experience",
+    ctaLabel: "לפרטים על האולפן",
+  },
+  talk: {
+    title: "שיחה של 20 דקות",
+    body: "בוא נמצא זמן שנוח לך ולי ונשוחח 20 דקות על מה שתרצה. אם תרצה לשמוע רעיונות חדשים, את דעתי על משהו ספציפי, או שאמפה איפה עוד אפשר לפתח ולחדד את החשיבה - זה בדיוק מה שאני כאן.",
+    ctaHref: "/services/#phone-perspective",
+    ctaLabel: "לקביעת שיחה",
+  },
+  archive: {
+    title: "ארכיון NeverMind",
+    body: "גישה לכל המאמרים והסרטונים באתר - כולל הפודקאסט המלא ויותר מ-12,000 שעות תוכן על כל נושאי החיים. פותחים נושאים מורכבים: דת, סמים, התמכרויות, סקס, זוגיות, פורנו ואהבה אמיתית.",
+    ctaHref: "/services/#portal-access",
+    ctaLabel: "למנוי הארכיון",
+  },
+  philosophy: {
+    title: "איך זה עובד כאן",
+    body: "זה לא עוד המלצה. זו הבנה עמוקה של מה שכבר קיים, ופתיחה לאפשרויות חדשות - אם תרצה.",
+    ctaHref: "/services/",
+    ctaLabel: "למרחב הגילוי",
+  },
+};
+
+export const servicesEngagementSections: EngagementSectionsMap = (() => {
+  const raw = (servicesConfig as Record<string, unknown>).engagement_sections as Partial<EngagementSectionsMap> | undefined;
+  if (!raw || typeof raw !== "object") return defaultEngagementSections;
+  return {
+    studio: { ...defaultEngagementSections.studio, ...(raw.studio ?? {}) },
+    talk: { ...defaultEngagementSections.talk, ...(raw.talk ?? {}) },
+    archive: { ...defaultEngagementSections.archive, ...(raw.archive ?? {}) },
+    philosophy: { ...defaultEngagementSections.philosophy, ...(raw.philosophy ?? {}) },
+  };
+})();
 
 export const servicesHero = servicesConfig.hero;
 export const servicesStages = servicesConfig.funnel_stages as ServiceStage[];
@@ -122,7 +174,7 @@ export function buildRetentionArticleWhatsAppHref(articleTitle: string, articleU
   return buildWhatsAppHref(body);
 }
 
-/** שאלה לפני התחלה — שם השירות משובץ בהודעה (מקודד ל־URL) */
+/** שאלה לפני התחלה. שם השירות משובץ בהודעה (מקודד ל־URL) */
 export function buildServicePreStartWhatsAppHref(serviceName: string): string {
   const name = serviceName.trim() || "השירות";
   const preface = buildWhatsAppCrmPreface(name);
@@ -174,7 +226,7 @@ function applyWhatsappTemplate(template: string, service: StageService | FlatSer
   return template.replace(/\{title\}/g, service.title).replace(/\{price\}/g, price);
 }
 
-/** קישור וואטסאפ לשירות — תבנית מה־JSON או ברירת מחדל, אחרת הודעה כללית */
+/** קישור וואטסאפ לשירות. תבנית מה־JSON או ברירת מחדל, אחרת הודעה כללית */
 export function buildServiceWhatsAppHref(service: StageService | FlatService): string {
   const raw = (service.whatsapp_template ?? defaultWhatsappServiceTemplate).trim();
   if (raw) {

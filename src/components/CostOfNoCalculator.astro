@@ -1,5 +1,6 @@
 ---
 import appConfig from "../config/appConfig.json";
+import { FloatingInput } from "./ui/FloatingInput";
 
 interface Props {
   phone?: string;
@@ -53,20 +54,24 @@ const initialMonthPhrase = toMonthPhrase(initialWorkDays);
   </div>
 
   <div class="mt-8 grid gap-6 lg:grid-cols-[minmax(0,21rem)_minmax(0,1fr)] lg:items-start">
-    <label class="block space-y-3 text-right">
-      <span class="text-sm font-semibold">כמה שעות בשבוע אתה מקדיש למחשבות סובבות על ההתלבטות הזו?</span>
-      <input
-        data-cost-input
+    <div class="space-y-3 text-right">
+      <FloatingInput
+        client:load
+        id="nm-cost-weekly-hours"
+        name="weekly_hours"
+        label="כמה שעות בשבוע אתה מקדיש למחשבות סובבות על ההתלבטות הזו"
         type="number"
         min={minHours}
         max={maxHours}
-        step="1"
-        value={defaultHours}
-        inputmode="numeric"
-        class="w-full rounded-[1.4rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-4 text-right text-lg font-semibold text-[var(--nm-fg)] outline-none transition duration-300 focus:border-[color-mix(in_srgb,var(--nm-accent)_35%,transparent)] focus:ring-2 focus:ring-[color-mix(in_srgb,var(--nm-accent)_16%,transparent)]"
+        step={1}
+        inputMode="numeric"
+        defaultValue={String(defaultHours)}
+        dataCostInput={true}
+        hideValidation={true}
+        className="[&_.nm-floating-control]:bg-[var(--nm-surface-muted)] [&_.nm-floating-control]:text-lg [&_.nm-floating-control]:font-medium"
       />
       <p class="text-xs leading-6 text-[var(--nm-fg)]/52">אפשר להכניס כל מספר בין {minHours} ל־{maxHours} שעות.</p>
-    </label>
+    </div>
 
     <div class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-accent)_14%,transparent)] bg-[color-mix(in_srgb,var(--nm-accent)_6%,var(--nm-bg-canvas))] p-5 md:p-6">
       <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">התוצאה</p>

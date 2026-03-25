@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { runPagefindSearch, type PagefindSearchResult } from "../lib/pagefind-client";
+import { FloatingInput } from "./ui/FloatingInput";
 
 export default function SearchModal() {
   const [isOpen, setIsOpen] = useState(false);
@@ -114,12 +115,14 @@ export default function SearchModal() {
         </p>
 
         <div className="mt-4">
-          <input
+          <FloatingInput
             ref={inputRef}
+            id="nm-search-modal-query"
+            label="מה מעסיק אותך כרגע"
+            type="search"
             value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="מה מעסיק אותך כרגע?"
-            className="w-full rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)]/85 px-4 py-3 text-right text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] text-[var(--nm-fg)] outline-none focus-visible:ring-2 focus-visible:ring-[color-mix(in_srgb,var(--nm-fg)_22%,transparent)]"
+            onChange={setQuery}
+            hideValidation
             dir="rtl"
             aria-label="מה מעסיק אותך כרגע? | חיפוש במרכז הידע של השם לא משנה"
           />

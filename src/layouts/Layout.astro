@@ -17,6 +17,7 @@ type BrandCfg = {
   defaultOgImagePath?: string;
   themeColor?: string;
   backgroundColor?: string;
+  wordmarkHe?: string;
 };
 type ContactCfg = {
   whatsAppNumber?: string;
@@ -110,6 +111,10 @@ const showOgRasterDimensions =
 const ogImageAlt = frontmatter?.title ? String(frontmatter.title) : pageTitle;
 const clientLogUrl = (import.meta.env.PUBLIC_CLIENT_LOG_URL ?? "").trim();
 const logoAbsolute = new URL(logoPath.replace(/^\//, ""), siteUrlSlash).toString();
+const wordmarkHe =
+  typeof brandCfg.wordmarkHe === "string" && brandCfg.wordmarkHe.trim().length > 0
+    ? brandCfg.wordmarkHe.trim()
+    : "השם לא משנה";
 
 const organizationSchema = {
   "@context": "https://schema.org",
@@ -162,6 +167,9 @@ const normalizeSegment = (segment: string) => {
     glossary: "הגדרות מחדש",
     questions: "שאלות קצרות",
     intake: "טופס הכנה לשיחה",
+    archive: "ארכיון",
+    studio: "סטודיו",
+    about: "להבין",
     "personal-consultation": "שיחה אישית",
     "premium-access": "גישת פרימיום",
     journey: "מסלולי בהירות",
@@ -174,6 +182,31 @@ const normalizeSegment = (segment: string) => {
 };
 
 const pathName = Astro.url?.pathname ?? "/";
+const normalizeNavPath = (raw: string) => {
+  const trimmed = String(raw || "").trim();
+  if (!trimmed || trimmed === "/") return "/";
+  return trimmed.replace(/\/+$/, "") || "/";
+};
+const currentNavPath = normalizeNavPath(pathName);
+
+const intentNavItems: { href: string; label: string; activePrefixes: string[] }[] = [
+  { href: "/archive/", label: "אני רוצה להעמיק", activePrefixes: ["/archive", "/articles"] },
+  {
+    href: "/studio/",
+    label: "אני רוצה לדבר",
+    activePrefixes: ["/studio", "/services", "/intake", "/personal-consultation"],
+  },
+  { href: "/about/", label: "אני רוצה להבין", activePrefixes: ["/about", "/glossary"] },
+];
+
+const intentNavItemIsCurrent = (prefixes: string[]) => {
+  const p = currentNavPath;
+  return prefixes.some((pre) => {
+    const norm = normalizeNavPath(pre);
+    if (norm === "/") return p === "/";
+    return p === norm || p.startsWith(`${norm}/`);
+  });
+};
 const shouldNoIndexByPath = pathName.startsWith("/admin/");
 const effectiveNoIndex = noIndex || shouldNoIndexByPath || !siteAllowsIndexing;
 const pathSegments = pathName.split("/").filter(Boolean);
@@ -303,14 +336,6 @@ const socialLinks = [
   { label: "X", href: "https://x.com/nevermindyakir", mark: "X" },
 ];
 
-const navItems = [
-  { href: "/", label: "בית" },
-  { href: "/articles/", label: "מאמרים" },
-  { href: "/glossary/", label: "הגדרות מחדש" },
-  { href: "/services/", label: "שירותים" },
-  { href: "/questions/", label: "שאלות קצרות" },
-  { href: "/now/", label: "מה המצב עכשיו" },
-];
 ---
 <!doctype html>
 <html lang="he" dir="rtl">
@@ -362,7 +387,7 @@ const navItems = [
   >
     <a
       href="#main-content"
-      class="sr-only transition-colors duration-200 focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[110] focus:rounded-md focus:bg-[var(--nm-bg-canvas)] focus:px-4 focus:py-2 focus:text-[var(--nm-fg)] focus:ring-2 focus:ring-[color-mix(in_srgb,var(--nm-accent)_35%,transparent)] shadow-xl"
+      class="sr-only transition-colors duration-200 focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[110] focus:rounded-md focus:bg-[var(--nm-bg-canvas)] focus:px-4 focus:py-2 focus:text-[var(--nm-fg)] focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-[var(--color-red)] shadow-xl"
     >
       דלג לתוכן הראשי
     </a>
@@ -388,31 +413,64 @@ const navItems = [
     <header>
       <nav
         data-nav
-        class={`fixed inset-x-0 z-50 flex justify-center px-4 transition-[top] duration-300 ${navTopClass}`}
+        class={`fixed inset-x-0 z-50 transition-[top] duration-300 ${navTopClass}`}
         aria-label="ניווט ראשי"
       >
-        <div class="flex flex-wrap items-center justify-center gap-3 rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)]/92 px-5 py-3 shadow-[0_14px_34px_color-mix(in_srgb,var(--nm-fg)_8%,transparent)] backdrop-blur-md">
-          {navItems.map((item) => (
-            <a href={item.href} class="text-sm font-semibold text-[color-mix(in_srgb,var(--nm-fg)_82%,var(--nm-bg))] transition-colors duration-200 hover:text-[var(--nm-accent)]">{item.label}</a>
-          ))}
-          <button
-            type="button"
-            data-random-article-trigger
-            class="rounded-full bg-[var(--nm-accent)] px-4 py-2 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]"
+        <div data-site-header-bar class="nm-header-bar w-full px-4">
+          <div class="mx-auto flex max-w-6xl flex-wrap items-center gap-3 py-3 md:flex-nowrap md:items-center md:gap-4 md:py-3.5">
+          <a
+            href="/"
+            class="nm-header-brand order-1 shrink-0 text-[clamp(1.05rem,1rem+0.35vw,1.25rem)] font-light leading-tight text-[var(--color-black)] no-underline transition-colors duration-200 [transition-timing-function:ease] hover:text-[var(--color-red)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-red)]"
           >
-            הפתע אותי
-          </button>
-          <button
-            id="search-trigger"
-            data-search-trigger
-            aria-label="חיפוש במרכז הידע | מה מעסיק אותך כרגע?"
-            class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))] transition-colors duration-200 hover:border-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)] hover:text-[var(--nm-accent)]"
-          >
-            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <circle cx="11" cy="11" r="8" />
-              <path d="m21 21-4.3-4.3" />
-            </svg>
-          </button>
+            {wordmarkHe}
+          </a>
+
+          <div class="order-2 min-w-0 flex-1 basis-full overflow-x-auto md:basis-auto nm-nav-scroll-hide">
+            <ul class="flex flex-nowrap items-stretch justify-start gap-1 sm:gap-2 md:justify-center" role="list">
+              {intentNavItems.map((item) => {
+                const active = intentNavItemIsCurrent(item.activePrefixes);
+                return (
+                  <li class="shrink-0" role="none">
+                    <a
+                      href={item.href}
+                      tabindex={0}
+                      class={`inline-flex min-h-[44px] max-w-[min(100vw-2rem,18rem)] items-center whitespace-nowrap rounded-md px-2.5 text-[0.9rem] font-normal no-underline transition-colors duration-200 [transition-timing-function:ease] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-red)] ${
+                        active
+                          ? "text-[var(--color-red)]"
+                          : "text-[color-mix(in_srgb,var(--color-black)_65%,transparent)] hover:text-[var(--color-black)]"
+                      }`}
+                      {...(active ? ({ "aria-current": "page" } as const) : {})}
+                    >
+                      {item.label}
+                    </a>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+
+          <div class="order-3 flex shrink-0 items-center gap-2">
+            <button
+              type="button"
+              data-random-article-trigger
+              class="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full bg-[var(--nm-accent)] px-4 py-2 text-sm font-medium text-[var(--nm-on-accent)] transition-colors duration-200 [transition-timing-function:ease] hover:bg-[var(--nm-accent-hover)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-red)]"
+            >
+              הפתע אותי
+            </button>
+            <button
+              id="search-trigger"
+              type="button"
+              data-search-trigger
+              aria-label="חיפוש במרכז הידע | מה מעסיק אותך כרגע?"
+              class="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))] transition-colors duration-200 [transition-timing-function:ease] hover:border-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)] hover:text-[var(--nm-accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-red)]"
+            >
+              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.3-4.3" />
+              </svg>
+            </button>
+          </div>
+          </div>
         </div>
       </nav>
     </header>
@@ -507,6 +565,17 @@ const navItems = [
       </div>
     </footer>
 
+    <button
+      type="button"
+      id="nm-back-to-top"
+      hidden
+      class="hidden inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-[var(--nm-inverse)] px-4 py-2 text-sm font-semibold text-[var(--nm-inverse-fg)] shadow-sm transition hover:bg-[var(--nm-inverse-hover)] fixed bottom-5 right-5 z-[46] md:bottom-6 md:right-6"
+      aria-label="חזרה לראש העמוד"
+      aria-hidden="true"
+    >
+      ↑ למעלה
+    </button>
+
     <WhatsAppButton
       phone={appConfig.contact.whatsAppNumber}
       tags={waTags}
@@ -522,6 +591,92 @@ const navItems = [
         if (window.__nmLayoutCleanup) {
           window.__nmLayoutCleanup();
         }
+
+        const titleNode = document.querySelector("title");
+        const titleText = titleNode?.textContent?.trim();
+        if (titleText) {
+          document.title = titleText;
+        }
+
+        const nmNavTrackKeyCurrent = "nm-nav-current";
+        const nmNavTrackKeyPrevious = "nm-nav-previous";
+        const nmShouldTrackPathname = (pathname) => {
+          if (!pathname) return false;
+          if (pathname.startsWith("/admin")) return false;
+          if (pathname.startsWith("/thank-you")) return false;
+          if (pathname === "/404" || pathname.startsWith("/404/")) return false;
+          return true;
+        };
+        const curFull = `${location.pathname}${location.search}`;
+        const curPath = location.pathname;
+        if (nmShouldTrackPathname(curPath)) {
+          try {
+            const last = sessionStorage.getItem(nmNavTrackKeyCurrent);
+            if (last && last !== curFull) {
+              sessionStorage.setItem(nmNavTrackKeyPrevious, last);
+            }
+            sessionStorage.setItem(nmNavTrackKeyCurrent, curFull);
+          } catch {
+            /* ignore */
+          }
+        }
+
+        window.__nmReturnLabelForPath = (pNorm) => {
+          if (pNorm === "/") return "חזור לדף הבית";
+          if (pNorm === "/archive" || pNorm.startsWith("/archive/")) return "חזור לארכיון";
+          if (pNorm === "/articles") return "חזור לארכיון";
+          if (pNorm.startsWith("/articles/")) return "חזור למאמר";
+          if (pNorm === "/studio" || pNorm.startsWith("/studio/")) return "חזור לסטודיו";
+          if (pNorm === "/about" || pNorm.startsWith("/about/")) return "חזור להבנה";
+          if (pNorm.startsWith("/topics/")) return "חזור לנושא";
+          if (pNorm.startsWith("/glossary")) return "חזור להגדרות מחדש";
+          if (pNorm.startsWith("/services") || pNorm.startsWith("/intake")) return "חזור ללוח הלמידה";
+          if (pNorm.startsWith("/questions")) return "חזור לשאלות";
+          if (pNorm === "/now" || pNorm.startsWith("/now/")) return "חזור למה המצב עכשיו";
+          return "חזור לאן שבאת";
+        };
+
+        window.__nmResolveReturnTarget = () => {
+          let href = "/archive/";
+          let label = "חזור לארכיון";
+          const here = `${location.pathname}${location.search}`;
+          const hereNorm = location.pathname.replace(/\/+$/, "") || "/";
+          try {
+            const prev = sessionStorage.getItem(nmNavTrackKeyPrevious);
+            if (prev && prev !== here) {
+              const pathOnly = prev.split("?")[0];
+              const pNorm = pathOnly.replace(/\/+$/, "") || "/";
+              href = prev.startsWith("/") ? prev : `/${prev}`;
+              label = window.__nmReturnLabelForPath(pNorm);
+              return { href, label };
+            }
+            const ref = document.referrer;
+            if (ref && ref.startsWith(location.origin)) {
+              const u = new URL(ref);
+              const refFull = `${u.pathname}${u.search}`;
+              const refNorm = u.pathname.replace(/\/+$/, "") || "/";
+              if (refFull !== here && !refNorm.startsWith("/admin")) {
+                href = `${u.pathname}${u.search}`;
+                label = window.__nmReturnLabelForPath(refNorm);
+                return { href, label };
+              }
+            }
+          } catch {
+            /* ignore */
+          }
+          return { href, label };
+        };
+
+        window.__nmFillReturnLink = (anchor) => {
+          if (!(anchor instanceof HTMLAnchorElement)) return;
+          const target = window.__nmResolveReturnTarget();
+          anchor.setAttribute("href", target.href);
+          anchor.textContent = target.label;
+        };
+
+        document.querySelectorAll("[data-nm-return-cta-link]").forEach((node) => {
+          window.__nmFillReturnLink(node);
+        });
 
         const searchTriggers = Array.from(document.querySelectorAll("[data-search-trigger]"));
         const randomTriggers = Array.from(document.querySelectorAll("[data-random-article-trigger]"));
@@ -578,9 +733,52 @@ const navItems = [
 
         const scrollStorageKey = `nm-scroll:${window.location.pathname}`;
         const savedScroll = Number(sessionStorage.getItem(scrollStorageKey));
-        if (Number.isFinite(savedScroll) && savedScroll > 0) {
-          window.requestAnimationFrame(() => window.scrollTo(0, savedScroll));
+
+        const backBtn = document.getElementById("nm-back-to-top");
+        const backThreshold = 300;
+        const syncBackToTop = () => {
+          if (!(backBtn instanceof HTMLElement)) return;
+          const y = window.scrollY || document.documentElement.scrollTop || 0;
+          const show = y > backThreshold;
+          backBtn.classList.toggle("hidden", !show);
+          backBtn.toggleAttribute("hidden", !show);
+          backBtn.setAttribute("aria-hidden", show ? "false" : "true");
+        };
+        const onBackToTopScroll = () => syncBackToTop();
+        const onBackToTopClick = () => {
+          const main = document.getElementById("main-content");
+          if (main instanceof HTMLElement) {
+            main.scrollIntoView({ behavior: "smooth", block: "start" });
+          } else {
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          }
+        };
+        if (backBtn instanceof HTMLElement) {
+          backBtn.addEventListener("click", onBackToTopClick);
         }
+        window.addEventListener("scroll", onBackToTopScroll, { passive: true });
+
+        const headerBar = document.querySelector("[data-site-header-bar]");
+        const headerScrollThreshold = 50;
+        const syncHeaderBarScrolled = () => {
+          if (!(headerBar instanceof HTMLElement)) return;
+          const y = window.scrollY || document.documentElement.scrollTop || 0;
+          headerBar.classList.toggle("nm-header--scrolled", y >= headerScrollThreshold);
+        };
+        const onHeaderScroll = () => syncHeaderBarScrolled();
+        window.addEventListener("scroll", onHeaderScroll, { passive: true });
+        syncHeaderBarScrolled();
+
+        if (Number.isFinite(savedScroll) && savedScroll > 0) {
+          window.requestAnimationFrame(() => {
+            window.scrollTo(0, savedScroll);
+            syncBackToTop();
+            syncHeaderBarScrolled();
+          });
+        } else {
+          syncBackToTop();
+        }
+
         const persistScroll = () => {
           sessionStorage.setItem(scrollStorageKey, String(window.scrollY || 0));
         };
@@ -643,6 +841,11 @@ const navItems = [
           randomTriggers.forEach((trigger) => trigger.removeEventListener("click", onRandomClick));
           window.removeEventListener("scroll", persistScroll);
           window.removeEventListener("beforeunload", persistScroll);
+          window.removeEventListener("scroll", onBackToTopScroll);
+          window.removeEventListener("scroll", onHeaderScroll);
+          if (backBtn instanceof HTMLElement) {
+            backBtn.removeEventListener("click", onBackToTopClick);
+          }
         };
       });
     </script>

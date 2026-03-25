@@ -101,7 +101,9 @@ const videoPoints = Array.isArray(canvas.featuredVideo?.videoSummaryPoints)
       </blockquote>
       {
         canvas.dailyQuote.attribution && (
-          <footer class="mt-4 text-sm text-[color-mix(in_srgb,var(--nm-fg-secondary)_65%,var(--nm-bg))]">— {canvas.dailyQuote.attribution}</footer>
+          <footer class="mt-4 text-sm text-[color-mix(in_srgb,var(--nm-fg-secondary)_65%,var(--nm-bg))]">
+            {canvas.dailyQuote.attribution}
+          </footer>
         )
       }
     </div>

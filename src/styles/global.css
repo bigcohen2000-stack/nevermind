@@ -1,13 +1,13 @@
 @import "tailwindcss";
 
 /**
- * פלטת NeverMind / השם לא משנה — בוטיק, ללא Dark Mode.
+ * פלטת NeverMind / השם לא משנה. בוטיק, ללא Dark Mode.
  * רקע, טקסט, אדום דגש בלבד (+ נגזרות mix).
  */
 :root {
   color-scheme: light;
 
-  /* מקור האמת — #1A1A1A טקסט, #FAFAF8 משטח, #D42B2B דגש */
+  /* מקור האמת: #1A1A1A טקסט, #FAFAF8 משטח, #D42B2B דגש */
   --color-text-primary: #1a1a1a;
   --color-surface-page: #fafaf8;
   --color-surface-canvas: #fafaf8;
@@ -16,7 +16,7 @@
   --color-accent: #d42b2b;
   --color-accent-hover: color-mix(in srgb, var(--color-accent) 88%, var(--color-text-primary));
   --color-on-accent: #fafaf8;
-  /* כפתורים כהים / בלוקי ניגוד — שחור מותג על רקע בהיר */
+  /* כפתורים כהים / בלוקי ניגוד: שחור מותג על רקע בהיר */
   --color-inverse-bg: #1a1a1a;
   --color-inverse-bg-hover: color-mix(in srgb, var(--color-inverse-bg) 85%, var(--color-accent));
   --color-inverse-fg: #fafaf8;
@@ -46,6 +46,19 @@
   --nm-nav-top: 1.5rem;
   /* באנר "בהרצה" בראש כל עמוד (Layout) */
   --nm-staging-banner-height: 3.5rem;
+
+  /* שמות מותג (מצביעים על אותם ערכים, בלי כפילות HEX בקומפוננטות) */
+  --color-white: var(--color-surface-page);
+  --color-red: var(--color-accent);
+  --color-black: var(--color-text-primary);
+  --content-width: 65ch;
+  --line-height-ui: 1.6;
+  --line-height-article: 1.8;
+  --transition-fast: 0.2s ease;
+  --transition-medium: 0.3s ease;
+
+  --color-valid: #16a34a;
+  --color-mark-highlight: #fef08a;
 }
 
 /* נגישות: הגדלת טקסט (A11yWidget) */
@@ -118,15 +131,132 @@ html[lang="he"] {
 body {
   font-family: "Assistant Variable", system-ui, sans-serif;
   font-size: 1rem;
-  line-height: 1.7;
+  line-height: var(--line-height-ui);
   letter-spacing: 0;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: var(--nm-bg);
   color: var(--nm-text);
   transition:
-    background-color 0.25s ease,
-    color 0.25s ease;
+    background-color var(--transition-fast),
+    color var(--transition-fast);
+}
+
+/* תוכן ארוך: רוחב שורה ושורת בסיס לקריאה */
+.nm-mdx-flow[data-content="long-form"],
+[data-content="long-form"] {
+  max-width: var(--content-width);
+  margin-inline: auto;
+  line-height: var(--line-height-article);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #1a1a1a #fafaf8;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #fafaf8;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1a1a1a;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-red);
+}
+
+/* שדה צף: מצב צף ב־:focus וב־:not(:placeholder-shown) (placeholder ריק NBSP) */
+.nm-floating-field {
+  line-height: var(--line-height-ui);
+}
+
+.nm-floating-control {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 3rem;
+  padding: 1.1rem 0.75rem 0.45rem;
+  border: 1.5px solid var(--color-black);
+  border-radius: 1rem;
+  background: transparent;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: var(--line-height-ui);
+  color: var(--color-black);
+  transition: border-color var(--transition-fast);
+}
+
+.nm-floating-control--textarea {
+  min-height: 6.5rem;
+}
+
+.nm-floating-control--embed {
+  min-height: 0;
+  display: inline-block;
+  width: auto;
+  min-width: 8rem;
+  max-width: min(100%, 18rem);
+  padding: 0.35rem 0.55rem 0.28rem;
+  vertical-align: baseline;
+  font-size: 1em;
+  border-radius: 0.5rem;
+}
+
+.nm-floating-control:focus {
+  border-color: var(--color-red);
+}
+
+.nm-floating-control:focus-visible {
+  outline: 2px solid var(--color-red);
+  outline-offset: 2px;
+}
+
+.nm-floating-label {
+  position: absolute;
+  inset-inline-start: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.2;
+  color: color-mix(in srgb, var(--color-black) 58%, var(--color-white));
+  pointer-events: none;
+  transition:
+    top var(--transition-fast),
+    transform var(--transition-fast),
+    font-size var(--transition-fast),
+    color var(--transition-fast);
+  transform-origin: top center;
+}
+
+.nm-floating-control--textarea ~ .nm-floating-label {
+  top: 1.1rem;
+  transform: translateY(0);
+}
+
+.nm-floating-control:focus ~ .nm-floating-label,
+.nm-floating-control:not(:placeholder-shown) ~ .nm-floating-label {
+  top: 0.35rem;
+  font-size: 0.72rem;
+  transform: translateY(0);
+  color: color-mix(in srgb, var(--color-black) 72%, var(--color-white));
+}
+
+mark {
+  background: var(--color-mark-highlight);
+  padding: 0 4px;
+  border-radius: 2px;
+  color: inherit;
+  font-style: normal;
+  font-weight: inherit;
 }
 
 /* Prevent hidden target behind fixed header */
@@ -245,7 +375,76 @@ main article :where(ol + h3) {
 }
 
 :focus-visible {
-  outline: 3px solid var(--nm-accent);
+  outline: 2px solid var(--color-red);
   outline-offset: 2px;
   border-radius: 2px;
+}
+
+/* כותרת עליונה: מצב ברירת מחדל מול אחרי גלילה (מחלקה nm-header--scrolled נוספת ב־JS) */
+.nm-header-bar {
+  background-color: transparent;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  border-bottom: none;
+  transition: all 0.3s ease;
+}
+
+.nm-header-bar.nm-header--scrolled {
+  background-color: #fafaf8;
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(26, 26, 26, 0.08);
+}
+
+.nm-nav-scroll-hide {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.nm-nav-scroll-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* תמונות תוכן: גוון מלא רק ב-hover (לא לוגו ולא UI) */
+article img,
+.content-image,
+[data-image="content"] {
+  filter: grayscale(100%);
+  transition: filter 0.4s ease;
+}
+
+article img:hover,
+.content-image:hover,
+[data-image="content"]:hover {
+  filter: grayscale(0%);
+}
+
+/* קישורי גוף טקסט: קו תחתון אדום מתרחב מהמרכז (לא ניווט/כפתורים עגולים) */
+main article a[href]:where(:not([class*="rounded-full"])),
+main .body-text a[href]:where(:not([class*="rounded-full"])),
+main p a[href]:where(:not([class*="rounded-full"])) {
+  text-decoration: none;
+  position: relative;
+}
+
+main article a[href]:where(:not([class*="rounded-full"]))::after,
+main .body-text a[href]:where(:not([class*="rounded-full"]))::after,
+main p a[href]:where(:not([class*="rounded-full"]))::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  left: 50%;
+  right: 50%;
+  height: 1px;
+  background: #d42b2b;
+  transition:
+    left 0.25s ease,
+    right 0.25s ease;
+}
+
+main article a[href]:where(:not([class*="rounded-full"])):hover::after,
+main .body-text a[href]:where(:not([class*="rounded-full"])):hover::after,
+main p a[href]:where(:not([class*="rounded-full"])):hover::after {
+  left: 0;
+  right: 0;
 }

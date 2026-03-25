@@ -4,7 +4,14 @@ import Layout from "../layouts/Layout.astro";
 import ThoughtShiftProof from "../components/ThoughtShiftProof.astro";
 import LogicCanvas from "../components/LogicCanvas.astro";
 import KnowledgeCenter from "../components/KnowledgeCenter.astro";
-import { resolveServiceAction, servicesHero, servicesStages, servicesThoughtShifts } from "../lib/services";
+import EngagementSections from "../components/EngagementSections.astro";
+import {
+  resolveServiceAction,
+  servicesEngagementSections,
+  servicesHero,
+  servicesStages,
+  servicesThoughtShifts,
+} from "../lib/services";
 
 const allArticles = await getCollection("articles", ({ data }) => data.draft !== true);
 const sortedArticles = allArticles.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
@@ -84,10 +91,12 @@ const stageCards = servicesStages
     </section>
   </section>
 
+  <EngagementSections sections={servicesEngagementSections} />
+
   <section class="mx-auto max-w-7xl border-t border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-6 py-20 md:py-24">
     <ThoughtShiftProof
       items={servicesThoughtShifts}
-      heading="לא עוד המלצה. שינוי במבנה החשיבה."
+      heading={servicesEngagementSections.philosophy.body}
       eyebrow="דפוס ישן מול בהירות חדשה"
     />
   </section>

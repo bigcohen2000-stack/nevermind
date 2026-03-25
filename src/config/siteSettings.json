@@ -1,12 +1,13 @@
 {
   "stagingBanner": {
-    "enabled": true,
+    "enabled": false,
     "message": "האתר בהרצה"
   },
   "seo": {
     "allowIndexing": true
   },
   "brand": {
+    "wordmarkHe": "השם לא משנה",
     "logoPath": "/images/LOGO.svg",
     "defaultOgImagePath": "/og.jpg",
     "themeColor": "#092038",

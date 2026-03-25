@@ -1,0 +1,60 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import appConfig from "../../config/appConfig.json";
+import { DirectLink } from "../../components/ui/DirectLink";
+---
+
+<Layout
+  title="להבין | NeverMind"
+  description="איך האתר בנוי: הפרדת עובדות, זיהוי מנגנונים, ויישור קו עם המציאות לפני החלטה."
+>
+  <div class="body-text mx-auto max-w-3xl space-y-8 py-10 text-right sm:px-2">
+    <header class="space-y-4">
+      <p class="text-sm font-semibold uppercase tracking-[0.2em] text-[var(--nm-accent)]">אני רוצה להבין</p>
+      <h1 class="text-[clamp(1.85rem,1.5rem+1.2vw,2.5rem)] font-semibold leading-tight text-[var(--nm-fg)]">
+        הלוגיקה של המקום
+      </h1>
+      <p class="text-base leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+        כאן אין הבטחה לשינוי מהיר. יש חומר מסודר שמאפשר לקרוא, לבדוק ולהחליט אם זה רלוונטי אליך.
+      </p>
+    </header>
+
+    <section class="space-y-4 rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-6 shadow-[0_18px_48px_rgba(26,26,26,0.05)]" aria-labelledby="about-how">
+      <h2 id="about-how" class="text-lg font-semibold text-[var(--nm-fg)]">
+        איך זה עובד בפועל
+      </h2>
+      <ul class="list-disc space-y-3 pr-5 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))]" role="list">
+        <li>מאמרים וארכיון: שפה אחידה, דגש על מבנה ולא על רעש.</li>
+        <li>הגדרות מחדש: פירוק מילים שמסתירות הנחות.</li>
+        <li>סטודיו ושירותים: רק אחרי שבחרת שכדאי להמשיך משם.</li>
+      </ul>
+    </section>
+
+    <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
+      אם משהו כאן מרגיש לא מדויק ביחס לחוויה שלך, זה נקודת מידע. לא סימון כשלון.
+    </p>
+
+    <nav class="flex flex-wrap justify-end gap-3 pt-4" aria-label="המשך קריאה">
+      <a
+        href="/archive/"
+        class="inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-5 py-2.5 text-sm font-medium text-[var(--nm-fg)] transition-colors hover:border-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)] hover:text-[var(--nm-accent)]"
+      >
+        לארכיון
+      </a>
+      <a
+        href="/studio/"
+        class="inline-flex min-h-[44px] items-center justify-center rounded-full bg-[var(--nm-inverse)] px-5 py-2.5 text-sm font-semibold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-inverse-hover)]"
+      >
+        לסטודיו
+      </a>
+    </nav>
+
+    <div class="flex justify-end border-t border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] pt-8" aria-label="פתיחת שיחה אחרי קריאה">
+      <DirectLink
+        client:load
+        whatsAppNumber={appConfig.contact.whatsAppNumber}
+        fallbackEmail={appConfig.contact.email}
+      />
+    </div>
+  </div>
+</Layout>

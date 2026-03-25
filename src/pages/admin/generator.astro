@@ -1,5 +1,6 @@
 ---
 import Layout from "../../layouts/Layout.astro";
+import { FloatingInput } from "../../components/ui/FloatingInput";
 
 const pageTitle = "Strategic Article Wizard";
 const pageDescription = "אשף 3 שלבים ליצירת Master Prompt מדויק לכתיבת מאמר.";
@@ -21,14 +22,17 @@ const pageDescription = "אשף 3 שלבים ליצירת Master Prompt מדוי
           <div id="wizard-progress" class="h-full rounded-full bg-[var(--nm-accent)] transition-all duration-300" style="width: 33%;"></div>
         </div>
         <p id="wizard-step-label" class="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--nm-accent)]">שלב 1 מתוך 3</p>
-      </div>
+        </div>
 
       <section data-step="1" class="wizard-step space-y-4">
         <h2 class="text-2xl font-semibold">Step 1: The Core</h2>
-        <label class="block space-y-2">
-          <span class="text-sm font-semibold">Topic / Title</span>
-          <input id="wiz-topic" type="text" placeholder="מה הנושא המרכזי?" class="w-full rounded-[1rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-transparent px-4 py-3 outline-none focus:border-[color-mix(in_srgb,var(--nm-accent)_35%,transparent)]" />
-        </label>
+        <FloatingInput
+          client:load
+          id="wiz-topic"
+          label="Topic / Title — הנושא המרכזי"
+          hideValidation={true}
+          className="[&_.nm-floating-control]:bg-transparent"
+        />
         <label class="block space-y-2">
           <span class="text-sm font-semibold">Target Audience</span>
           <select id="wiz-audience" class="w-full rounded-[1rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-transparent px-4 py-3 outline-none focus:border-[color-mix(in_srgb,var(--nm-accent)_35%,transparent)]">
@@ -36,19 +40,34 @@ const pageDescription = "אשף 3 שלבים ליצירת Master Prompt מדוי
             <option>Advanced</option>
             <option>Internal Community</option>
           </select>
-        </label>
-        <label class="block space-y-2">
-          <span class="text-sm font-semibold">Aha! Moment</span>
-          <textarea id="wiz-aha" rows="3" placeholder="מה הדבר האחד שהם חייבים להבין?" class="w-full rounded-[1rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-transparent px-4 py-3 outline-none focus:border-[color-mix(in_srgb,var(--nm-accent)_35%,transparent)]"></textarea>
-        </label>
-        <label class="block space-y-2">
-          <span class="text-sm font-semibold">Bottom line (שורת תחתית, frontmatter bottomLine)</span>
-          <textarea id="wiz-bottom-line" rows="2" placeholder="משפט אחד או שניים שסוגרים את המסר" class="w-full rounded-[1rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-transparent px-4 py-3 outline-none focus:border-[color-mix(in_srgb,var(--nm-accent)_35%,transparent)]"></textarea>
-        </label>
-        <label class="block space-y-2">
-          <span class="text-sm font-semibold">Inversion / עומק (אופציונלי, frontmatter inversionNote)</span>
-          <textarea id="wiz-inversion" rows="2" placeholder="זוויות היפוך, ספקנות, שכבת מועדון" class="w-full rounded-[1rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-transparent px-4 py-3 outline-none focus:border-[color-mix(in_srgb,var(--nm-accent)_35%,transparent)]"></textarea>
-        </label>
+          </label>
+        <FloatingInput
+          client:load
+          id="wiz-aha"
+          label="Aha! Moment — מה הדבר האחד שהם חייבים להבין"
+          multiline
+          rows={3}
+          hideValidation={true}
+          className="[&_.nm-floating-control]:bg-transparent"
+        />
+        <FloatingInput
+          client:load
+          id="wiz-bottom-line"
+          label="Bottom line (frontmatter bottomLine)"
+          multiline
+          rows={2}
+          hideValidation={true}
+          className="[&_.nm-floating-control]:bg-transparent"
+        />
+        <FloatingInput
+          client:load
+          id="wiz-inversion"
+          label="Inversion / עומק (אופציונלי, inversionNote)"
+          multiline
+          rows={2}
+          hideValidation={true}
+          className="[&_.nm-floating-control]:bg-transparent"
+        />
         <label class="flex cursor-pointer items-center gap-3 rounded-[1rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-4 py-3">
           <input id="wiz-is-premium" type="checkbox" class="size-4 accent-[var(--nm-accent)]" />
           <span class="text-sm font-semibold">תוכן פרימיום (isPremium)</span>
@@ -62,17 +81,26 @@ const pageDescription = "אשף 3 שלבים ליצירת Master Prompt מדוי
           </select>
         </label>
         <div class="grid gap-4 md:grid-cols-2">
-          <label class="block space-y-2">
-            <span class="text-sm font-semibold">Clean Link (Slug)</span>
-            <input id="wiz-slug" type="text" placeholder="nevermind-clean-link" dir="ltr" class="w-full rounded-[1rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-transparent px-4 py-3 text-left outline-none focus:border-[color-mix(in_srgb,var(--nm-accent)_35%,transparent)]" />
-          </label>
-          <label class="block space-y-2">
-            <span class="text-sm font-semibold">Marketing Summary</span>
-            <span class="block text-xs text-[color-mix(in_srgb,var(--nm-fg)_52%,var(--nm-bg))]">ממופה ל-description ב-frontmatter</span>
-            <input id="wiz-summary" type="text" placeholder="תקציר קצר ומדויק" class="w-full rounded-[1rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-transparent px-4 py-3 outline-none focus:border-[color-mix(in_srgb,var(--nm-accent)_35%,transparent)]" />
-          </label>
+          <FloatingInput
+            client:load
+            id="wiz-slug"
+            label="Clean Link (Slug)"
+            dir="ltr"
+            hideValidation={true}
+            className="[&_.nm-floating-control]:bg-transparent [&_.nm-floating-control]:text-left"
+          />
+          <div class="space-y-1">
+            <p class="text-xs text-[color-mix(in_srgb,var(--nm-fg)_52%,var(--nm-bg))]">ממופה ל-description ב-frontmatter</p>
+            <FloatingInput
+              client:load
+              id="wiz-summary"
+              label="Marketing Summary — תקציר קצר ומדויק"
+              hideValidation={true}
+              className="[&_.nm-floating-control]:bg-transparent"
+            />
+          </div>
         </div>
-      </section>
+        </section>
 
       <section data-step="2" class="wizard-step hidden space-y-4">
         <h2 class="text-2xl font-semibold">Step 2: Structure & Tone</h2>
@@ -83,11 +111,16 @@ const pageDescription = "אשף 3 שלבים ליצירת Master Prompt מדוי
             <option>Analytical</option>
             <option>Grounded</option>
           </select>
-        </label>
-        <label class="block space-y-2">
-          <span class="text-sm font-semibold">Key Bullet Points (Must-Haves)</span>
-          <textarea id="wiz-points" rows="5" placeholder="כל נקודה בשורה חדשה" class="w-full rounded-[1rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-transparent px-4 py-3 outline-none focus:border-[color-mix(in_srgb,var(--nm-accent)_35%,transparent)]"></textarea>
-        </label>
+          </label>
+        <FloatingInput
+          client:load
+          id="wiz-points"
+          label="Key Bullet Points — כל נקודה בשורה חדשה"
+          multiline
+          rows={5}
+          hideValidation={true}
+          className="[&_.nm-floating-control]:bg-transparent"
+        />
         <label class="block space-y-2">
           <span class="text-sm font-semibold">Length</span>
           <select id="wiz-length" class="w-full rounded-[1rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-transparent px-4 py-3 outline-none focus:border-[color-mix(in_srgb,var(--nm-accent)_35%,transparent)]">
@@ -96,18 +129,31 @@ const pageDescription = "אשף 3 שלבים ליצירת Master Prompt מדוי
             <option>Full Research</option>
           </select>
         </label>
-        <label class="block space-y-2">
-          <span class="text-sm font-semibold">Tags</span>
-          <input id="wiz-tags" type="text" placeholder="בהירות, בחירה, פירוק" class="w-full rounded-[1rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-transparent px-4 py-3 outline-none focus:border-[color-mix(in_srgb,var(--nm-accent)_35%,transparent)]" />
-        </label>
-        <label class="block space-y-2">
-          <span class="text-sm font-semibold">YouTube ID (אופציונלי, 11 תווים)</span>
-          <input id="wiz-youtube" type="text" placeholder="dQw4w9WgXcQ" dir="ltr" maxlength="11" class="w-full rounded-[1rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-transparent px-4 py-3 text-left outline-none focus:border-[color-mix(in_srgb,var(--nm-accent)_35%,transparent)]" />
-        </label>
-        <label class="block space-y-2">
-          <span class="text-sm font-semibold">Draft Body (Markdown, optional)</span>
-          <textarea id="wiz-body" rows="6" placeholder="טיוטת גוף המאמר (אופציונלי)" class="w-full rounded-[1rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-transparent px-4 py-3 outline-none focus:border-[color-mix(in_srgb,var(--nm-accent)_35%,transparent)]"></textarea>
-        </label>
+        <FloatingInput
+          client:load
+          id="wiz-tags"
+          label="Tags — בהירות, בחירה, פירוק"
+          hideValidation={true}
+          className="[&_.nm-floating-control]:bg-transparent"
+        />
+        <FloatingInput
+          client:load
+          id="wiz-youtube"
+          label="YouTube ID (אופציונלי, 11 תווים)"
+          dir="ltr"
+          maxLength={11}
+          hideValidation={true}
+          className="[&_.nm-floating-control]:bg-transparent [&_.nm-floating-control]:text-left"
+        />
+        <FloatingInput
+          client:load
+          id="wiz-body"
+          label="Draft Body (Markdown, אופציונלי)"
+          multiline
+          rows={6}
+          hideValidation={true}
+          className="[&_.nm-floating-control]:bg-transparent"
+        />
         <p id="wiz-word-count" class="text-xs font-semibold text-[color-mix(in_srgb,var(--nm-fg)_55%,var(--nm-bg))]">מילים בטיוטה: 0</p>
         <div
           id="wiz-preflight"
@@ -115,35 +161,43 @@ const pageDescription = "אשף 3 שלבים ליצירת Master Prompt מדוי
           aria-live="polite"
         >
           בדיקות לפני שלב 3 יופיעו כאן (אזהרות בלבד, לא חוסמות).
-        </div>
+          </div>
       </section>
 
       <section data-step="3" class="wizard-step hidden space-y-4">
         <h2 class="text-2xl font-semibold">Step 3: Final Review & Generator</h2>
         <button id="wiz-generate" type="button" class="inline-flex min-h-[44px] items-center justify-center rounded-full bg-[var(--nm-inverse)] px-6 py-3 text-sm font-semibold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-inverse-hover)]">
           Generate Master Prompt
-        </button>
-        <label class="block space-y-2">
-          <span class="text-sm font-semibold">Master Prompt</span>
-          <textarea id="wiz-output" rows="12" readonly class="w-full rounded-[1rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3 text-left leading-7 outline-none"></textarea>
-        </label>
+          </button>
+        <FloatingInput
+          client:load
+          id="wiz-output"
+          label="Master Prompt"
+          multiline
+          rows={12}
+          readOnly={true}
+          hideValidation={true}
+          dir="ltr"
+          defaultValue=""
+          className="[&_.nm-floating-control]:bg-[var(--nm-surface-muted)] [&_.nm-floating-control]:text-left [&_.nm-floating-control]:leading-7"
+        />
         <button id="wiz-copy" type="button" class="inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-transparent px-6 py-3 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]">
           Copy to Clipboard
-        </button>
+          </button>
         <button id="wiz-save" type="button" class="inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-transparent px-6 py-3 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]">
           Save Draft Data
-        </button>
+          </button>
         <p id="wiz-save-status" class="text-xs font-semibold text-[color-mix(in_srgb,var(--nm-fg)_62%,var(--nm-bg))]"></p>
       </section>
 
       <div class="flex items-center justify-between gap-3">
         <button id="wiz-back" type="button" class="inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-transparent px-5 py-2 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]">
           חזור
-        </button>
+            </button>
         <button id="wiz-next" type="button" class="inline-flex min-h-[44px] items-center justify-center rounded-full bg-[var(--nm-accent)] px-5 py-2 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]">
           המשך
-        </button>
-      </div>
+            </button>
+            </div>
     </article>
   </section>
 
@@ -185,7 +239,7 @@ const pageDescription = "אשף 3 שלבים ליצירת Master Prompt מדוי
       const tagParts = data.tags
         .split(/[,،]/)
         .map((t) => t.trim())
-        .filter(Boolean);
+              .filter(Boolean);
       for (const t of tagParts) {
         if (!glossaryAllowed.has(t.toLowerCase())) {
           warnings.push(`התג "${t}" לא נמצא במילות המפתח של הגלוסה. כדאי לבדוק איות או להוסיף למאמר רק אם זה מכוון.`);
@@ -402,7 +456,7 @@ Follow the brand identity: zero fluff, focus on thought-shifts, NeverMind voice 
           try {
             await (window as unknown as { __nmGeneratorSave: (p: unknown) => Promise<void> }).__nmGeneratorSave(payload);
             savedViaHook = true;
-          } catch {
+        } catch {
             savedViaHook = false;
           }
         }

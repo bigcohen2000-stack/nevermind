@@ -1,6 +1,7 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import appConfig from "../config/appConfig.json";
+import { FloatingInput } from "../components/ui/FloatingInput";
 
 const pageTitle = "אזור חקירה אישי";
 const pageDescription = "הזנת סיסמה לגישת פרימיום לאזור החקירה האישי.";
@@ -19,10 +20,17 @@ const premiumAccess = appConfig.premiumAccess;
 
     <section class="rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/86 p-6 shadow-[0_24px_80px_rgba(26,26,26,0.06)]">
       <div class="space-y-5">
-        <label class="block space-y-2">
-          <span class="text-sm font-semibold text-[var(--nm-fg)]">סיסמה</span>
-          <input id="premium-code" type="password" dir="ltr" class="w-full rounded-[1.4rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-[var(--nm-surface-muted)] px-5 py-4 text-left text-base text-[var(--nm-fg)] outline-none transition-colors duration-200 focus:border-[color-mix(in_srgb,var(--nm-accent)_40%,transparent)] focus:ring-2 focus:ring-[color-mix(in_srgb,var(--nm-accent)_20%,transparent)]" placeholder="NM-ACCESS-2026" />
-        </label>
+        <FloatingInput
+          client:load
+          id="premium-code"
+          name="premium-code"
+          label="סיסמה (פורמט לדוגמה: NM-ACCESS-2026)"
+          type="password"
+          dir="ltr"
+          hideValidation={true}
+          autoComplete="current-password"
+          className="[&_.nm-floating-control]:bg-[var(--nm-surface-muted)] [&_.nm-floating-control]:text-left [&_.nm-floating-label]:text-right"
+        />
 
         <div class="flex flex-col gap-3 sm:flex-row sm:justify-end">
           <button id="unlock-premium" type="button" class="inline-flex items-center justify-center rounded-full bg-[var(--nm-inverse)] px-6 py-3 text-sm font-semibold text-[var(--nm-inverse-fg)] transition-colors duration-200 hover:bg-[var(--nm-inverse-hover)]">כניסה לאזור</button>

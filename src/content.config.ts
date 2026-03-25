@@ -21,7 +21,7 @@ const articles = defineCollection({
       .regex(/^[a-zA-Z0-9._-]+\.(mp3|m4a|ogg|wav)$/)
       .optional(),
     youtubeId: z.string().optional(),
-    /** נקודות מרכזיות מהתמלול — מוצגות ב"סיכום מהיר" מתחת לנגן + SEO */
+    /** נקודות מרכזיות מהתמלול. מוצגות ב"סיכום מהיר" מתחת לנגן + SEO */
     videoSummaryPoints: z.array(z.string()).optional(),
     tallyUrl: z.string().url().optional(),
     isPremium: z.boolean().default(false),
@@ -42,9 +42,9 @@ const articles = defineCollection({
         })
       )
       .optional(),
-    /** מזהה קונספטואלי באנגלית (מילה–שתיים) — שם קובץ מוצע / מיתוג; נתיב ה-URL נשאר משם קובץ ה-.mdx */
+    /** מזהה קונספטואלי באנגלית (מילה-שתיים). שם קובץ מוצע / מיתוג; נתיב ה-URL נשאר משם קובץ ה-.mdx */
     slug: z.string().optional(),
-    /** Work order לווידאו (מחבילת AI חלק ג') — אופציונלי */
+    /** Work order לווידאו (מחבילת AI חלק ג'). אופציונלי */
     videoContent: z
       .object({
         hook: z.string().optional(),

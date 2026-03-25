@@ -2,6 +2,7 @@
 import { buildArticleContextWhatsAppHref } from "../lib/services";
 import { microPosts } from "../data/microPosts";
 import BigQuestionLayout from "./BigQuestionLayout.astro";
+import { FloatingInput } from "./ui/FloatingInput";
 
 interface GlossaryTerm {
   term: string;
@@ -43,29 +44,27 @@ const contextWaHref = buildArticleContextWhatsAppHref({ tags, articleTitle: arti
       <input type="hidden" name="source_url" value={pageUrl} />
       <input type="text" name="botcheck" style="display:none" tabindex="-1" autocomplete="off" aria-hidden="true" />
 
-      <div class="space-y-2">
-        <label for="logical-name" class="text-sm font-medium text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">שם פרטי</label>
-        <input
-          id="logical-name"
-          name="name"
-          type="text"
-          placeholder="לא חובה"
-          class="w-full rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3 text-right text-sm text-[var(--nm-fg)] outline-none transition focus:border-[color-mix(in_srgb,var(--nm-accent)_35%,transparent)] focus:ring-2 focus:ring-[color-mix(in_srgb,var(--nm-accent)_16%,transparent)]"
-        />
-      </div>
-
-      <div class="space-y-2">
-        <label for="logical-question" class="text-sm font-medium text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">השאלה שלך</label>
-        <textarea
-          id="logical-question"
-          name="message"
-          rows="5"
-          maxlength="320"
-          required
-          placeholder="למשל: איך מזהים מתי אני תקוע כי אני באמת לא יודע, ומתי אני פשוט מפחד מהמחיר של ההחלטה?"
-          class="w-full rounded-[1.4rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3 text-right text-sm leading-7 text-[var(--nm-fg)] outline-none transition focus:border-[color-mix(in_srgb,var(--nm-accent)_35%,transparent)] focus:ring-2 focus:ring-[color-mix(in_srgb,var(--nm-accent)_16%,transparent)]"
-        ></textarea>
-      </div>
+      <FloatingInput
+        client:load
+        id="logical-name"
+        name="name"
+        label="שם פרטי (לא חובה)"
+        dir="rtl"
+        hideValidation={true}
+        className="[&_.nm-floating-control]:bg-[var(--nm-surface-muted)]"
+      />
+      <FloatingInput
+        client:load
+        id="logical-question"
+        name="message"
+        label="השאלה שלך"
+        multiline
+        rows={5}
+        maxLength={320}
+        required
+        dir="rtl"
+        className="[&_.nm-floating-control]:bg-[var(--nm-surface-muted)]"
+      />
 
       <div class="flex flex-wrap gap-3">
         <button
@@ -85,8 +84,17 @@ const contextWaHref = buildArticleContextWhatsAppHref({ tags, articleTitle: arti
       </div>
 
       <p data-logical-question-status aria-live="polite" class="text-sm text-[color-mix(in_srgb,var(--nm-fg)_58%,var(--nm-bg))] opacity-0 transition-opacity duration-300">
-        תודה. אם זו שאלה חיה, היא יכולה להפוך לפוסט קצר בקרוב.
+        נשלח - אני בדרך כלל חוזר ממש מהר. אם השאלה תיבחר, תופיע תשובה קצרה באתר.
       </p>
+      <div data-nm-logical-form-return class="hidden pt-2 text-right">
+        <a
+          data-nm-return-cta-link
+          href="/articles/"
+          class="inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-accent)_28%,transparent)] bg-[var(--nm-tint)] px-4 py-2 text-sm font-semibold text-[var(--nm-accent)] transition hover:bg-[var(--nm-tint-hover)]"
+        >
+          חזור לארכיון
+        </a>
+      </div>
     </form>
   </section>
 
@@ -128,15 +136,21 @@ const contextWaHref = buildArticleContextWhatsAppHref({ tags, articleTitle: arti
           });
 
           status.textContent = response.ok
-            ? "השאלה נשלחה. אם היא תיבחר, תראה עליה תשובה קצרה באתר."
-            : "משהו השתבש. אפשר לנסות שוב או לשלוח בוואטסאפ.";
+            ? "נשלח - אני בדרך כלל חוזר ממש מהר. אם השאלה תיבחר, תופיע תשובה קצרה באתר."
+            : "נראה שלא עבר הפעם. אפשר לנסות שוב או לשלוח בוואטסאפ.";
           status.classList.add("opacity-100");
 
           if (response.ok) {
             form.reset();
+            if (logicalReturn instanceof HTMLElement && logicalReturnLink instanceof HTMLAnchorElement) {
+              if (typeof window.__nmFillReturnLink === "function") {
+                window.__nmFillReturnLink(logicalReturnLink);
+              }
+              logicalReturn.classList.remove("hidden");
+            }
           }
         } catch {
-          status.textContent = "משהו השתבש. אפשר לנסות שוב או לשלוח בוואטסאפ.";
+          status.textContent = "נראה שלא עבר הפעם. אפשר לנסות שוב או לשלוח בוואטסאפ.";
           status.classList.add("opacity-100");
         }
       };

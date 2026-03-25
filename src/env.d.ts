@@ -2,6 +2,9 @@
 
 interface ImportMetaEnv {
   readonly PUBLIC_CLIENT_LOG_URL?: string;
+  readonly PUBLIC_WHATSAPP_NUMBER?: string;
+  readonly NEXT_PUBLIC_WHATSAPP_NUMBER?: string;
+  readonly PUBLIC_CONTACT_EMAIL?: string;
 }
 
 interface ImportMeta {

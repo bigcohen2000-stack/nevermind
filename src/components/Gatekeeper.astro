@@ -1,5 +1,6 @@
----
+﻿---
 import appConfig from "../config/appConfig.json";
+import { FloatingInput } from "./ui/FloatingInput";
 
 interface Props {
   phone?: string;
@@ -69,10 +70,16 @@ const maxScore =
         <h2 class="text-2xl font-semibold text-[var(--nm-fg)]">�� ���, ��� �� ��� ���� ����?</h2>
       </div>
 
-      <label class="block space-y-2 text-right">
-        <span class="text-sm font-semibold text-[var(--nm-fg)]">��</span>
-        <input data-name-input type="text" placeholder="��� ����� ��?" class="w-full rounded-[1.4rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-[var(--nm-surface-muted)] px-5 py-4 text-right text-base text-[var(--nm-fg)] outline-none transition focus:border-[color-mix(in_srgb,var(--nm-accent)_40%,transparent)] focus:ring-2 focus:ring-[color-mix(in_srgb,var(--nm-accent)_20%,transparent)]" />
-      </label>
+      <FloatingInput
+        client:load
+        id="nm-gatekeeper-name"
+        name="gatekeeper_name"
+        label="איך לפנות אליך בשם"
+        dataNameInput={true}
+        hideValidation={true}
+        className="[&_.nm-floating-control]:bg-[var(--nm-surface-muted)]"
+      />
+
 
       <div class="space-y-3 text-right">
         <p class="text-sm font-semibold text-[var(--nm-fg)]">����</p>

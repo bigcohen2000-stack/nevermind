@@ -1,5 +1,7 @@
 ---
 import Layout from "../../layouts/Layout.astro";
+import appConfig from "../../config/appConfig.json";
+import { DirectLink } from "../../components/ui/DirectLink";
 
 const topicMap = {
   freedom: {
@@ -134,5 +136,13 @@ const articles = topicInfo.tag
         זה נושא שנפתח לאט. בקרוב יופיע כאן שקט חדש.
       </div>
     )}
+
+    <div class="flex justify-end pt-6" aria-label="פתיחת שיחה אחרי קריאה">
+      <DirectLink
+        client:load
+        whatsAppNumber={appConfig.contact.whatsAppNumber}
+        fallbackEmail={appConfig.contact.email}
+      />
+    </div>
   </section>
 </Layout>

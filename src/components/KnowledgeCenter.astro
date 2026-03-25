@@ -1,4 +1,6 @@
 ---
+import { ArchiveSearchFloatingInput } from "./ArchiveSearchFloatingInput";
+
 interface FeaturedItem {
   title: string;
   description: string;
@@ -35,12 +37,11 @@ const inquiries = [
     </header>
 
     <div class="mt-6">
-      <input
+      <ArchiveSearchFloatingInput
+        client:load
         id="knowledge-search-input"
-        type="search"
-        placeholder="מה מעסיק אותך כרגע?"
-        class="w-full rounded-[1.5rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-[var(--nm-bg-canvas)] px-5 py-4 text-right text-[clamp(1.05rem,1rem+0.3vw,1.2rem)] text-[var(--nm-fg)] outline-none transition focus:border-[color-mix(in_srgb,var(--nm-accent)_38%,transparent)] focus:ring-2 focus:ring-[color-mix(in_srgb,var(--nm-accent)_18%,transparent)]"
-        aria-label="מה מעסיק אותך כרגע? | חיפוש במרכז הידע של השם לא משנה"
+        label="מה מעסיק אותך כרגע"
+        className="[&_.nm-floating-control]:shadow-[0_12px_32px_color-mix(in_srgb,var(--nm-fg)_4%,transparent)]"
       />
     </div>
 

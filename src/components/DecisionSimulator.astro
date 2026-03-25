@@ -1,5 +1,6 @@
 ---
 import appConfig from "../config/appConfig.json";
+import { FloatingInput } from "./ui/FloatingInput";
 
 interface Props {
   phone?: string;
@@ -32,15 +33,14 @@ const defaultHref = `https://wa.me/${phone}?text=${encodeURIComponent(baseMessag
 
   <div class="mt-8 grid gap-6 lg:grid-cols-[minmax(0,22rem)_minmax(0,1fr)] lg:items-start">
     <div class="space-y-4">
-      <label class="block space-y-3 text-right">
-        <span class="text-sm font-semibold">איזו החלטה אתה דוחה עכשיו?</span>
-        <input
-          data-decision-input
-          type="text"
-          class="w-full rounded-[1.4rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-4 text-right text-base font-semibold text-[var(--nm-fg)] outline-none transition duration-300 focus:border-[color-mix(in_srgb,var(--nm-accent)_35%,transparent)] focus:ring-2 focus:ring-[color-mix(in_srgb,var(--nm-accent)_16%,transparent)]"
-          placeholder="למשל: לעזוב עבודה, לפתוח שיחה, להעלות מחיר"
-        />
-      </label>
+      <FloatingInput
+        client:load
+        id="nm-decision-delayed"
+        label="איזו החלטה אתה דוחה עכשיו? למשל לעזוב עבודה, לפתוח שיחה, להעלות מחיר"
+        dataDecisionInput={true}
+        hideValidation={true}
+        className="[&_.nm-floating-control]:bg-[var(--nm-surface-muted)] [&_.nm-floating-control]:font-medium"
+      />
 
       <button
         type="button"
