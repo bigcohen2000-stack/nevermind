@@ -26,10 +26,6 @@ export async function getStaticPaths() {
         .map((slug) => slugMap.get(slug))
         .filter(Boolean) as ArticleEntry[];
 
-      if (availableArticles.length !== 3) {
-        return null;
-      }
-
       return {
         params: { id: journey.id },
         props: {

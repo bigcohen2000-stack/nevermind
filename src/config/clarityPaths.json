@@ -5,28 +5,28 @@
       "title": "אני בלופ של מחשבות",
       "emoji": "🔄",
       "shortDescription": "שלושה צעדים קצרים לפרק לולאה ולחזור לשאלה אמיתית אחת.",
-      "articleSlugs": ["decap-cms-setup", "template", "decap-cms-setup"]
+      "articleSlugs": ["understanding-anger", "what-is-success", "resolving-fights"]
     },
     {
       "id": "specific-fear",
       "title": "אני מפחד ממשהו ספציפי",
       "emoji": "⚖️",
       "shortDescription": "להבדיל בין איום אמיתי לבין סיפור שהמוח מספר.",
-      "articleSlugs": ["template", "decap-cms-setup", "template"]
+      "articleSlugs": ["why-bad-things-happen", "feeling-alone", "understanding-anger"]
     },
     {
       "id": "emptiness",
       "title": "אני מרגיש ריקנות / חוסר משמעות",
       "emoji": "⚪",
       "shortDescription": "מקום להתבונן בלי למלא רעש — ואז לבחור כיוון קטן.",
-      "articleSlugs": ["decap-cms-setup", "decap-cms-setup", "template"]
+      "articleSlugs": ["what-is-success", "feeling-alone", "why-bad-things-happen"]
     },
     {
       "id": "how-mind-works",
       "title": "אני רוצה להבין איך המוח שלי עובד",
       "emoji": "🧠",
       "shortDescription": "מבנה, עיוותים, ואיך לא להאמין לכל קול פנימי באותה עוצמה.",
-      "articleSlugs": ["template", "template", "decap-cms-setup"]
+      "articleSlugs": ["why-bad-things-happen", "understanding-anger", "what-is-success"]
     }
   ]
 }

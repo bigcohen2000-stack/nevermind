@@ -13,6 +13,7 @@ import {
 } from "../lib/services";
 import { ArchiveSearchFloatingInput } from "../components/ArchiveSearchFloatingInput";
 import { DirectLink } from "../components/ui/DirectLink";
+import Gatekeeper from "../components/Gatekeeper.astro";
 
 const services = flattenVisibleServices();
 const popularTags = glossaryConcepts.slice(0, 6).map((c) => ({
@@ -62,6 +63,14 @@ const waNumber = String(appConfig.contact.whatsAppNumber ?? "").replace(/\D/g, "
         }
       </div>
     </header>
+
+    <div class="pt-10">
+      <Gatekeeper
+        phone={appConfig.contact.whatsAppNumber}
+        fallbackHref="/articles/"
+        fallbackLabel="חזרה לארכיון"
+      />
+    </div>
 
     <div id="discovery-results" class="hidden grid-cols-1 gap-12 lg:grid-cols-2">
       <div class="space-y-6">

@@ -60,9 +60,10 @@ const defaultNode = problemRootNodes[0];
                 </linearGradient>
               </defs>
 
-              <line x1="550" y1="190" x2="250" y2="420" stroke="color-mix(in srgb, var(--nm-fg) 14%, transparent)" stroke-width="3" />
+              <!-- מרכזי תחתונים: 190 / 550 / 910 (מלבנים 340px, רווח 20, שוליים 20) -->
+              <line x1="550" y1="190" x2="190" y2="420" stroke="color-mix(in srgb, var(--nm-fg) 14%, transparent)" stroke-width="3" />
               <line x1="550" y1="190" x2="550" y2="420" stroke="color-mix(in srgb, var(--nm-fg) 14%, transparent)" stroke-width="3" />
-              <line x1="550" y1="190" x2="850" y2="420" stroke="color-mix(in srgb, var(--nm-fg) 14%, transparent)" stroke-width="3" />
+              <line x1="550" y1="190" x2="910" y2="420" stroke="color-mix(in srgb, var(--nm-fg) 14%, transparent)" stroke-width="3" />
 
               <g>
                 <rect x="320" y="70" rx="34" ry="34" width="460" height="140" fill="url(#problemCard)" stroke="color-mix(in srgb, var(--nm-accent) 22%, transparent)" stroke-width="3" />
@@ -71,21 +72,21 @@ const defaultNode = problemRootNodes[0];
               </g>
 
               <g data-svg-root-card="0">
-                <rect x="70" y="420" rx="30" ry="30" width="360" height="210" fill="var(--nm-bg-canvas)" stroke="color-mix(in srgb, var(--nm-fg) 10%, transparent)" stroke-width="2" />
-                <text data-svg-root-title="0" x="250" y="485" text-anchor="middle" font-size="27" font-weight="700" fill="var(--nm-fg)">{defaultNode.roots[0].title}</text>
-                <text data-svg-root-description="0" x="250" y="535" text-anchor="middle" font-size="18" fill="color-mix(in srgb, var(--nm-fg) 66%, var(--nm-bg-canvas))"><tspan x="250" dy="0">{defaultNode.roots[0].description}</tspan></text>
+                <rect x="20" y="420" rx="30" ry="30" width="340" height="230" fill="var(--nm-bg-canvas)" stroke="color-mix(in srgb, var(--nm-fg) 10%, transparent)" stroke-width="2" />
+                <text data-svg-root-title="0" x="190" y="458" text-anchor="middle" font-size="24" font-weight="700" fill="var(--nm-fg)">{defaultNode.roots[0].title}</text>
+                <text data-svg-root-description="0" x="190" y="538" text-anchor="middle" font-size="16" fill="color-mix(in srgb, var(--nm-fg) 66%, var(--nm-bg-canvas))"><tspan x="190" dy="0">{defaultNode.roots[0].description}</tspan></text>
               </g>
 
               <g data-svg-root-card="1">
-                <rect x="370" y="420" rx="30" ry="30" width="360" height="210" fill="var(--nm-bg-canvas)" stroke="color-mix(in srgb, var(--nm-fg) 10%, transparent)" stroke-width="2" />
-                <text data-svg-root-title="1" x="550" y="485" text-anchor="middle" font-size="27" font-weight="700" fill="var(--nm-fg)">{defaultNode.roots[1].title}</text>
-                <text data-svg-root-description="1" x="550" y="535" text-anchor="middle" font-size="18" fill="color-mix(in srgb, var(--nm-fg) 66%, var(--nm-bg-canvas))"><tspan x="550" dy="0">{defaultNode.roots[1].description}</tspan></text>
+                <rect x="380" y="420" rx="30" ry="30" width="340" height="230" fill="var(--nm-bg-canvas)" stroke="color-mix(in srgb, var(--nm-fg) 10%, transparent)" stroke-width="2" />
+                <text data-svg-root-title="1" x="550" y="458" text-anchor="middle" font-size="24" font-weight="700" fill="var(--nm-fg)">{defaultNode.roots[1].title}</text>
+                <text data-svg-root-description="1" x="550" y="538" text-anchor="middle" font-size="16" fill="color-mix(in srgb, var(--nm-fg) 66%, var(--nm-bg-canvas))"><tspan x="550" dy="0">{defaultNode.roots[1].description}</tspan></text>
               </g>
 
               <g data-svg-root-card="2">
-                <rect x="670" y="420" rx="30" ry="30" width="360" height="210" fill="var(--nm-bg-canvas)" stroke="color-mix(in srgb, var(--nm-fg) 10%, transparent)" stroke-width="2" />
-                <text data-svg-root-title="2" x="850" y="485" text-anchor="middle" font-size="27" font-weight="700" fill="var(--nm-fg)">{defaultNode.roots[2].title}</text>
-                <text data-svg-root-description="2" x="850" y="535" text-anchor="middle" font-size="18" fill="color-mix(in srgb, var(--nm-fg) 66%, var(--nm-bg-canvas))"><tspan x="850" dy="0">{defaultNode.roots[2].description}</tspan></text>
+                <rect x="740" y="420" rx="30" ry="30" width="340" height="230" fill="var(--nm-bg-canvas)" stroke="color-mix(in srgb, var(--nm-fg) 10%, transparent)" stroke-width="2" />
+                <text data-svg-root-title="2" x="910" y="458" text-anchor="middle" font-size="24" font-weight="700" fill="var(--nm-fg)">{defaultNode.roots[2].title}</text>
+                <text data-svg-root-description="2" x="910" y="538" text-anchor="middle" font-size="16" fill="color-mix(in srgb, var(--nm-fg) 66%, var(--nm-bg-canvas))"><tspan x="910" dy="0">{defaultNode.roots[2].description}</tspan></text>
               </g>
             </svg>
           </div>
@@ -110,6 +111,56 @@ const defaultNode = problemRootNodes[0];
 
     <script is:inline define:vars={{ problemRootNodes }}>
       document.addEventListener("astro:page-load", () => {
+        const escapeForSvg = (s) => String(s ?? "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#039;");
+
+        const wrapForSvg = (text, maxCharsPerLine) => {
+          const raw = String(text ?? "").trim();
+          if (!raw) return [""];
+          const words = raw.split(/\s+/).filter(Boolean);
+          const lines = [];
+          let line = "";
+
+          for (const word of words) {
+            const next = line ? `${line} ${word}` : word;
+            if (next.length <= maxCharsPerLine) {
+              line = next;
+              continue;
+            }
+            if (line) lines.push(line);
+            line = word;
+          }
+
+          if (line) lines.push(line);
+          return lines.length ? lines : [""];
+        };
+
+        const renderWrappedSvgText = (textEl, value, opts) => {
+          if (!textEl) return;
+          const el = textEl instanceof SVGTextElement ? textEl : null;
+          if (!el) return;
+
+          const {
+            maxCharsPerLine,
+            maxLines,
+            lineDyEm,
+          } = opts;
+
+          const x = el.getAttribute("x") || "";
+          const lines = wrapForSvg(value, maxCharsPerLine).slice(0, maxLines);
+
+          el.innerHTML = lines
+            .map((ln, i) => {
+              const dy = i === 0 ? 0 : `${lineDyEm}em`;
+              return `<tspan x="${escapeForSvg(x)}" dy="${dy}">${escapeForSvg(ln)}</tspan>`;
+            })
+            .join("");
+        };
+
         const triggers = Array.from(document.querySelectorAll("[data-problem-trigger]"));
         const titleNode = document.querySelector("[data-problem-title]");
         const summaryNode = document.querySelector("[data-problem-summary]");
@@ -141,8 +192,16 @@ const defaultNode = problemRootNodes[0];
 
             if (rootTitle) rootTitle.textContent = root.title;
             if (rootDescription) rootDescription.textContent = root.description;
-            if (svgRootTitle) svgRootTitle.textContent = root.title;
-            if (svgRootDescription) svgRootDescription.textContent = root.description;
+            renderWrappedSvgText(
+              svgRootTitle,
+              root.title,
+              { maxCharsPerLine: 14, maxLines: 2, lineDyEm: 1.12 }
+            );
+            renderWrappedSvgText(
+              svgRootDescription,
+              root.description,
+              { maxCharsPerLine: 22, maxLines: 4, lineDyEm: 1.18 }
+            );
             if (rootLink instanceof HTMLAnchorElement) {
               if (root.relatedHref && root.relatedLabel) {
                 rootLink.href = root.relatedHref;

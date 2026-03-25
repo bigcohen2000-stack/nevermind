@@ -27,6 +27,9 @@ import AudioNarrative from "../components/AudioNarrative.astro";
 import { FloatingInput } from "../components/ui/FloatingInput";
 import { DirectLink } from "../components/ui/DirectLink";
 import TruthBlock from "../components/ui/TruthBlock";
+import SocialParadoxes from "../components/SocialParadoxes.astro";
+import DeepDiveInquiry from "../components/DeepDiveInquiry.astro";
+import ClarityAnalogy from "../components/ClarityAnalogy.astro";
 
 type ArticleEntry = CollectionEntry<"articles">;
 type InternalLink = {
@@ -93,7 +96,7 @@ const kindLabelMap = {
 export async function getStaticPaths() {
   const entries = await getCollection("articles", ({ data }) => data.draft !== true);
   return entries.map((entry) => ({
-    params: { slug: `articles/${toArticleSlug(entry)}` },
+    params: { slug: `articles/${entry.id.replace(/\.mdx$/, "")}` },
     props: { entry },
   }));
 }
@@ -299,6 +302,9 @@ const components = {
   PerspectiveToggle,
   ThoughtReveal,
   TruthBlock,
+  SocialParadoxes,
+  DeepDiveInquiry,
+  ClarityAnalogy,
 };
 ---
 

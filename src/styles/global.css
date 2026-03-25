@@ -405,6 +405,19 @@ main article :where(ol + h3) {
   display: none;
 }
 
+/* תפריט עליון: פס ניווט מרוכז בתוך קapsule */
+.nm-nav-pill {
+  border-radius: 9999px;
+  border: 1px solid rgba(26, 26, 26, 0.08);
+  background-color: color-mix(in srgb, var(--nm-bg-canvas) 88%, transparent);
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--nm-fg) 4%, transparent);
+}
+
+.nm-header-bar.nm-header--scrolled .nm-nav-pill {
+  background-color: color-mix(in srgb, #fafaf8 92%, transparent);
+  border-color: rgba(26, 26, 26, 0.06);
+}
+
 /* תמונות תוכן: גוון מלא רק ב-hover (לא לוגו ולא UI) */
 article img,
 .content-image,
@@ -417,6 +430,21 @@ article img:hover,
 .content-image:hover,
 [data-image="content"]:hover {
   filter: grayscale(0%);
+}
+
+/* חריג: אל תמרח גרייסקייל על הלוגו.
+   [src*="logo.svg"] תופס גם query string: /images/logo.svg?v=2 כי "logo.svg" מופיע בתוך הערך */
+article img[src*="logo.svg"],
+.content-image[src*="logo.svg"],
+[data-image="content"][src*="logo.svg"] {
+  filter: none;
+  transition: none;
+}
+
+article img[src*="logo.svg"]:hover,
+.content-image[src*="logo.svg"]:hover,
+[data-image="content"][src*="logo.svg"]:hover {
+  filter: none;
 }
 
 /* קישורי גוף טקסט: קו תחתון אדום מתרחב מהמרכז (לא ניווט/כפתורים עגולים) */

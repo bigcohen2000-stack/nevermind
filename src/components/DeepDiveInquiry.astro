@@ -1,0 +1,28 @@
+---
+/**
+ * שלוש שאלות להרהור עמוק (מאמרי deep).
+ */
+interface Props {
+  questions: string[];
+  title?: string;
+}
+const { questions, title = "שאלות להרהור עמוק" } = Astro.props;
+const list = Array.isArray(questions) ? questions.filter((s) => typeof s === "string" && s.trim()).slice(0, 3) : [];
+---
+
+{
+  list.length > 0 && (
+    <section
+      class="mx-auto max-w-[72ch] rounded-[1.5rem] border border-[color-mix(in_srgb,var(--nm-inverse)_18%,transparent)] bg-[var(--nm-inverse)] px-6 py-6 text-right text-[var(--nm-inverse-fg)]"
+      aria-label={title}
+    >
+      <p class="text-xs font-semibold uppercase tracking-[0.2em] text-[color-mix(in_srgb,var(--nm-inverse-fg)_55%,transparent)]">חקירה עמוקה</p>
+      <h2 class="mt-2 text-[clamp(1.2rem,1.05rem+0.45vw,1.45rem)] font-semibold leading-snug">{title}</h2>
+      <ol class="mt-5 list-decimal space-y-4 pr-5 text-[clamp(0.98rem,0.93rem+0.2vw,1.08rem)] leading-8 marker:text-[var(--nm-accent)]">
+        {list.map((q) => (
+          <li>{q}</li>
+        ))}
+      </ol>
+    </section>
+  )
+}

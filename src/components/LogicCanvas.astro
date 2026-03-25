@@ -33,9 +33,9 @@ for (const article of publishedArticles) {
   [article.slug, base, tail].filter(Boolean).forEach((key) => availableSlugs.add(String(key)));
 }
 
-const paths = clarityPathsFile.paths.filter((pathDef) =>
-  pathDef.articleSlugs.every((slug) => availableSlugs.has(String(slug)))
-);
+// מציגים תמיד את המסלולים. גם אם חלק מהמאמרים לא זמינים אחרי העלאה/שינוי slug,
+// לפחות יהיה קישור יציב ל־/journey/<id>.
+const paths = clarityPathsFile.paths;
 const videoId = String(canvas.featuredVideo?.youtubeId ?? "").trim();
 const videoTitle = canvas.featuredVideo?.title ?? "סרטון מומלץ";
 const videoPoints = Array.isArray(canvas.featuredVideo?.videoSummaryPoints)

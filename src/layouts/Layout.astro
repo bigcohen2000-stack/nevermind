@@ -207,6 +207,46 @@ const intentNavItemIsCurrent = (prefixes: string[]) => {
     return p === norm || p.startsWith(`${norm}/`);
   });
 };
+
+/** קישורי פוטר: מסלול, תוכן, נושאים נפוצים, כלים */
+const footerLinkColumns: { title: string; links: { href: string; label: string }[] }[] = [
+  {
+    title: "מסלול",
+    links: [
+      { href: "/services/", label: "שירותים" },
+      { href: "/intake/", label: "טופס לפני שיחה" },
+      { href: "/studio/", label: "סטודיו" },
+      { href: "/personal-consultation/", label: "שיחה אישית" },
+    ],
+  },
+  {
+    title: "תוכן",
+    links: [
+      { href: "/articles/", label: "ארכיון מאמרים" },
+      { href: "/about/", label: "איך זה עובד כאן" },
+      { href: "/glossary/", label: "הגדרות מחדש" },
+      { href: "/questions/", label: "שאלות קצרות" },
+      { href: "/now/", label: "מה המצב עכשיו" },
+    ],
+  },
+  {
+    title: "נושאים לדוגמה",
+    links: [
+      { href: "/topics/clarity/", label: "בהירות" },
+      { href: "/topics/freedom/", label: "חופש" },
+      { href: "/topics/self/", label: "העצמי" },
+      { href: "/topics/thought-mechanics/", label: "מכניקת מחשבה" },
+    ],
+  },
+  {
+    title: "כלים",
+    links: [
+      { href: "/forbidden-library/", label: "הספרייה האסורה" },
+      { href: "/root-problem-tree/", label: "עץ שורש הבעיה" },
+      { href: "/accessibility/", label: "נגישות" },
+    ],
+  },
+];
 const shouldNoIndexByPath = pathName.startsWith("/admin/");
 const effectiveNoIndex = noIndex || shouldNoIndexByPath || !siteAllowsIndexing;
 const pathSegments = pathName.split("/").filter(Boolean);
@@ -417,59 +457,76 @@ const socialLinks = [
         aria-label="ניווט ראשי"
       >
         <div data-site-header-bar class="nm-header-bar w-full px-4">
-          <div class="mx-auto flex max-w-6xl flex-wrap items-center gap-3 py-3 md:flex-nowrap md:items-center md:gap-4 md:py-3.5">
-          <a
-            href="/"
-            class="nm-header-brand order-1 shrink-0 text-[clamp(1.05rem,1rem+0.35vw,1.25rem)] font-light leading-tight text-[var(--color-black)] no-underline transition-colors duration-200 [transition-timing-function:ease] hover:text-[var(--color-red)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-red)]"
-          >
-            {wordmarkHe}
-          </a>
-
-          <div class="order-2 min-w-0 flex-1 basis-full overflow-x-auto md:basis-auto nm-nav-scroll-hide">
-            <ul class="flex flex-nowrap items-stretch justify-start gap-1 sm:gap-2 md:justify-center" role="list">
-              {intentNavItems.map((item) => {
-                const active = intentNavItemIsCurrent(item.activePrefixes);
-                return (
-                  <li class="shrink-0" role="none">
-                    <a
-                      href={item.href}
-                      tabindex={0}
-                      class={`inline-flex min-h-[44px] max-w-[min(100vw-2rem,18rem)] items-center whitespace-nowrap rounded-md px-2.5 text-[0.9rem] font-normal no-underline transition-colors duration-200 [transition-timing-function:ease] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-red)] ${
-                        active
-                          ? "text-[var(--color-red)]"
-                          : "text-[color-mix(in_srgb,var(--color-black)_65%,transparent)] hover:text-[var(--color-black)]"
-                      }`}
-                      {...(active ? ({ "aria-current": "page" } as const) : {})}
-                    >
-                      {item.label}
-                    </a>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-
-          <div class="order-3 flex shrink-0 items-center gap-2">
-            <button
-              type="button"
-              data-random-article-trigger
-              class="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full bg-[var(--nm-accent)] px-4 py-2 text-sm font-medium text-[var(--nm-on-accent)] transition-colors duration-200 [transition-timing-function:ease] hover:bg-[var(--nm-accent-hover)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-red)]"
+          <div class="nm-header-inner mx-auto grid max-w-6xl grid-cols-[1fr_auto] items-center gap-x-3 gap-y-3 py-3 md:grid-cols-[auto_minmax(0,1fr)_auto] md:gap-x-5 md:py-3.5">
+            <a
+              href="/"
+              class="nm-header-brand col-start-1 row-start-1 flex min-w-0 max-w-[min(100%,20rem)] items-center gap-2.5 text-[clamp(1.05rem,1rem+0.35vw,1.25rem)] font-light leading-tight text-[var(--color-black)] no-underline transition-colors duration-200 [transition-timing-function:ease] hover:text-[var(--color-red)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-red)]"
             >
-              הפתע אותי
-            </button>
-            <button
-              id="search-trigger"
-              type="button"
-              data-search-trigger
-              aria-label="חיפוש במרכז הידע | מה מעסיק אותך כרגע?"
-              class="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))] transition-colors duration-200 [transition-timing-function:ease] hover:border-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)] hover:text-[var(--nm-accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-red)]"
-            >
-              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <circle cx="11" cy="11" r="8" />
-                <path d="m21 21-4.3-4.3" />
-              </svg>
-            </button>
-          </div>
+              <img
+                src={logoPath}
+                alt=""
+                width="36"
+                height="36"
+                class="h-9 w-9 shrink-0 object-contain"
+                loading="eager"
+                decoding="async"
+              />
+              <span class="truncate">{wordmarkHe}</span>
+            </a>
+
+            <div class="nm-nav-shell col-span-2 row-start-2 min-w-0 md:col-span-1 md:col-start-2 md:row-start-1 md:justify-self-stretch">
+              <div class="nm-nav-pill overflow-x-auto nm-nav-scroll-hide">
+                <ul class="flex w-max min-w-full flex-nowrap items-stretch justify-center gap-0.5 px-0.5 py-0.5 sm:gap-1" role="list">
+                  {intentNavItems.map((item) => {
+                    const active = intentNavItemIsCurrent(item.activePrefixes);
+                    return (
+                      <li class="shrink-0" role="none">
+                        <a
+                          href={item.href}
+                          tabindex={0}
+                          class={`nm-nav-link inline-flex min-h-[44px] max-w-[min(100vw-2rem,18rem)] items-center whitespace-nowrap rounded-full px-3 py-2 text-[0.9rem] font-normal no-underline transition-colors duration-200 [transition-timing-function:ease] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-red)] sm:px-3.5 ${
+                            active
+                              ? "bg-[color-mix(in_srgb,var(--color-red)_10%,transparent)] font-medium text-[var(--color-red)] shadow-[inset_0_0_0_1px_color-mix(in_srgb,var(--color-red)_22%,transparent)]"
+                              : "text-[color-mix(in_srgb,var(--color-black)_65%,transparent)] hover:bg-[color-mix(in_srgb,var(--color-black)_5%,transparent)] hover:text-[var(--color-black)]"
+                          }`}
+                          {...(active ? ({ "aria-current": "page" } as const) : {})}
+                        >
+                          {item.label}
+                        </a>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            </div>
+
+            <div class="nm-header-actions col-start-2 row-start-1 flex shrink-0 items-center justify-end gap-2 md:col-start-3 md:row-start-1">
+              <a
+                href="/services/"
+                class="nm-header-services-link inline-flex min-h-[44px] items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-[color-mix(in_srgb,var(--nm-bg-canvas)_88%,transparent)] px-3 text-sm font-medium text-[color-mix(in_srgb,var(--nm-fg)_82%,var(--nm-bg))] no-underline transition-colors duration-200 [transition-timing-function:ease] hover:border-[color-mix(in_srgb,var(--nm-accent)_24%,transparent)] hover:text-[var(--nm-accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-red)] sm:px-3.5"
+              >
+                שירותים
+              </a>
+              <button
+                type="button"
+                data-random-article-trigger
+                class="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full bg-[var(--nm-accent)] px-3.5 py-2 text-sm font-medium text-[var(--nm-on-accent)] transition-colors duration-200 [transition-timing-function:ease] hover:bg-[var(--nm-accent-hover)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-red)] sm:px-4"
+              >
+                הפתע אותי
+              </button>
+              <button
+                id="search-trigger"
+                type="button"
+                data-search-trigger
+                aria-label="חיפוש במרכז הידע | מה מעסיק אותך כרגע?"
+                class="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))] transition-colors duration-200 [transition-timing-function:ease] hover:border-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)] hover:text-[var(--nm-accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-red)]"
+              >
+                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <circle cx="11" cy="11" r="8" />
+                  <path d="m21 21-4.3-4.3" />
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
       </nav>
@@ -482,15 +539,39 @@ const socialLinks = [
       <slot />
     </main>
 
-    <footer data-footer class="mt-20 border-t border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] px-6 py-12">
-      <div class="mx-auto flex max-w-6xl flex-col gap-6">
-        <div class="flex flex-col items-center justify-between gap-6 md:flex-row">
-          <div class="space-y-2 text-center md:text-right">
-            <p class="text-sm text-[color-mix(in_srgb,var(--nm-fg)_60%,var(--nm-bg))]">
-              © {new Date().getFullYear()} NeverMind | הכל מתחיל ונגמר בראש.
+    <footer data-footer class="mt-20 border-t border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] px-6 py-14">
+      <div class="mx-auto max-w-6xl space-y-10">
+        <div class="grid gap-10 sm:grid-cols-2 lg:grid-cols-4" dir="rtl">
+          {
+            footerLinkColumns.map((col) => (
+              <div class="space-y-3 text-right">
+                <p class="text-xs font-semibold uppercase tracking-[0.2em] text-[color-mix(in_srgb,var(--nm-fg)_45%,var(--nm-bg))]">
+                  {col.title}
+                </p>
+                <ul class="space-y-2 text-sm" role="list">
+                  {col.links.map((link) => (
+                    <li>
+                      <a
+                        href={link.href}
+                        class="block rounded-md py-1 text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))] transition-colors duration-200 [transition-timing-function:ease] hover:text-[var(--nm-accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-red)]"
+                      >
+                        {link.label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))
+          }
+        </div>
+
+        <div class="flex flex-col items-stretch justify-between gap-8 border-t border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] pt-10 md:flex-row md:items-start">
+          <div class="max-w-xl space-y-3 text-right">
+            <p class="text-sm font-medium text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+              © {new Date().getFullYear()} NeverMind · הכל מתחיל ונגמר בראש.
             </p>
-            <p class="text-xs text-[color-mix(in_srgb,var(--nm-fg)_45%,var(--nm-bg))]">האתר מאובטח SSL | סליקה מאושרת דרך Grow</p>
-            <div class="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-sm text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))] md:justify-end">
+            <p class="text-xs text-[color-mix(in_srgb,var(--nm-fg)_48%,var(--nm-bg))]">האתר מאובטח SSL · סליקה מאושרת דרך Grow</p>
+            <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
               {emailStr ? (
                 <a href={`mailto:${emailStr}`} class="font-semibold underline-offset-2 hover:text-[var(--nm-accent)] hover:underline">
                   {emailStr}
@@ -507,7 +588,7 @@ const socialLinks = [
               ) : null}
               {waDigits ? (
                 <>
-                  {(emailStr || telHref) ? <span class="text-[color-mix(in_srgb,var(--nm-fg)_40%,var(--nm-bg))]">·</span> : null}
+                  {emailStr || telHref ? <span class="text-[color-mix(in_srgb,var(--nm-fg)_40%,var(--nm-bg))]">·</span> : null}
                   <a
                     href={`https://wa.me/${waDigits}`}
                     target="_blank"
@@ -519,48 +600,31 @@ const socialLinks = [
                 </>
               ) : null}
             </div>
-            <p class="max-w-3xl whitespace-pre-line text-xs leading-relaxed text-[color-mix(in_srgb,var(--nm-fg)_48%,var(--nm-bg))]">
+            <p class="whitespace-pre-line text-xs leading-relaxed text-[color-mix(in_srgb,var(--nm-fg)_48%,var(--nm-bg))]">
               {disclaimerLong}
             </p>
           </div>
-          <div class="flex items-center gap-3">
-            {socialLinks.map(({ label, href, mark }) => (
-              <a
-                href={href}
-                target="_blank"
-                rel="noreferrer"
-                aria-label={label}
-                class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)]/75 text-sm font-semibold text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))] transition hover:border-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)] hover:text-[var(--nm-accent)]"
-              >
-                <span aria-hidden="true">{mark}</span>
-              </a>
-            ))}
-            <a href="https://tally.so/r/3N0x0q" class="text-sm font-semibold text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))] transition-colors duration-200 hover:text-[var(--nm-accent)]">יצירת קשר</a>
+          <div class="flex flex-col items-end gap-4 sm:flex-row sm:items-center sm:gap-6">
+            <div class="flex flex-wrap items-center justify-end gap-2">
+              {socialLinks.map(({ label, href, mark }) => (
+                <a
+                  href={href}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label={label}
+                  class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)]/75 text-sm font-semibold text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))] transition hover:border-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)] hover:text-[var(--nm-accent)]"
+                >
+                  <span aria-hidden="true">{mark}</span>
+                </a>
+              ))}
+            </div>
+            <a
+              href="https://tally.so/r/3N0x0q"
+              class="text-sm font-semibold text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))] transition-colors duration-200 hover:text-[var(--nm-accent)]"
+            >
+              יצירת קשר
+            </a>
           </div>
-        </div>
-        <div class="flex flex-wrap items-center justify-center gap-3 text-sm font-semibold text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))] md:justify-end">
-          <span class="text-[color-mix(in_srgb,var(--nm-fg)_50%,var(--nm-bg))]">כלים וחקירה:</span>
-          <a
-            href="/forbidden-library/"
-            class="transition-colors duration-200 hover:text-[var(--nm-accent)]"
-            title="הספרייה האסורה | תוכן לחקירה"
-          >
-            הספרייה האסורה
-          </a>
-          <a
-            href="/root-problem-tree/"
-            class="transition-colors duration-200 hover:text-[var(--nm-accent)]"
-            title="עץ שורש הבעיה | כלי חשיבה"
-          >
-            עץ שורש הבעיה
-          </a>
-          <a
-            href="/accessibility/"
-            class="transition-colors duration-200 hover:text-[var(--nm-accent)]"
-            title="הצהרת נגישות | השם לא משנה"
-          >
-            הצהרת נגישות
-          </a>
         </div>
       </div>
     </footer>
@@ -769,7 +833,19 @@ const socialLinks = [
         window.addEventListener("scroll", onHeaderScroll, { passive: true });
         syncHeaderBarScrolled();
 
-        if (Number.isFinite(savedScroll) && savedScroll > 0) {
+        const hash = String(window.location.hash || "").replace(/^#/, "");
+        if (hash) {
+          const target = document.getElementById(hash);
+          if (target instanceof HTMLElement) {
+            window.requestAnimationFrame(() => {
+              target.scrollIntoView({ behavior: "auto", block: "start" });
+              syncBackToTop();
+              syncHeaderBarScrolled();
+            });
+          } else {
+            syncBackToTop();
+          }
+        } else if (Number.isFinite(savedScroll) && savedScroll > 0) {
           window.requestAnimationFrame(() => {
             window.scrollTo(0, savedScroll);
             syncBackToTop();
