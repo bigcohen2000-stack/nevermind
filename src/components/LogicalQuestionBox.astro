@@ -48,9 +48,30 @@ const contextWaHref = buildArticleContextWhatsAppHref({ tags, articleTitle: arti
         client:load
         id="logical-name"
         name="name"
-        label="שם פרטי (לא חובה)"
+        label="שם פרטי"
         dir="rtl"
         hideValidation={true}
+        className="[&_.nm-floating-control]:bg-[var(--nm-surface-muted)]"
+      />
+      <FloatingInput
+        client:load
+        id="logical-email"
+        name="email"
+        label="אימייל לחזרה"
+        type="email"
+        required
+        dir="rtl"
+        className="[&_.nm-floating-control]:bg-[var(--nm-surface-muted)]"
+      />
+      <FloatingInput
+        client:load
+        id="logical-phone"
+        name="phone"
+        label="טלפון לחזרה"
+        type="tel"
+        required
+        pattern="^0[0-9]{8,9}$"
+        dir="rtl"
         className="[&_.nm-floating-control]:bg-[var(--nm-surface-muted)]"
       />
       <FloatingInput
@@ -125,9 +146,18 @@ const contextWaHref = buildArticleContextWhatsAppHref({ tags, articleTitle: arti
       const status = document.querySelector("[data-logical-question-status]");
       if (!(form instanceof HTMLFormElement) || !(status instanceof HTMLElement)) return;
 
+      const logicalReturn = document.querySelector("[data-nm-logical-form-return]");
+      const logicalReturnLink = document.querySelector("[data-nm-return-cta-link]");
+
       const handleSubmit = async (event) => {
         event.preventDefault();
         const formData = new FormData(form);
+        const phoneValue = String(formData.get("phone") || "").trim();
+        if (!/^0[0-9]{8,9}$/.test(phoneValue)) {
+          status.textContent = "מספר הטלפון לא תקין. כתוב מספר ישראלי שמתחיל ב-0.";
+          status.classList.add("opacity-100");
+          return;
+        }
 
         try {
           const response = await fetch("https://api.web3forms.com/submit", {

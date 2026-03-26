@@ -64,7 +64,7 @@ const siteUrlSlash = siteUrl.endsWith("/") ? siteUrl : `${siteUrl}/`;
 const logoPath =
   typeof brandCfg.logoPath === "string" && brandCfg.logoPath.startsWith("/")
     ? brandCfg.logoPath
-    : "/images/LOGO.svg";
+    : "/images/logo.svg";
 const defaultOgPath =
   typeof brandCfg.defaultOgImagePath === "string" && brandCfg.defaultOgImagePath.startsWith("/")
     ? brandCfg.defaultOgImagePath
@@ -85,6 +85,9 @@ const phoneLabel =
       ? `+972 ${waDigits.slice(3, 5)}-${waDigits.slice(5)}`
       : telHref;
 const emailStr = typeof contact.email === "string" ? contact.email.trim() : "";
+const [emailUserRaw = "", emailDomainRaw = ""] = emailStr.includes("@") ? emailStr.split("@") : ["", ""];
+const emailUser = emailUserRaw.trim();
+const emailDomain = emailDomainRaw.trim();
 const pageTitle = title ? `${title} | ${siteTitle}` : siteTitle;
 const trimMetaDescription = (value: string) => {
   const normalized = String(value || "").trim().replace(/\s+/g, " ");
@@ -456,7 +459,7 @@ const socialLinks = [
         class={`fixed inset-x-0 z-50 transition-[top] duration-300 ${navTopClass}`}
         aria-label="ניווט ראשי"
       >
-        <div data-site-header-bar class="nm-header-bar w-full px-4">
+        <div data-site-header-bar class="nm-header-bar w-full px-3 sm:px-4">
           <div class="nm-header-inner mx-auto grid max-w-6xl grid-cols-[1fr_auto] items-center gap-x-3 gap-y-3 py-3 md:grid-cols-[auto_minmax(0,1fr)_auto] md:gap-x-5 md:py-3.5">
             <a
               href="/"
@@ -534,12 +537,12 @@ const socialLinks = [
 
     <main
       id="main-content"
-      class={`relative z-10 mx-auto w-full max-w-6xl px-6 pb-20 ${mainPadTopClass}`}
+      class={`relative z-10 mx-auto w-full max-w-6xl px-4 pb-20 sm:px-6 ${mainPadTopClass}`}
     >
       <slot />
     </main>
 
-    <footer data-footer class="mt-20 border-t border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] px-6 py-14">
+    <footer data-footer class="mt-20 border-t border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] px-4 py-14 sm:px-6">
       <div class="mx-auto max-w-6xl space-y-10">
         <div class="grid gap-10 sm:grid-cols-2 lg:grid-cols-4" dir="rtl">
           {
@@ -567,17 +570,44 @@ const socialLinks = [
 
         <div class="flex flex-col items-stretch justify-between gap-8 border-t border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] pt-10 md:flex-row md:items-start">
           <div class="max-w-xl space-y-3 text-right">
+            <a href="/" class="inline-flex items-center gap-3 rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-white/70 px-4 py-3 transition hover:border-[color-mix(in_srgb,var(--nm-accent)_24%,transparent)]">
+              <img
+                src={logoPath}
+                alt="NeverMind"
+                width="40"
+                height="40"
+                class="h-10 w-10 shrink-0 object-contain"
+                loading="lazy"
+                decoding="async"
+              />
+              <span class="text-sm font-semibold text-[var(--nm-fg)]">{wordmarkHe}</span>
+            </a>
             <p class="text-sm font-medium text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
               © {new Date().getFullYear()} NeverMind · הכל מתחיל ונגמר בראש.
             </p>
+            <p
+              id="nm-footer-identity-line"
+              class="hidden text-sm font-semibold text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))]"
+            >
+              הזהות האמיתית שלך מתחילה איפה שהשם שלך נגמר
+            </p>
+            <p class="text-xs text-[color-mix(in_srgb,var(--nm-fg)_52%,var(--nm-bg))]">
+              שתפו באהבה, רק ציינו את המקור: NeverMind.co.il
+            </p>
             <p class="text-xs text-[color-mix(in_srgb,var(--nm-fg)_48%,var(--nm-bg))]">האתר מאובטח SSL · סליקה מאושרת דרך Grow</p>
             <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
-              {emailStr ? (
-                <a href={`mailto:${emailStr}`} class="font-semibold underline-offset-2 hover:text-[var(--nm-accent)] hover:underline">
-                  {emailStr}
-                </a>
+              {emailUser && emailDomain ? (
+                <button
+                  type="button"
+                  data-email-cta
+                  data-email-user={emailUser}
+                  data-email-domain={emailDomain}
+                  class="inline-flex min-h-[40px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-4 py-1.5 font-semibold transition-colors hover:border-[color-mix(in_srgb,var(--nm-accent)_24%,transparent)] hover:text-[var(--nm-accent)]"
+                >
+                  שלח מייל
+                </button>
               ) : null}
-              {emailStr && telHref ? <span class="text-[color-mix(in_srgb,var(--nm-fg)_40%,var(--nm-bg))]">·</span> : null}
+              {emailUser && emailDomain && telHref ? <span class="text-[color-mix(in_srgb,var(--nm-fg)_40%,var(--nm-bg))]">·</span> : null}
               {telHref ? (
                 <a
                   href={`tel:${telHref.replace(/\s/g, "")}`}
@@ -604,7 +634,7 @@ const socialLinks = [
               {disclaimerLong}
             </p>
           </div>
-          <div class="flex flex-col items-end gap-4 sm:flex-row sm:items-center sm:gap-6">
+          <div class="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:gap-6">
             <div class="flex flex-wrap items-center justify-end gap-2">
               {socialLinks.map(({ label, href, mark }) => (
                 <a
@@ -744,6 +774,8 @@ const socialLinks = [
 
         const searchTriggers = Array.from(document.querySelectorAll("[data-search-trigger]"));
         const randomTriggers = Array.from(document.querySelectorAll("[data-random-article-trigger]"));
+        const emailTriggers = Array.from(document.querySelectorAll("[data-email-cta]"));
+        const footerIdentityLine = document.getElementById("nm-footer-identity-line");
 
         const onSearchClick = (event) => {
           event.preventDefault();
@@ -760,6 +792,24 @@ const socialLinks = [
           const source = pool.length ? pool : paths;
           const target = source[Math.floor(Math.random() * source.length)];
           if (target) window.location.href = target;
+        };
+        const maybeShowIdentityLine = () => {
+          if (!(footerIdentityLine instanceof HTMLElement)) return;
+          const chance = Math.random();
+          if (chance <= 0.35) {
+            footerIdentityLine.classList.remove("hidden");
+          } else {
+            footerIdentityLine.classList.add("hidden");
+          }
+        };
+        const onEmailClick = (event) => {
+          const trigger = event.currentTarget;
+          if (!(trigger instanceof HTMLElement)) return;
+          const user = String(trigger.getAttribute("data-email-user") || "").trim();
+          const domain = String(trigger.getAttribute("data-email-domain") || "").trim();
+          if (!user || !domain) return;
+          const mailto = `mailto:${user}@${domain}`;
+          window.location.href = mailto;
         };
 
         const saveDataMode = Boolean(navigator.connection && navigator.connection.saveData);
@@ -793,6 +843,7 @@ const socialLinks = [
 
         searchTriggers.forEach((trigger) => trigger.addEventListener("click", onSearchClick));
         randomTriggers.forEach((trigger) => trigger.addEventListener("click", onRandomClick));
+        maybeShowIdentityLine();
         refreshAvailabilityLines();
 
         const scrollStorageKey = `nm-scroll:${window.location.pathname}`;
@@ -902,6 +953,8 @@ const socialLinks = [
           });
         });
 
+        emailTriggers.forEach((trigger) => trigger.addEventListener("click", onEmailClick));
+
         window.addEventListener("nm:focus-target", (event) => {
           const selector = event?.detail?.selector;
           if (!selector) return;
@@ -915,6 +968,7 @@ const socialLinks = [
         window.__nmLayoutCleanup = () => {
           searchTriggers.forEach((trigger) => trigger.removeEventListener("click", onSearchClick));
           randomTriggers.forEach((trigger) => trigger.removeEventListener("click", onRandomClick));
+          emailTriggers.forEach((trigger) => trigger.removeEventListener("click", onEmailClick));
           window.removeEventListener("scroll", persistScroll);
           window.removeEventListener("beforeunload", persistScroll);
           window.removeEventListener("scroll", onBackToTopScroll);

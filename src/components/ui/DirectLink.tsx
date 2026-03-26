@@ -18,7 +18,7 @@ export type DirectLinkProps = {
 };
 
 /**
- * קריאה ישירה לוואטסאפ עם הקשר עמוד (כותרת + URL). בלי אייקונים.
+ * קריאה ישירה לוואטסאפ עם הקשר עמוד (כותרת + URL).
  */
 export function DirectLink({ whatsAppNumber, fallbackEmail, className = "" }: DirectLinkProps) {
   const handleClick = useCallback(() => {
@@ -59,8 +59,32 @@ export function DirectLink({ whatsAppNumber, fallbackEmail, className = "" }: Di
     <button
       type="button"
       onClick={handleClick}
-      className={`inline-flex items-center justify-center rounded-full bg-[#25D366] px-[1.25rem] py-[0.75rem] text-[0.95rem] font-semibold leading-normal text-white transition-colors duration-200 [transition-timing-function:ease] hover:bg-[#1FAE55] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#25D366] ${className}`.trim()}
+      className={`group inline-flex items-center justify-center gap-2 rounded-full bg-[#25D366] px-[1.25rem] py-[0.75rem] text-[0.95rem] font-semibold leading-normal text-white shadow-[0_10px_24px_rgba(37,211,102,0.22)] transition-all duration-200 [transition-timing-function:ease] hover:-translate-y-0.5 hover:bg-[#1FAE55] hover:shadow-[0_14px_28px_rgba(37,211,102,0.28)] active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#25D366] ${className}`.trim()}
+      aria-label="יש לך מחשבה על זה? בוא נדבר בוואטסאפ"
     >
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        aria-hidden="true"
+        className="transition-transform duration-200 group-hover:scale-110"
+      >
+        <path
+          d="M20 12a8 8 0 0 1-8 8c-1.2 0-2.35-.3-3.37-.86L4 20l.86-4.63A8 8 0 1 1 20 12Z"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinejoin="round"
+          opacity="1"
+        />
+        <path
+          d="M10 9c.8 2 2 3 4 4"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
       יש לך מחשבה על זה? בוא נדבר
     </button>
   );

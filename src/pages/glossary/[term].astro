@@ -84,6 +84,7 @@ const otherConcepts = glossaryConcepts
 
 const pageTitle = `${concept.title} | הגדרות מחדש`;
 const pageDescription = concept.summary;
+const relatedSearchHref = `/services/?q=${encodeURIComponent(concept.title)}&topic=${encodeURIComponent(concept.title)}`;
 ---
 
 <Layout title={pageTitle} description={pageDescription}>
@@ -92,6 +93,14 @@ const pageDescription = concept.summary;
       <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--nm-accent)]">מושג יסוד</p>
       <h1 class="mt-3 text-[clamp(2.1rem,1.6rem+2vw,3.2rem)] font-semibold text-[var(--nm-fg)]">{concept.title}</h1>
       <p class="mt-4 max-w-3xl text-[clamp(1rem,0.95rem+0.35vw,1.18rem)] leading-8 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">{concept.summary}</p>
+      <div class="mt-5 flex flex-wrap justify-end gap-3">
+        <a
+          href={relatedSearchHref}
+          class="inline-flex min-h-[44px] items-center justify-center rounded-full bg-[var(--nm-accent)] px-5 py-2.5 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]"
+        >
+          עוד בנושא: {concept.title}
+        </a>
+      </div>
       <div class="mt-5 flex flex-wrap justify-end gap-2 text-xs text-[color-mix(in_srgb,var(--nm-fg)_55%,var(--nm-bg))]">
         {concept.tags.map((tag) => (
           <span class="rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-3 py-1">{tag}</span>

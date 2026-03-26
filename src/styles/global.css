@@ -142,6 +142,25 @@ body {
     color var(--transition-fast);
 }
 
+img,
+video,
+canvas,
+svg {
+  max-width: 100%;
+  height: auto;
+}
+
+p,
+li,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  overflow-wrap: anywhere;
+}
+
 /* תוכן ארוך: רוחב שורה ושורת בסיס לקריאה */
 .nm-mdx-flow[data-content="long-form"],
 [data-content="long-form"] {
@@ -358,6 +377,16 @@ main article :where(p) {
 
 main article :where(p + p) {
   margin-block-start: clamp(2rem, 4.5vw, 3.75rem);
+}
+
+@media (max-width: 640px) {
+  :root {
+    --nm-nav-top: 1rem;
+  }
+
+  main article :where(p + p) {
+    margin-block-start: 1.4rem;
+  }
 }
 
 main article :where(h2),

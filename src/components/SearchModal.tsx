@@ -1,13 +1,16 @@
 import { useEffect, useRef, useState } from "react";
 import { runPagefindSearch, type PagefindSearchResult } from "../lib/pagefind-client";
 import { FloatingInput } from "./ui/FloatingInput";
+import { glossaryConcepts } from "../data/glossary";
 
 export default function SearchModal() {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<PagefindSearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
+  const requestIdRef = useRef(0);
 
   useEffect(() => {
     const onOpen = () => setIsOpen(true);
@@ -43,39 +46,55 @@ export default function SearchModal() {
     return () => document.removeEventListener("keydown", onKeyDown);
   }, [isOpen]);
 
+  const executeSearch = async (raw: string) => {
+    const trimmed = raw.trim();
+    if (!trimmed) {
+      setResults([]);
+      setIsLoading(false);
+      return;
+    }
+
+    const myId = ++requestIdRef.current;
+    setIsLoading(true);
+    try {
+      const next = await runPagefindSearch(trimmed, 8);
+      if (myId !== requestIdRef.current) return;
+      setResults(next);
+    } catch {
+      if (myId !== requestIdRef.current) return;
+      setResults([]);
+    } finally {
+      if (myId === requestIdRef.current) {
+        setIsLoading(false);
+      }
+    }
+  };
+
   useEffect(() => {
     if (!isOpen) return;
-
-    if (!query.trim()) {
+    const trimmed = query.trim();
+    if (!trimmed) {
+      setSuggestions([]);
       setResults([]);
       return;
     }
 
-    let cancelled = false;
+    const base = glossaryConcepts
+      .map((item) => item.title.trim())
+      .filter(Boolean)
+      .filter((title) => title.includes(trimmed) || trimmed.includes(title))
+      .slice(0, 6);
+    setSuggestions(base);
+  }, [isOpen, query]);
 
-    const runSearch = async () => {
-      try {
-        setIsLoading(true);
-        const next = await runPagefindSearch(query, 6);
-        if (!cancelled) {
-          setResults(next);
-        }
-      } catch {
-        if (!cancelled) {
-          setResults([]);
-        }
-      } finally {
-        if (!cancelled) {
-          setIsLoading(false);
-        }
-      }
-    };
-
-    runSearch();
-
-    return () => {
-      cancelled = true;
-    };
+  useEffect(() => {
+    if (!isOpen) return;
+    const trimmed = query.trim();
+    if (!trimmed) return;
+    const timeout = window.setTimeout(() => {
+      void executeSearch(trimmed);
+    }, 180);
+    return () => window.clearTimeout(timeout);
   }, [isOpen, query]);
 
   if (!isOpen) return null;
@@ -87,7 +106,11 @@ export default function SearchModal() {
       role="dialog"
       aria-modal="true"
       aria-labelledby="search-title"
-      onClick={() => setIsOpen(false)}
+      onClick={() => {
+        setIsOpen(false);
+        setQuery("");
+        setSuggestions([]);
+      }}
     >
       <div
         className="w-[min(720px,92vw)] rounded-3xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-6 shadow-sm"
@@ -102,7 +125,11 @@ export default function SearchModal() {
           </h2>
           <button
             type="button"
-            onClick={() => setIsOpen(false)}
+            onClick={() => {
+              setIsOpen(false);
+              setQuery("");
+              setSuggestions([]);
+            }}
             className="rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/70 px-3 py-1 text-[clamp(0.8rem,0.75rem+0.2vw,0.95rem)] text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))] transition-colors duration-300 hover:bg-white"
           >
             סגור
@@ -111,10 +138,16 @@ export default function SearchModal() {
 
         <p className="mt-3 text-right text-[clamp(1rem,0.95rem+0.25vw,1.05rem)] font-semibold text-[var(--nm-fg)]">מה מעסיק אותך כרגע?</p>
         <p className="mt-1 text-right text-[clamp(0.85rem,0.82rem+0.2vw,1rem)] leading-6 text-[color-mix(in_srgb,var(--nm-fg)_62%,var(--nm-bg))]">
-          נסה לחפש: בהירות, פרדוקס, או איך פותרים בעיית שורש.
+          כתוב מילה כמו אגו, בחירה או בהירות. לחץ Enter לחיפוש ממוקד.
         </p>
 
-        <div className="mt-4">
+        <form
+          className="mt-4 space-y-3"
+          onSubmit={(event) => {
+            event.preventDefault();
+            void executeSearch(query);
+          }}
+        >
           <FloatingInput
             ref={inputRef}
             id="nm-search-modal-query"
@@ -124,14 +157,44 @@ export default function SearchModal() {
             onChange={setQuery}
             hideValidation
             dir="rtl"
+            onKeyDown={(event) => {
+              if (event.key === "Enter") {
+                event.preventDefault();
+                void executeSearch(query);
+              }
+            }}
             aria-label="מה מעסיק אותך כרגע? | חיפוש במרכז הידע של השם לא משנה"
           />
-        </div>
+          <button
+            type="submit"
+            className="inline-flex min-h-[44px] items-center justify-center rounded-full bg-[var(--nm-accent)] px-5 py-2.5 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]"
+          >
+            חפש
+          </button>
+        </form>
+
+        {suggestions.length > 0 && (
+          <div className="mt-3 flex flex-wrap justify-end gap-2" aria-label="השלמות חיפוש">
+            {suggestions.map((item) => (
+              <button
+                key={item}
+                type="button"
+                onClick={() => {
+                  setQuery(item);
+                  void executeSearch(item);
+                }}
+                className="rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-3 py-1.5 text-sm font-semibold text-[var(--nm-accent)] transition hover:border-[color-mix(in_srgb,var(--nm-accent)_24%,transparent)]"
+              >
+                {item}
+              </button>
+            ))}
+          </div>
+        )}
 
         <div className="mt-4 space-y-3">
           {isLoading && (
             <p className="text-[clamp(0.85rem,0.8rem+0.2vw,1rem)] text-[color-mix(in_srgb,var(--nm-fg)_60%,var(--nm-bg))]">
-              מחפשים מה מתאים…
+              מחפשים מה מתאים...
             </p>
           )}
 

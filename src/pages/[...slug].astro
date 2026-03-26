@@ -24,7 +24,6 @@ import LogicNote from "../components/LogicNote.astro";
 import WhatsAppButton from "../components/WhatsAppButton.astro";
 import ThoughtReveal from "../components/ThoughtReveal.astro";
 import AudioNarrative from "../components/AudioNarrative.astro";
-import { FloatingInput } from "../components/ui/FloatingInput";
 import { DirectLink } from "../components/ui/DirectLink";
 import TruthBlock from "../components/ui/TruthBlock";
 import SocialParadoxes from "../components/SocialParadoxes.astro";
@@ -35,6 +34,7 @@ import ArticleBenefits from "../components/ArticleBenefits.astro";
 import TenSecondExercise from "../components/TenSecondExercise.astro";
 import NextNaturalStep from "../components/NextNaturalStep.astro";
 import DepthSideNav from "../components/DepthSideNav.astro";
+import BookBanner from "../components/ui/BookBanner.astro";
 
 type ArticleEntry = CollectionEntry<"articles">;
 type InternalLink = {
@@ -214,6 +214,10 @@ const relatedArticles = allEntries
     return right.item.data.pubDate.getTime() - left.item.data.pubDate.getTime();
   })
   .slice(0, 3);
+
+const isRelationshipArticle =
+  /zugiyut|zogiyut|relationship/i.test(currentSlug) ||
+  tags.some((tag) => ["זוגיות", "מערכות-יחסים", "חברים"].includes(String(tag)));
 
 const resolveDifficultyKeyForEntry = (entry: ArticleEntry): DifficultyKey => {
   const level = entry.data.difficultyLevel;
@@ -422,7 +426,7 @@ const components = {
   <div class="mx-auto max-w-7xl lg:grid lg:grid-cols-[minmax(0,72ch)_minmax(280px,340px)] lg:gap-10">
     <article class="min-w-0 space-y-[clamp(1.75rem,3vw,2.5rem)]">
       <nav aria-label="פירורי לחם" class="text-right">
-        <ol class="flex flex-wrap items-center justify-end gap-2 text-sm text-[color-mix(in_srgb,var(--nm-fg)_58%,var(--nm-bg))]">
+        <ol class="flex w-full flex-wrap items-center justify-start gap-2 text-sm text-[color-mix(in_srgb,var(--nm-fg)_58%,var(--nm-bg))]">
           <li>
             <a
               href="/"
@@ -582,6 +586,8 @@ const components = {
 
       <TenSecondExercise text={reflectionQuestions[0] ?? bottomLine} />
 
+      {isRelationshipArticle ? <BookBanner /> : null}
+
       {showPremiumBreak && <PremiumBreak wizardHref={discoveryServicesHref} />}
 
       <section
@@ -593,7 +599,7 @@ const components = {
         </p>
         <a
           href={discoveryServicesHref}
-          class="mt-4 inline-flex min-h-[44px] items-center justify-center rounded-full bg-[var(--nm-inverse)] px-5 py-2.5 text-sm font-semibold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-inverse-hover)]"
+          class="mt-4 inline-flex min-h-[44px] items-center justify-center rounded-full bg-[var(--nm-inverse)] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[var(--nm-inverse-hover)]"
         >
           {tags.length > 0 ? `למרחב הגילוי עם הנושא: ${tags[0]}` : "למרחב הגילוי בשירותים"}
         </a>
@@ -658,7 +664,7 @@ const components = {
           <div class="space-y-2 text-right">
             <h2 class="text-[clamp(1.4rem,1.15rem+1vw,2rem)] font-semibold text-[var(--nm-fg)]">ראה גם</h2>
             <p class="text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] text-[var(--nm-fg)]/65">
-              כדי להעמיק בלי לשבור רצף, המשך מכאן ל-3–5 עמודים שמרחיבים את אותה חקירה מכיוון אחר.
+              כדי להעמיק בלי לשבור רצף, המשך מכאן ל-3-5 עמודים שמרחיבים את אותה חקירה מכיוון אחר.
             </p>
           </div>
           <div class={`grid gap-4 ${curatedInternalLinks.length > 1 ? "md:grid-cols-2" : ""}`}>
@@ -677,46 +683,6 @@ const components = {
       )}
 
       {showBottomLine && bottomLine && <BottomLineSummary summary={bottomLine} />}
-
-      <section class="mx-auto max-w-2xl space-y-6">
-        <h2 class="text-center text-[clamp(1.4rem,1.15rem+1vw,2rem)] font-semibold text-[var(--nm-fg)]">
-          אפשר להשאיר שאלה או פנייה
-        </h2>
-        <form
-          data-contact-form
-          action="https://api.web3forms.com/submit"
-          method="POST"
-          class="space-y-5 rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/80 p-6 shadow-sm"
-        >
-          <input type="hidden" name="access_key" value={web3formsKey} />
-          <input type="hidden" name="subject" value="פנייה מ-NeverMind" />
-          <input type="hidden" name="page" value={title} />
-          <input type="text" name="botcheck" style="display:none" tabindex="-1" autocomplete="off" aria-hidden="true" />
-
-          <FloatingInput client:load id="name" name="name" label="שם מלא" required dir="rtl" />
-          <FloatingInput client:load id="email" name="email" label="אימייל" type="email" required dir="rtl" />
-          <FloatingInput client:load id="message" name="message" label="הודעה" multiline rows={4} required dir="rtl" />
-
-          <button
-            type="submit"
-            class="inline-flex w-full items-center justify-center rounded-full bg-[var(--nm-inverse)] px-5 py-3 text-sm font-semibold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-inverse-hover)]"
-          >
-            שליחה
-          </button>
-          <p data-form-status aria-live="polite" class="text-center text-[clamp(0.85rem,0.8rem+0.2vw,1rem)] text-[color-mix(in_srgb,var(--nm-fg)_60%,var(--nm-bg))] opacity-0 transition-opacity duration-300">
-            נשלח - אני בדרך כלל חוזר ממש מהר.
-          </p>
-          <div data-nm-post-form-return class="hidden text-center">
-            <a
-              data-nm-return-cta-link
-              href="/articles/"
-              class="mt-3 inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-accent)_28%,transparent)] bg-[var(--nm-tint)] px-5 py-2.5 text-sm font-semibold text-[var(--nm-accent)] transition hover:bg-[var(--nm-tint-hover)]"
-            >
-              חזור לארכיון
-            </a>
-          </div>
-        </form>
-      </section>
 
       <div class="mx-auto max-w-[72ch]">
         <SubscribeBanner />
@@ -850,10 +816,6 @@ const components = {
       const copyButton = document.querySelector("[data-copy-link]");
       const insightCopyButton = document.querySelector("[data-copy-insight]");
       const toast = document.querySelector("[data-copy-toast]");
-      const contactForm = document.querySelector("[data-contact-form]");
-      const formStatus = document.querySelector("[data-form-status]");
-      const postFormReturn = document.querySelector("[data-nm-post-form-return]");
-      const postFormReturnLink = postFormReturn?.querySelector("[data-nm-return-cta-link]");
       const premiumBody = document.querySelector("[data-premium-body]");
       const cleanups = [];
       let ticking = false;
@@ -990,7 +952,7 @@ const components = {
         }
 
         const accessEnabled = premiumBody.dataset.premiumAccessEnabled === "true";
-        const title = overrides.title || premiumBody.dataset.premiumTitle || "מכאן הלאה – נכנסים לפרטים";
+        const title = overrides.title || premiumBody.dataset.premiumTitle || "מכאן הלאה - נכנסים לפרטים";
         const description =
           overrides.description ||
           premiumBody.dataset.premiumDescription ||
@@ -1092,41 +1054,6 @@ const components = {
 
         focusToggle.addEventListener("click", onFocusClick);
         cleanups.push(() => focusToggle.removeEventListener("click", onFocusClick));
-      }
-
-      if (contactForm instanceof HTMLFormElement && formStatus instanceof HTMLElement) {
-        const onSubmit = async (event) => {
-          event.preventDefault();
-          formStatus.classList.remove("opacity-100");
-
-          try {
-            const formData = new FormData(contactForm);
-            const response = await fetch(contactForm.action, {
-              method: "POST",
-              body: formData,
-            });
-
-            if (!response.ok) {
-              throw new Error("Form submission failed");
-            }
-
-            formStatus.textContent = "נשלח - אני בדרך כלל חוזר ממש מהר.";
-            formStatus.classList.add("opacity-100");
-            contactForm.reset();
-            if (postFormReturn instanceof HTMLElement && postFormReturnLink instanceof HTMLAnchorElement) {
-              if (typeof window.__nmFillReturnLink === "function") {
-                window.__nmFillReturnLink(postFormReturnLink);
-              }
-              postFormReturn.classList.remove("hidden");
-            }
-          } catch {
-            formStatus.textContent = "נראה שלא עבר הפעם. רוצה לנסות שוב?";
-            formStatus.classList.add("opacity-100");
-          }
-        };
-
-        contactForm.addEventListener("submit", onSubmit);
-        cleanups.push(() => contactForm.removeEventListener("submit", onSubmit));
       }
 
       document.addEventListener("scroll", onScroll, { passive: true });

@@ -57,87 +57,91 @@ const waNumber = String(appConfig.contact.whatsAppNumber ?? "").replace(/\D/g, "
               data-discovery-tag={searchQuery}
               class="rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[color-mix(in_srgb,var(--nm-bg-canvas)_90%,transparent)] px-3 py-1.5 text-sm font-semibold text-[var(--nm-accent)] transition hover:border-[color-mix(in_srgb,var(--nm-accent)_24%,transparent)] hover:bg-[var(--nm-surface-muted)]"
             >
-              #{label}
+              {label}
             </button>
           ))
         }
       </div>
     </header>
 
-    <div class="pt-10">
-      <Gatekeeper
-        phone={appConfig.contact.whatsAppNumber}
-        fallbackHref="/articles/"
-        fallbackLabel="חזרה לארכיון"
-      />
-    </div>
-
-    <div id="discovery-results" class="hidden grid-cols-1 gap-12 lg:grid-cols-2">
+    <div id="discovery-results" class="grid grid-cols-1 gap-12 lg:grid-cols-2">
       <div class="space-y-6">
         <div class="border-b border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] pb-3">
           <h2 class="text-xs font-bold uppercase tracking-[0.2em] text-[color-mix(in_srgb,var(--nm-fg)_45%,var(--nm-bg))]">
             מהארכיון
           </h2>
         </div>
-        <p id="discovery-archive-status" class="hidden text-sm text-[color-mix(in_srgb,var(--nm-fg)_55%,var(--nm-bg))]"></p>
-        <div id="discovery-archive-list" class="space-y-3"></div>
-      </div>
-
-      <div class="space-y-6">
-        <div class="border-b border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] pb-3">
-          <h2 class="text-xs font-bold uppercase tracking-[0.2em] text-[var(--nm-accent)]">
-            רוצה לפרק את זה יחד?
-          </h2>
-          <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
-            אלו הדרכים שבהן אנחנו יכולים לשבת על זה.
+        <div
+          id="discovery-idle"
+          class="rounded-3xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[color-mix(in_srgb,var(--nm-bg-canvas)_94%,transparent)] px-6 py-8 text-right"
+        >
+          <p class="text-lg font-semibold text-[var(--nm-fg)]">בחר נושא וקבל כיוון</p>
+          <p class="mt-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
+            כאן יופיעו תוצאות מהארכיון. אפשר להתחיל מהחיפוש למעלה או ללחוץ על אחת התגיות.
           </p>
         </div>
-        <div class="grid gap-4">
-          {
-            services.map((service) => {
-              const action = resolveServiceAction(service);
-              const note = service.friendly_note?.trim() || service.subtitle || "";
-              return (
-                <div
-                  id={service.id}
-                  class="group rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-6 shadow-[0_12px_32px_color-mix(in_srgb,var(--nm-fg)_4%,transparent)] transition hover:border-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)]"
-                >
-                  <div class="flex flex-wrap items-start justify-between gap-3">
-                    <h3 class="text-lg font-semibold text-[var(--nm-fg)]">{service.title}</h3>
-                    <span class="text-sm font-semibold text-[color-mix(in_srgb,var(--nm-fg)_55%,var(--nm-bg))]">
-                      {formatMoney(service.price_full)}
-                    </span>
-                  </div>
-                  {note ? (
-                    <p class="mt-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">{note}</p>
-                  ) : null}
-                  <a
-                    href={action.href}
-                    {...(action.external ? { target: "_blank", rel: "noreferrer" } : {})}
-                    class="mt-5 inline-flex min-h-[44px] items-center gap-2 text-sm font-bold text-[var(--nm-accent)] underline-offset-4 transition group-hover:underline"
-                  >
-                    {action.label}
-                  </a>
-                </div>
-              );
-            })
-          }
-        </div>
+        <p id="discovery-archive-status" class="hidden text-sm text-[color-mix(in_srgb,var(--nm-fg)_55%,var(--nm-bg))]"></p>
+        <div id="discovery-archive-list" class="space-y-3"></div>
+      <div
+        id="discovery-gap"
+        class="hidden rounded-3xl border-2 border-dashed border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-[color-mix(in_srgb,var(--nm-bg-canvas)_96%,transparent)] px-6 py-10 text-center"
+      >
+        <p id="discovery-gap-text" class="text-lg leading-8 text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))]"></p>
+        <a
+          id="discovery-gap-wa"
+          href="#"
+          class="mt-8 inline-flex min-h-[48px] items-center justify-center gap-2 rounded-full bg-[var(--nm-inverse)] px-8 py-3 text-sm font-semibold text-white transition hover:bg-[var(--nm-inverse-hover)]"
+        >
+          נדבר על זה בוואטסאפ
+        </a>
       </div>
     </div>
 
-    <div
-      id="discovery-gap"
-      class="hidden mx-auto max-w-2xl rounded-3xl border-2 border-dashed border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-[color-mix(in_srgb,var(--nm-bg-canvas)_96%,transparent)] px-6 py-10 text-center"
-    >
-      <p id="discovery-gap-text" class="text-lg leading-8 text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))]"></p>
-      <a
-        id="discovery-gap-wa"
-        href="#"
-        class="mt-8 inline-flex min-h-[48px] items-center justify-center gap-2 rounded-full bg-[var(--nm-inverse)] px-8 py-3 text-sm font-semibold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-inverse-hover)]"
-      >
-        נדבר בוואטסאפ?
-      </a>
+    <div class="space-y-6">
+      <div class="border-b border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] pb-3">
+        <h2 class="text-xs font-bold uppercase tracking-[0.2em] text-[var(--nm-accent)]">
+          רוצה לפרק את זה יחד?
+        </h2>
+        <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
+          אלו הדרכים שבהן אנחנו יכולים לשבת על זה.
+        </p>
+      </div>
+      <div class="grid gap-4">
+        {
+          services.map((service) => {
+            const action = resolveServiceAction(service);
+            const note = service.friendly_note?.trim() || service.subtitle || "";
+            return (
+              <div
+                id={service.id}
+                class="group rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-6 shadow-[0_12px_32px_color-mix(in_srgb,var(--nm-fg)_4%,transparent)] transition hover:border-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)]"
+              >
+                <div class="flex flex-wrap items-start justify-between gap-3">
+                  <h3 class="text-lg font-semibold text-[var(--nm-fg)]">{service.title}</h3>
+                  <span class="text-sm font-semibold text-[color-mix(in_srgb,var(--nm-fg)_55%,var(--nm-bg))]">
+                    {formatMoney(service.price_full)}
+                  </span>
+                </div>
+                {note ? (
+                  <p class="mt-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">{note}</p>
+                ) : null}
+                <a
+                  href={action.href}
+                  {...(action.external ? { target: "_blank", rel: "noreferrer" } : {})}
+                  class="mt-5 inline-flex min-h-[44px] items-center gap-2 text-sm font-bold text-[var(--nm-accent)] underline-offset-4 transition group-hover:underline"
+                >
+                  {action.label}
+                </a>
+              </div>
+            );
+          })
+        }
+      </div>
+      <Gatekeeper
+        phone={appConfig.contact.whatsAppNumber}
+        fallbackHref="/articles/"
+        fallbackLabel="חזרה לארכיון"
+      />
     </div>
   </section>
 
@@ -171,7 +175,7 @@ const waNumber = String(appConfig.contact.whatsAppNumber ?? "").replace(/\D/g, "
 
     function waHrefForTopic(topic) {
       const t = String(topic || "").trim() || "הנושא שחיפשתי";
-      const body = `היי יקיר, חיפשתי באתר על ${t} ולא מצאתי, אשמח לדבר על זה.`;
+      const body = `היי, חיפשתי באתר על ${t} ולא מצאתי, אשמח לדבר על זה.`;
       return `https://wa.me/${waNumber}?text=${encodeURIComponent(body)}`;
     }
 
@@ -183,6 +187,7 @@ const waNumber = String(appConfig.contact.whatsAppNumber ?? "").replace(/\D/g, "
       const gapWa = document.getElementById("discovery-gap-wa");
       const listEl = document.getElementById("discovery-archive-list");
       const statusEl = document.getElementById("discovery-archive-status");
+      const idleEl = document.getElementById("discovery-idle");
 
       if (
         !(input instanceof HTMLInputElement) ||
@@ -191,7 +196,8 @@ const waNumber = String(appConfig.contact.whatsAppNumber ?? "").replace(/\D/g, "
         !(gapText instanceof HTMLElement) ||
         !(gapWa instanceof HTMLAnchorElement) ||
         !(listEl instanceof HTMLElement) ||
-        !(statusEl instanceof HTMLElement)
+        !(statusEl instanceof HTMLElement) ||
+        !(idleEl instanceof HTMLElement)
       ) {
         return;
       }
@@ -199,9 +205,8 @@ const waNumber = String(appConfig.contact.whatsAppNumber ?? "").replace(/\D/g, "
       let debounceTimer = 0;
       let requestId = 0;
 
-      function hideAll() {
-        resultsEl.classList.add("hidden");
-        resultsEl.classList.remove("grid");
+      function showIdle() {
+        idleEl.classList.remove("hidden");
         gapEl.classList.add("hidden");
         listEl.innerHTML = "";
         statusEl.classList.add("hidden");
@@ -211,16 +216,15 @@ const waNumber = String(appConfig.contact.whatsAppNumber ?? "").replace(/\D/g, "
       async function runQuery(raw) {
         const q = raw.trim();
         if (q.length < MIN_LEN) {
-          hideAll();
+          showIdle();
           return;
         }
 
         const myId = ++requestId;
+        idleEl.classList.add("hidden");
         gapEl.classList.add("hidden");
-        resultsEl.classList.remove("hidden");
-        resultsEl.classList.add("grid");
         statusEl.classList.remove("hidden");
-        statusEl.textContent = "מחפשים בארכיון…";
+        statusEl.textContent = "מחפשים בארכיון...";
         listEl.innerHTML = "";
 
         let rows = [];
@@ -236,11 +240,10 @@ const waNumber = String(appConfig.contact.whatsAppNumber ?? "").replace(/\D/g, "
         statusEl.textContent = "";
 
         if (rows.length === 0) {
-          resultsEl.classList.add("hidden");
-          resultsEl.classList.remove("grid");
           gapEl.classList.remove("hidden");
           gapText.textContent = contentGapMessage;
           gapWa.href = waHrefForTopic(q);
+          listEl.innerHTML = "";
           return;
         }
 
@@ -276,6 +279,8 @@ const waNumber = String(appConfig.contact.whatsAppNumber ?? "").replace(/\D/g, "
         input.value = fromUrl;
         window.clearTimeout(debounceTimer);
         void runQuery(fromUrl);
+      } else {
+        showIdle();
       }
     });
   </script>

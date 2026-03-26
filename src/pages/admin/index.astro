@@ -217,14 +217,16 @@ const topPriority =
       <article class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-5 text-right"><p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">שירותים פעילים</p><p class="mt-3 text-3xl font-semibold text-[var(--nm-fg)]">{stats.activeServices}</p></article>
     </section>
 
-    <ArticlesTable articles={articles} />
+    <section id="content-queue">
+      <ArticlesTable articles={articles} />
+    </section>
 
-    <div class="grid gap-8 xl:grid-cols-2">
+    <div id="services-config" class="grid gap-8 xl:grid-cols-2">
       <ServicesControlPanel />
       <AppConfigControlPanel />
     </div>
 
-    <div class="grid gap-8 xl:grid-cols-2">
+    <div id="canvas-paths" class="grid gap-8 xl:grid-cols-2">
       <HomeCanvasControlPanel />
       <ClarityPathsControlPanel />
     </div>
@@ -242,12 +244,22 @@ const topPriority =
       </article>
 
       <article class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/82 p-5 shadow-[0_24px_70px_rgba(26,26,26,0.06)] text-right">
-        <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--nm-accent)]">Recommended Flow</p>
+        <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--nm-accent)]">זרימת עבודה מעודכנת</p>
         <h2 class="mt-3 text-2xl font-semibold text-[var(--nm-fg)]">מה עושים מכאן</h2>
         <ol class="mt-5 space-y-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
-          <li class="rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3">יוצרים מאמר חדש דרך המחולל.</li>
-          <li class="rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3">מקדמים כל מאמר דרך התור: בכתיבה, לבדיקה, מוכן לפרסום, ואז פורסם.</li>
-          <li class="rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3">בודקים את השירותים והקונפיג לפני כל push כדי לא לשבור את האתר החי.</li>
+          <li class="rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3">
+            יוצרים טיוטה חדשה ומייצרים תוכן מהמחולל.
+            <a href="/admin/generator/" class="ms-2 font-semibold text-[var(--nm-accent)] underline-offset-4 hover:underline">פתח מחולל</a>
+          </li>
+          <li class="rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3">
+            מקדמים מאמרים דרך התור לפי סטטוס: בכתיבה, לבדיקה, מוכן לפרסום, פורסם.
+            <a href="#content-queue" class="ms-2 font-semibold text-[var(--nm-accent)] underline-offset-4 hover:underline">לתור המאמרים</a>
+          </li>
+          <li class="rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3">
+            לפני push בודקים שירותים, הגדרות כלליות, קנבס ומסלולים.
+            <a href="#services-config" class="ms-2 font-semibold text-[var(--nm-accent)] underline-offset-4 hover:underline">שירותים וקונפיג</a>
+            <a href="#canvas-paths" class="ms-2 font-semibold text-[var(--nm-accent)] underline-offset-4 hover:underline">קנבס ומסלולים</a>
+          </li>
         </ol>
       </article>
     </section>
