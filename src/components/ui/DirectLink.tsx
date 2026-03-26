@@ -59,7 +59,7 @@ export function DirectLink({ whatsAppNumber, fallbackEmail, className = "" }: Di
     <button
       type="button"
       onClick={handleClick}
-      className={`inline-flex items-center justify-center rounded-[2px] border-[1.5px] border-solid border-[#1a1a1a] bg-transparent px-[1.25rem] py-[0.6rem] text-[0.9rem] font-normal leading-normal text-[#1a1a1a] transition-colors duration-200 [transition-timing-function:ease] hover:border-[#d42b2b] hover:text-[#d42b2b] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#d42b2b] ${className}`.trim()}
+      className={`inline-flex items-center justify-center rounded-full bg-[#25D366] px-[1.25rem] py-[0.75rem] text-[0.95rem] font-semibold leading-normal text-white transition-colors duration-200 [transition-timing-function:ease] hover:bg-[#1FAE55] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#25D366] ${className}`.trim()}
     >
       יש לך מחשבה על זה? בוא נדבר
     </button>

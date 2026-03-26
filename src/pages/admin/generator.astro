@@ -230,11 +230,16 @@ const pageDescription = "אשף 3 שלבים ליצירת Master Prompt מדוי
       tags: string;
       youtubeId: string;
       body: string;
+      summary: string;
     }): string[] {
       const warnings: string[] = [];
       const yt = data.youtubeId.trim();
       if (yt && !YOUTUBE_ID_RE.test(yt)) {
         warnings.push("מזהה YouTube לא תקין (צפוי בדיוק 11 תווים, אותיות מספרים מקף תחתון).");
+      }
+      const desc = data.summary.trim();
+      if (desc.length > 0 && (desc.length < 150 || desc.length > 160)) {
+        warnings.push(`Meta description צריך להיות בין 150 ל-160 תווים. כעת: ${desc.length}.`);
       }
       const tagParts = data.tags
         .split(/[,،]/)
@@ -347,14 +352,23 @@ const pageDescription = "אשף 3 שלבים ליצירת Master Prompt מדוי
         return `[Role: Strategic Content Expert]
 [Context: NeverMind Project]
 Act as a high-end content strategist for NeverMind. Write an article about ${data.topic || "[Topic]"} for ${data.audience || "[Audience]"}. The core insight is ${data.aha || "[Aha Moment]"}.${bl}${inv}
-Frontmatter targets: description (summary)=${data.summary || "[Summary]"}; slug=${data.slug || "[Slug]"}; tags=[${data.tags || "[Tags]"}]; isPremium=${data.isPremium}; difficultyLevel=${data.difficultyLevel}; youtubeId=${data.youtubeId || "[optional]"}; bottomLine=${data.bottomLine || "[optional]"}; inversionNote=${data.inversionNote || "[optional]"}.
+Frontmatter targets: description (summary)=${data.summary || "[Summary]"}; slug=${data.slug || "[Slug]"}; tags=[${data.tags || "[Tags]"}]; isPremium=${data.isPremium}; difficultyLevel=${data.difficultyLevel}; youtubeId=${data.youtubeId || "[optional]"}; bottomLine=${data.bottomLine || "[optional]"}; inversionNote=${data.inversionNote || "[optional]"}; reflectionQuestions=[3 questions]; faq=[3 Q/A objects derived from the reflectionQuestions].
 Style: ${data.tone || "[Tone]"}. Ensure the piece includes: ${normalizedPoints || "[Key Points]"}. Length intent: ${data.length || "[Length]"}. Draft body (if any) should be refined, not duplicated blindly:
 [DRAFT_BODY_START]
 ${data.body.trim() || "[no draft yet]"}
 [DRAFT_BODY_END]
 ${depthBlock}
 Follow the brand identity: zero fluff, focus on thought-shifts, NeverMind voice (direct, analytical, no filler).
-[Output Instructions: Markdown; no fluff; focus on Thought-Shifts; structure for web reading.]`;
+[Output Instructions: Markdown; no fluff; focus on Thought-Shifts; structure for web reading.
+- Use the following heading order and exact labels (must match exactly):
+  1) ## מה המנגנון כאן
+  2) ## שאלת היפוך
+  3) ### ניסוי קצר
+  4) ## סיכום פרקטי
+- Inside at least 2 headings above, weave 2-3 natural SEO phrases derived from the topic (use Hebrew patterns like: איך {topic}, איך להפסיק {topic}, פתרון ... בזוגיות when relevant).
+- Two-layer writing: each paragraph has two sentences. First sentence simple and concrete. Second sentence deeper and more precise.
+- Keep paragraphs short. No generic filler.
+]`;
       };
 
       backBtn?.addEventListener("click", () => {

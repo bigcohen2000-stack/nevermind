@@ -30,6 +30,11 @@ import TruthBlock from "../components/ui/TruthBlock";
 import SocialParadoxes from "../components/SocialParadoxes.astro";
 import DeepDiveInquiry from "../components/DeepDiveInquiry.astro";
 import ClarityAnalogy from "../components/ClarityAnalogy.astro";
+import ArticleShareActions from "../components/ArticleShareActions.astro";
+import ArticleBenefits from "../components/ArticleBenefits.astro";
+import TenSecondExercise from "../components/TenSecondExercise.astro";
+import NextNaturalStep from "../components/NextNaturalStep.astro";
+import DepthSideNav from "../components/DepthSideNav.astro";
 
 type ArticleEntry = CollectionEntry<"articles">;
 type InternalLink = {
@@ -117,7 +122,7 @@ const audioUrl = frontmatter.audioUrl;
 const audioFile = typeof frontmatter.audioFile === "string" ? frontmatter.audioFile.trim() : "";
 const hasInlineVideoPlayer = /<VideoPlayer\b/i.test(rawContent);
 const tags = Array.isArray(frontmatter.tags) ? frontmatter.tags : [];
-const faqItems = Array.isArray(frontmatter.faq) ? frontmatter.faq : [];
+let faqItems = Array.isArray(frontmatter.faq) ? frontmatter.faq : [];
 const hasInquirySection = rawContent.includes("InquirySection") || rawContent.includes("InquiryBox");
 const siteUrl = Astro.site?.toString() ?? appConfig.site.url;
 const shareUrl = Astro.url ? new URL(Astro.url.pathname, siteUrl).toString() : siteUrl;
@@ -162,6 +167,12 @@ const reflectionQuestions =
   Array.isArray(frontmatter.reflectionQuestions) && frontmatter.reflectionQuestions.length === 3
     ? frontmatter.reflectionQuestions
     : fallbackReflectionQuestions;
+
+if (faqItems.length === 0 && reflectionQuestions.length === 3) {
+  const baseAnswer = bottomLine || description;
+  faqItems = reflectionQuestions.map((question) => ({ question, answer: baseAnswer }));
+}
+
 const meetingMessage = buildArticleMeetingWhatsAppMessage({
   title,
   slug: currentSlug,
@@ -203,6 +214,93 @@ const relatedArticles = allEntries
     return right.item.data.pubDate.getTime() - left.item.data.pubDate.getTime();
   })
   .slice(0, 3);
+
+const resolveDifficultyKeyForEntry = (entry: ArticleEntry): DifficultyKey => {
+  const level = entry.data.difficultyLevel;
+  if (level && level in difficultyConfig) return level as DifficultyKey;
+  const body = entry.body ?? "";
+  const wordCount = body.replace(/<[^>]*>/g, " ").split(/\s+/).filter(Boolean).length;
+  if (wordCount > 1400) return "deep";
+  if (wordCount > 900) return "advanced";
+  return "beginner";
+};
+
+const nextDifficulty: DifficultyKey | null =
+  difficultyKey === "beginner" ? "advanced" : difficultyKey === "advanced" ? "deep" : null;
+
+const overlapRankedArticles = allEntries
+  .filter((item) => `articles/${toArticleSlug(item)}` !== currentSlug)
+  .map((item) => {
+    const itemTags = Array.isArray(item.data.tags) ? item.data.tags : [];
+    const overlap = itemTags.filter((tag) => tags.includes(tag)).length;
+    return { item, overlap };
+  })
+  .filter(({ overlap }) => overlap > 0)
+  .sort((left, right) => {
+    if (right.overlap !== left.overlap) return right.overlap - left.overlap;
+    return right.item.data.pubDate.getTime() - left.item.data.pubDate.getTime();
+  })
+  .slice(0, 10);
+
+const nextArticleEntry =
+  nextDifficulty != null
+    ? overlapRankedArticles.find(({ item }) => resolveDifficultyKeyForEntry(item) === nextDifficulty)?.item ??
+      overlapRankedArticles[0]?.item
+    : null;
+
+const nextTarget =
+  nextArticleEntry && nextDifficulty
+    ? {
+        kind: "article" as const,
+        href: `/articles/${toArticleSlug(nextArticleEntry)}`,
+        title: nextArticleEntry.data.title,
+        description: nextArticleEntry.data.description,
+        label: difficultyConfig[nextDifficulty].label,
+      }
+    : {
+        kind: "service" as const,
+        href: discoveryServicesHref,
+        title: "עבודה משותפת",
+        description: "אם המאמר פגש נקודה חיה, בוחרים צעד אחד ומתקדמים.",
+        label: "שיחה ממוקדת",
+      };
+
+const secondaryTargets = overlapRankedArticles
+  .filter(({ item }) => {
+    if (!nextArticleEntry) return true;
+    return toArticleSlug(item) !== toArticleSlug(nextArticleEntry);
+  })
+  .slice(0, 2)
+  .map(({ item }) => ({
+    kind: "article" as const,
+    href: `/articles/${toArticleSlug(item)}`,
+    title: item.data.title,
+    description: item.data.description,
+  }));
+
+const beginnerEntryForNav = overlapRankedArticles.find(({ item }) => resolveDifficultyKeyForEntry(item) === "beginner")?.item;
+const advancedEntryForNav = overlapRankedArticles.find(({ item }) => resolveDifficultyKeyForEntry(item) === "advanced")?.item;
+
+const depthNavItems = [
+  {
+    key: "beginner" as const,
+    label: difficultyConfig.beginner.label,
+    tone: difficultyConfig.beginner.tone,
+    href: difficultyKey !== "beginner" && beginnerEntryForNav ? `/articles/${toArticleSlug(beginnerEntryForNav)}` : undefined,
+  },
+  {
+    key: "advanced" as const,
+    label: difficultyConfig.advanced.label,
+    tone: difficultyConfig.advanced.tone,
+    href: difficultyKey !== "advanced" && advancedEntryForNav ? `/articles/${toArticleSlug(advancedEntryForNav)}` : undefined,
+  },
+  {
+    key: "deep" as const,
+    label: difficultyConfig.deep.label,
+    tone: difficultyConfig.deep.tone,
+    href: difficultyKey !== "deep" ? discoveryServicesHref : undefined,
+  },
+];
 
 const sortedChrono = [...allEntries].sort((a, b) => a.data.pubDate.valueOf() - b.data.pubDate.valueOf());
 const chronoIdx = sortedChrono.findIndex((e) => toArticleSlug(e) === toArticleSlug(entry));
@@ -357,6 +455,25 @@ const components = {
           <p class="mt-2 text-[clamp(1.08rem,1rem+0.35vw,1.35rem)] font-semibold leading-8 text-[color-mix(in_srgb,var(--nm-fg)_80%,var(--nm-bg))]">{description}</p>
         </section>
 
+        {frontmatter.image && frontmatter.image !== "/og.jpg" ? (
+          <section
+            class="mx-auto max-w-[72ch] overflow-hidden rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/70"
+            aria-label="תמונה ראשית"
+          >
+            <img
+              src={frontmatter.image}
+              alt={title}
+              loading="lazy"
+              decoding="async"
+              width="1280"
+              height="720"
+              class="block h-auto w-full"
+            />
+          </section>
+        ) : null}
+
+        <ArticleBenefits reflectionQuestions={reflectionQuestions} bottomLine={bottomLine} />
+
         {originalInsight && (
           <section class="rounded-[1.35rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-5 py-4">
             <div class="flex flex-wrap items-start justify-between gap-3">
@@ -419,8 +536,6 @@ const components = {
         </div>
       </header>
 
-      {showBottomLine && bottomLine && <BottomLineSummary summary={bottomLine} />}
-
       {audioFile && (
         <AudioNarrative src={`/audio/articles/${audioFile}`} title={title} />
       )}
@@ -464,6 +579,9 @@ const components = {
           </p>
         </section>
       ) : null}
+
+      <TenSecondExercise text={reflectionQuestions[0] ?? bottomLine} />
+
       {showPremiumBreak && <PremiumBreak wizardHref={discoveryServicesHref} />}
 
       <section
@@ -486,31 +604,7 @@ const components = {
       </section>
 
       <section class="mx-auto max-w-[72ch] space-y-4">
-        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
-          <a
-            href={whatsappShareUrl}
-            target="_blank"
-            rel="noreferrer"
-            class="inline-flex items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/70 px-4 py-2 text-[clamp(0.9rem,0.85rem+0.2vw,1.05rem)] text-[var(--nm-fg)]/75 transition-colors duration-300 hover:bg-white"
-          >
-            הפץ את האור
-          </a>
-          <button
-            type="button"
-            data-copy-link
-            data-copy-value={shareUrl}
-            class="inline-flex items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/70 px-4 py-2 text-[clamp(0.9rem,0.85rem+0.2vw,1.05rem)] text-[var(--nm-fg)]/75 transition-colors duration-300 hover:bg-white"
-          >
-            העתק קישור
-          </button>
-        </div>
-
-        <div
-          data-copy-toast
-          class="pointer-events-none fixed bottom-6 right-6 z-50 rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 px-4 py-2 text-[clamp(0.85rem,0.8rem+0.2vw,1rem)] text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))] opacity-0 transition-opacity duration-300"
-        >
-          הועתק
-        </div>
+        <ArticleShareActions whatsappShareUrl={whatsappShareUrl} shareUrl={shareUrl} />
 
         <div class="flex justify-end pt-1" aria-label="פתיחת שיחה אחרי קריאה">
           <DirectLink
@@ -521,27 +615,7 @@ const components = {
         </div>
       </section>
 
-      {relatedArticles.length > 0 && (
-        <section class="mx-auto max-w-[72ch] space-y-4" aria-label="מאמרים קשורים לפי תגיות">
-          <div class="space-y-2 text-right">
-            <h2 class="text-[clamp(1.4rem,1.15rem+1vw,2rem)] font-semibold text-[var(--nm-fg)]">מאמרים קשורים</h2>
-            <p class="text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] text-[var(--nm-fg)]/65">
-              עד שלושה כיוונים נוספים מאותה משפחת תגיות.
-            </p>
-          </div>
-          <div class={`grid gap-4 ${relatedArticles.length > 1 ? "md:grid-cols-2" : ""}`}>
-            {relatedArticles.map(({ item }) => (
-              <a
-                href={`/articles/${toArticleSlug(item)}`}
-                class="flex h-full flex-col justify-between gap-3 rounded-3xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/70 px-5 py-4 text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] text-[var(--nm-fg)]/80 shadow-sm transition-all duration-500 hover:-translate-y-[2px] hover:bg-white"
-              >
-                <span class="font-semibold text-[var(--nm-fg)]">{item.data.title}</span>
-                <span class="text-[clamp(0.85rem,0.82rem+0.2vw,1rem)] text-[color-mix(in_srgb,var(--nm-fg)_60%,var(--nm-bg))]">{item.data.description}</span>
-              </a>
-            ))}
-          </div>
-        </section>
-      )}
+      <NextNaturalStep currentDifficultyLabel={difficultyMeta.label} next={nextTarget} secondary={secondaryTargets} />
 
       <nav
         aria-label="מעבר בין מאמרים לפי תאריך פרסום"
@@ -602,6 +676,8 @@ const components = {
         </section>
       )}
 
+      {showBottomLine && bottomLine && <BottomLineSummary summary={bottomLine} />}
+
       <section class="mx-auto max-w-2xl space-y-6">
         <h2 class="text-center text-[clamp(1.4rem,1.15rem+1vw,2rem)] font-semibold text-[var(--nm-fg)]">
           אפשר להשאיר שאלה או פנייה
@@ -648,6 +724,7 @@ const components = {
     </article>
 
     <aside class="mt-10 space-y-5 lg:mt-0">
+      <DepthSideNav currentKey={difficultyKey} items={depthNavItems} />
       <DeepDiveConcepts concepts={relatedConcepts} />
       <LogicalQuestionBox
         pageTitle={title}
