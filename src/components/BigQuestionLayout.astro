@@ -1,6 +1,6 @@
 ---
 /**
- * בלוק "שאלה גדולה" — היררכיה שטוחה, פונט גדול, מודולים: הפכים, מילון (dfn), מילוי + וואטסאפ.
+ * בלוק "שאלה גדולה" - היררכיה שטוחה, פונט גדול, מודולים: הפכים, מילון (dfn), מילוי + וואטסאפ.
  */
 import appConfig from "../config/appConfig.json";
 import { FloatingInput } from "./ui/FloatingInput";
@@ -15,7 +15,7 @@ export interface GlossaryTerm {
 interface Props {
   tags: string[];
   articleTitle?: string;
-  /** מונחים פשוטים להסבר ב-hover — אופציונלי */
+  /** מונחים פשוטים להסבר ב-hover - אופציונלי */
   glossaryTerms?: GlossaryTerm[];
 }
 
@@ -28,7 +28,7 @@ const defaultGlossary: GlossaryTerm[] = [
   },
   {
     term: "הפך",
-    definition: "מה הייתי חושב אם הייתי הופך את המשפט בראש — כמו לראות את אותו חדר מחלון אחר.",
+    definition: "מה הייתי חושב אם הייתי הופך את המשפט בראש - כמו לראות את אותו חדר מחלון אחר.",
   },
 ];
 
@@ -48,7 +48,7 @@ const leadSourceTitle = (articleTitle || "מאמר").trim() || "מאמר";
   </h2>
 
   <p class="mt-3 max-w-prose">
-    אני לא בודק אותך כאן. אני רק מזמין אותך לנסח לעצמך בבהירות — כמו לדבר בקול רגוע לפני שאתה שולח הודעה.
+    אני לא בודק אותך כאן. אני רק מזמין אותך לנסח לעצמך בבהירות - כמו לדבר בקול רגוע לפני שאתה שולח הודעה.
   </p>
 
   <!-- Method of Opposites -->
@@ -76,7 +76,7 @@ const leadSourceTitle = (articleTitle || "מאמר").trim() || "מאמר";
       >
         <p class="text-[0.7rem] font-bold uppercase text-[var(--nm-fg-secondary)] [letter-spacing:0]">מה קורה אם הופכים</p>
         <p class="mt-3">
-          אם הייתי אומר את ההפך בקול שקט — מה היה משתנה? לא צריך תשובה נכונה; צריך כיוון אחר לנסות.
+          אם הייתי אומר את ההפך בקול שקט - מה היה משתנה? לא צריך תשובה נכונה; צריך כיוון אחר לנסות.
         </p>
       </div>
     </div>
@@ -110,7 +110,7 @@ const leadSourceTitle = (articleTitle || "מאמר").trim() || "מאמר";
     dir="rtl"
   >
     <p class="text-[clamp(1rem,0.95rem+0.25vw,1.15rem)] font-medium text-[var(--nm-fg)]">
-      משפט אחד בשבילך — בלי טפסים ומיילים, רק שיחה בוואטסאפ כשתרצה:
+      משפט אחד בשבילך - בלי טפסים ומיילים, רק שיחה בוואטסאפ כשתרצה:
     </p>
     <p class="text-[color-mix(in_srgb,var(--nm-fg)_85%,var(--nm-bg))]">
       אם הייתי מפסיק/ת לפחד מ־
@@ -144,12 +144,12 @@ const leadSourceTitle = (articleTitle || "מאמר").trim() || "מאמר";
     <button
       type="button"
       data-bq-fill-submit
-      data-label-pending="מלאו את שני הריבועים — ואז נפתחת שיחה מיידית עם יקיר"
-      data-label-ready="שלח ליקיר לקבלת תובנה"
+      data-label-pending="מלאו את שני הריבועים - ואז נפתחת שיחה מיידית עם השם לא משנה"
+      data-label-ready="שלח להשם לא משנה לקבלת תובנה"
       disabled
       class="bq-fill-wa-btn w-full rounded-full px-5 py-3 text-[clamp(1rem,0.95rem+0.2vw,1.1rem)] font-semibold transition-colors duration-200 md:w-auto [letter-spacing:0]"
     >
-      מלאו את שני הריבועים — ואז נפתחת שיחה מיידית עם יקיר
+      מלאו את שני הריבועים - ואז נפתחת שיחה מיידית עם השם לא משנה
     </button>
   </form>
 
@@ -163,7 +163,7 @@ const leadSourceTitle = (articleTitle || "מאמר").trim() || "מאמר";
 </section>
 
 <style is:global>
-  /* מוגבל לתוך .bq-root — tooltips ל-dfn */
+  /* מוגבל לתוך .bq-root - tooltips ל-dfn */
   .bq-root .bq-dfn {
     position: relative;
     cursor: help;
@@ -257,8 +257,8 @@ const leadSourceTitle = (articleTitle || "מאמר").trim() || "מאמר";
       const a = fear.value.trim();
       const b = would.value.trim();
       const line = `אם הייתי מפסיק/ת לפחד מ־${a}, הייתי ${b}.`;
-      const preface = `[Lead | Source: ${leadSourceTitle}]\nמחשבה אחת נקייה – ישר לוואטסאפ`;
-      const full = `${preface}\n\nהיי יקיר,\n${readContextLine}\n\n${line}\n\nרציתי תובנה קצרה על המשפט הזה — אפשר להמשיך כאן בשיחה.`;
+      const preface = `[Lead | Source: ${leadSourceTitle}]\nמחשבה אחת נקייה - ישר לוואטסאפ`;
+      const full = `${preface}\n\nהיי השם לא משנה,\n${readContextLine}\n\n${line}\n\nרציתי תובנה קצרה על המשפט הזה - אפשר להמשיך כאן בשיחה.`;
       const url = `https://wa.me/${waPhone}?text=${encodeURIComponent(full)}`;
       window.open(url, "_blank", "noopener,noreferrer");
     };

@@ -459,7 +459,7 @@ const components = {
           <p class="mt-2 text-[clamp(1.08rem,1rem+0.35vw,1.35rem)] font-semibold leading-8 text-[color-mix(in_srgb,var(--nm-fg)_80%,var(--nm-bg))]">{description}</p>
         </section>
 
-        {frontmatter.image && frontmatter.image !== "/og.jpg" ? (
+        {frontmatter.image && frontmatter.image !== "/images/logo.svg" ? (
           <section
             class="mx-auto max-w-[72ch] overflow-hidden rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/70"
             aria-label="תמונה ראשית"
@@ -600,6 +600,7 @@ const components = {
         <a
           href={discoveryServicesHref}
           class="mt-4 inline-flex min-h-[44px] items-center justify-center rounded-full bg-[var(--nm-inverse)] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[var(--nm-inverse-hover)]"
+          style="color:#fff;"
         >
           {tags.length > 0 ? `למרחב הגילוי עם הנושא: ${tags[0]}` : "למרחב הגילוי בשירותים"}
         </a>
@@ -959,7 +960,7 @@ const components = {
           "הבסיס תמיד יהיה פתוח לכולם. ההמשך של המאמר הזה מיועד למי שרוצה לקחת את ההבנה צעד אחד קדימה ולהשקיע בתהליך. הגישה פתוחה לחברי המסלול המלא.";
         const fallbackCtaLabel = overrides.ctaLabel || premiumBody.dataset.premiumCtaLabel || "איך מצטרפים?";
         const fallbackCtaHref = overrides.ctaHref || premiumBody.dataset.premiumCtaHref || "/services/";
-        const accessRoute = premiumBody.dataset.premiumAccessRoute || "/premium-access/";
+        const accessRoute = premiumBody.dataset.premiumAccessRoute || "/dashboard/";
         const helperText =
           premiumBody.dataset.premiumAccessHelper || "גישה לתוכן פרימיום נפתחת כרגע דרך קוד גישה מתחלף.";
         const returnTo = encodeURIComponent(window.location.pathname);

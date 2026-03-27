@@ -3,20 +3,20 @@ import Layout from "../layouts/Layout.astro";
 import Gatekeeper from "../components/Gatekeeper.astro";
 import appConfig from "../config/appConfig.json";
 
-const pageTitle = "���� ���� �����";
-const pageDescription = "���� ���� ���� ��� ����� ���� �� �����. ������ ��� �� ����� ������ ������.";
+const pageTitle = "בדיקת התאמה קצרה לשיחה";
+const pageDescription = "שלושה סימונים קצרים כדי להבין אם נכון להמשיך עכשיו לשיחה או לחזור לחקירה בארכיון.";
 ---
 
 <Layout title={pageTitle} description={pageDescription} noIndex={true}>
-  <section class="mx-auto max-w-5xl space-y-10 px-4 pb-16">
+  <section class="mx-auto max-w-5xl space-y-10 px-4 py-16">
     <header class="max-w-3xl space-y-4 text-right">
-      <p class="text-sm font-semibold uppercase tracking-[0.24em] text-[var(--nm-accent)]">Private Intake</p>
-      <h1 class="text-[clamp(2.2rem,1.5rem+2.2vw,3.6rem)] font-semibold leading-[1.05] text-[var(--nm-fg)]">���� ���� �� �����, ����� ��� ���� ���.</h1>
+      <p class="text-sm font-semibold uppercase tracking-[0.24em] text-[var(--nm-accent)]">בדיקת התאמה</p>
+      <h1 class="text-[clamp(2.2rem,1.5rem+2.2vw,3.6rem)] font-semibold leading-[1.05] text-[var(--nm-fg)]">בוא נבדוק אם נכון להמשיך עכשיו לשיחה.</h1>
       <p class="text-[1rem] leading-8 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
-        �� ����� ����. ����� ��� ��� ����� ������ ������ ���� ����, ��� ����� �� ���� ���� �����, ��� ��, �� �� ���� ����.
+        זה לא טופס ארוך. זה מסנן קצר. בסוף תקבל כיוון אחד ברור: להמשיך לשיחה או לחזור לחקירה ממוקדת בארכיון.
       </p>
     </header>
 
-    <Gatekeeper phone={appConfig.contact.whatsAppNumber} fallbackHref="/articles/" fallbackLabel="����� ���� ���� ���� ����" />
+    <Gatekeeper phone={appConfig.contact.whatsAppNumber} fallbackHref="/articles/" fallbackLabel="חזרה לארכיון" />
   </section>
 </Layout>

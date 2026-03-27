@@ -178,7 +178,7 @@ export function buildRetentionArticleWhatsAppHref(articleTitle: string, articleU
 export function buildServicePreStartWhatsAppHref(serviceName: string): string {
   const name = serviceName.trim() || "השירות";
   const preface = buildWhatsAppCrmPreface(name);
-  const message = `${preface}\n\nהיי יקיר, אני קורא עכשיו על ${name} ומשהו שם סיקרן אותי. אפשר לשאול שאלה קטנה לפני שממשיכים?`;
+  const message = `${preface}\n\nהיי השם לא משנה, אני קורא עכשיו על ${name} ומשהו שם סיקרן אותי. אפשר לשאול שאלה קטנה לפני שממשיכים?`;
   return buildWhatsAppHref(message);
 }
 
@@ -237,6 +237,15 @@ export function buildServiceWhatsAppHref(service: StageService | FlatService): s
   return buildWhatsAppHref(actionText === service.action_text ? `${actionText}. ${defaultMessage}` : defaultMessage);
 }
 
+export function buildServiceActionWhatsAppHref(service: StageService | FlatService): string {
+  const preface = buildWhatsAppCrmPreface(service.title);
+  const paymentLink = typeof service.payment_link === "string" ? service.payment_link.trim() : "";
+  const actionLine = service.action_text?.trim() || `אני רוצה להתקדם עם ${service.title}`;
+  const paymentLine = paymentLink ? `לינק תשלום לשלב הבא: ${paymentLink}` : "אשמח ללינק תשלום אחרי התאמה קצרה.";
+  const body = `${actionLine}\nמחיר: ${formatMoney(service.price_full)}\n${paymentLine}`;
+  return buildWhatsAppHref(`${preface}\n\n${body}`);
+}
+
 /** התראת עניין בשירות (best-effort, לא לשבור UX) */
 export async function notifyServiceInterest(params: {
   serviceId: string;
@@ -257,7 +266,7 @@ export async function notifyServiceInterest(params: {
   }
 }
 
-const WA_CRM_TAGLINE = "מחשבה אחת נקייה – ישר לוואטסאפ";
+const WA_CRM_TAGLINE = "מחשבה אחת נקייה - ישר לוואטסאפ";
 
 /** שורת CRM לפרסור: מקור + טון קבוע */
 export function buildWhatsAppCrmPreface(sourceTitle: string): string {
@@ -286,12 +295,12 @@ export const buildArticleContextLeadMessage = (opts: {
   const sourceTitle = titleTrim || subjectLabel || "NeverMind";
   const preface = buildWhatsAppCrmPreface(sourceTitle);
   if (subjectLabel) {
-    return `${preface}\n\nהיי יקיר, קראתי את המאמר בנושא ${subjectLabel} ורציתי להתייעץ...`;
+    return `${preface}\n\nהיי השם לא משנה, קראתי את המאמר בנושא ${subjectLabel} ורציתי להתייעץ...`;
   }
   if (titleTrim) {
-    return `${preface}\n\nהיי יקיר, קראתי את המאמר "${titleTrim}" ורציתי להתייעץ...`;
+    return `${preface}\n\nהיי השם לא משנה, קראתי את המאמר "${titleTrim}" ורציתי להתייעץ...`;
   }
-  return `${preface}\n\nהיי יקיר, קראתי מאמר באתר NeverMind ורציתי להתייעץ...`;
+  return `${preface}\n\nהיי השם לא משנה, קראתי מאמר באתר NeverMind ורציתי להתייעץ...`;
 };
 
 export const buildArticleContextWhatsAppHref = (

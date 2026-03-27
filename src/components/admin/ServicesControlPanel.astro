@@ -17,22 +17,22 @@ const services = flattenVisibleServices();
     <summary class="cursor-pointer text-sm font-semibold text-[var(--nm-fg)]">שדות אופציונליים בשירות (מפת עריכה)</summary>
     <ul class="mt-3 list-inside list-disc space-y-2 text-xs leading-6 text-[color-mix(in_srgb,var(--nm-fg)_62%,var(--nm-bg))]">
       <li>
-        <code class="rounded bg-[var(--nm-code-bg)] px-1 text-[var(--nm-code-fg)]">whatsapp_template</code> — טקסט הודעה; פלייסהולדרים{" "}
+        <code class="rounded bg-[var(--nm-code-bg)] px-1 text-[var(--nm-code-fg)]">whatsapp_template</code> - טקסט הודעה; פלייסהולדרים{" "}
         <code class="rounded bg-[var(--nm-code-bg)] px-1 text-[var(--nm-code-fg)]">{"{title}"}</code>,{" "}
         <code class="rounded bg-[var(--nm-code-bg)] px-1 text-[var(--nm-code-fg)]">{"{price}"}</code> (מספר בלי סימן ₪). חובה מומלץ כש־<code class="rounded bg-[var(--nm-code-bg)] px-1 text-[var(--nm-code-fg)]">action_type</code> הוא{" "}
         <code class="rounded bg-[var(--nm-code-bg)] px-1 text-[var(--nm-code-fg)]">whatsapp</code>.
       </li>
       <li>
-        <code class="rounded bg-[var(--nm-code-bg)] px-1 text-[var(--nm-code-fg)]">social_proof</code> — שורת הוכחה חברתית (מוצגת בכרטיס בין כותרת משנה לתיאור).
+        <code class="rounded bg-[var(--nm-code-bg)] px-1 text-[var(--nm-code-fg)]">social_proof</code> - שורת הוכחה חברתית (מוצגת בכרטיס בין כותרת משנה לתיאור).
       </li>
       <li>
-        <code class="rounded bg-[var(--nm-code-bg)] px-1 text-[var(--nm-code-fg)]">availability</code> — אובייקט:{" "}
+        <code class="rounded bg-[var(--nm-code-bg)] px-1 text-[var(--nm-code-fg)]">availability</code> - אובייקט:{" "}
         <code class="rounded bg-[var(--nm-code-bg)] px-1 text-[var(--nm-code-fg)]">spots_left</code> (מספר),{" "}
         <code class="rounded bg-[var(--nm-code-bg)] px-1 text-[var(--nm-code-fg)]">updated_at</code> (ISO), אופציונלי{" "}
         <code class="rounded bg-[var(--nm-code-bg)] px-1 text-[var(--nm-code-fg)]">label</code> (ברירת מחדל: «נותרו»). תאימות:{" "}
         <code class="rounded bg-[var(--nm-code-bg)] px-1 text-[var(--nm-code-fg)]">availability_note</code> מחרוזת (legacy).
       </li>
-      <li>גילוי נאות ארוך: <code class="rounded bg-[var(--nm-code-bg)] px-1 text-[var(--nm-code-fg)]">trust_elements.disclaimer</code> — מקור אחד לפוטר ולמקטעים ארוכים. שורה קצרה מתחת לכפתורים: קבוע בקוד (<code class="rounded bg-[var(--nm-code-bg)] px-1 text-[var(--nm-code-fg)]">disclaimerShort</code>).</li>
+      <li>גילוי נאות ארוך: <code class="rounded bg-[var(--nm-code-bg)] px-1 text-[var(--nm-code-fg)]">trust_elements.disclaimer</code> - מקור אחד לפוטר ולמקטעים ארוכים. שורה קצרה מתחת לכפתורים: קבוע בקוד (<code class="rounded bg-[var(--nm-code-bg)] px-1 text-[var(--nm-code-fg)]">disclaimerShort</code>).</li>
     </ul>
   </details>
 
@@ -168,7 +168,7 @@ const services = flattenVisibleServices();
           if (s.action_type === "whatsapp") {
             const tpl = s.whatsapp_template;
             if (tpl == null || String(tpl).trim() === "") {
-              hints.push(`«${sid}»: whatsapp בלי whatsapp_template — תבנית ברירת־מחדל מהקוד.`);
+              hints.push(`«${sid}»: whatsapp בלי whatsapp_template - תבנית ברירת-מחדל מהקוד.`);
             }
           }
           if (s.availability && typeof s.availability === "object") {
@@ -184,13 +184,13 @@ const services = flattenVisibleServices();
             }
           }
           if (s.availability && s.availability_note && String(s.availability_note).trim()) {
-            hints.push(`«${sid}»: יש גם availability וגם availability_note — בכרטיס תוצג רק הזמינות המובנית.`);
+            hints.push(`«${sid}»: יש גם availability וגם availability_note - בכרטיס תוצג רק הזמינות המובנית.`);
           }
         }
       }
       const disc = parsed.trust_elements?.disclaimer;
       if (typeof disc === "string" && !disc.trim()) {
-        hints.push("trust_elements.disclaimer ריק — גילוי נאות ארוך בפוטר יהיה ריק.");
+        hints.push("trust_elements.disclaimer ריק - גילוי נאות ארוך בפוטר יהיה ריק.");
       }
       return hints;
     };
@@ -219,7 +219,7 @@ const services = flattenVisibleServices();
       try {
         renderHints(parseInput());
       } catch {
-        servicesHints.textContent = "לא ניתן לנתח JSON — תקן תחביר לפני שמירה.";
+        servicesHints.textContent = "לא ניתן לנתח JSON - תקן תחביר לפני שמירה.";
       }
     });
 

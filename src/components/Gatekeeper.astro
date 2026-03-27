@@ -23,8 +23,8 @@ const goals = [
 
 const budgets = [
   { id: "under-500", label: "עד 500 ₪", score: 2, reason: "מתאים לשלב בדיקה קצר. תנועה קטנה לפני התחייבות." },
-  { id: "500-1500", label: "500–1,500 ₪", score: 12, reason: "מתאים למסגרת מצומצמת שמחזירה בהירות." },
-  { id: "1500-3000", label: "1,500–3,000 ₪", score: 24, reason: "מתאים לעומק משמעותי עם פעולה ברורה." },
+  { id: "500-1500", label: "500-1,500 ₪", score: 12, reason: "מתאים למסגרת מצומצמת שמחזירה בהירות." },
+  { id: "1500-3000", label: "1,500-3,000 ₪", score: 24, reason: "מתאים לעומק משמעותי עם פעולה ברורה." },
   { id: "3000-plus", label: "3,000+ ₪", score: 28, reason: "מתאים למסלול עם השפעה חיצונית או תוצר תוכן." },
 ];
 
@@ -154,7 +154,7 @@ const maxScore =
       <p data-result-text class="mt-3 max-w-2xl text-base leading-8 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]"></p>
       <ul data-reasons-list class="mt-5 space-y-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]"></ul>
       <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
-        <a data-whatsapp-link target="_blank" rel="noreferrer" class="hidden items-center justify-center rounded-full bg-[var(--nm-inverse)] px-6 py-3 text-sm font-semibold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-inverse-hover)]">פתיחת שיחה בוואטסאפ</a>
+        <a data-whatsapp-link class="hidden items-center justify-center rounded-full bg-[var(--nm-inverse)] px-6 py-3 text-sm font-semibold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-inverse-hover)]">מעבר לשיחה ממוקדת</a>
         <a data-fallback-link class="hidden items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] px-6 py-3 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]">חזרה לארכיון לפי סימנים</a>
         <button type="button" data-reset-gatekeeper class="rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] px-6 py-3 text-sm font-semibold text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))] transition hover:bg-[var(--nm-surface-muted)]">איפוס</button>
       </div>
@@ -184,7 +184,6 @@ const maxScore =
       stageReason: "",
     };
 
-    const phone = root.dataset.phone || "972555634035";
     const fallbackHref = root.dataset.fallbackHref || "/articles/";
     const fallbackLabel = root.dataset.fallbackLabel || "חזרה לארכיון";
     const maxScore = Number(root.dataset.maxScore || 78);
@@ -225,10 +224,10 @@ const maxScore =
       return "not-fit";
     };
 
-    const buildWhatsAppHref = () => {
+    const buildConversationHref = () => {
       const safeName = state.name || "אורח";
-      const text = `Hi, I'm ${safeName}, I'm interested in ${state.goal} and I'm at the ${state.stage} stage.`;
-      return `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
+      const summary = `${safeName} | ${state.goal} | ${state.budget} | ${state.stage}`;
+      return `/studio/?topic=gatekeeper&summary=${encodeURIComponent(summary)}`;
     };
 
     const renderReasons = () => {
@@ -262,8 +261,7 @@ const maxScore =
       if (tier === "fit") {
         resultBadge.textContent = "תוצאה מלאה";
         resultTitle.textContent = "התאמה טובה עכשיו.";
-        resultText.textContent = "�����, ������ ����� ��� ����� ������ ��� ����� ����� ���� ������� ��� ����� ��� �� ����� ���� �� �����.";
-        whatsappLink.href = buildWhatsAppHref();
+        whatsappLink.href = buildConversationHref();
         whatsappLink.classList.remove("hidden");
         whatsappLink.classList.add("inline-flex");
         fallbackLink.classList.add("hidden");
@@ -275,13 +273,13 @@ const maxScore =
       if (tier === "partial") {
         resultBadge.textContent = "תוצאה חלקית";
         resultTitle.textContent = "זה יכול להתאים, אבל לא בדיוק עכשיו.";
-        resultText.textContent = "���� �� ����� ����� ����. ���� ����� ���� ��� ���� ����, ��� �� ���� ����, ����� ����� ����� �� ����.";
         fallbackLink.href = fallbackHref;
         fallbackLink.textContent = fallbackLabel;
         fallbackLink.classList.remove("hidden");
         fallbackLink.classList.add("inline-flex");
-        whatsappLink.classList.add("hidden");
-        whatsappLink.classList.remove("inline-flex");
+        whatsappLink.href = buildConversationHref();
+        whatsappLink.classList.remove("hidden");
+        whatsappLink.classList.add("inline-flex");
         resultText.textContent =
           "יש התאמה לכיוון. אם מתאים לך לחדד ולסדר מבנה לפני פעולה, חזור לארכיון או חזור לסימון מחדש.";
         return;
@@ -289,13 +287,13 @@ const maxScore =
 
       resultBadge.textContent = "לא מתאים כרגע";
       resultTitle.textContent = "כנראה עדיין לא זה הזמן.";
-      resultText.textContent = "�� �� ���� ���� �����. �� �� ���� ����� ���� ������ ������ ���� �� ������ ���� ���� ���� ����� �����.";
       fallbackLink.href = fallbackHref;
       fallbackLink.textContent = fallbackLabel;
       fallbackLink.classList.remove("hidden");
       fallbackLink.classList.add("inline-flex");
-      whatsappLink.classList.add("hidden");
-      whatsappLink.classList.remove("inline-flex");
+      whatsappLink.href = buildConversationHref();
+      whatsappLink.classList.remove("hidden");
+      whatsappLink.classList.add("inline-flex");
       resultText.textContent =
         "הסימונים שלך מראים מצב שמקדים הבהרה לפני פעולה. כרגע לך על חזרה לארכיון או חזור לסימון מחדש.";
     };

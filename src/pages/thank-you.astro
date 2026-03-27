@@ -4,7 +4,7 @@ import ReturnToContextCta from "../components/ReturnToContextCta.astro";
 import { FloatingInput } from "../components/ui/FloatingInput";
 import { buildWhatsAppHref } from "../lib/services";
 
-const waMessage = "היי יקיר, אני רוצה לקבל סיסמה לאזור החקירה האישי ולפתוח גישת פרימיום.";
+const waMessage = "היי השם לא משנה, אני רוצה לקבל סיסמה לאזור החקירה האישי ולפתוח גישת פרימיום.";
 const waHref = buildWhatsAppHref(waMessage);
 const source = Astro.url.searchParams.get("source")?.trim() || "";
 const purchaseState = Astro.url.searchParams.get("purchase")?.trim() || "";
@@ -79,12 +79,12 @@ const nextMoves = [
 
     <section class="relative overflow-hidden rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_22%,transparent)] bg-[var(--nm-inverse)] p-10 text-[var(--nm-inverse-fg)] shadow-[0_22px_48px_color-mix(in_srgb,var(--nm-fg)_5%,transparent)]">
       <img
-        src="/images/ghost-preview.webp"
+        src="/images/logo.svg"
         alt=""
         aria-hidden="true"
-        width="1600"
+        width="900"
         height="900"
-        class="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-20"
+        class="pointer-events-none absolute inset-0 h-full w-full object-contain opacity-15"
         loading="lazy"
         decoding="async"
       />
@@ -99,7 +99,7 @@ const nextMoves = [
           {offerLine}
         </p>
         <p class="text-xs leading-6 text-[color-mix(in_srgb,var(--nm-inverse-fg)_82%,var(--nm-inverse))]">
-          אין הרשמה פתוחה מהאתר. רק אחרי אישור ידני תקבל סיסמה לגישה.
+          אין אזור אישי פתוח מהאתר. רק אחרי אישור ידני תקבל סיסמה לגישה.
         </p>
         {isExistingBuyer && (
           <p class="text-xs leading-6 text-[color-mix(in_srgb,var(--nm-inverse-fg)_82%,var(--nm-inverse))]">
@@ -116,7 +116,7 @@ const nextMoves = [
           בקשת סיסמה בוואטסאפ
         </a>
         <a
-          href="/premium-access/"
+          href="/dashboard/"
           class="inline-flex w-fit rounded-full border border-[color-mix(in_srgb,var(--nm-inverse-fg)_24%,transparent)] bg-transparent px-6 py-3 text-sm font-semibold text-[var(--nm-inverse-fg)] transition hover:bg-[color-mix(in_srgb,var(--nm-inverse-fg)_8%,transparent)]"
           title="מעבר למסך הזנת סיסמה"
         >

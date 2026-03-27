@@ -1,6 +1,7 @@
 ---
 import {
   buildServicePreStartWhatsAppHref,
+  buildServiceActionWhatsAppHref,
   disclaimerShort,
   featureIcons,
   formatAvailabilityLine,
@@ -19,6 +20,7 @@ interface Props {
 const { service } = Astro.props;
 const action = resolveServiceAction(service);
 const preStartWhatsAppHref = buildServicePreStartWhatsAppHref(service.title);
+const actionWhatsAppHref = buildServiceActionWhatsAppHref(service);
 const netPrice = getNetPrice(service.price_full, 18);
 const vatAmount = getVatAmount(service.price_full, 18);
 const availabilityLine = formatAvailabilityLine(service);
@@ -126,21 +128,17 @@ const normalizedFeatures = (service.features ?? [])
 
     <div class="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-stretch sm:justify-start sm:gap-2">
       <a
-        href={action.href}
-        target={action.external ? "_blank" : undefined}
-        rel={action.external ? "noreferrer" : undefined}
+        href={actionWhatsAppHref}
         data-service-cta=""
         data-service-id={service.id}
         data-service-title={service.title}
-        data-flow={action.flow}
+        data-flow="whatsapp-first"
         class="inline-flex min-h-[2.75rem] items-center justify-center rounded-full bg-[var(--nm-accent)] px-5 py-3 text-sm font-semibold text-[var(--nm-on-accent)] transition-colors duration-200 hover:bg-[var(--nm-accent-hover)]"
       >
-        {action.label}
+        {action.label || "לתיאום קצר בוואטסאפ"}
       </a>
       <a
         href={preStartWhatsAppHref}
-        target="_blank"
-        rel="noreferrer"
         class="inline-flex min-h-[2.75rem] items-center justify-center rounded-full border-2 border-[var(--nm-fg)] bg-transparent px-5 py-3 text-sm font-medium text-[var(--nm-fg)] transition-colors duration-200 hover:bg-[var(--nm-surface-muted)]"
       >
         שאלה לפני שמתחילים?

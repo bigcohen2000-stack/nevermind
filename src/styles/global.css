@@ -11,7 +11,7 @@
   --color-text-primary: #1a1a1a;
   --color-surface-page: #fafaf8;
   --color-surface-canvas: #fafaf8;
-  --color-text-secondary: color-mix(in srgb, var(--color-text-primary) 62%, var(--color-surface-page));
+  --color-text-secondary: color-mix(in srgb, var(--color-text-primary) 72%, var(--color-surface-page));
   --color-surface-muted: color-mix(in srgb, var(--color-text-primary) 4%, var(--color-surface-page));
   --color-accent: #d42b2b;
   --color-accent-hover: color-mix(in srgb, var(--color-accent) 88%, var(--color-text-primary));
@@ -95,30 +95,6 @@ html[data-nm-a11y-links="on"] a[href]:focus-visible {
 
 @import "./components.css";
 
-@font-face {
-  font-family: "Assistant Variable";
-  src: url("/fonts/assistant-hebrew-wght-normal.woff2") format("woff2");
-  font-style: normal;
-  font-display: swap;
-  unicode-range: U+0590-05FF, U+FB1D-FB4F;
-}
-
-@font-face {
-  font-family: "Assistant Variable";
-  src: url("/fonts/assistant-latin-ext-wght-normal.woff2") format("woff2");
-  font-style: normal;
-  font-display: swap;
-  unicode-range: U+0100-024F, U+1E00-1EFF;
-}
-
-@font-face {
-  font-family: "Assistant Variable";
-  src: url("/fonts/assistant-latin-wght-normal.woff2") format("woff2");
-  font-style: normal;
-  font-display: swap;
-  unicode-range: U+0000-00FF;
-}
-
 html {
   scroll-behavior: smooth;
 }
@@ -129,7 +105,7 @@ html[lang="he"] {
 }
 
 body {
-  font-family: "Assistant Variable", system-ui, sans-serif;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
   font-size: 1rem;
   line-height: var(--line-height-ui);
   letter-spacing: 0;
@@ -279,8 +255,9 @@ mark {
 }
 
 /* Prevent hidden target behind fixed header */
-:target {
-  scroll-margin-top: 80px;
+:target,
+[id] {
+  scroll-margin-top: 100px;
 }
 
 /* Reusable loading placeholder */
@@ -314,6 +291,9 @@ mark {
 /* Minimum touch target for controls */
 a,
 button,
+input,
+select,
+textarea,
 input[type="button"],
 input[type="submit"],
 input[type="reset"] {
@@ -325,6 +305,15 @@ button,
 a.inline-flex,
 a[aria-label] {
   min-width: 44px;
+}
+
+@media (max-width: 767px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+    line-height: 1.6;
+  }
 }
 
 /* Motion safe baseline */

@@ -1,129 +1,116 @@
 ---
 import Layout from "../../layouts/Layout.astro";
-import appConfig from "../../config/appConfig.json";
-import { DirectLink } from "../../components/ui/DirectLink";
 ---
 
 <Layout
-  title="להבין | NeverMind"
-  description="איך האתר בנוי: הפרדת עובדות, זיהוי מנגנונים, ויישור קו עם המציאות לפני החלטה."
+  title="שיטת NEVERMIND | NeverMind"
+  description="איך זה עובד בפשטות. בלבול, בהירות, הבנה, פעולה וקשר אישי."
 >
-  <div class="body-text mx-auto max-w-4xl space-y-8 py-10 text-right sm:px-2">
+  <div class="mx-auto max-w-6xl space-y-20 px-4 py-14 text-right text-[var(--nm-fg)]">
     <header class="space-y-4">
-      <p class="text-sm font-semibold uppercase tracking-[0.2em] text-[var(--nm-accent)]">אני רוצה להבין</p>
-      <h1 class="text-[clamp(1.85rem,1.5rem+1.2vw,2.5rem)] font-semibold leading-tight text-[var(--nm-fg)]">
-        שיטת NeverMind
-      </h1>
-      <p class="text-base leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
-        כאן לא מוכרים קיצור דרך. כאן מפרקים מנגנון. מזהים הנחה. מיישרים קו עם המציאות.
+      <p class="text-sm font-semibold uppercase tracking-[0.2em] text-[var(--nm-accent)]">שיטת NEVERMIND</p>
+      <h1 class="text-[clamp(2rem,1.4rem+2.2vw,3.4rem)] font-light leading-tight">כאן הכל נהיה פשוט</h1>
+      <p class="max-w-3xl text-base leading-8 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+        זה דף קצר. בלי רעש. אתה קורא. אתה רואה מה נכון. אתה זז.
       </p>
     </header>
 
-    <section class="space-y-4 rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-6 shadow-[0_18px_48px_rgba(26,26,26,0.05)]" aria-labelledby="about-who">
-      <h2 id="about-who" class="text-lg font-semibold text-[var(--nm-fg)]">
-        מי אני משחק
-      </h2>
-      <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))]">
-        במשך שנים אני בעולמות של יצירה, הפקה וסאונד. אני מפיק שירים. מתקלט באירועים. מנהל עסקים.
-      </p>
-      <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))]">
-        אלו הדמויות שאני משחק בעולם. בנקודה מסוימת הפסקתי להסתכל רק על המשחק. התחלתי להתבונן בשחקן.
-      </p>
-      <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))]">
-        האמת לא נמצאה בטכניקה מושלמת. היא נמצאה בשבר. בחוסר השלמות. בפשטות נקייה. משם נולדה NeverMind.
-      </p>
-    </section>
-
-    <section class="space-y-4 rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/80 p-6" aria-labelledby="about-logic">
-      <h2 id="about-logic" class="text-lg font-semibold text-[var(--nm-fg)]">הלוגיקה של השיטה</h2>
-      <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))]">
-        כלל פשוט. אם חסר חלק. זה לא שלם.
-      </p>
-      <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))]">
-        רוב הגישות עוזרות נקודתית. להירגע. לשנות הרגל. לחשוב אחרת. כאן שואלים מה חסר בתוך כל זה. משלימים את החלק החסר.
-      </p>
-      <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))]">
-        זה לא פלסטר. זה פירוק שורש. זו מערכת הפעלה. לא אפליקציה.
-      </p>
-    </section>
-
-    <section class="space-y-4 rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-6" aria-labelledby="about-principles">
-      <h2 id="about-principles" class="text-lg font-semibold text-[var(--nm-fg)]">עקרונות עבודה</h2>
-      <ol class="list-decimal space-y-3 pr-5 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_80%,var(--nm-bg))]">
-        <li>הפרדת עובדות מפירוש.</li>
-        <li>זיהוי מנגנון שחוזר על עצמו.</li>
-        <li>שאלת היפוך שמפרקת הנחת יסוד.</li>
-        <li>פעולה קטנה עכשיו. בלי נאום.</li>
-        <li>בדיקת אמת במציאות. לא בראש.</li>
-      </ol>
-    </section>
-
-    <section class="space-y-4 rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/80 p-6" aria-labelledby="about-core">
-      <h2 id="about-core" class="text-lg font-semibold text-[var(--nm-fg)]">הליבה</h2>
-      <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))]">
-        הכל מתחיל במחשבה. אם אני מפחד. חשבתי משהו מפחיד.
-      </p>
-      <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))]">
-        רגש הוא מחשבה בתחפושת. כשמזהים את המחשבה. המתח יורד מעצמו.
-      </p>
-      <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))]">
-        החופש כאן הוא לא לברוח מהחיים. החופש הוא לבחור איך לשחק את המשחק מתוך בחירה ולא מתוך פחד.
-      </p>
-    </section>
-
-    <section class="space-y-4 rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-6" aria-labelledby="about-tools">
-      <h2 id="about-tools" class="text-lg font-semibold text-[var(--nm-fg)]">כלים שחייבים להיות בעמוד השיטה</h2>
-      <ul class="list-disc space-y-3 pr-5 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_80%,var(--nm-bg))]">
-        <li>מפת תהליך קצרה. בלבול, בהירות, הבנה, פעולה, קשר אישי.</li>
-        <li>כרטיס עקרון יומי. משפט אחד חד שאפשר לבדוק היום.</li>
-        <li>שאלת היפוך יומית. לחיצה אחת מייצרת שאלה חדשה.</li>
-        <li>קישור ישיר להגדרות מחדש לפי מושגים שעלו בטקסט.</li>
-        <li>FAQ קצר. שלוש שאלות שחוזרות על עצמן.</li>
-      </ul>
-    </section>
-
-    <section class="rounded-2xl border border-[color-mix(in_srgb,var(--nm-accent)_30%,transparent)] bg-[var(--nm-tint)] p-6" aria-labelledby="about-cta">
-      <h2 id="about-cta" class="text-lg font-semibold text-[var(--nm-fg)]">אם זה פגש נקודה חיה</h2>
-      <p class="mt-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_80%,var(--nm-bg))]">
-        השם שלי לא משנה. הלוגיקה כן. אם זה מדויק לך, ממשיכים לחקירה ממוקדת.
-      </p>
-      <div class="mt-5 flex flex-wrap justify-end gap-3">
-        <a
-          href="/services/"
-          class="inline-flex min-h-[44px] items-center justify-center rounded-full bg-[var(--nm-inverse)] px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-[var(--nm-inverse-hover)]"
-        >
-          בוא נדבר
-        </a>
-        <a
-          href="/glossary/"
-          class="inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_16%,transparent)] px-6 py-2.5 text-sm font-semibold text-[var(--nm-fg)] transition hover:border-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)]"
-        >
-          פתח מושגים
-        </a>
+    <section aria-labelledby="process-map" class="space-y-7">
+      <h2 id="process-map" class="text-[clamp(1.5rem,1.25rem+1vw,2rem)] font-light">איך זה עובד</h2>
+      <div class="grid gap-4 md:grid-cols-5">
+        <article class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white p-5">
+          <h3 class="text-lg font-semibold">בלבול</h3>
+          <p class="mt-2 text-sm leading-8 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">מרגישים שמשהו תקוע ולא מבינים למה.</p>
+        </article>
+        <article class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white p-5">
+          <h3 class="text-lg font-semibold">בהירות</h3>
+          <p class="mt-2 text-sm leading-8 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">מפסיקים את הרעש ורואים מה באמת קורה.</p>
+        </article>
+        <article class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white p-5">
+          <h3 class="text-lg font-semibold">הבנה</h3>
+          <p class="mt-2 text-sm leading-8 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">הכל נהיה פשוט. רואים את הסיפור שסיפרנו לעצמנו.</p>
+        </article>
+        <article class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white p-5">
+          <h3 class="text-lg font-semibold">פעולה</h3>
+          <p class="mt-2 text-sm leading-8 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">עושים את הצעד הנכון בלי מאמץ מיותר.</p>
+        </article>
+        <article class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white p-5">
+          <h3 class="text-lg font-semibold">קשר אישי</h3>
+          <p class="mt-2 text-sm leading-8 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">כשאתה רואה נכון, גם האנשים סביבך משתנים.</p>
+        </article>
       </div>
     </section>
 
-    <nav class="flex flex-wrap justify-end gap-3 pt-4" aria-label="המשך קריאה">
-      <a
-        href="/archive/"
-        class="inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-5 py-2.5 text-sm font-medium text-[var(--nm-fg)] transition-colors hover:border-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)] hover:text-[var(--nm-accent)]"
-      >
-        לארכיון
-      </a>
-      <a
-        href="/studio/"
-        class="inline-flex min-h-[44px] items-center justify-center rounded-full bg-[var(--nm-inverse)] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[var(--nm-inverse-hover)]"
-      >
-        לסטודיו
-      </a>
-    </nav>
+    <section aria-labelledby="daily-principle" class="space-y-4">
+      <h2 id="daily-principle" class="text-[clamp(1.4rem,1.2rem+0.8vw,1.9rem)] font-light">משהו קטן להיום</h2>
+      <article class="rounded-[1.8rem] border-2 border-[var(--nm-accent)] bg-white p-6">
+        <p class="text-[clamp(1.15rem,1.05rem+0.3vw,1.35rem)] leading-9">אל תחפש להרגיש טוב יותר. תחפש לראות מה נכון.</p>
+      </article>
+    </section>
 
-    <div class="flex justify-end border-t border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] pt-8" aria-label="פתיחת שיחה אחרי קריאה">
-      <DirectLink
-        client:load
-        whatsAppNumber={appConfig.contact.whatsAppNumber}
-        fallbackEmail={appConfig.contact.email}
-      />
-    </div>
+    <section aria-labelledby="reversal-question" class="space-y-5">
+      <h2 id="reversal-question" class="text-[clamp(1.4rem,1.2rem+0.8vw,1.9rem)] font-light">שאלה שהופכת הכל</h2>
+      <p id="reversal-question-text" class="max-w-3xl text-[clamp(1.5rem,1.2rem+1vw,2.2rem)] font-light leading-tight">
+        מה אם הבעיה היא בכלל הפתרון?
+      </p>
+      <button
+        id="next-reversal-question"
+        type="button"
+        class="inline-flex min-h-[46px] items-center justify-center rounded-full bg-[var(--nm-accent)] px-7 py-2.5 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]"
+      >
+        תן לי שאלה אחרת
+      </button>
+    </section>
+
+    <section aria-labelledby="definitions-links" class="space-y-4">
+      <h2 id="definitions-links" class="text-[clamp(1.4rem,1.2rem+0.8vw,1.9rem)] font-light">מילים שצריך להבין אחרת</h2>
+      <nav aria-label="הגדרות מחדש">
+        <ul class="space-y-3 text-base leading-8">
+          <li><a href="/definitions/love/" class="underline underline-offset-4">מה זו אהבה באמת? -></a></li>
+          <li><a href="/definitions/fear/" class="underline underline-offset-4">למה אנחנו מפחדים? -></a></li>
+          <li><a href="/definitions/choice/" class="underline underline-offset-4">מה זה חופש בחירה? -></a></li>
+        </ul>
+      </nav>
+    </section>
+
+    <section aria-labelledby="faq-short" class="space-y-4">
+      <h2 id="faq-short" class="text-[clamp(1.4rem,1.2rem+0.8vw,1.9rem)] font-light">שאלות נפוצות</h2>
+      <div class="space-y-4">
+        <article class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white p-5">
+          <h3 class="text-lg font-semibold">זה טיפול פסיכולוגי?</h3>
+          <p class="mt-2 text-sm leading-8 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">לא. אנחנו לא נוברים בעבר, אנחנו מפרקים את מה שתוקע אותך עכשיו.</p>
+        </article>
+        <article class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white p-5">
+          <h3 class="text-lg font-semibold">כמה זמן זה לוקח?</h3>
+          <p class="mt-2 text-sm leading-8 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">הבנה יכולה לקרות ברגע אחד. לפעמים מספיקה שיחה אחת כדי לשנות הכל.</p>
+        </article>
+        <article class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white p-5">
+          <h3 class="text-lg font-semibold">חייבים לבוא עם זוג הצידה?</h3>
+          <p class="mt-2 text-sm leading-8 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">ממש לא. השינוי תמיד מתחיל בראייה שלך, גם אם הקשר הוא הבעיה.</p>
+        </article>
+      </div>
+    </section>
   </div>
+
+  <script is:inline>
+    (() => {
+      const questions = [
+        "מה אם הבעיה היא בכלל הפתרון?",
+        "מה אם אתה לא צריך להחליט עכשיו?",
+        "מה יקרה אם תפסיק לנסות לתקן?",
+        "מה הדבר הכי פשוט שאתה יכול לעשות ברגע זה?",
+        "מה אם אתה כבר יודע את התשובה ומפחד להודות בה?",
+        "מה אתה מרוויח מזה שזה נשאר תקוע?",
+        "מה משתנה אם אתה מפסיק להילחם במה שכבר קרה?",
+      ];
+      let idx = 0;
+      const textEl = document.getElementById("reversal-question-text");
+      const btn = document.getElementById("next-reversal-question");
+      if (!textEl || !btn) return;
+      btn.addEventListener("click", () => {
+        idx = (idx + 1) % questions.length;
+        textEl.textContent = questions[idx];
+      });
+    })();
+  </script>
 </Layout>

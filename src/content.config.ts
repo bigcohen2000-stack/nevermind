@@ -11,7 +11,7 @@ const articles = defineCollection({
     updatedDate: z.coerce.date().optional(),
     author: z.string().default("השם לא משנה"),
     tags: z.array(z.string()).default([]),
-    image: z.string().default("/og.jpg"),
+    image: z.string().default("/images/logo.svg"),
     canonicalUrl: z.string().url().optional(),
     keywords: z.string().optional(),
     audioUrl: z.string().optional(),

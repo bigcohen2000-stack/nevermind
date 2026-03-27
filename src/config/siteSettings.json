@@ -8,7 +8,7 @@
   },
   "brand": {
     "wordmarkHe": "השם לא משנה",
-    "logoPath": "/images/LOGO.svg",
+    "logoPath": "/images/logo.webp",
     "defaultOgImagePath": "/og.jpg",
     "themeColor": "#092038",
     "backgroundColor": "#fafaf8"

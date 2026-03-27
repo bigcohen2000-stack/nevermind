@@ -6,7 +6,7 @@
 |-----|--------|
 | `heroEyebrow`, `heroTitle`, `heroSubtitle` | כותרות מעל הגריד |
 | `dailyQuote` | `{ "text": string, "attribution"?: string }` |
-| `featuredVideo` | `{ "youtubeId": string, "title"?: string, "videoSummaryPoints"?: string[] }` — אם `youtubeId` ריק, אריח הווידאו מוסתר |
+| `featuredVideo` | `{ "youtubeId": string, "title"?: string, "videoSummaryPoints"?: string[] }` - אם `youtubeId` ריק, אריח הווידאו מוסתר |
 | `showTrendGraph` | `boolean` |
 | `openQuestion` | `{ "text": string, "href"?: string }` |
 

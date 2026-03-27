@@ -22,7 +22,7 @@ const pathCount = clarityPaths.paths?.length ?? 0;
     <article class="rounded-[1.5rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-4 text-right">
       <p class="text-base font-semibold text-[var(--nm-fg)]">מזהים</p>
       <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_64%,var(--nm-bg))]">
-        {clarityPaths.paths?.map((p) => p.id).join(", ") || "—"}
+        {clarityPaths.paths?.map((p) => p.id).join(", ") || "-"}
       </p>
     </article>
   </div>
