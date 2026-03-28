@@ -110,6 +110,31 @@
           "price_full": 950,
           "price_note": "החל משעה, כולל מע\"מ",
           "badges": ["פגישה פיזית", "ללא צילום"],
+          "extensions_gated": true,
+          "override_on_extension": true,
+          "extensions": [
+            {
+              "id": "clinic-60",
+              "label": "עד 60 דקות",
+              "price": 950,
+              "description": "מפגש סטנדרטי בקליניקה כשיש נושא אחד מרכזי לפרק.",
+              "action_text": "קביעה · עד 60 דק' (950 ₪)"
+            },
+            {
+              "id": "clinic-90",
+              "label": "עד 90 דקות",
+              "price": 1280,
+              "description": "יותר אוויר כשיש כמה שכבות או שצריך זמן בלי לקצר באמצע.",
+              "action_text": "קביעה · עד 90 דק' (1,280 ₪)"
+            },
+            {
+              "id": "clinic-120",
+              "label": "עד שעתיים",
+              "price": 1650,
+              "description": "בלוק ארוך לעומק באותו יום, בתיאום מראש.",
+              "action_text": "קביעה · עד שעתיים (1,650 ₪)"
+            }
+          ],
           "features": [
             { "text": "קליניקה פרטית במודיעין", "icon": "location" },
             { "text": "אורך מפגש גמיש (בתיאום)", "icon": "time" },
@@ -119,7 +144,7 @@
           "payment_link": "https://mrng.to/TNtAiJ5TZ6",
           "payment_cta": "קביעת פגישה (950 ₪)",
           "installments": { "count": 2, "label": "2 תשלומים ללא ריבית" },
-          "whatsapp_template": "שלום, אני מעוניין בפגישה אישית בקליניקה במודיעין.",
+          "whatsapp_template": "שלום, אני מעוניין בפגישה בקליניקה במודיעין. אופציה: {label}. מחיר מוצג: {price} ₪",
           "action_type": "payment",
           "action_text": "קביעת פגישה (950 ₪)",
           "visible": true
@@ -134,6 +159,39 @@
           "price_full": 1450,
           "price_note": "950 ₪ + 500 ₪ נסיעה",
           "badges": ["אני מגיע אליך", "כל הארץ"],
+          "extensions_gated": true,
+          "override_on_extension": true,
+          "extensions": [
+            {
+              "id": "travel-60",
+              "label": "עד 60 דקות · נסיעה סטנדרטית",
+              "price": 1450,
+              "description": "מפגש סטנדרטי אצלך או בנקודה נייטרלית, כולל נסיעה וזמן דרך קבועים.",
+              "action_text": "קביעה · עד 60 דק' (1,450 ₪)"
+            },
+            {
+              "id": "travel-90",
+              "label": "עד 90 דקות · נסיעה סטנדרטית",
+              "price": 1820,
+              "description": "יותר זמן למפגש כשיש מה לפתוח בלי לדחוף לסוף השעה.",
+              "action_text": "קביעה · עד 90 דק' (1,820 ₪)"
+            },
+            {
+              "id": "travel-120",
+              "label": "עד שעתיים · נסיעה סטנדרטית",
+              "price": 2280,
+              "description": "בלוק ארוך באותו יום, לפני תיאום נבדקת נקודת המפגש והאזור.",
+              "action_text": "קביעה · עד שעתיים (2,280 ₪)"
+            },
+            {
+              "id": "travel-remote",
+              "label": "אזור רחוק / חלון זמן מיוחד",
+              "price": 0,
+              "price_additive": true,
+              "description": "פרימיה על מרחק או שעה חריגה. המחיר הסופי מתואם אחרי שורת מיקום וזמן בוואטסאפ.",
+              "action_text": "תיאום אזור רחוק / חלון מיוחד"
+            }
+          ],
           "features": [
             { "text": "בחירת מיקום לפי נוחותך", "icon": "location" },
             { "text": "מינימום שעה למפגש", "icon": "time" },
@@ -143,7 +201,7 @@
           "payment_link": "https://mrng.to/jHmcTciacE",
           "payment_cta": "קביעת פגישה (1,450 ₪)",
           "installments": { "count": 2, "label": "2 תשלומים ללא ריבית" },
-          "whatsapp_template": "שלום, אני מעוניין בפגישה אצלי. האזור שלי הוא: ",
+          "whatsapp_template": "שלום, אני מעוניין בפגישה בטריטוריה שלי. אופציה: {label}. מחיר מוצג: {price} ₪. האזור שלי: ",
           "action_type": "payment",
           "action_text": "קביעת פגישה (1,450 ₪)",
           "visible": true

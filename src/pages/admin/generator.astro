@@ -235,7 +235,6 @@ const pageDescription = "אשף 3 שלבים ליצירת Master Prompt מדוי
   <script lang="ts">
     import { ARTICLE_TAG_WHITELIST, ARTICLE_TAG_WHITELIST_SET } from "../../data/article-tags";
     import { ROBOTIC_BLOCKLIST, SENSITIVE_TOPIC_WARNING, validateAndClassify } from "../../utils/contentValidator";
-    import { validateContent } from "../../utils/validateContent";
 
     const SLUG_EN_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
     const YOUTUBE_ID_RE = /^[a-zA-Z0-9_-]{11}$/;
@@ -276,19 +275,7 @@ const pageDescription = "אשף 3 שלבים ליצירת Master Prompt מדוי
         }
       }
 
-      const scanBlob = [
-        data.body,
-        data.summary,
-        data.bottomLine,
-        data.topic,
-        data.aha,
-        data.questionForSchema,
-        data.imageAlt,
-      ].join("\n");
-      const { hits } = validateContent(scanBlob);
-      if (hits.length > 0) {
-        errors.push(`מילים/ביטויים חסומים ב-Content Score: ${hits.join(", ")}.`);
-      }
+      /* לא סורקים כאן רובוטיקה/Content Score: בשדות האשף אפשר טיוטות גולמיות. המודל מקבל בפרומפט הסופי את רשימת האיסור. */
 
       if (!data.questionForSchema.trim()) errors.push("חסר questionForSchema.");
       if (!data.aha.trim()) errors.push("חסר originalInsight (שדה תובנת ליבה).");
@@ -324,9 +311,29 @@ const pageDescription = "אשף 3 שלבים ליצירת Master Prompt מדוי
       return warnings;
     }
 
+    function fieldValue(id: string): string {
+      const el = document.getElementById(id);
+      if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) return el.value;
+      return "";
+    }
+
+    function fieldTrim(id: string): string {
+      return fieldValue(id).trim();
+    }
+
     document.addEventListener("astro:page-load", () => {
       const root = document.getElementById("nm-article-wizard");
       if (!(root instanceof HTMLElement)) return;
+      if (root.dataset.nmWizardInit === "1") return;
+
+      let mountAttempts = 0;
+      const mountWizard = () => {
+        mountAttempts += 1;
+        if (!document.getElementById("wiz-topic")) {
+          if (mountAttempts < 180) requestAnimationFrame(mountWizard);
+          return;
+        }
+        root.dataset.nmWizardInit = "1";
 
       const steps = Array.from(root.querySelectorAll(".wizard-step"));
       const progress = document.getElementById("wizard-progress");
@@ -335,27 +342,14 @@ const pageDescription = "אשף 3 שלבים ליצירת Master Prompt מדוי
       const nextBtn = document.getElementById("wiz-next");
       const genBtn = document.getElementById("wiz-generate");
       const copyBtn = document.getElementById("wiz-copy");
-      const output = document.getElementById("wiz-output");
       const saveBtn = document.getElementById("wiz-save");
       const saveStatus = document.getElementById("wiz-save-status");
-      const topic = document.getElementById("wiz-topic");
       const audience = document.getElementById("wiz-audience");
-      const aha = document.getElementById("wiz-aha");
-      const bottomLine = document.getElementById("wiz-bottom-line");
-      const inversion = document.getElementById("wiz-inversion");
       const isPremium = document.getElementById("wiz-is-premium");
       const difficulty = document.getElementById("wiz-difficulty");
-      const slug = document.getElementById("wiz-slug");
-      const questionSchema = document.getElementById("wiz-question-schema");
-      const imageAlt = document.getElementById("wiz-image-alt");
       const mindShift = document.getElementById("wiz-mind-shift");
-      const summary = document.getElementById("wiz-summary");
       const tone = document.getElementById("wiz-tone");
-      const points = document.getElementById("wiz-points");
       const length = document.getElementById("wiz-length");
-      const tags = document.getElementById("wiz-tags");
-      const youtube = document.getElementById("wiz-youtube");
-      const body = document.getElementById("wiz-body");
       const wordCountEl = document.getElementById("wiz-word-count");
       const preflightEl = document.getElementById("wiz-preflight");
       const blockersEl = document.getElementById("wiz-blockers");
@@ -363,30 +357,24 @@ const pageDescription = "אשף 3 שלבים ליצירת Master Prompt מדוי
       let current = 1;
 
       const collectData = () => ({
-        topic: topic instanceof HTMLInputElement ? topic.value.trim() : "",
+        topic: fieldTrim("wiz-topic"),
         audience: audience instanceof HTMLSelectElement ? audience.value : "",
-        aha: aha instanceof HTMLTextAreaElement ? aha.value.trim() : "",
-        bottomLine: bottomLine instanceof HTMLTextAreaElement ? bottomLine.value.trim() : "",
-        inversionNote: inversion instanceof HTMLTextAreaElement ? inversion.value.trim() : "",
+        aha: fieldTrim("wiz-aha"),
+        bottomLine: fieldTrim("wiz-bottom-line"),
+        inversionNote: fieldTrim("wiz-inversion"),
         isPremium: isPremium instanceof HTMLInputElement ? isPremium.checked : false,
         difficultyLevel: difficulty instanceof HTMLSelectElement ? difficulty.value : "beginner",
-        slug: slug instanceof HTMLInputElement ? slug.value.trim() : "",
-        questionForSchema:
-          questionSchema instanceof HTMLInputElement || questionSchema instanceof HTMLTextAreaElement
-            ? questionSchema.value.trim()
-            : "",
-        imageAlt:
-          imageAlt instanceof HTMLInputElement || imageAlt instanceof HTMLTextAreaElement
-            ? imageAlt.value.trim()
-            : "",
+        slug: fieldTrim("wiz-slug"),
+        questionForSchema: fieldTrim("wiz-question-schema"),
+        imageAlt: fieldTrim("wiz-image-alt"),
         mindShiftIntensity: mindShift instanceof HTMLSelectElement ? mindShift.value : "3",
-        summary: summary instanceof HTMLInputElement ? summary.value.trim() : "",
+        summary: fieldTrim("wiz-summary"),
         tone: tone instanceof HTMLSelectElement ? tone.value : "",
-        points: points instanceof HTMLTextAreaElement ? points.value : "",
+        points: fieldValue("wiz-points"),
         length: length instanceof HTMLSelectElement ? length.value : "",
-        tags: tags instanceof HTMLInputElement ? tags.value.trim() : "",
-        youtubeId: youtube instanceof HTMLInputElement ? youtube.value.trim() : "",
-        body: body instanceof HTMLTextAreaElement ? body.value : "",
+        tags: fieldTrim("wiz-tags"),
+        youtubeId: fieldTrim("wiz-youtube"),
+        body: fieldValue("wiz-body"),
       });
 
       function updateWordCountAndPreflight() {
@@ -404,24 +392,26 @@ const pageDescription = "אשף 3 שלבים ליצירת Master Prompt מדוי
               blockersEl.textContent = "";
             }
           }
-        if (preflightEl) {
-          const w = runPreflight(data);
-          const scanBlob = [
-            data.body,
-            data.summary,
-            data.bottomLine,
-            data.topic,
-            data.aha,
-            data.questionForSchema,
-            data.imageAlt,
-          ].join("\n");
-          const c = validateAndClassify(scanBlob);
-          if (c.recommendPremium) {
-            w.push(`${SENSITIVE_TOPIC_WARNING} — זוהו: ${c.matchedSensitive.join(", ")}`);
+          if (preflightEl) {
+            const w = runPreflight(data);
+            const scanBlob = [
+              data.body,
+              data.summary,
+              data.bottomLine,
+              data.topic,
+              data.aha,
+              data.questionForSchema,
+              data.imageAlt,
+            ].join("\n");
+            const c = validateAndClassify(scanBlob);
+            if (c.recommendPremium) {
+              w.push(`${SENSITIVE_TOPIC_WARNING} · זוהו: ${c.matchedSensitive.join(", ")}`);
+            }
+            preflightEl.textContent =
+              w.length > 0
+                ? ["אזהרות:", ...w.map((x) => `• ${x}`)].join("\n")
+                : "אין אזהרות. אם אין חסימות באדום, אפשר לשלב 3.";
           }
-          preflightEl.textContent =
-            w.length > 0 ? ["אזהרות:", ...w.map((x) => `• ${x}`)].join("\n") : "אין אזהרות. אם אין חסימות באדום, אפשר לשלב 3.";
-        }
         }
       }
 
@@ -443,7 +433,7 @@ const pageDescription = "אשף 3 שלבים ליצירת Master Prompt מדוי
 
       const buildPrompt = () => {
         const data = collectData();
-        const rawPoints = points instanceof HTMLTextAreaElement ? points.value : "";
+        const rawPoints = data.points;
         const normalizedPoints = rawPoints
           .split("\n")
           .map((line) => line.trim())
@@ -471,6 +461,8 @@ Mandatory frontmatter — always generate these keys with real, non-empty values
 
 Forbidden robotic / corporate cliché vocabulary — do NOT use these strings anywhere in the entire output (including YAML values, title, description, and body). Case-insensitive; includes multi-word phrases:
 ${roboticBannedList}
+
+Wizard inputs vs final file: Values typed in the wizard (topic, bullets, draft body inside [DRAFT_BODY_START]...[DRAFT_BODY_END]) may include rough notes or placeholder phrasing. The final MDX you produce must rewrite this into clean NeverMind voice and MUST obey every rule above. Do not paste robotic or filler phrasing from the draft into the published text.
 
 Required frontmatter keys (all must be present with non-empty values where noted):
 - title: Hebrew title
@@ -525,14 +517,16 @@ Follow the brand identity: zero fluff, focus on thought-shifts, NeverMind voice 
       });
 
       genBtn?.addEventListener("click", () => {
-        if (!(output instanceof HTMLTextAreaElement)) return;
-        output.value = buildPrompt();
+        const out = document.getElementById("wiz-output");
+        if (!(out instanceof HTMLTextAreaElement)) return;
+        out.value = buildPrompt();
       });
 
       copyBtn?.addEventListener("click", async () => {
-        if (!(output instanceof HTMLTextAreaElement) || !output.value.trim()) return;
+        const out = document.getElementById("wiz-output");
+        if (!(out instanceof HTMLTextAreaElement) || !out.value.trim()) return;
         try {
-          await navigator.clipboard.writeText(output.value);
+          await navigator.clipboard.writeText(out.value);
           const original = copyBtn.textContent || "Copy to Clipboard";
           copyBtn.textContent = "הועתק";
           window.setTimeout(() => {
@@ -544,39 +538,40 @@ Follow the brand identity: zero fluff, focus on thought-shifts, NeverMind voice 
       });
 
       const storageKey = "nm-article-wizard-draft";
+      const setFieldValue = (id: string, value: string) => {
+        const el = document.getElementById(id);
+        if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) el.value = value;
+      };
+
       const restoreDraft = () => {
         try {
           const raw = localStorage.getItem(storageKey);
           if (!raw) return;
           const data = JSON.parse(raw) as Record<string, unknown>;
-          if (topic instanceof HTMLInputElement) topic.value = String(data.topic ?? "");
+          setFieldValue("wiz-topic", String(data.topic ?? ""));
           if (audience instanceof HTMLSelectElement) audience.value = String(data.audience ?? "Beginners");
-          if (aha instanceof HTMLTextAreaElement) aha.value = String(data.aha ?? "");
-          if (bottomLine instanceof HTMLTextAreaElement) bottomLine.value = String(data.bottomLine ?? "");
-          if (inversion instanceof HTMLTextAreaElement) inversion.value = String(data.inversionNote ?? "");
+          setFieldValue("wiz-aha", String(data.aha ?? ""));
+          setFieldValue("wiz-bottom-line", String(data.bottomLine ?? ""));
+          setFieldValue("wiz-inversion", String(data.inversionNote ?? ""));
           if (isPremium instanceof HTMLInputElement) isPremium.checked = Boolean(data.isPremium);
           if (difficulty instanceof HTMLSelectElement) {
             const d = String(data.difficultyLevel ?? "beginner");
             difficulty.value = ["beginner", "advanced", "deep"].includes(d) ? d : "beginner";
           }
-          if (slug instanceof HTMLInputElement) slug.value = String(data.slug ?? "");
-          if (questionSchema instanceof HTMLInputElement || questionSchema instanceof HTMLTextAreaElement) {
-            questionSchema.value = String(data.questionForSchema ?? "");
-          }
-          if (imageAlt instanceof HTMLInputElement || imageAlt instanceof HTMLTextAreaElement) {
-            imageAlt.value = String(data.imageAlt ?? "");
-          }
+          setFieldValue("wiz-slug", String(data.slug ?? ""));
+          setFieldValue("wiz-question-schema", String(data.questionForSchema ?? ""));
+          setFieldValue("wiz-image-alt", String(data.imageAlt ?? ""));
           if (mindShift instanceof HTMLSelectElement) {
             const m = String(data.mindShiftIntensity ?? "3");
             mindShift.value = ["1", "2", "3", "4", "5"].includes(m) ? m : "3";
           }
-          if (summary instanceof HTMLInputElement) summary.value = String(data.summary ?? "");
+          setFieldValue("wiz-summary", String(data.summary ?? ""));
           if (tone instanceof HTMLSelectElement) tone.value = String(data.tone ?? "Provocative");
-          if (points instanceof HTMLTextAreaElement) points.value = String(data.points ?? "");
+          setFieldValue("wiz-points", String(data.points ?? ""));
           if (length instanceof HTMLSelectElement) length.value = String(data.length ?? "Short Post");
-          if (tags instanceof HTMLInputElement) tags.value = String(data.tags ?? "");
-          if (youtube instanceof HTMLInputElement) youtube.value = String(data.youtubeId ?? "");
-          if (body instanceof HTMLTextAreaElement) body.value = String(data.body ?? "");
+          setFieldValue("wiz-tags", String(data.tags ?? ""));
+          setFieldValue("wiz-youtube", String(data.youtubeId ?? ""));
+          setFieldValue("wiz-body", String(data.body ?? ""));
         } catch {
           // no-op
         }
@@ -586,35 +581,19 @@ Follow the brand identity: zero fluff, focus on thought-shifts, NeverMind voice 
         localStorage.setItem(storageKey, JSON.stringify(collectData()));
       };
 
-      const fields: (Element | null)[] = [
-        topic,
-        audience,
-        aha,
-        bottomLine,
-        inversion,
-        isPremium,
-        difficulty,
-        slug,
-        questionSchema,
-        imageAlt,
-        mindShift,
-        summary,
-        tone,
-        points,
-        length,
-        tags,
-        youtube,
-        body,
-      ];
-      fields.forEach((field) => {
-        field?.addEventListener("input", () => {
-          persistDraft();
-          updateWordCountAndPreflight();
-        });
-        field?.addEventListener("change", () => {
-          persistDraft();
-          updateWordCountAndPreflight();
-        });
+      const onWizardFieldActivity = () => {
+        persistDraft();
+        updateWordCountAndPreflight();
+      };
+      root.addEventListener("input", (e) => {
+        const t = e.target;
+        if (!(t instanceof HTMLElement) || typeof t.id !== "string" || !t.id.startsWith("wiz-")) return;
+        onWizardFieldActivity();
+      });
+      root.addEventListener("change", (e) => {
+        const t = e.target;
+        if (!(t instanceof HTMLElement)) return;
+        if (typeof t.id === "string" && t.id.startsWith("wiz-")) onWizardFieldActivity();
       });
 
       saveBtn?.addEventListener("click", async () => {
@@ -636,6 +615,9 @@ Follow the brand identity: zero fluff, focus on thought-shifts, NeverMind voice 
 
       restoreDraft();
       render();
+      };
+
+      mountWizard();
     });
   </script>
 </Layout>

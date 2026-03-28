@@ -1,7 +1,6 @@
 ---
 import {
   buildServicePreStartWhatsAppHref,
-  buildServiceActionWhatsAppHref,
   disclaimerShort,
   featureIcons,
   formatAvailabilityLine,
@@ -13,6 +12,7 @@ import {
 } from "../lib/services";
 import AvailabilityBadge from "./AvailabilityBadge.astro";
 import ServicePricingBlock from "./ServicePricingBlock";
+import ServiceProposalWhatsAppCta from "./ServiceProposalWhatsAppCta";
 
 interface Props {
   service: FlatService;
@@ -21,7 +21,6 @@ interface Props {
 const { service } = Astro.props;
 const action = resolveServiceAction(service);
 const preStartWhatsAppHref = buildServicePreStartWhatsAppHref(service.title);
-const actionWhatsAppHref = buildServiceActionWhatsAppHref(service);
 const netPrice = getNetPrice(service.price_full, 18);
 const vatAmount = getVatAmount(service.price_full, 18);
 const availabilityLine = formatAvailabilityLine(service);
@@ -147,14 +146,9 @@ const serviceJson = JSON.stringify(service);
           >
             {action.label || "לתיאום קצר בוואטסאפ"}
           </a>
-          <a
-            href={actionWhatsAppHref}
-            target="_blank"
-            rel="noreferrer"
-            class="inline-flex min-h-[2.75rem] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_14%,transparent)] px-5 py-3 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-tint)]"
-          >
-            הודעת פתיחה עם מחיר
-          </a>
+          <div class="basis-full w-full min-w-0">
+            <ServiceProposalWhatsAppCta client:load serviceJson={serviceJson} />
+          </div>
           <a
             href={preStartWhatsAppHref}
             target="_blank"

@@ -41,6 +41,8 @@ export type StageService = ServiceStage["services"][number] & {
   features?: Array<string | { text?: string; icon?: string }>;
   friendly_note?: string;
   extensions?: ServiceExtension[];
+  /** אם true: בוחרים תחילה הרחבה (בלי ברירת מחדל), ואז נפתחים מחיר וכפתורים — כמו שלבים בטופס */
+  extensions_gated?: boolean;
   update?: boolean;
   override_on_extension?: boolean;
 };
@@ -261,8 +263,25 @@ export const flattenVisibleServices = (): FlatService[] =>
 
 export const findServiceById = (id: string) => flattenVisibleServices().find((service) => service.id === id);
 
-export const buildWhatsAppHref = (message: string) =>
-  `https://wa.me/${appConfig.contact.whatsAppNumber}?text=${encodeURIComponent(message)}`;
+/** מנקה רווחים כפולים, שורות ריקות ורעש לפני encodeURIComponent */
+export function normalizeWhatsAppMessageBody(raw: string): string {
+  const s = String(raw ?? "")
+    .replace(/\r\n/g, "\n")
+    .replace(/\r/g, "\n");
+  const lines = s
+    .split("\n")
+    .map((line) => line.replace(/[\t ]+/g, " ").trim())
+    .filter((line) => line.length > 0);
+  let out = lines.join("\n").trim();
+  out = out.replace(/\n{3,}/g, "\n\n");
+  out = out.replace(/\.{3,}/g, ".");
+  return out;
+}
+
+export const buildWhatsAppHref = (message: string) => {
+  const normalized = normalizeWhatsAppMessageBody(message);
+  return `https://wa.me/${appConfig.contact.whatsAppNumber}?text=${encodeURIComponent(normalized)}`;
+};
 
 /** וואטסאפ בסוף מאמר: ניסוח שימור קצר + כותרת + קישור */
 export function buildRetentionArticleWhatsAppHref(articleTitle: string, articleUrl: string): string {
@@ -351,6 +370,52 @@ export function mergeServiceWithExtension(
     base.payment_cta = ext.action_text;
   }
   return base;
+}
+
+/** הודעת כפתור שלח הצעה בוואטסאפ (מחיר ב־Ref פנימי בלבד) */
+export function buildServiceProposalWhatsAppMessage(args: {
+  serviceTitle: string;
+  extensionLabel: string;
+  userFocus?: string;
+  priceGross: number;
+  includeCrmPreface?: boolean;
+}): string {
+  const serviceName = (args.serviceTitle || "").trim() || "השירות";
+  const extensionName = (args.extensionLabel || "").trim() || "בסיס";
+  const focusRaw = (args.userFocus ?? "").replace(/[\t ]+/g, " ").trim();
+  const refN = Math.max(0, Math.round(Number(args.priceGross) || 0));
+
+  const chunks: string[] = [];
+  if (args.includeCrmPreface !== false) {
+    chunks.push(buildWhatsAppCrmPreface(serviceName));
+    chunks.push("");
+  }
+  chunks.push(`היי יקיר, ראיתי את האפשרות של ${serviceName} עם הרחבת ${extensionName}.`);
+  if (focusRaw.length > 0) {
+    const focusSentence = /[.!?]$/.test(focusRaw) ? focusRaw : `${focusRaw}.`;
+    chunks.push(`אני רוצה להתמקד ב: ${focusSentence}`);
+  }
+  chunks.push("מתי נוכל להתקדם?");
+  chunks.push(`(Ref: NM-${refN})`);
+
+  return normalizeWhatsAppMessageBody(chunks.join("\n"));
+}
+
+export function buildServiceProposalWhatsAppHref(
+  service: StageService | FlatService,
+  selectedExtension?: ServiceExtension | null,
+  userFocus?: string
+): string {
+  const merged = mergeServiceWithExtension(service, selectedExtension ?? null);
+  const extLabel = selectedExtension?.label?.trim() || "בסיס";
+  const message = buildServiceProposalWhatsAppMessage({
+    serviceTitle: service.title,
+    extensionLabel: extLabel,
+    userFocus,
+    priceGross: merged.price_full,
+    includeCrmPreface: true,
+  });
+  return buildWhatsAppHref(message);
 }
 
 /** קישור וואטסאפ לשירות. תבנית מה־JSON או ברירת מחדל, אחרת הודעה כללית */
