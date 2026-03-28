@@ -73,7 +73,7 @@ export const disclaimerLong =
 /** שורה מתחת לכל כפתור פעולה בכרטיס שירות */
 export const disclaimerShort =
   (servicesConfig.trust_elements as Record<string, unknown>).disclaimer_short?.toString?.() ||
-  "זהו הסבר פרספקטיבה אישית, לא טיפול.";
+  "זהו הסבר פרספקטיבה אישית, לא שיפוט קליני.";
 
 /** תבנית ברירת מחדל לוואטסאפ מדף שירותים (אם חסר `whatsapp_template` ב־JSON) */
 export const defaultWhatsappServiceTemplate =
@@ -95,6 +95,14 @@ export const featureIcons: Record<string, string> = {
 
 export const servicesCurrency = servicesConfig.currency;
 export const servicesTaxLabel = servicesConfig.tax_label;
+
+/** מחיר ייחוס לתצוגה (לפני הנחת בוטיק מוצגת) — התשלום בפועל נשאר לפי price_full ב־JSON */
+export function getBoutiqueReferenceListPrice(chargePrice: number): number | null {
+  const raw = (servicesConfig as Record<string, unknown>).boutique_display_discount_percent;
+  const pct = typeof raw === "number" ? raw : typeof raw === "string" ? Number.parseFloat(raw) : 0;
+  if (!Number.isFinite(pct) || pct <= 0 || pct >= 50) return null;
+  return Math.round(chargePrice / (1 - pct / 100));
+}
 const DEFAULT_CONTENT_GAP_MESSAGE =
   "חיפשתי בארכיון, וראיתי שעוד לא יצא לי להקליט או לכתוב משהו ספציפי על זה. זה דווקא מעניין, אם תרצה נוכל לדבר על זה רגע יחד. לפעמים ככה נולדים התכנים הכי טובים כאן, וזה נוגע גם לאחרים. אפשר גם באנונימיות מלאה, מה שנוח לך. מה דעתך?";
 

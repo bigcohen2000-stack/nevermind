@@ -1,10 +1,7 @@
 ---
 import { buildArticleContextWhatsAppHref } from "../lib/services";
-import { WEB3FORMS_ACCESS_KEY } from "../lib/web3forms-access";
 import { microPosts } from "../data/microPosts";
 import BigQuestionLayout from "./BigQuestionLayout.astro";
-import FormAntispamFields from "./FormAntispamFields.astro";
-import { FloatingInput } from "./ui/FloatingInput";
 
 interface GlossaryTerm {
   term: string;
@@ -13,118 +10,68 @@ interface GlossaryTerm {
 
 interface Props {
   pageTitle: string;
-  pageUrl: string;
   tags?: string[];
   articleTitle?: string;
   glossaryTerms?: GlossaryTerm[];
 }
 
-const { pageTitle, pageUrl, tags = [], articleTitle = "", glossaryTerms } = Astro.props as Props;
+const { pageTitle, tags = [], articleTitle = "", glossaryTerms } = Astro.props as Props;
 const recentMicroPosts = microPosts.slice(0, 3);
 const contextWaHref = buildArticleContextWhatsAppHref({ tags, articleTitle: articleTitle || pageTitle });
 ---
 
 <aside class="space-y-5 lg:sticky lg:top-28">
-  <section class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/88 p-5 shadow-[0_18px_60px_rgba(26,26,26,0.06)]">
-    <div class="space-y-3 text-right">
-      <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">שאלה לוגית</p>
-      <h2 class="text-[1.35rem] font-semibold text-[var(--nm-fg)]">שאל שאלה לוגית</h2>
-      <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
-        לפעמים מספיק משפט אחד מדויק כדי לפתוח כיוון חדש. אם השאלה שלך תיגע בנקודה חיה, היא יכולה להפוך למיקרו־פוסט קצר באתר.
+  <section
+    class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/88 p-5 shadow-[0_18px_60px_rgba(26,26,26,0.06)]"
+    aria-labelledby="nm-contextual-components-heading"
+  >
+    <div class="space-y-4 text-right">
+      <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">רכיבים לפי הקשר</p>
+      <h2 id="nm-contextual-components-heading" class="text-[1.2rem] font-semibold leading-snug text-[var(--nm-fg)]">
+        יצירת רכיבים חכמים <span class="text-[color-mix(in_srgb,var(--nm-fg)_55%,var(--nm-bg))]">(Contextual Components)</span>
+      </h2>
+      <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+        אם מכניסים טקסט מאמר ובוחנים את המודל: &quot;צור שאלת לוגיקה שמתאימה בדיוק לפסקה השלישית&quot; — התוצאה חדה יותר משאלה גנרית על כל הטקסט.
       </p>
+      <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+        כאן התפקיד הוא לאסוף טקסט גולמי, הערות ובקשות, לעבור דרך קבינט המומחים, ולייצר קובץ MDX סופי נקי. הרכיב <code class="rounded bg-[var(--nm-surface-muted)] px-1.5 py-0.5 text-[0.8em]">מעבר למילים</code> יושב היכן שהקריאה נסדקת והקורא הכי סקרן להמשיך — לא שבירה אקראית באמצע פסקה.
+      </p>
+      <div class="space-y-3 rounded-[1.25rem] border border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] bg-[var(--nm-surface-muted)]/60 p-4 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))]">
+        <p>
+          <strong class="text-[var(--nm-fg)]">שלב 1 · איסוף וביקורת:</strong>
+          סריקת כל הטקסט והבקשות. כל רעיון שחזר מטיוטה — נכנס פנימה בלי להשמיט.
+        </p>
+        <p>
+          <strong class="text-[var(--nm-fg)]">שלב 2 · קבינט:</strong>
+          Copy: תובנה מרכזית והיפוכים, בלי מילים ריקות. SEO: <span class="whitespace-nowrap">questionForSchema</span> מדויק מהטקסט. מיקום רכיב מעבר המילים בנקודת הסדק הנכונה.
+        </p>
+        <p>
+          <strong class="text-[var(--nm-fg)]">שלב 3 · MDX:</strong>
+          Frontmatter תקני, פסקאות קצרות, מרווח קריאה, שפה ישירה.
+        </p>
+      </div>
     </div>
 
-    <div class="mt-5">
+    <div class="mt-5 border-t border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] pt-5">
       <BigQuestionLayout tags={tags} articleTitle={articleTitle || pageTitle} glossaryTerms={glossaryTerms} />
     </div>
 
-    <form
-      data-logical-question-form
-      data-nm-antispam
-      class="mt-5 space-y-4 text-right"
-      action="https://api.web3forms.com/submit"
-      method="POST"
-    >
-      <input type="hidden" name="access_key" value={WEB3FORMS_ACCESS_KEY} />
-      <input type="hidden" name="subject" value="שאלה לוגית חדשה מ-NeverMind" />
-      <input type="hidden" name="source_page" value={pageTitle} />
-      <input type="hidden" name="source_url" value={pageUrl} />
-      <input type="text" name="botcheck" style="display:none" tabindex="-1" autocomplete="off" aria-hidden="true" />
-      <FormAntispamFields />
-
-      <FloatingInput
-        client:load
-        id="logical-name"
-        name="name"
-        label="שם פרטי"
-        dir="rtl"
-        hideValidation={true}
-        className="[&_.nm-floating-control]:bg-[var(--nm-surface-muted)]"
-      />
-      <FloatingInput
-        client:load
-        id="logical-email"
-        name="email"
-        label="אימייל לחזרה"
-        type="email"
-        required
-        dir="rtl"
-        className="[&_.nm-floating-control]:bg-[var(--nm-surface-muted)]"
-      />
-      <FloatingInput
-        client:load
-        id="logical-phone"
-        name="phone"
-        label="טלפון לחזרה"
-        type="tel"
-        required
-        pattern="^0[0-9]{8,9}$"
-        dir="rtl"
-        className="[&_.nm-floating-control]:bg-[var(--nm-surface-muted)]"
-      />
-      <FloatingInput
-        client:load
-        id="logical-question"
-        name="message"
-        label="השאלה שלך"
-        multiline
-        rows={5}
-        maxLength={320}
-        required
-        dir="rtl"
-        className="[&_.nm-floating-control]:bg-[var(--nm-surface-muted)]"
-      />
-
-      <div class="flex flex-wrap gap-3">
-        <button
-          type="submit"
-          class="inline-flex flex-1 items-center justify-center rounded-full bg-[var(--nm-accent)] px-5 py-3 text-sm font-semibold text-[var(--nm-on-accent)] transition-colors duration-200 hover:bg-[var(--nm-accent-hover)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-red)]"
-        >
-          שלח שאלה קצרה
-        </button>
-        <a
-          href={contextWaHref}
-          target="_blank"
-          rel="noreferrer"
-          class="inline-flex items-center justify-center rounded-full bg-[#25D366] px-5 py-3 text-sm font-semibold text-white transition-colors duration-200 hover:bg-[#1FAE55] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#25D366]"
-        >
-          או שלח בוואטסאפ
-        </a>
-      </div>
-
-      <p data-logical-question-status aria-live="polite" class="text-sm text-[color-mix(in_srgb,var(--nm-fg)_58%,var(--nm-bg))] opacity-0 transition-opacity duration-300">
-        נשלח - אני בדרך כלל חוזר ממש מהר. אם השאלה תיבחר, תופיע תשובה קצרה באתר.
-      </p>
-      <div data-nm-logical-form-return class="hidden pt-2 text-right">
-        <a
-          data-nm-return-cta-link
-          href="/articles/"
-          class="inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-accent)_28%,transparent)] bg-[var(--nm-tint)] px-4 py-2 text-sm font-semibold text-[var(--nm-accent)] transition hover:bg-[var(--nm-tint-hover)]"
-        >
-          חזור לארכיון
-        </a>
-      </div>
-    </form>
+    <div class="mt-5 flex flex-wrap gap-2">
+      <a
+        href={contextWaHref}
+        target="_blank"
+        rel="noreferrer"
+        class="inline-flex min-h-[44px] flex-1 items-center justify-center rounded-full bg-[#25D366] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#1FAE55] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#25D366]"
+      >
+        להמשיך את השיחה בוואטסאפ
+      </a>
+      <a
+        href="/services/"
+        class="inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-4 py-2.5 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-tint)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-red)]"
+      >
+        למרחב הגילוי
+      </a>
+    </div>
   </section>
 
   <section class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-5 text-right">
@@ -147,76 +94,4 @@ const contextWaHref = buildArticleContextWhatsAppHref({ tags, articleTitle: arti
       לכל המיקרו־פוסטים
     </a>
   </section>
-
-  <script is:inline>
-    document.addEventListener("astro:page-load", () => {
-      if (window.__nmLogicalQuestionCleanup) window.__nmLogicalQuestionCleanup();
-
-      const form = document.querySelector("[data-logical-question-form]");
-      const status = document.querySelector("[data-logical-question-status]");
-      if (!(form instanceof HTMLFormElement) || !(status instanceof HTMLElement)) return;
-
-      if (typeof window.__nmStampFormAntispam === "function") {
-        window.__nmStampFormAntispam(form);
-      }
-
-      const logicalReturn = document.querySelector("[data-nm-logical-form-return]");
-      const logicalReturnLink = document.querySelector("[data-nm-return-cta-link]");
-
-      const handleSubmit = async (event) => {
-        event.preventDefault();
-        const formData = new FormData(form);
-        const phoneValue = String(formData.get("phone") || "").trim();
-        if (!/^0[0-9]{8,9}$/.test(phoneValue)) {
-          status.textContent = "מספר הטלפון לא תקין. כתוב מספר ישראלי שמתחיל ב-0.";
-          status.classList.add("opacity-100");
-          return;
-        }
-
-        const msg = String(formData.get("message") || "").trim();
-        const read = window.__nmReadAntispamFromForm;
-        const validate = window.__nmValidateAntispamFields;
-        if (typeof read === "function" && typeof validate === "function") {
-          const as = read(form);
-          const check = validate({ ...as, messageTexts: [msg, phoneValue] });
-          if (!check.ok) {
-            status.textContent = check.userMessage;
-            status.classList.add("opacity-100");
-            return;
-          }
-        }
-
-        try {
-          const response = await fetch("https://api.web3forms.com/submit", {
-            method: "POST",
-            body: formData,
-          });
-
-          status.textContent = response.ok
-            ? "נשלח - אני בדרך כלל חוזר ממש מהר. אם השאלה תיבחר, תופיע תשובה קצרה באתר."
-            : "נראה שלא עבר הפעם. אפשר לנסות שוב או לשלוח בוואטסאפ.";
-          status.classList.add("opacity-100");
-
-          if (response.ok) {
-            form.reset();
-            if (logicalReturn instanceof HTMLElement && logicalReturnLink instanceof HTMLAnchorElement) {
-              if (typeof window.__nmFillReturnLink === "function") {
-                window.__nmFillReturnLink(logicalReturnLink);
-              }
-              logicalReturn.classList.remove("hidden");
-            }
-          }
-        } catch {
-          status.textContent = "נראה שלא עבר הפעם. אפשר לנסות שוב או לשלוח בוואטסאפ.";
-          status.classList.add("opacity-100");
-        }
-      };
-
-      form.addEventListener("submit", handleSubmit);
-
-      window.__nmLogicalQuestionCleanup = () => {
-        form.removeEventListener("submit", handleSubmit);
-      };
-    });
-  </script>
 </aside>

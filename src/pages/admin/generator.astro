@@ -2,17 +2,17 @@
 import Layout from "../../layouts/Layout.astro";
 import { FloatingInput } from "../../components/ui/FloatingInput";
 
-const pageTitle = "Strategic Article Wizard";
-const pageDescription = "אשף 3 שלבים ליצירת Master Prompt מדויק לכתיבת מאמר.";
+const pageTitle = "אשף מאמרים";
+const pageDescription = "אשף שלושה שלבים ליצירת פרומפט מדויק לכתיבת מאמר.";
 ---
 
 <Layout title={pageTitle} description={pageDescription} noIndex={true}>
   <section class="mx-auto max-w-4xl space-y-8 px-4 pb-16 text-right text-[var(--nm-fg)]">
     <header class="space-y-3">
-      <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--nm-accent)]">Article Creator</p>
-      <h1 class="text-[clamp(2rem,1.5rem+1.8vw,3.2rem)] font-semibold leading-[1.05]">Strategic Wizard</h1>
+      <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--nm-accent)]">יצירת תוכן</p>
+      <h1 class="text-[clamp(2rem,1.5rem+1.8vw,3.2rem)] font-semibold leading-[1.05]">אשף מאמרים</h1>
       <p class="text-[clamp(1rem,0.95rem+0.25vw,1.15rem)] leading-8 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
-        שלושה שלבים קצרים. בסוף מתקבל Master Prompt מוכן להעתקה.
+        שלושה שלבים קצרים. בסוף מתקבל פרומפט מוכן להעתקה.
       </p>
     </header>
 
@@ -22,29 +22,29 @@ const pageDescription = "אשף 3 שלבים ליצירת Master Prompt מדוי
           <div id="wizard-progress" class="h-full rounded-full bg-[var(--nm-accent)] transition-all duration-300" style="width: 33%;"></div>
         </div>
         <p id="wizard-step-label" class="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--nm-accent)]">שלב 1 מתוך 3</p>
-        </div>
+      </div>
 
       <section data-step="1" class="wizard-step space-y-4">
-        <h2 class="text-2xl font-semibold">Step 1: The Core</h2>
+        <h2 class="text-2xl font-semibold">שלב 1: הליבה</h2>
         <FloatingInput
           client:load
           id="wiz-topic"
-          label="Topic / Title - הנושא המרכזי"
+          label="נושא או כותרת"
           hideValidation={true}
           className="[&_.nm-floating-control]:bg-transparent"
         />
         <label class="block space-y-2">
-          <span class="text-sm font-semibold">Target Audience</span>
+          <span class="text-sm font-semibold">מי קורא אותנו?</span>
           <select id="wiz-audience" class="w-full rounded-[1rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-transparent px-4 py-3 outline-none focus:border-[color-mix(in_srgb,var(--nm-accent)_35%,transparent)]">
-            <option>Beginners</option>
-            <option>Advanced</option>
-            <option>Internal Community</option>
+            <option value="Beginners">מתחילים</option>
+            <option value="Advanced">קוראים מנוסים</option>
+            <option value="Internal Community">קהילה פנימית</option>
           </select>
-          </label>
+        </label>
         <FloatingInput
           client:load
           id="wiz-aha"
-          label="originalInsight (תובנת ליבה — משפט אחד עד שלושה)"
+          label="תובנת ליבה (משפט אחד עד שלושה)"
           multiline
           rows={3}
           hideValidation={true}
@@ -53,21 +53,21 @@ const pageDescription = "אשף 3 שלבים ליצירת Master Prompt מדוי
         <FloatingInput
           client:load
           id="wiz-question-schema"
-          label="questionForSchema — שאלה מזוקקת למנועי חיפוש (עברית)"
+          label="שאלה מזוקקת למנועי חיפוש (עברית)"
           hideValidation={true}
           className="[&_.nm-floating-control]:bg-transparent"
         />
         <FloatingInput
           client:load
           id="wiz-image-alt"
-          label="imageAlt — מה התמונה מייצגת (קונספט + נגישות), לא רק 'מה רואים'"
+          label="מה התמונה מייצגת (רעיון ונגישות, לא רק תיאור פיקסלים)"
           multiline
           rows={2}
           hideValidation={true}
           className="[&_.nm-floating-control]:bg-transparent"
         />
         <label class="block space-y-2">
-          <span class="text-sm font-semibold">mindShiftIntensity (1–5)</span>
+          <span class="text-sm font-semibold">עוצמת שינוי תפיסתי (1–5)</span>
           <select id="wiz-mind-shift" class="w-full rounded-[1rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-transparent px-4 py-3 outline-none focus:border-[color-mix(in_srgb,var(--nm-accent)_35%,transparent)]">
             <option value="1">1 — עדין</option>
             <option value="2">2</option>
@@ -79,7 +79,7 @@ const pageDescription = "אשף 3 שלבים ליצירת Master Prompt מדוי
         <FloatingInput
           client:load
           id="wiz-bottom-line"
-          label="Bottom line (frontmatter bottomLine)"
+          label="שורת תחתית לקורא (bottomLine)"
           multiline
           rows={2}
           hideValidation={true}
@@ -88,7 +88,7 @@ const pageDescription = "אשף 3 שלבים ליצירת Master Prompt מדוי
         <FloatingInput
           client:load
           id="wiz-inversion"
-          label="Inversion / עומק (אופציונלי, inversionNote)"
+          label="עומק / היפוך (אופציונלי)"
           multiline
           rows={2}
           hideValidation={true}
@@ -96,76 +96,76 @@ const pageDescription = "אשף 3 שלבים ליצירת Master Prompt מדוי
         />
         <label class="flex cursor-pointer items-center gap-3 rounded-[1rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-4 py-3">
           <input id="wiz-is-premium" type="checkbox" class="size-4 accent-[var(--nm-accent)]" />
-          <span class="text-sm font-semibold">תוכן פרימיום (isPremium)</span>
+          <span class="text-sm font-semibold">תוכן למנויים בלבד</span>
         </label>
         <label class="block space-y-2">
-          <span class="text-sm font-semibold">רמת עומק ב-MDX (difficultyLevel)</span>
+          <span class="text-sm font-semibold">רמת עומק במאמר</span>
           <select id="wiz-difficulty" class="w-full rounded-[1rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-transparent px-4 py-3 outline-none focus:border-[color-mix(in_srgb,var(--nm-accent)_35%,transparent)]">
-            <option value="beginner">מתחילים (beginner)</option>
-            <option value="advanced">מתקדמים (advanced)</option>
-            <option value="deep">עומק / קהילה (deep)</option>
+            <option value="beginner">מתחילים</option>
+            <option value="advanced">מתקדמים</option>
+            <option value="deep">עומק / מועדון</option>
           </select>
         </label>
         <div class="grid gap-4 md:grid-cols-2">
           <FloatingInput
             client:load
             id="wiz-slug"
-            label="Clean Link (Slug)"
+            label="כתובת נקייה באנגלית (slug)"
             dir="ltr"
             hideValidation={true}
             className="[&_.nm-floating-control]:bg-transparent [&_.nm-floating-control]:text-left"
           />
           <div class="space-y-1">
-            <p class="text-xs text-[color-mix(in_srgb,var(--nm-fg)_52%,var(--nm-bg))]">ממופה ל-description ב-frontmatter</p>
+            <p class="text-xs text-[color-mix(in_srgb,var(--nm-fg)_52%,var(--nm-bg))]">ממופה לתיאור בקובץ המאמר</p>
             <FloatingInput
               client:load
               id="wiz-summary"
-              label="Marketing Summary - תקציר קצר ומדויק"
+              label="תקציר קצר ומדויק (למנועי חיפוש)"
               hideValidation={true}
               className="[&_.nm-floating-control]:bg-transparent"
             />
           </div>
         </div>
-        </section>
+      </section>
 
       <section data-step="2" class="wizard-step hidden space-y-4">
-        <h2 class="text-2xl font-semibold">Step 2: Structure & Tone</h2>
+        <h2 class="text-2xl font-semibold">שלב 2: מבנה ותדר</h2>
         <label class="block space-y-2">
-          <span class="text-sm font-semibold">Tone</span>
+          <span class="text-sm font-semibold">תדר השיחה</span>
           <select id="wiz-tone" class="w-full rounded-[1rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-transparent px-4 py-3 outline-none focus:border-[color-mix(in_srgb,var(--nm-accent)_35%,transparent)]">
-            <option>Provocative</option>
-            <option>Analytical</option>
-            <option>Grounded</option>
+            <option value="Provocative">חד</option>
+            <option value="Analytical">אנליטי</option>
+            <option value="Grounded">מחובר לקרקע</option>
           </select>
-          </label>
+        </label>
         <FloatingInput
           client:load
           id="wiz-points"
-          label="Key Bullet Points - כל נקודה בשורה חדשה"
+          label="נקודות מפתח (כל שורה נקודה אחת)"
           multiline
           rows={5}
           hideValidation={true}
           className="[&_.nm-floating-control]:bg-transparent"
         />
         <label class="block space-y-2">
-          <span class="text-sm font-semibold">Length</span>
+          <span class="text-sm font-semibold">אורך משוער</span>
           <select id="wiz-length" class="w-full rounded-[1rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-transparent px-4 py-3 outline-none focus:border-[color-mix(in_srgb,var(--nm-accent)_35%,transparent)]">
-            <option>Short Post</option>
-            <option>Deep Dive</option>
-            <option>Full Research</option>
+            <option value="Short Post">פוסט קצר</option>
+            <option value="Deep Dive">צלילה עמוקה</option>
+            <option value="Full Research">מחקר מלא</option>
           </select>
         </label>
         <FloatingInput
           client:load
           id="wiz-tags"
-          label="Tags - בהירות, בחירה, פירוק"
+          label="תגיות (מהרשימה הקנונית, מופרדות בפסיק)"
           hideValidation={true}
           className="[&_.nm-floating-control]:bg-transparent"
         />
         <FloatingInput
           client:load
           id="wiz-youtube"
-          label="YouTube ID (אופציונלי, 11 תווים)"
+          label="מזהה YouTube (אופציונלי, 11 תווים)"
           dir="ltr"
           maxLength={11}
           hideValidation={true}
@@ -174,7 +174,7 @@ const pageDescription = "אשף 3 שלבים ליצירת Master Prompt מדוי
         <FloatingInput
           client:load
           id="wiz-body"
-          label="Draft Body (Markdown, אופציונלי)"
+          label="טיוטת גוף (Markdown, אופציונלי)"
           multiline
           rows={6}
           hideValidation={true}
@@ -192,18 +192,18 @@ const pageDescription = "אשף 3 שלבים ליצירת Master Prompt מדוי
           aria-live="polite"
         >
           בדיקות לפני שלב 3: חסימות באדום למעלה. כאן אזהרות בלבד.
-          </div>
+        </div>
       </section>
 
       <section data-step="3" class="wizard-step hidden space-y-4">
-        <h2 class="text-2xl font-semibold">Step 3: Final Review & Generator</h2>
+        <h2 class="text-2xl font-semibold">שלב 3: סיכום ולזיקה</h2>
         <button id="wiz-generate" type="button" class="inline-flex min-h-[44px] items-center justify-center rounded-full bg-[var(--nm-inverse)] px-6 py-3 text-sm font-semibold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-inverse-hover)]">
-          Generate Master Prompt
-          </button>
+          לזקק למאמר
+        </button>
         <FloatingInput
           client:load
           id="wiz-output"
-          label="Master Prompt"
+          label="פרומפט מלא"
           multiline
           rows={12}
           readOnly={true}
@@ -213,22 +213,22 @@ const pageDescription = "אשף 3 שלבים ליצירת Master Prompt מדוי
           className="[&_.nm-floating-control]:bg-[var(--nm-surface-muted)] [&_.nm-floating-control]:text-left [&_.nm-floating-control]:leading-7"
         />
         <button id="wiz-copy" type="button" class="inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-transparent px-6 py-3 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]">
-          Copy to Clipboard
-          </button>
+          העתק ללוח
+        </button>
         <button id="wiz-save" type="button" class="inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-transparent px-6 py-3 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]">
-          Save Draft Data
-          </button>
+          שמור טיוטה
+        </button>
         <p id="wiz-save-status" class="text-xs font-semibold text-[color-mix(in_srgb,var(--nm-fg)_62%,var(--nm-bg))]"></p>
       </section>
 
       <div class="flex items-center justify-between gap-3">
         <button id="wiz-back" type="button" class="inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-transparent px-5 py-2 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]">
           חזור
-            </button>
+        </button>
         <button id="wiz-next" type="button" class="inline-flex min-h-[44px] items-center justify-center rounded-full bg-[var(--nm-accent)] px-5 py-2 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]">
           המשך
-            </button>
-            </div>
+        </button>
+      </div>
     </article>
   </section>
 
@@ -240,6 +240,9 @@ const pageDescription = "אשף 3 שלבים ליצירת Master Prompt מדוי
     const YOUTUBE_ID_RE = /^[a-zA-Z0-9_-]{11}$/;
     const WORD_WARN = 900;
     const WORD_DEEP = 1400;
+
+    type WizardCleanup = () => void;
+    const g = globalThis as typeof globalThis & { __nmWizardCleanup?: WizardCleanup };
 
     function countWords(raw: string): number {
       return raw
@@ -261,25 +264,23 @@ const pageDescription = "אשף 3 שלבים ליצירת Master Prompt מדוי
     }): string[] {
       const errors: string[] = [];
       const slug = data.slug.trim();
-      if (!slug) errors.push("חסר slug באנגלית.");
-      else if (!SLUG_EN_RE.test(slug)) errors.push("slug חייב באנגלית קטנה, מקפים בלבד, בלי רווחים.");
+      if (!slug) errors.push("חסרה כתובת באנגלית קטנה (slug).");
+      else if (!SLUG_EN_RE.test(slug)) errors.push("הכתובת באנגלית קטנה, מקפים בלבד, בלי רווחים.");
 
       const tagParts = data.tags
         .split(/[,،]/)
         .map((t) => t.trim())
         .filter(Boolean);
-      if (tagParts.length === 0) errors.push("חסרות תגיות. רק מהרשימה הקנונית ב-src/data/article-tags.ts.");
+      if (tagParts.length === 0) errors.push("חסרות תגיות. רק מהרשימה בקובץ התגיות.");
       for (const t of tagParts) {
         if (!ARTICLE_TAG_WHITELIST_SET.has(t)) {
-          errors.push(`תגית לא ברשימה המאושרת: "${t}".`);
+          errors.push(`תגית לא ברשימה: "${t}".`);
         }
       }
 
-      /* לא סורקים כאן רובוטיקה/Content Score: בשדות האשף אפשר טיוטות גולמיות. המודל מקבל בפרומפט הסופי את רשימת האיסור. */
-
-      if (!data.questionForSchema.trim()) errors.push("חסר questionForSchema.");
-      if (!data.aha.trim()) errors.push("חסר originalInsight (שדה תובנת ליבה).");
-      if (!data.imageAlt.trim()) errors.push("חסר imageAlt.");
+      if (!data.questionForSchema.trim()) errors.push("חסרה שאלה למנועי חיפוש.");
+      if (!data.aha.trim()) errors.push("חסרה תובנת ליבה.");
+      if (!data.imageAlt.trim()) errors.push("חסר תיאור תמונה.");
 
       return errors;
     }
@@ -293,20 +294,20 @@ const pageDescription = "אשף 3 שלבים ליצירת Master Prompt מדוי
       const warnings: string[] = [];
       const yt = data.youtubeId.trim();
       if (yt && !YOUTUBE_ID_RE.test(yt)) {
-        warnings.push("מזהה YouTube לא תקין (צפוי בדיוק 11 תווים, אותיות מספרים מקף תחתון).");
+        warnings.push("מזהה YouTube לא תקין (צפוי בדיוק 11 תווים).");
       }
       const desc = data.summary.trim();
       if (desc.length > 0 && (desc.length < 150 || desc.length > 160)) {
-        warnings.push(`Meta description צריך להיות בין 150 ל-160 תווים. כעת: ${desc.length}.`);
+        warnings.push(`אורך התקציר לחיפוש: בין 150 ל־160 תווים. כעת: ${desc.length}.`);
       }
       const wc = countWords(data.body);
       if (wc > 0 && wc < 120) {
         warnings.push(`מעט מילים בטיוטה (${wc}). אם זה מכוון, בסדר.`);
       }
       if (wc >= WORD_DEEP) {
-        warnings.push(`הטיוטה ארוכה (${wc} מילים). זה מתאים בדרך כלל ל-deep / מחקר מלא.`);
+        warnings.push(`הטיוטה ארוכה (${wc} מילים). מתאים בדרך כלל לרמת עומק גבוהה.`);
       } else if (wc >= WORD_WARN) {
-        warnings.push(`הטיוטה מעל ${WORD_WARN} מילים. שקול difficultyLevel: advanced או deep.`);
+        warnings.push(`הטיוטה מעל ${WORD_WARN} מילים. שקול רמת עומק מתקדמים או עומק.`);
       }
       return warnings;
     }
@@ -321,61 +322,64 @@ const pageDescription = "אשף 3 שלבים ליצירת Master Prompt מדוי
       return fieldValue(id).trim();
     }
 
+    function isWizardFieldTarget(target: EventTarget | null): boolean {
+      if (!(target instanceof HTMLElement)) return false;
+      const el = target.closest("#wiz-topic, #wiz-aha, #wiz-question-schema, #wiz-image-alt, #wiz-bottom-line, #wiz-inversion, #wiz-slug, #wiz-summary, #wiz-points, #wiz-tags, #wiz-youtube, #wiz-body, #wiz-output");
+      return Boolean(el);
+    }
+
     document.addEventListener("astro:page-load", () => {
       const root = document.getElementById("nm-article-wizard");
       if (!(root instanceof HTMLElement)) return;
-      if (root.dataset.nmWizardInit === "1") return;
 
-      let mountAttempts = 0;
-      const mountWizard = () => {
-        mountAttempts += 1;
-        if (!document.getElementById("wiz-topic")) {
-          if (mountAttempts < 180) requestAnimationFrame(mountWizard);
-          return;
-        }
-        root.dataset.nmWizardInit = "1";
+      g.__nmWizardCleanup?.();
+      const ac = new AbortController();
+      const signal = ac.signal;
+      g.__nmWizardCleanup = () => {
+        ac.abort();
+        mo.disconnect();
+        if (restoreTimer) window.clearTimeout(restoreTimer);
+      };
 
       const steps = Array.from(root.querySelectorAll(".wizard-step"));
+      let current = 1;
+      let draftRestored = false;
+      let restoreTimer: number | undefined;
+
       const progress = document.getElementById("wizard-progress");
       const stepLabel = document.getElementById("wizard-step-label");
-      const backBtn = document.getElementById("wiz-back");
-      const nextBtn = document.getElementById("wiz-next");
-      const genBtn = document.getElementById("wiz-generate");
-      const copyBtn = document.getElementById("wiz-copy");
-      const saveBtn = document.getElementById("wiz-save");
-      const saveStatus = document.getElementById("wiz-save-status");
-      const audience = document.getElementById("wiz-audience");
-      const isPremium = document.getElementById("wiz-is-premium");
-      const difficulty = document.getElementById("wiz-difficulty");
-      const mindShift = document.getElementById("wiz-mind-shift");
-      const tone = document.getElementById("wiz-tone");
-      const length = document.getElementById("wiz-length");
       const wordCountEl = document.getElementById("wiz-word-count");
       const preflightEl = document.getElementById("wiz-preflight");
       const blockersEl = document.getElementById("wiz-blockers");
 
-      let current = 1;
-
-      const collectData = () => ({
-        topic: fieldTrim("wiz-topic"),
-        audience: audience instanceof HTMLSelectElement ? audience.value : "",
-        aha: fieldTrim("wiz-aha"),
-        bottomLine: fieldTrim("wiz-bottom-line"),
-        inversionNote: fieldTrim("wiz-inversion"),
-        isPremium: isPremium instanceof HTMLInputElement ? isPremium.checked : false,
-        difficultyLevel: difficulty instanceof HTMLSelectElement ? difficulty.value : "beginner",
-        slug: fieldTrim("wiz-slug"),
-        questionForSchema: fieldTrim("wiz-question-schema"),
-        imageAlt: fieldTrim("wiz-image-alt"),
-        mindShiftIntensity: mindShift instanceof HTMLSelectElement ? mindShift.value : "3",
-        summary: fieldTrim("wiz-summary"),
-        tone: tone instanceof HTMLSelectElement ? tone.value : "",
-        points: fieldValue("wiz-points"),
-        length: length instanceof HTMLSelectElement ? length.value : "",
-        tags: fieldTrim("wiz-tags"),
-        youtubeId: fieldTrim("wiz-youtube"),
-        body: fieldValue("wiz-body"),
-      });
+      const collectData = () => {
+        const audience = document.getElementById("wiz-audience");
+        const isPremium = document.getElementById("wiz-is-premium");
+        const difficulty = document.getElementById("wiz-difficulty");
+        const mindShift = document.getElementById("wiz-mind-shift");
+        const tone = document.getElementById("wiz-tone");
+        const length = document.getElementById("wiz-length");
+        return {
+          topic: fieldTrim("wiz-topic"),
+          audience: audience instanceof HTMLSelectElement ? audience.value : "",
+          aha: fieldTrim("wiz-aha"),
+          bottomLine: fieldTrim("wiz-bottom-line"),
+          inversionNote: fieldTrim("wiz-inversion"),
+          isPremium: isPremium instanceof HTMLInputElement ? isPremium.checked : false,
+          difficultyLevel: difficulty instanceof HTMLSelectElement ? difficulty.value : "beginner",
+          slug: fieldTrim("wiz-slug"),
+          questionForSchema: fieldTrim("wiz-question-schema"),
+          imageAlt: fieldTrim("wiz-image-alt"),
+          mindShiftIntensity: mindShift instanceof HTMLSelectElement ? mindShift.value : "3",
+          summary: fieldTrim("wiz-summary"),
+          tone: tone instanceof HTMLSelectElement ? tone.value : "",
+          points: fieldValue("wiz-points"),
+          length: length instanceof HTMLSelectElement ? length.value : "",
+          tags: fieldTrim("wiz-tags"),
+          youtubeId: fieldTrim("wiz-youtube"),
+          body: fieldValue("wiz-body"),
+        };
+      };
 
       function updateWordCountAndPreflight() {
         const data = collectData();
@@ -386,7 +390,7 @@ const pageDescription = "אשף 3 שלבים ליצירת Master Prompt מדוי
           if (blockersEl) {
             if (blockers.length > 0) {
               blockersEl.classList.remove("hidden");
-              blockersEl.textContent = ["חסימות (לא עוברים לשלב 3):", ...blockers.map((x) => `• ${x}`)].join("\n");
+              blockersEl.textContent = ["לא עוברים לשלב 3 עד שמתקנים:", ...blockers.map((x) => `• ${x}`)].join("\n");
             } else {
               blockersEl.classList.add("hidden");
               blockersEl.textContent = "";
@@ -419,6 +423,8 @@ const pageDescription = "אשף 3 שלבים ליצירת Master Prompt מדוי
         steps.forEach((step, idx) => step.classList.toggle("hidden", idx + 1 !== current));
         if (progress instanceof HTMLElement) progress.style.width = `${(current / 3) * 100}%`;
         if (stepLabel instanceof HTMLElement) stepLabel.textContent = `שלב ${current} מתוך 3`;
+        const backBtn = document.getElementById("wiz-back");
+        const nextBtn = document.getElementById("wiz-next");
         if (backBtn instanceof HTMLButtonElement) backBtn.disabled = current === 1;
         if (nextBtn instanceof HTMLButtonElement) nextBtn.classList.toggle("hidden", current === 3);
         if (current === 2) updateWordCountAndPreflight();
@@ -501,12 +507,12 @@ Follow the brand identity: zero fluff, focus on thought-shifts, NeverMind voice 
 ]`;
       };
 
-      backBtn?.addEventListener("click", () => {
+      function goBack() {
         current = Math.max(1, current - 1);
         render();
-      });
+      }
 
-      nextBtn?.addEventListener("click", () => {
+      function goNext() {
         if (current === 2) {
           updateWordCountAndPreflight();
           const blockers = runBlockingChecks(collectData());
@@ -514,28 +520,30 @@ Follow the brand identity: zero fluff, focus on thought-shifts, NeverMind voice 
         }
         current = Math.min(3, current + 1);
         render();
-      });
+      }
 
-      genBtn?.addEventListener("click", () => {
+      function onGenerate() {
         const out = document.getElementById("wiz-output");
         if (!(out instanceof HTMLTextAreaElement)) return;
         out.value = buildPrompt();
-      });
+      }
 
-      copyBtn?.addEventListener("click", async () => {
+      async function onCopy() {
         const out = document.getElementById("wiz-output");
+        const copyBtn = document.getElementById("wiz-copy");
         if (!(out instanceof HTMLTextAreaElement) || !out.value.trim()) return;
+        if (!(copyBtn instanceof HTMLButtonElement)) return;
         try {
           await navigator.clipboard.writeText(out.value);
-          const original = copyBtn.textContent || "Copy to Clipboard";
+          const original = copyBtn.textContent || "העתק ללוח";
           copyBtn.textContent = "הועתק";
           window.setTimeout(() => {
             copyBtn.textContent = original;
           }, 2000);
         } catch {
-          // no-op
+          /* ignore */
         }
-      });
+      }
 
       const storageKey = "nm-article-wizard-draft";
       const setFieldValue = (id: string, value: string) => {
@@ -544,6 +552,12 @@ Follow the brand identity: zero fluff, focus on thought-shifts, NeverMind voice 
       };
 
       const restoreDraft = () => {
+        const audience = document.getElementById("wiz-audience");
+        const isPremium = document.getElementById("wiz-is-premium");
+        const difficulty = document.getElementById("wiz-difficulty");
+        const mindShift = document.getElementById("wiz-mind-shift");
+        const tone = document.getElementById("wiz-tone");
+        const length = document.getElementById("wiz-length");
         try {
           const raw = localStorage.getItem(storageKey);
           if (!raw) return;
@@ -573,7 +587,7 @@ Follow the brand identity: zero fluff, focus on thought-shifts, NeverMind voice 
           setFieldValue("wiz-youtube", String(data.youtubeId ?? ""));
           setFieldValue("wiz-body", String(data.body ?? ""));
         } catch {
-          // no-op
+          /* ignore */
         }
       };
 
@@ -585,39 +599,84 @@ Follow the brand identity: zero fluff, focus on thought-shifts, NeverMind voice 
         persistDraft();
         updateWordCountAndPreflight();
       };
-      root.addEventListener("input", (e) => {
-        const t = e.target;
-        if (!(t instanceof HTMLElement) || typeof t.id !== "string" || !t.id.startsWith("wiz-")) return;
-        onWizardFieldActivity();
-      });
-      root.addEventListener("change", (e) => {
-        const t = e.target;
-        if (!(t instanceof HTMLElement)) return;
-        if (typeof t.id === "string" && t.id.startsWith("wiz-")) onWizardFieldActivity();
-      });
 
-      saveBtn?.addEventListener("click", async () => {
+      const tryRestoreOnce = () => {
+        if (draftRestored) return;
+        if (!document.getElementById("wiz-topic")) return;
+        draftRestored = true;
+        restoreDraft();
+        render();
+        updateWordCountAndPreflight();
+      };
+
+      const mo = new MutationObserver(() => tryRestoreOnce());
+      mo.observe(root, { childList: true, subtree: true });
+      tryRestoreOnce();
+      restoreTimer = window.setTimeout(() => {
+        tryRestoreOnce();
+        mo.disconnect();
+      }, 10000) as unknown as number;
+
+      document.addEventListener(
+        "click",
+        (e) => {
+          const t = e.target;
+          if (!(t instanceof Element)) return;
+          const btn = t.closest("#wiz-next, #wiz-back, #wiz-generate, #wiz-copy, #wiz-save");
+          if (!btn || !root.contains(btn)) return;
+          e.preventDefault();
+          const id = btn.id;
+          if (id === "wiz-back") goBack();
+          else if (id === "wiz-next") goNext();
+          else if (id === "wiz-generate") onGenerate();
+          else if (id === "wiz-copy") void onCopy();
+          else if (id === "wiz-save") void onSave();
+        },
+        { signal }
+      );
+
+      async function onSave() {
+        const saveStatus = document.getElementById("wiz-save-status");
         const payload = collectData();
         persistDraft();
         let savedViaHook = false;
-        if (typeof (window as unknown as { __nmGeneratorSave?: (p: unknown) => Promise<void> }).__nmGeneratorSave === "function") {
+        const hook = (window as unknown as { __nmGeneratorSave?: (p: unknown) => Promise<void> }).__nmGeneratorSave;
+        if (typeof hook === "function") {
           try {
-            await (window as unknown as { __nmGeneratorSave: (p: unknown) => Promise<void> }).__nmGeneratorSave(payload);
+            await hook(payload);
             savedViaHook = true;
-        } catch {
+          } catch {
             savedViaHook = false;
           }
         }
         if (saveStatus instanceof HTMLElement) {
-          saveStatus.textContent = savedViaHook ? "נשמר דרך save hook פעיל." : "נשמר מקומית בדפדפן (localStorage).";
+          saveStatus.textContent = savedViaHook ? "נשמר דרך חיבור חיצוני." : "נשמר בדפדפן בלבד.";
         }
-      });
+      }
 
-      restoreDraft();
+      document.addEventListener(
+        "input",
+        (e) => {
+          if (!root.contains(e.target as Node)) return;
+          if (!isWizardFieldTarget(e.target)) return;
+          onWizardFieldActivity();
+        },
+        { signal }
+      );
+
+      document.addEventListener(
+        "change",
+        (e) => {
+          if (!root.contains(e.target as Node)) return;
+          const t = e.target;
+          if (t instanceof HTMLElement && typeof t.id === "string" && t.id.startsWith("wiz-")) {
+            onWizardFieldActivity();
+          }
+        },
+        { signal }
+      );
+
       render();
-      };
-
-      mountWizard();
     });
   </script>
 </Layout>

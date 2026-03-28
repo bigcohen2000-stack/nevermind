@@ -15,6 +15,7 @@ import {
 import { ArchiveSearchFloatingInput } from "../components/ArchiveSearchFloatingInput";
 import { DirectLink } from "../components/ui/DirectLink";
 import ServicePricingBlock from "../components/ServicePricingBlock";
+import ServicesPricingStickyBar from "../components/ServicesPricingStickyBar";
 import TopicQueryLandingBanner from "../components/TopicQueryLandingBanner";
 
 const services = flattenVisibleServices();
@@ -30,7 +31,20 @@ const waNumber = String(appConfig.contact.whatsAppNumber ?? "").replace(/\D/g, "
   description="חיפוש בארכיון התכנים ודרכים להעמיק בשיחה, בלי אשף שלבים."
 >
   <TopicQueryLandingBanner client:load />
-  <section class="mx-auto max-w-6xl space-y-12 px-4 py-16 text-[var(--nm-fg)] md:py-20">
+  <section class="mx-auto max-w-6xl space-y-12 px-4 pb-28 pt-16 text-[var(--nm-fg)] md:pb-20 md:py-20">
+    <nav
+      aria-label="קפיצה לחלקי העמוד"
+      class="flex flex-wrap items-center justify-center gap-2 border-b border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] pb-6 text-sm font-semibold text-[var(--nm-accent)]"
+    >
+      <a href="#discovery-results" class="rounded-full px-3 py-1.5 hover:bg-[var(--nm-tint)]">גילוי</a>
+      <span class="text-[color-mix(in_srgb,var(--nm-fg)_30%,var(--nm-bg))]" aria-hidden="true">·</span>
+      <a href="#pricing" class="rounded-full px-3 py-1.5 hover:bg-[var(--nm-tint)]">מחירון</a>
+      <span class="text-[color-mix(in_srgb,var(--nm-fg)_30%,var(--nm-bg))]" aria-hidden="true">·</span>
+      <a href="/intake/" class="rounded-full px-3 py-1.5 hover:bg-[var(--nm-tint)]">לפני שיחה</a>
+    </nav>
+
+    <ServicesPricingStickyBar client:load />
+
     <header class="space-y-8 text-center">
       <h1 class="text-[clamp(2rem,1.5rem+2.2vw,3.5rem)] font-semibold leading-[1.08] tracking-tight">
         {servicesHero.title}
@@ -101,7 +115,7 @@ const waNumber = String(appConfig.contact.whatsAppNumber ?? "").replace(/\D/g, "
       </div>
     </div>
 
-    <div id="pricing" class="space-y-6">
+    <div id="pricing" class="scroll-mt-28 space-y-6" tabindex="-1">
       <div class="border-b border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] pb-3">
         <h2 class="text-xs font-bold uppercase tracking-[0.2em] text-[var(--nm-accent)]">
           רוצה לפרק את זה יחד?
@@ -255,7 +269,8 @@ const waNumber = String(appConfig.contact.whatsAppNumber ?? "").replace(/\D/g, "
         gapEl.classList.add("hidden");
         listEl.innerHTML = "";
         statusEl.classList.add("hidden");
-        statusEl.textContent = "";
+        statusEl.removeAttribute("aria-busy");
+        statusEl.innerHTML = "";
       }
 
       async function runQuery(raw) {
@@ -269,7 +284,9 @@ const waNumber = String(appConfig.contact.whatsAppNumber ?? "").replace(/\D/g, "
         idleEl.classList.add("hidden");
         gapEl.classList.add("hidden");
         statusEl.classList.remove("hidden");
-        statusEl.textContent = "מחפשים בארכיון...";
+        statusEl.setAttribute("aria-busy", "true");
+        statusEl.innerHTML =
+          '<span class="nm-skeleton-line nm-skeleton-line--88 mb-2 block max-w-md rounded-lg" aria-hidden="true"></span><span class="nm-skeleton-line nm-skeleton-line--60 block max-w-sm rounded-lg" aria-hidden="true"></span>';
         listEl.innerHTML = "";
 
         let rows = [];
@@ -282,7 +299,8 @@ const waNumber = String(appConfig.contact.whatsAppNumber ?? "").replace(/\D/g, "
         if (myId !== requestId) return;
 
         statusEl.classList.add("hidden");
-        statusEl.textContent = "";
+        statusEl.removeAttribute("aria-busy");
+        statusEl.innerHTML = "";
 
         if (rows.length === 0) {
           gapEl.classList.remove("hidden");

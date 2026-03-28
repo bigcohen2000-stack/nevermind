@@ -1,15 +1,41 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { FlatService, ServiceExtension } from "../lib/services";
 import {
   buildServicePreStartWhatsAppHref,
   buildServiceReservationWhatsAppHref,
   formatMoney,
+  getBoutiqueReferenceListPrice,
   getNetPrice,
   getVatAmount,
   mergeServiceWithExtension,
   resolveServiceAction,
 } from "../lib/services";
 import ServiceProposalWhatsAppCta from "./ServiceProposalWhatsAppCta";
+
+function usePriceTicker(target: number, durationMs = 380) {
+  const [display, setDisplay] = useState(target);
+  const displayRef = useRef(target);
+
+  useEffect(() => {
+    const start = displayRef.current;
+    if (start === target) return;
+    let frame = 0;
+    const t0 = performance.now();
+    const tick = (now: number) => {
+      const p = Math.min(1, (now - t0) / durationMs);
+      const eased = 1 - (1 - p) ** 2;
+      const next = Math.round(start + (target - start) * eased);
+      displayRef.current = next;
+      setDisplay(next);
+      if (p < 1) frame = requestAnimationFrame(tick);
+      else displayRef.current = target;
+    };
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [target, durationMs]);
+
+  return display;
+}
 
 type Props = {
   serviceJson: string;
@@ -36,10 +62,26 @@ export default function ServicePricingBlock({ serviceJson, layout = "full" }: Pr
   }, [extensions, extensionsGated, selectedId]);
 
   const merged = useMemo(() => mergeServiceWithExtension(service, selectedExt), [service, selectedExt]);
+  const tickered = usePriceTicker(merged.price_full);
+  const boutiqueRef = getBoutiqueReferenceListPrice(merged.price_full);
 
   const baseAction = useMemo(() => resolveServiceAction(service), [service]);
 
   const showPricingAndActions = !extensionsGated || typeof selectedId === "string";
+
+  useEffect(() => {
+    if (!showPricingAndActions) return;
+    window.dispatchEvent(
+      new CustomEvent("nm-service-price", {
+        detail: {
+          serviceId: service.id,
+          price: merged.price_full,
+          formatted: formatMoney(merged.price_full),
+          title: service.title,
+        },
+      }),
+    );
+  }, [merged.price_full, service.id, service.title, showPricingAndActions]);
 
   const primaryHref = showPricingAndActions
     ? selectedExt
@@ -114,6 +156,7 @@ export default function ServicePricingBlock({ serviceJson, layout = "full" }: Pr
                 name={`nm-ext-${service.id}`}
                 checked={selectedId === null}
                 onChange={() => setSelectedId(null)}
+                aria-label={`בסיס, מחיר ${formatMoney(service.price_full)}`}
               />
               <span className="text-sm text-[var(--nm-fg)]">
                 <span className="font-semibold">בסיס</span>
@@ -124,7 +167,15 @@ export default function ServicePricingBlock({ serviceJson, layout = "full" }: Pr
               </span>
             </label>
           ) : null}
-          {extensions.map((ext) => (
+          {extensions.map((ext) => {
+            const extGross =
+              ext.price_additive === true
+                ? ext.price === 0
+                  ? service.price_full
+                  : service.price_full + ext.price
+                : ext.price;
+            const extAria = `${ext.label}, מחיר ${formatMoney(extGross)}`;
+            return (
             <label
               key={ext.id}
               className="flex cursor-pointer items-start gap-3 rounded-xl border border-transparent bg-white/70 px-3 py-2 transition hover:border-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)] has-[:checked]:border-[color-mix(in_srgb,var(--nm-accent)_35%,transparent)]"
@@ -135,6 +186,8 @@ export default function ServicePricingBlock({ serviceJson, layout = "full" }: Pr
                 name={`nm-ext-${service.id}`}
                 checked={selectedId === ext.id}
                 onChange={() => setSelectedId(ext.id)}
+                aria-label={extAria}
+                aria-describedby={ext.description ? `nm-ext-desc-${service.id}-${ext.id}` : undefined}
               />
               <span className="min-w-0 flex-1 text-sm text-[var(--nm-fg)]">
                 <span className="font-semibold">{ext.label}</span>
@@ -149,13 +202,14 @@ export default function ServicePricingBlock({ serviceJson, layout = "full" }: Pr
                   )
                 </span>
                 {ext.description ? (
-                  <span className="mt-1 block text-xs leading-relaxed text-[color-mix(in_srgb,var(--nm-fg)_55%,var(--nm-bg))]">
+                  <span id={`nm-ext-desc-${service.id}-${ext.id}`} className="mt-1 block text-xs leading-relaxed text-[color-mix(in_srgb,var(--nm-fg)_55%,var(--nm-bg))]">
                     {ext.description}
                   </span>
                 ) : null}
               </span>
             </label>
-          ))}
+            );
+          })}
         </div>
       </fieldset>
 
@@ -163,14 +217,25 @@ export default function ServicePricingBlock({ serviceJson, layout = "full" }: Pr
         <>
           {isCompact ? (
             <p className="text-sm font-semibold text-[var(--nm-fg)]">
-              מחיר נבחר: <span data-nm-live-price="">{formatMoney(merged.price_full)}</span>
+              מחיר נבחר:{" "}
+              <span data-nm-live-price="" className="tabular-nums">
+                {formatMoney(tickered)}
+              </span>
             </p>
           ) : (
             <div className="text-right">
               <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">כולל מע״מ</p>
-              <p className="mt-2 text-4xl font-semibold text-[var(--nm-fg)]" data-nm-live-price="">
-                {formatMoney(merged.price_full)}
+              <p className="mt-2 text-4xl font-semibold tabular-nums text-[var(--nm-fg)]" data-nm-live-price="">
+                {formatMoney(tickered)}
               </p>
+              {boutiqueRef != null && boutiqueRef > merged.price_full ? (
+                <p className="mt-1 text-xs text-[color-mix(in_srgb,var(--nm-fg)_52%,var(--nm-bg))]">
+                  <span className="line-through decoration-[color-mix(in_srgb,var(--nm-fg)_35%,transparent)]">
+                    {formatMoney(boutiqueRef)}
+                  </span>
+                  <span className="ms-2">ייחוס לפני ערך בוטיק</span>
+                </p>
+              ) : null}
               <p className="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_64%,var(--nm-bg))]">
                 {formatMoney(netPrice)} לפני מע״מ + {formatMoney(vatAmount)} מע״מ
               </p>
