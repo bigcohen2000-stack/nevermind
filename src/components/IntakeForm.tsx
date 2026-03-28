@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
+import { validateAntispamFields } from "../lib/form-antispam";
 import { FloatingInput } from "./ui/FloatingInput";
 
 const WEB3_KEY = "94b32b6c-7590-4ac6-b8b4-1bc73dd2e5c8";
@@ -130,6 +131,9 @@ export default function IntakeForm() {
   const [status, setStatus] = useState<"idle" | "sending" | "ok" | "err">("idle");
   const [clientError, setClientError] = useState("");
   const successRef = useRef<HTMLParagraphElement | null>(null);
+  const openedAtRef = useRef(Date.now());
+  const botcheckRef = useRef<HTMLInputElement | null>(null);
+  const hpRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     const d = loadDraft();
@@ -297,14 +301,30 @@ export default function IntakeForm() {
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
+
+    const bodyText = buildBody();
+    const tagLabels = tags.map((k) => TAG_DEFS.find((d) => d.key === k)?.label ?? k).join(" ");
+    const spam = validateAntispamFields({
+      botcheckValue: botcheckRef.current?.value ?? "",
+      honeypotWebsiteValue: hpRef.current?.value ?? "",
+      startedAtMs: openedAtRef.current,
+      messageTexts: [bodyText, name, email, phone, tagLabels],
+    });
+    if (!spam.ok) {
+      setClientError(spam.userMessage);
+      return;
+    }
+
     setStatus("sending");
     const fd = new FormData();
     fd.append("access_key", WEB3_KEY);
     fd.append("subject", "הכרות לפני שיחה | NeverMind");
     fd.append("name", name.trim());
     fd.append("email", email.trim());
-    fd.append("message", buildBody());
-    fd.append("botcheck", "");
+    fd.append("message", bodyText);
+    fd.append("botcheck", botcheckRef.current?.value ?? "");
+    fd.append("nm_hp_website", hpRef.current?.value ?? "");
+    fd.append("nm_form_started_ms", String(openedAtRef.current));
     try {
       const res = await fetch("https://api.web3forms.com/submit", { method: "POST", body: fd });
       if (res.ok) {
@@ -338,6 +358,28 @@ export default function IntakeForm() {
       dir="rtl"
       noValidate
     >
+      <input
+        ref={botcheckRef}
+        type="text"
+        name="botcheck"
+        tabIndex={-1}
+        autoComplete="off"
+        aria-hidden
+        defaultValue=""
+        className="pointer-events-none absolute left-[9999px] h-px w-px overflow-hidden border-0 p-0 opacity-0"
+      />
+      <input
+        ref={hpRef}
+        type="text"
+        name="nm_hp_website"
+        tabIndex={-1}
+        autoComplete="off"
+        aria-hidden
+        title=""
+        defaultValue=""
+        className="pointer-events-none absolute left-[9999px] h-px w-px overflow-hidden border-0 p-0 opacity-0"
+      />
+
       <section className="space-y-4 rounded-[1.5rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)]/95 p-6">
         <h2 className="text-lg font-semibold text-[var(--nm-fg)]">איך נוח לך להביע את עצמך</h2>
         <p className="text-sm leading-relaxed text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">

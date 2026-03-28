@@ -1,5 +1,6 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import FormAntispamFields from "../components/FormAntispamFields.astro";
 import ReturnToContextCta from "../components/ReturnToContextCta.astro";
 import { FloatingInput } from "../components/ui/FloatingInput";
 import { buildWhatsAppHref } from "../lib/services";
@@ -147,11 +148,18 @@ const nextMoves = [
 
     <section class="space-y-5 rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-transparent p-10 shadow-[0_18px_42px_color-mix(in_srgb,var(--nm-fg)_5%,transparent)]">
       <h3 class="text-[clamp(1.2rem,1.05rem+0.7vw,1.6rem)] font-semibold text-[var(--nm-fg)]">רוצה לקבל את התובנות למייל או לשאול משהו אחר?</h3>
-      <form id="thank-you-form" action="https://api.web3forms.com/submit" method="POST" class="mx-auto max-w-2xl space-y-6">
+      <form
+        id="thank-you-form"
+        data-nm-antispam
+        class="mx-auto max-w-2xl space-y-6"
+        action="https://api.web3forms.com/submit"
+        method="POST"
+      >
         <input type="hidden" name="access_key" value="94b32b6c-7590-4ac6-b8b4-1bc73dd2e5c8" />
         <input type="hidden" name="subject" value="פנייה מעמוד תודה | השם לא משנה" />
         <input type="hidden" name="page" value="thank-you" />
         <input type="text" name="botcheck" style="display:none" tabindex="-1" autocomplete="off" aria-hidden="true" />
+        <FormAntispamFields />
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
           <FloatingInput
             client:load
@@ -191,14 +199,28 @@ const nextMoves = [
         >
           שליחה למערכת
         </button>
+        <p
+          data-thank-you-form-status
+          aria-live="polite"
+          class="text-center text-sm text-[color-mix(in_srgb,var(--nm-fg)_58%,var(--nm-bg))] opacity-0 transition-opacity"
+        >
+          נשלח.
+        </p>
       </form>
     </section>
   </section>
 
   <script is:inline>
     document.addEventListener("astro:page-load", () => {
+      if (window.__nmThankYouFormCleanup) window.__nmThankYouFormCleanup();
+
       const form = document.getElementById("thank-you-form");
+      const status = document.querySelector("[data-thank-you-form-status]");
       if (!(form instanceof HTMLFormElement)) return;
+      if (typeof window.__nmStampFormAntispam === "function") {
+        window.__nmStampFormAntispam(form);
+      }
+
       const nameInput = document.getElementById("thank-you-name");
       const emailInput = document.getElementById("thank-you-email");
       const messageInput = document.getElementById("thank-you-message");
@@ -226,15 +248,57 @@ const nextMoves = [
         } catch {}
       };
       restoreDraft();
+
+      const onInput = () => saveDraft();
       [nameInput, emailInput, messageInput].forEach((field) => {
-        field.addEventListener("input", () => {
-          saveDraft();
-        });
+        field.addEventListener("input", onInput);
       });
 
-      form.addEventListener("submit", () => {
-        localStorage.removeItem(storageKey);
-      });
+      const onSubmit = async (event) => {
+        event.preventDefault();
+        const fd = new FormData(form);
+        const msg = String(fd.get("message") || "").trim();
+        const read = window.__nmReadAntispamFromForm;
+        const validate = window.__nmValidateAntispamFields;
+        if (typeof read === "function" && typeof validate === "function") {
+          const as = read(form);
+          const check = validate({ ...as, messageTexts: [msg] });
+          if (!check.ok && status instanceof HTMLElement) {
+            status.textContent = check.userMessage;
+            status.classList.add("opacity-100");
+            return;
+          }
+        }
+        try {
+          const res = await fetch("https://api.web3forms.com/submit", { method: "POST", body: fd });
+          if (res.ok) {
+            localStorage.removeItem(storageKey);
+            form.reset();
+            if (status instanceof HTMLElement) {
+              status.textContent = "נשלח.";
+              status.classList.add("opacity-100");
+            }
+            window.__nmAnnounce?.("הטופס נשלח");
+          } else if (status instanceof HTMLElement) {
+            status.textContent = "לא נשלח הפעם. נסה שוב.";
+            status.classList.add("opacity-100");
+          }
+        } catch {
+          if (status instanceof HTMLElement) {
+            status.textContent = "לא נשלח הפעם. נסה שוב.";
+            status.classList.add("opacity-100");
+          }
+        }
+      };
+
+      form.addEventListener("submit", onSubmit);
+
+      window.__nmThankYouFormCleanup = () => {
+        [nameInput, emailInput, messageInput].forEach((field) => {
+          field.removeEventListener("input", onInput);
+        });
+        form.removeEventListener("submit", onSubmit);
+      };
     });
   </script>
 </Layout>

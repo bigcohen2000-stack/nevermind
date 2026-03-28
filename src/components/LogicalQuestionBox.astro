@@ -2,6 +2,7 @@
 import { buildArticleContextWhatsAppHref } from "../lib/services";
 import { microPosts } from "../data/microPosts";
 import BigQuestionLayout from "./BigQuestionLayout.astro";
+import FormAntispamFields from "./FormAntispamFields.astro";
 import { FloatingInput } from "./ui/FloatingInput";
 
 interface GlossaryTerm {
@@ -37,12 +38,19 @@ const contextWaHref = buildArticleContextWhatsAppHref({ tags, articleTitle: arti
       <BigQuestionLayout tags={tags} articleTitle={articleTitle || pageTitle} glossaryTerms={glossaryTerms} />
     </div>
 
-    <form data-logical-question-form class="mt-5 space-y-4 text-right" action="https://api.web3forms.com/submit" method="POST">
+    <form
+      data-logical-question-form
+      data-nm-antispam
+      class="mt-5 space-y-4 text-right"
+      action="https://api.web3forms.com/submit"
+      method="POST"
+    >
       <input type="hidden" name="access_key" value={web3formsKey} />
       <input type="hidden" name="subject" value="שאלה לוגית חדשה מ-NeverMind" />
       <input type="hidden" name="source_page" value={pageTitle} />
       <input type="hidden" name="source_url" value={pageUrl} />
       <input type="text" name="botcheck" style="display:none" tabindex="-1" autocomplete="off" aria-hidden="true" />
+      <FormAntispamFields />
 
       <FloatingInput
         client:load
@@ -142,9 +150,15 @@ const contextWaHref = buildArticleContextWhatsAppHref({ tags, articleTitle: arti
 
   <script is:inline>
     document.addEventListener("astro:page-load", () => {
+      if (window.__nmLogicalQuestionCleanup) window.__nmLogicalQuestionCleanup();
+
       const form = document.querySelector("[data-logical-question-form]");
       const status = document.querySelector("[data-logical-question-status]");
       if (!(form instanceof HTMLFormElement) || !(status instanceof HTMLElement)) return;
+
+      if (typeof window.__nmStampFormAntispam === "function") {
+        window.__nmStampFormAntispam(form);
+      }
 
       const logicalReturn = document.querySelector("[data-nm-logical-form-return]");
       const logicalReturnLink = document.querySelector("[data-nm-return-cta-link]");
@@ -157,6 +171,19 @@ const contextWaHref = buildArticleContextWhatsAppHref({ tags, articleTitle: arti
           status.textContent = "מספר הטלפון לא תקין. כתוב מספר ישראלי שמתחיל ב-0.";
           status.classList.add("opacity-100");
           return;
+        }
+
+        const msg = String(formData.get("message") || "").trim();
+        const read = window.__nmReadAntispamFromForm;
+        const validate = window.__nmValidateAntispamFields;
+        if (typeof read === "function" && typeof validate === "function") {
+          const as = read(form);
+          const check = validate({ ...as, messageTexts: [msg, phoneValue] });
+          if (!check.ok) {
+            status.textContent = check.userMessage;
+            status.classList.add("opacity-100");
+            return;
+          }
         }
 
         try {
@@ -186,6 +213,10 @@ const contextWaHref = buildArticleContextWhatsAppHref({ tags, articleTitle: arti
       };
 
       form.addEventListener("submit", handleSubmit);
+
+      window.__nmLogicalQuestionCleanup = () => {
+        form.removeEventListener("submit", handleSubmit);
+      };
     });
   </script>
 </aside>

@@ -160,13 +160,48 @@ const inquiries = [
         errorState.classList.add("hidden");
 
         try {
-          await loadPagefind();
-          const search = await window.pagefind?.search(trimmed);
-          const data = await Promise.all((search?.results || []).slice(0, 8).map((r) => r.data()));
+          const localFn = window.__nmLocalSiteSearch;
+          const mergeFn = window.__nmMergeSearchResults;
+          const localHits = typeof localFn === "function" ? localFn(trimmed, 10) : [];
+
+          let remoteItems = [];
+          try {
+            await loadPagefind();
+            if (window.pagefind && typeof window.pagefind.options === "function") {
+              try {
+                await window.pagefind.options({ baseUrl: "/" });
+              } catch (e) {
+                /* ignore */
+              }
+            }
+            const search = await window.pagefind?.search(trimmed);
+            const data = await Promise.all((search?.results || []).slice(0, 8).map((r) => r.data()));
+            remoteItems = data.map((item) => {
+              let u = item.url || "#";
+              try {
+                if (/^https?:\/\//i.test(u)) u = new URL(u).pathname;
+              } catch (e) {
+                /* ignore */
+              }
+              if (u.startsWith("/") && !u.endsWith("/") && !u.split("/").pop().includes(".")) u = `${u}/`;
+              return {
+                url: u,
+                title: item.meta?.title || "",
+                excerpt: item.excerpt || "",
+              };
+            });
+          } catch (e) {
+            remoteItems = [];
+          }
+
           if (runId !== activeRun) return;
 
-          if (!data.length) {
-            status.textContent = "עדיין לא נחשף התאמה חדה. אפשר לנסח אחרת או לבחור שאלה מהרשימה - לפעמים הגילוי מגיע מהזזה קטנה בשאלה.";
+          const merged =
+            typeof mergeFn === "function" ? mergeFn(localHits, remoteItems, 8) : [...localHits, ...remoteItems].slice(0, 8);
+
+          if (!merged.length) {
+            status.textContent =
+              "עדיין לא נחשף התאמה חדה. אפשר לנסח אחרת או לבחור שאלה מהרשימה - לפעמים הגילוי מגיע מהזזה קטנה בשאלה.";
             resultsList.innerHTML = "";
             const gapKey = trimmed.toLowerCase();
             if (!loggedGapQueries.has(gapKey)) {
@@ -180,14 +215,8 @@ const inquiries = [
             return;
           }
 
-          status.textContent = `נחשפו ${data.length} כיוונים רלוונטיים.`;
-          renderResults(
-            data.map((item) => ({
-              url: item.url || "#",
-              title: item.meta?.title || "",
-              excerpt: item.excerpt || "",
-            }))
-          );
+          status.textContent = `נחשפו ${merged.length} כיוונים רלוונטיים.`;
+          renderResults(merged);
         } catch {
           if (runId !== activeRun) return;
           status.textContent = "";

@@ -1,3 +1,5 @@
+import { localSiteSearch, mergeSearchResults } from "./local-site-search";
+
 export type PagefindSearchResult = {
   url: string;
   title: string;
@@ -7,11 +9,27 @@ export type PagefindSearchResult = {
 declare global {
   interface Window {
     pagefind?: {
+      options?: (opts: Record<string, unknown>) => Promise<void>;
       search: (query: string) => Promise<{
         results: { data: () => Promise<{ url: string; meta: { title: string }; excerpt: string }> }[];
       }>;
     };
   }
+}
+
+/** נתיב יחסי עם סלאש בסוף לעמודי HTML בסגנון האתר */
+function normalizeResultUrl(url: string): string {
+  if (!url || url.startsWith("#")) return url;
+  let path = url;
+  try {
+    if (/^https?:\/\//i.test(url)) path = new URL(url).pathname;
+  } catch {
+    /* ignore */
+  }
+  if (!path.startsWith("/")) path = `/${path}`;
+  const seg = path.split("/").filter(Boolean).pop() ?? "";
+  if (!seg.includes(".") && !path.endsWith("/")) return `${path}/`;
+  return path;
 }
 
 export const loadPagefind = () =>
@@ -47,23 +65,39 @@ export async function runPagefindSearch(query: string, limit = 6): Promise<Pagef
   if (!trimmed) return [];
   const q = trimmed.toLowerCase();
 
-  await loadPagefind();
-  const search = await window.pagefind?.search(trimmed);
-  const data = await Promise.all(
-    (search?.results ?? []).slice(0, limit).map((result) => result.data())
-  );
+  const local = localSiteSearch(trimmed, limit);
 
-  return data
-    .map((item) => ({
-      url: item.url,
+  let remote: PagefindSearchResult[] = [];
+  try {
+    await loadPagefind();
+    if (typeof window.pagefind?.options === "function") {
+      try {
+        await window.pagefind.options({ baseUrl: "/" });
+      } catch {
+        /* ignore */
+      }
+    }
+    const search = await window.pagefind?.search(trimmed);
+    const data = await Promise.all(
+      (search?.results ?? []).slice(0, limit).map((result) => result.data())
+    );
+
+    remote = data.map((item) => ({
+      url: normalizeResultUrl(item.url),
       title: item.meta?.title ?? "",
       excerpt: item.excerpt ?? "",
-    }))
-    .sort((a, b) => {
-      const aTitle = a.title.toLowerCase();
-      const bTitle = b.title.toLowerCase();
-      const aExact = aTitle === q ? 3 : aTitle.includes(q) ? 2 : a.url.includes(`/glossary/${encodeURIComponent(trimmed)}`) ? 1 : 0;
-      const bExact = bTitle === q ? 3 : bTitle.includes(q) ? 2 : b.url.includes(`/glossary/${encodeURIComponent(trimmed)}`) ? 1 : 0;
-      return bExact - aExact;
-    });
+    }));
+  } catch {
+    return local.slice(0, limit);
+  }
+
+  const scored = remote.sort((a, b) => {
+    const aTitle = a.title.toLowerCase();
+    const bTitle = b.title.toLowerCase();
+    const aExact = aTitle === q ? 3 : aTitle.includes(q) ? 2 : a.url.includes("/glossary/") ? 1 : 0;
+    const bExact = bTitle === q ? 3 : bTitle.includes(q) ? 2 : b.url.includes("/glossary/") ? 1 : 0;
+    return bExact - aExact;
+  });
+
+  return mergeSearchResults(local, scored, limit);
 }

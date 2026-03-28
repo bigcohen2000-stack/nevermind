@@ -1,6 +1,7 @@
 ---
 import { getCollection } from "astro:content";
 import Layout from "../layouts/Layout.astro";
+import FormAntispamFields from "../components/FormAntispamFields.astro";
 import SubscribeBanner from "../components/SubscribeBanner.astro";
 import { FloatingInput } from "../components/ui/FloatingInput";
 
@@ -98,6 +99,7 @@ const siteUpdates = [
     <form
       id="contact-form"
       data-contact-form
+      data-nm-antispam
       class="space-y-4 rounded-3xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/70 p-6"
       action="https://api.web3forms.com/submit"
       method="POST"
@@ -112,6 +114,7 @@ const siteUpdates = [
         autocomplete="off"
         aria-hidden="true"
       />
+      <FormAntispamFields />
       <FloatingInput client:load id="name" name="name" label="שם מלא" required dir="rtl" />
       <FloatingInput client:load id="email" name="email" label="אימייל" type="email" required dir="rtl" />
       <FloatingInput client:load id="message" name="message" label="הודעה" multiline rows={4} required dir="rtl" />
@@ -197,6 +200,10 @@ const siteUpdates = [
 
       if (!form || !(contactForm instanceof HTMLFormElement)) return;
 
+      if (typeof window.__nmStampFormAntispam === "function") {
+        window.__nmStampFormAntispam(contactForm);
+      }
+
       const fields = ["name", "email", "message"];
       fields.forEach((field) => {
         const savedValue = localStorage.getItem(`form_${field}`);
@@ -233,6 +240,18 @@ const siteUpdates = [
       const onSubmit = async (event) => {
         event.preventDefault();
         const formData = new FormData(form);
+        const msg = String(formData.get("message") || "").trim();
+        const read = window.__nmReadAntispamFromForm;
+        const validate = window.__nmValidateAntispamFields;
+        if (typeof read === "function" && typeof validate === "function") {
+          const as = read(contactForm);
+          const check = validate({ ...as, messageTexts: [msg] });
+          if (!check.ok && status instanceof HTMLElement) {
+            status.textContent = check.userMessage;
+            status.classList.add("opacity-100");
+            return;
+          }
+        }
 
         try {
           const response = await fetch("https://api.web3forms.com/submit", {

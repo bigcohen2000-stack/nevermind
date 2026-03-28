@@ -1,17 +1,20 @@
 ---
-const { title = "שאלת חקירה" } = Astro.props;
+const {
+  title = "איפה כאן אתה מוכן לעצור ולבדוק עובדה לעומת פרשנות, בלי להריץ עוד סיבוב של הצדקה?",
+} = Astro.props;
+const hasSlot = Astro.slots.has("default");
 ---
 <aside
   class="rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/70 p-[clamp(1.25rem,2vw,2rem)] shadow-sm backdrop-blur-md"
   role="note"
   aria-label={title}
 >
-  <p class="text-[clamp(0.85rem,0.8rem+0.25vw,1rem)] text-[color-mix(in_srgb,var(--nm-fg)_55%,var(--nm-bg))]">
+  <p class="text-[clamp(1.05rem,1rem+0.35vw,1.35rem)] font-semibold leading-snug text-[var(--nm-fg)]">
     {title}
   </p>
-  <div
-    class="mt-3 text-[clamp(1rem,0.95rem+0.3vw,1.2rem)] leading-[1.8] text-[var(--nm-fg)]/75"
-  >
-    <slot />
-  </div>
+  {hasSlot ? (
+    <div class="mt-4 text-[clamp(1rem,0.95rem+0.3vw,1.2rem)] leading-[1.8] text-[var(--nm-fg)]/75">
+      <slot />
+    </div>
+  ) : null}
 </aside>
