@@ -87,26 +87,30 @@ const tags = Array.from(tagSet);
 
     <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
       {articles.map((article) => (
-        <a href={`/articles/${article.slug}`} data-article-card data-tags={article.tags.join(",")} class="group flex h-full flex-col justify-between gap-5 rounded-3xl border border-white/70 bg-white/70 p-6 shadow-sm backdrop-blur-md transition-all duration-500 ease-out hover:scale-[1.01] focus-visible:scale-[1.01] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color-mix(in_srgb,var(--nm-fg)_22%,transparent)]">
-          <div class="space-y-3 text-right">
-            <h2 transition:name={`article-${article.transitionId}`} class="text-[clamp(1.3rem,1.1rem+0.6vw,1.7rem)] font-semibold text-[var(--nm-fg)]">{article.title}</h2>
-            {article.description && <p class="text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] text-[var(--nm-fg)]/65">{article.description}</p>}
-          </div>
-          <div class="flex flex-wrap items-center justify-between gap-3 text-right">
-            <span class={`inline-flex rounded-full border px-3 py-1 text-xs font-semibold ${article.difficultyTone}`}>{article.difficultyLabel}</span>
-            <span class="text-[clamp(0.8rem,0.78rem+0.2vw,0.95rem)] text-[color-mix(in_srgb,var(--nm-fg)_58%,var(--nm-bg))]">{article.readingMinutes} דק׳ קריאה</span>
-          </div>
-          {article.tags.length > 0 && (
-            <div class="flex flex-wrap gap-2 text-[clamp(0.8rem,0.78rem+0.2vw,0.95rem)] text-[color-mix(in_srgb,var(--nm-fg)_55%,var(--nm-bg))]">
-              {article.tags.map((tag) => (
-                <span class="rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/70 px-3 py-1">{tag}</span>
-              ))}
-            </div>
+        <div
+          data-article-card
+          data-tags={article.tags.join(",")}
+          class="article-card group rounded-lg border border-[#1A1A1A]/10 bg-white p-6 transition-all hover:border-[#D42B2B]/30 hover:shadow-lg"
+        >
+          <h2
+            transition:name={`article-${article.transitionId}`}
+            class="mb-2 text-xl font-bold text-[#1A1A1A] transition-colors group-hover:text-[#D42B2B]"
+          >
+            {article.title}
+          </h2>
+          {article.description && (
+            <p class="mb-4 line-clamp-2 text-sm text-gray-600">
+              {article.description}
+            </p>
           )}
-          <p data-iso-date={article.date.toISOString()} class="text-right text-[0.7rem] leading-relaxed text-[color-mix(in_srgb,var(--nm-fg)_42%,var(--nm-bg))]">
-            {article.date.toLocaleDateString("he-IL")}
-          </p>
-        </a>
+          <a
+            href={`/articles/${article.slug}`}
+            aria-label={`התחל מסלול: ${article.title}`}
+            class="inline-flex min-h-[44px] min-w-[44px] items-center font-bold text-[#D42B2B]"
+          >
+            התחל מסלול: {article.title} ←
+          </a>
+        </div>
       ))}
     </div>
   </section>

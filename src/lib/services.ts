@@ -246,6 +246,35 @@ export function buildServiceActionWhatsAppHref(service: StageService | FlatServi
   return buildWhatsAppHref(`${preface}\n\n${body}`);
 }
 
+/** שיריון / התעניינות: פירוט חבילה ולינק תשלום רק בהקשר שיחה סגורה */
+export function buildServiceReservationWhatsAppHref(service: StageService | FlatService): string {
+  const preface = buildWhatsAppCrmPreface(service.title);
+  const price = formatMoney(service.price_full);
+  const paymentLink = typeof service.payment_link === "string" ? service.payment_link.trim() : "";
+  const featureLines = Array.isArray(service.features)
+    ? service.features.map((f) => (typeof f === "string" ? f : f.text ?? "").trim()).filter(Boolean)
+    : [];
+  const includesLine =
+    featureLines.length > 0
+      ? `מה זה כולל בפועל: ${featureLines.slice(0, 6).join(" · ")}`
+      : service.subtitle?.trim()
+        ? `מה זה כולל בפועל: ${service.subtitle.trim()}`
+        : "";
+  const paymentLine = paymentLink
+    ? `לינק לתשלום מאושר (מיועד להמשך רק בתוך השיחה הזו אחרי התאמה קצרה, לא כפרסום חיצוני): ${paymentLink}`
+    : "מבקש לינק תשלום מאושר אחרי תיאום קצר כאן בשיחה.";
+  const body = [
+    `היי, אני מתעניין ב${service.title} (${price}).`,
+    includesLine,
+    paymentLine,
+    "",
+    "אם זה לא רלוונטי — תגיב בקצרה ואסיים כאן.",
+  ]
+    .filter((line) => line.length > 0)
+    .join("\n");
+  return buildWhatsAppHref(`${preface}\n\n${body}`);
+}
+
 /** התראת עניין בשירות (best-effort, לא לשבור UX) */
 export async function notifyServiceInterest(params: {
   serviceId: string;

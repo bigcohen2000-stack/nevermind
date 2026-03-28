@@ -1,16 +1,16 @@
 ---
 import { getCollection } from "astro:content";
 import Layout from "../layouts/Layout.astro";
-import ThoughtShiftProof from "../components/ThoughtShiftProof.astro";
 import LogicCanvas from "../components/LogicCanvas.astro";
 import KnowledgeCenter from "../components/KnowledgeCenter.astro";
 import EngagementSections from "../components/EngagementSections.astro";
 import {
   resolveServiceAction,
+  buildServiceReservationWhatsAppHref,
+  findServiceById,
   servicesEngagementSections,
   servicesHero,
   servicesStages,
-  servicesThoughtShifts,
 } from "../lib/services";
 
 const allArticles = await getCollection("articles", ({ data }) => data.draft !== true);
@@ -25,6 +25,9 @@ const featuredArticles = [...recentArticles]
     href: `/articles/${article.slug}/`,
   }));
 const siteUrl = Astro.site?.toString() ?? "https://www.nevermind.co.il";
+const balconyExperience = findServiceById("balcony-experience");
+const balconyReserveHref = balconyExperience ? buildServiceReservationWhatsAppHref(balconyExperience) : "";
+const balconyPayHref = balconyExperience ? resolveServiceAction(balconyExperience) : null;
 const stageCards = servicesStages
   .map((stage) => ({
     ...stage,
@@ -74,16 +77,26 @@ const stageCards = servicesStages
                 <span class="rounded-full border border-[color-mix(in_srgb,var(--nm-accent)_18%,transparent)] bg-[var(--nm-tint)] px-3 py-1 text-xs font-semibold text-[var(--nm-accent)]">{badge}</span>
               ))}
             </div>
-            <div class="mt-6 flex items-center justify-between gap-4">
-              <span class="text-lg font-semibold text-[var(--nm-fg)]">{service.price_full.toLocaleString("he-IL")} ₪</span>
-              <a
-                href={action.href}
-                target={action.external ? "_blank" : undefined}
-                rel={action.external ? "noreferrer" : undefined}
-                class="inline-flex items-center justify-center rounded-full bg-[var(--nm-accent)] px-4 py-2 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]"
-              >
-                {service.action_text}
-              </a>
+            <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+              <span class="price-tag text-lg font-semibold text-[var(--nm-fg)]">מחיר: {service.price_full.toLocaleString("he-IL")} ₪</span>
+              <div class="flex flex-wrap items-center justify-end gap-2">
+                <a
+                  href={action.href}
+                  target={action.external ? "_blank" : undefined}
+                  rel={action.external ? "noreferrer" : undefined}
+                  class="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full bg-[var(--nm-accent)] px-4 py-2 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]"
+                >
+                  {service.payment_cta || service.action_text}
+                </a>
+                <a
+                  href={buildServiceReservationWhatsAppHref(service)}
+                  target="_blank"
+                  rel="noreferrer"
+                  class="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_14%,transparent)] bg-[var(--nm-bg-canvas)] px-4 py-2 text-sm font-semibold text-[var(--nm-fg)] transition hover:border-[color-mix(in_srgb,var(--nm-accent)_24%,transparent)] hover:bg-[var(--nm-tint)]"
+                >
+                  שיריון מקום
+                </a>
+              </div>
             </div>
           </article>
         );
@@ -91,15 +104,41 @@ const stageCards = servicesStages
     </section>
   </section>
 
-  <EngagementSections sections={servicesEngagementSections} />
+  {balconyExperience && balconyPayHref && balconyReserveHref ? (
+    <section
+      id="balcony-experience"
+      class="mx-auto max-w-7xl scroll-mt-[100px] border-t border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-5 py-16 sm:px-8 lg:px-12"
+    >
+      <div class="rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/92 p-6 text-right shadow-[0_24px_70px_rgba(26,26,26,0.06)] md:p-8">
+        <p class="text-sm font-semibold uppercase tracking-[0.2em] text-[var(--nm-accent)]">שלב 1</p>
+        <h2 class="mt-2 text-[clamp(1.2rem,1.05rem+0.45vw,1.45rem)] font-semibold text-[var(--nm-fg)]">{balconyExperience.title}</h2>
+        <p class="mt-2 text-sm leading-[var(--line-height-ui)] text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))]">{balconyExperience.subtitle}</p>
+        <p class="mt-2 text-sm font-semibold text-[var(--nm-fg)]">
+          מחיר: <span class="price-tag">{balconyExperience.price_full.toLocaleString("he-IL")} ₪</span>
+        </p>
+        <div class="mt-5 flex flex-wrap gap-2">
+          <a
+            href={balconyPayHref.href}
+            target={balconyPayHref.external ? "_blank" : undefined}
+            rel={balconyPayHref.external ? "noreferrer" : undefined}
+            class="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full bg-[var(--nm-accent)] px-5 py-3 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]"
+          >
+            {balconyExperience.payment_cta || balconyExperience.action_text}
+          </a>
+          <a
+            href={balconyReserveHref}
+            target="_blank"
+            rel="noreferrer"
+            class="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] px-5 py-3 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-tint)]"
+          >
+            שיריון מקום
+          </a>
+        </div>
+      </div>
+    </section>
+  ) : null}
 
-  <section class="mx-auto max-w-7xl border-t border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-6 py-20 md:py-24">
-    <ThoughtShiftProof
-      items={servicesThoughtShifts}
-      heading={servicesEngagementSections.philosophy.body}
-      eyebrow="דפוס ישן מול בהירות חדשה"
-    />
-  </section>
+  <EngagementSections sections={servicesEngagementSections} />
 
   <section id="articles" class="mx-auto max-w-7xl border-t border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-6 py-20 md:py-28">
     <div class="flex items-end justify-between gap-4">

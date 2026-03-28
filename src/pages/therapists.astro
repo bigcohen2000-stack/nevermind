@@ -77,6 +77,26 @@ const featuredService: FlatService = consultation ?? fallbackConsultation;
       <div class="grid gap-5 lg:grid-cols-1">
         <ServiceCard service={featuredService} />
       </div>
+      <button
+        id="booking-btn"
+        type="button"
+        class="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded bg-[#1A1A1A] px-6 py-3 text-[#FAFAF8] transition-all hover:bg-[#D42B2B] focus-visible:outline-2 disabled:cursor-not-allowed disabled:opacity-50"
+        onclick="handleBooking(this)"
+      >
+        <span id="btn-text">קביעת שיחה (650&nbsp;₪) • פירוק סיטואציה בזמן אמת</span>
+        <span id="btn-spinner" class="mr-2 hidden animate-spin">🔄</span>
+      </button>
     </section>
   </section>
+
+  <script is:inline>
+    function handleBooking(btn) {
+      const text = btn.querySelector("#btn-text");
+      const spinner = btn.querySelector("#btn-spinner");
+      btn.disabled = true;
+      spinner.classList.remove("hidden");
+      text.innerText = "מעבד פנייה...";
+      setTimeout(() => {}, 2000);
+    }
+  </script>
 </Layout>

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { runPagefindSearch, type PagefindSearchResult } from "../lib/pagefind-client";
 import { FloatingInput } from "./ui/FloatingInput";
 import { glossaryConcepts } from "../data/glossary";
@@ -8,6 +8,7 @@ export default function SearchModal() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<PagefindSearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [loadError, setLoadError] = useState(false);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
   const requestIdRef = useRef(0);
@@ -33,29 +34,40 @@ export default function SearchModal() {
     };
   }, [isOpen]);
 
+  const closeModal = useCallback(() => {
+    setIsOpen(false);
+    setQuery("");
+    setSuggestions([]);
+    setResults([]);
+    setLoadError(false);
+    setIsLoading(false);
+  }, []);
+
   useEffect(() => {
     if (!isOpen) return;
 
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
-        setIsOpen(false);
+        closeModal();
       }
     };
 
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
-  }, [isOpen]);
+  }, [isOpen, closeModal]);
 
   const executeSearch = async (raw: string) => {
     const trimmed = raw.trim();
     if (!trimmed) {
       setResults([]);
       setIsLoading(false);
+      setLoadError(false);
       return;
     }
 
     const myId = ++requestIdRef.current;
     setIsLoading(true);
+    setLoadError(false);
     try {
       const next = await runPagefindSearch(trimmed, 8);
       if (myId !== requestIdRef.current) return;
@@ -63,6 +75,7 @@ export default function SearchModal() {
     } catch {
       if (myId !== requestIdRef.current) return;
       setResults([]);
+      setLoadError(true);
     } finally {
       if (myId === requestIdRef.current) {
         setIsLoading(false);
@@ -106,11 +119,7 @@ export default function SearchModal() {
       role="dialog"
       aria-modal="true"
       aria-labelledby="search-title"
-      onClick={() => {
-        setIsOpen(false);
-        setQuery("");
-        setSuggestions([]);
-      }}
+      onClick={closeModal}
     >
       <div
         className="w-[min(720px,92vw)] rounded-3xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-6 shadow-sm"
@@ -125,11 +134,7 @@ export default function SearchModal() {
           </h2>
           <button
             type="button"
-            onClick={() => {
-              setIsOpen(false);
-              setQuery("");
-              setSuggestions([]);
-            }}
+            onClick={closeModal}
             className="rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/70 px-3 py-1 text-[clamp(0.8rem,0.75rem+0.2vw,0.95rem)] text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))] transition-colors duration-300 hover:bg-white"
           >
             סגור
@@ -198,17 +203,37 @@ export default function SearchModal() {
             </p>
           )}
 
-          {!isLoading && query && results.length === 0 && (
+          {loadError && (
+            <p className="rounded-2xl border border-[color-mix(in_srgb,var(--nm-accent)_24%,transparent)] bg-[var(--nm-tint)] px-4 py-3 text-right text-[clamp(0.85rem,0.8rem+0.2vw,1rem)] text-[var(--nm-fg)]">
+              מנוע החיפוש לא נטען (לרוב אחרי בנייה מקומית). נסה שוב אחרי פרסום, או עבור ישירות לספרייה והגדרות.
+            </p>
+          )}
+
+          {!isLoading && query && results.length === 0 && !loadError && (
             <div className="space-y-3">
               <p className="text-[clamp(0.85rem,0.8rem+0.2vw,1rem)] text-[color-mix(in_srgb,var(--nm-fg)_60%,var(--nm-bg))]">
                 אולי השאלה היא לא איפה לחפש, אלא מה באמת מבקש להיראות.
               </p>
-              <a
-                href="/articles"
-                className="inline-flex items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/70 px-4 py-2 text-[clamp(0.85rem,0.8rem+0.2vw,1rem)] text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))] transition-colors duration-300 hover:bg-white"
-              >
-                להתחיל לחקור
-              </a>
+              <div className="flex flex-wrap justify-end gap-2">
+                <a
+                  href="/articles/"
+                  className="inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/70 px-4 py-2 text-[clamp(0.85rem,0.8rem+0.2vw,1rem)] text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))] transition-colors duration-300 hover:bg-white"
+                >
+                  ארכיון מאמרים
+                </a>
+                <a
+                  href="/library/"
+                  className="inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/70 px-4 py-2 text-[clamp(0.85rem,0.8rem+0.2vw,1rem)] text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))] transition-colors duration-300 hover:bg-white"
+                >
+                  ספרייה מובנית
+                </a>
+                <a
+                  href="/glossary/ego/"
+                  className="inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/70 px-4 py-2 text-[clamp(0.85rem,0.8rem+0.2vw,1rem)] text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))] transition-colors duration-300 hover:bg-white"
+                >
+                  מה זה אגו?
+                </a>
+              </div>
             </div>
           )}
 

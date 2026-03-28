@@ -1,0 +1,62 @@
+---
+import Layout from "../layouts/Layout.astro";
+import appConfig from "../config/appConfig.json";
+---
+
+<Layout
+  title="מדיניות פרטיות"
+  description="איזה נתונים נאספים, למה, ואיך שומרים עליהם."
+>
+  <article class="mx-auto max-w-[65ch] space-y-8 px-4 py-14 text-right text-[var(--nm-fg)]" data-content="long-form">
+    <header class="space-y-3">
+      <h1 class="text-[clamp(1.75rem,1.4rem+1.2vw,2.5rem)] font-semibold">מדיניות פרטיות</h1>
+      <p class="text-sm text-[color-mix(in_srgb,var(--nm-fg)_65%,var(--nm-bg))]">
+        עדכון אחרון: מרץ 2026 · מפעיל: {appConfig.site.name}
+      </p>
+    </header>
+
+    <section class="space-y-3">
+      <h2 class="text-xl font-semibold">1. מה נאסף</h2>
+      <p class="leading-[var(--line-height-ui)] text-[color-mix(in_srgb,var(--nm-fg)_88%,var(--nm-bg))]">
+        כשאתה משאיר פרטים בטפסים באתר, נשמרים שם, אימייל והודעה לצורך מענה. כשאתה לוחץ על קישור וואטסאפ, השיחה נפתחת אצל ספק הצד השלישי לפי מדיניותו.
+      </p>
+    </section>
+
+    <section class="space-y-3">
+      <h2 class="text-xl font-semibold">2. למה זה משמש</h2>
+      <p class="leading-[var(--line-height-ui)] text-[color-mix(in_srgb,var(--nm-fg)_88%,var(--nm-bg))]">
+        רק כדי לחזור אליך, לתאם, או לענות על שאלה. אין שימוש בפרטים לפרסום אוטומטי ואין מכירת רשימות.
+      </p>
+    </section>
+
+    <section class="space-y-3">
+      <h2 class="text-xl font-semibold">3. אחסון ואבטחה</h2>
+      <p class="leading-[var(--line-height-ui)] text-[color-mix(in_srgb,var(--nm-fg)_88%,var(--nm-bg))]">
+        האתר מוגש ב-HTTPS. טפסים חיצוניים מעובדים לפי מדיניות הספק שבחרת בשליחה. מומלץ לא לשלוח בטקסט פתוח מידע רגיש מיותר שלא נדרש למענה.
+      </p>
+    </section>
+
+    <section class="space-y-3">
+      <h2 class="text-xl font-semibold">4. עוגיות ומדידה</h2>
+      <p class="leading-[var(--line-height-ui)] text-[color-mix(in_srgb,var(--nm-fg)_88%,var(--nm-bg))]">
+        ייתכן שימוש בעוגיות טכניות לתפקוד האתר. אם יתווספו כלי אנליטיקה, יתעדכן סעיף זה בצורה מפורשת.
+      </p>
+    </section>
+
+    <section class="space-y-3">
+      <h2 class="text-xl font-semibold">5. זכויות</h2>
+      <p class="leading-[var(--line-height-ui)] text-[color-mix(in_srgb,var(--nm-fg)_88%,var(--nm-bg))]">
+        אפשר לבקש עדכון או מחיקה של פנייה שנשלחה דרך האתר, ככל שהמידע עדיין אצלנו או אצל ספק הטפסים לפי דין החל.
+      </p>
+    </section>
+
+    <section class="space-y-3">
+      <h2 class="text-xl font-semibold">6. יצירת קשר בנושא פרטיות</h2>
+      <p class="leading-[var(--line-height-ui)] text-[color-mix(in_srgb,var(--nm-fg)_88%,var(--nm-bg))]">
+        <a href="/contact/" class="font-semibold text-[var(--nm-accent)] underline-offset-2 hover:underline">עמוד יצירת קשר</a>
+        {" · "}
+        {appConfig.contact.email}
+      </p>
+    </section>
+  </article>
+</Layout>

@@ -1,22 +1,51 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import Gatekeeper from "../components/Gatekeeper.astro";
-import appConfig from "../config/appConfig.json";
+import IntakeForm from "../components/IntakeForm";
 
-const pageTitle = "בדיקת התאמה קצרה לשיחה";
-const pageDescription = "שלושה סימונים קצרים כדי להבין אם נכון להמשיך עכשיו לשיחה או לחזור לחקירה בארכיון.";
+const pageTitle = "צור קשר (אונליין)";
+const pageDescription =
+  "מקום להכיר קצת את מי שמגיע לפני שיחה: כתיבה, סימון, או שניהם. בלי ציון. בלי מבחן.";
 ---
 
-<Layout title={pageTitle} description={pageDescription} noIndex={true}>
-  <section class="mx-auto max-w-5xl space-y-10 px-4 py-16">
-    <header class="max-w-3xl space-y-4 text-right">
-      <p class="text-sm font-semibold uppercase tracking-[0.24em] text-[var(--nm-accent)]">בדיקת התאמה</p>
-      <h1 class="text-[clamp(2.2rem,1.5rem+2.2vw,3.6rem)] font-semibold leading-[1.05] text-[var(--nm-fg)]">בוא נבדוק אם נכון להמשיך עכשיו לשיחה.</h1>
+<Layout title={pageTitle} description={pageDescription}>
+  <section class="mx-auto max-w-3xl space-y-10 px-4 py-14">
+    <header class="space-y-4 text-right">
+      <p class="text-sm font-semibold uppercase tracking-[0.24em] text-[var(--nm-accent)]">לפני שיחה</p>
+      <h1 class="text-[clamp(2rem,1.5rem+2.2vw,3.2rem)] font-semibold leading-[1.08] text-[var(--nm-fg)]">
+        מקום להביע בקצב שלך
+      </h1>
       <p class="text-[1rem] leading-8 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
-        זה לא טופס ארוך. זה מסנן קצר. בסוף תקבל כיוון אחד ברור: להמשיך לשיחה או לחזור לחקירה ממוקדת בארכיון.
+        אפשר לכתוב בחופשיות, לסמן נושאים, או לשלב. ההערות בדרך משתנות לפי מה שבחרת. הטיוטה נשמרת מקומית בדפדפן
+        עד שליחה מוצלחת.
       </p>
     </header>
 
-    <Gatekeeper phone={appConfig.contact.whatsAppNumber} fallbackHref="/articles/" fallbackLabel="חזרה לארכיון" />
+    <IntakeForm client:visible />
+
+    <nav aria-label="המשך באתר" class="flex flex-col gap-3 border-t border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] pt-10 sm:flex-row sm:flex-wrap sm:justify-end">
+      <a
+        href="/book/"
+        class="inline-flex min-h-[44px] items-center justify-center rounded-full bg-[var(--nm-inverse)] px-5 py-3 text-sm font-semibold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-inverse-hover)]"
+      >
+        קביעת שיחה
+      </a>
+      <a
+        href="/services/#pricing"
+        class="inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-5 py-3 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]"
+      >
+        מחירון
+      </a>
+      <a
+        href="/contact/"
+        class="inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-5 py-3 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]"
+      >
+        ערוצים נוספים (מייל · טלפון · וואטסאפ)
+      </a>
+    </nav>
+
+    <p class="text-xs leading-relaxed text-[color-mix(in_srgb,var(--nm-fg)_52%,var(--nm-bg))]">
+      מה ששולחים כאן מיועד למענה בלבד, לא לפרסום או לשיווק.
+      <a href="/privacy/" class="font-semibold underline-offset-2 hover:text-[var(--nm-accent)]">מדיניות פרטיות</a>
+    </p>
   </section>
 </Layout>

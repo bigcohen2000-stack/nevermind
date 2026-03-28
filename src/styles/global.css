@@ -105,7 +105,7 @@ html[lang="he"] {
 }
 
 body {
-  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-family: "Assistant Variable", system-ui, -apple-system, "Segoe UI", sans-serif;
   font-size: 1rem;
   line-height: var(--line-height-ui);
   letter-spacing: 0;
@@ -328,7 +328,12 @@ a[aria-label] {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
+}
+
+.price-tag {
+  white-space: nowrap;
 }
 
 body[data-whisper-banner-state="hidden"] {

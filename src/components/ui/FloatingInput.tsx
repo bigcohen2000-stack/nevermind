@@ -56,7 +56,7 @@ export type FloatingInputProps = {
   dataDecisionInput?: boolean;
   /** data-cost-input */
   dataCostInput?: boolean;
-  /** data-name-input ל־Gatekeeper */
+  /** data-name-input לטפסים עם שמירה מקומית */
   dataNameInput?: boolean;
 } & Omit<
   React.InputHTMLAttributes<HTMLInputElement>,

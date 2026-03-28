@@ -15,6 +15,29 @@ import Layout from "../../layouts/Layout.astro";
       </p>
     </header>
 
+    <section aria-labelledby="about-personal" class="space-y-4 rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white p-6 text-right">
+      <h2 id="about-personal" class="text-[clamp(1.35rem,1.15rem+0.6vw,1.75rem)] font-semibold">
+        מי עומד מאחורי המסלול
+      </h2>
+      <p class="text-sm leading-[var(--line-height-ui)] text-[color-mix(in_srgb,var(--nm-fg)_76%,var(--nm-bg))]">
+        זה לא סיפור חיים ארוך. זה עיקרון: אני מחזיק מרחב שבו אפשר לפרק את מה שמסתובב בראש בלי לשחק חכם. אם זה נשמע לך נכון, אפשר להמשיך דרך ארכיון או דרך שיחה ממוקדת.
+      </p>
+      <div class="flex flex-wrap gap-3">
+        <a
+          href="/library/"
+          class="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full bg-[var(--nm-inverse)] px-5 py-2.5 text-sm font-semibold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-inverse-hover)]"
+        >
+          לספרייה
+        </a>
+        <a
+          href="/book/"
+          class="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-5 py-2.5 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]"
+        >
+          קביעת שיחה
+        </a>
+      </div>
+    </section>
+
     <section aria-labelledby="process-map" class="space-y-7">
       <h2 id="process-map" class="text-[clamp(1.5rem,1.25rem+1vw,2rem)] font-light">איך זה עובד</h2>
       <div class="grid gap-4 md:grid-cols-5">
@@ -62,22 +85,11 @@ import Layout from "../../layouts/Layout.astro";
       </button>
     </section>
 
-    <section aria-labelledby="definitions-links" class="space-y-4">
-      <h2 id="definitions-links" class="text-[clamp(1.4rem,1.2rem+0.8vw,1.9rem)] font-light">מילים שצריך להבין אחרת</h2>
-      <nav aria-label="הגדרות מחדש">
-        <ul class="space-y-3 text-base leading-8">
-          <li><a href="/definitions/love/" class="underline underline-offset-4">מה זו אהבה באמת? -></a></li>
-          <li><a href="/definitions/fear/" class="underline underline-offset-4">למה אנחנו מפחדים? -></a></li>
-          <li><a href="/definitions/choice/" class="underline underline-offset-4">מה זה חופש בחירה? -></a></li>
-        </ul>
-      </nav>
-    </section>
-
     <section aria-labelledby="faq-short" class="space-y-4">
       <h2 id="faq-short" class="text-[clamp(1.4rem,1.2rem+0.8vw,1.9rem)] font-light">שאלות נפוצות</h2>
       <div class="space-y-4">
         <article class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white p-5">
-          <h3 class="text-lg font-semibold">זה טיפול פסיכולוגי?</h3>
+          <h3 class="text-lg font-semibold">זה עבודה קלינית קלאסית?</h3>
           <p class="mt-2 text-sm leading-8 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">לא. אנחנו לא נוברים בעבר, אנחנו מפרקים את מה שתוקע אותך עכשיו.</p>
         </article>
         <article class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white p-5">

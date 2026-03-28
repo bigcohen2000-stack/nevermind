@@ -1,4 +1,5 @@
 ---
+import "@fontsource-variable/assistant/wght.css";
 import "../styles/global.css";
 import { getCollection } from "astro:content";
 import { ClientRouter } from "astro:transitions";
@@ -50,6 +51,7 @@ const {
   faqItems,
   image,
   noIndex = false,
+  robots = "index, follow",
   waArticleSlug = "",
 } = Astro.props;
 
@@ -100,6 +102,7 @@ const trimMetaDescription = (value: string) => {
 };
 const pageDescription = trimMetaDescription(description ?? frontmatter?.description ?? siteDescription);
 const pageUrl = Astro.url ? new URL(Astro.url.pathname, siteUrl).toString() : siteUrl;
+const canonicalURL = Astro.site ? new URL(Astro.url.pathname, Astro.site).toString() : pageUrl;
 const defaultOgAbsolute = new URL(defaultOgPath.replace(/^\//, ""), siteUrlSlash).toString();
 const resolveOgImage = (): string => {
   if (typeof image === "string" && image.trim().length > 0) {
@@ -132,6 +135,12 @@ const organizationSchema = {
   image: logoAbsolute,
   description: siteDescription,
   inLanguage: "he-IL",
+  sameAs: [
+    "https://www.facebook.com/nevermindyakir",
+    "https://www.instagram.com/nevermind.co.il/",
+    "https://www.tiktok.com/@nevermind.co.il",
+    "https://x.com/nevermindyakir",
+  ],
 };
 
 const websiteSchema = {
@@ -173,7 +182,7 @@ const normalizeSegment = (segment: string) => {
     services: "שירותים",
     glossary: "הגדרות מחדש",
     questions: "שאלות קצרות",
-    intake: "טופס הכנה לשיחה",
+    intake: "צור קשר (אונליין)",
     archive: "ארכיון",
     studio: "סטודיו",
     about: "להבין",
@@ -183,6 +192,14 @@ const normalizeSegment = (segment: string) => {
     "root-problem-tree": "עץ שורש הבעיה",
     "forbidden-library": "הספרייה האסורה",
     accessibility: "הצהרת נגישות",
+    book: "קביעת שיחה",
+    contact: "יצירת קשר",
+    privacy: "מדיניות פרטיות",
+    faq: "שאלות נפוצות",
+    testimonials: "המלצות",
+    terms: "תנאי התקשרות",
+    library: "ספרייה מובנית",
+    search: "חיפוש",
   };
 
   return map[segment] ?? segment;
@@ -201,9 +218,10 @@ const intentNavItems: { href: string; label: string; activePrefixes: string[] }[
   {
     href: "/studio/",
     label: "אני רוצה לדבר",
-    activePrefixes: ["/studio", "/services", "/intake", "/personal-consultation"],
+    activePrefixes: ["/studio", "/services", "/intake", "/personal-consultation", "/contact", "/book"],
   },
-  { href: "/about/", label: "שיטת NEVERMIND", activePrefixes: ["/about", "/glossary"] },
+  { href: "/glossary/", label: "הגדרות מחדש", activePrefixes: ["/glossary"] },
+  { href: "/about/", label: "שיטת NEVERMIND", activePrefixes: ["/about"] },
 ];
 
 const intentNavItemIsCurrent = (prefixes: string[]) => {
@@ -220,8 +238,9 @@ const footerLinkColumns: { title: string; links: { href: string; label: string }
   {
     title: "מסלול",
     links: [
+      { href: "/book/", label: "קביעת שיחה" },
       { href: "/services/", label: "שירותים" },
-      { href: "/intake/", label: "טופס לפני שיחה" },
+      { href: "/intake/", label: "צור קשר (אונליין)" },
       { href: "/studio/", label: "סטודיו" },
       { href: "/personal-consultation/", label: "שיחה אישית" },
     ],
@@ -230,6 +249,7 @@ const footerLinkColumns: { title: string; links: { href: string; label: string }
     title: "תוכן",
     links: [
       { href: "/articles/", label: "ארכיון מאמרים" },
+      { href: "/library/", label: "ספרייה מובנית" },
       { href: "/about/", label: "איך זה עובד כאן" },
       { href: "/glossary/", label: "הגדרות מחדש" },
       { href: "/questions/", label: "שאלות קצרות" },
@@ -253,9 +273,25 @@ const footerLinkColumns: { title: string; links: { href: string; label: string }
       { href: "/accessibility/", label: "נגישות" },
     ],
   },
+  {
+    title: "מערכת",
+    links: [
+      { href: "/contact/", label: "יצירת קשר" },
+      { href: "/faq/", label: "שאלות נפוצות" },
+      { href: "/testimonials/", label: "המלצות" },
+      { href: "/privacy/", label: "מדיניות פרטיות" },
+      { href: "/terms/", label: "תנאי התקשרות" },
+    ],
+  },
 ];
 const shouldNoIndexByPath = pathName.startsWith("/admin/");
 const effectiveNoIndex = noIndex || shouldNoIndexByPath || !siteAllowsIndexing;
+const robotsContent =
+  typeof robots === "string" && robots.trim().length > 0
+    ? robots.trim()
+    : effectiveNoIndex
+      ? "noindex, nofollow"
+      : "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1";
 const pathSegments = pathName.split("/").filter(Boolean);
 const breadcrumbItems = [{ name: "בית", item: siteUrl }];
 let runningUrl = siteUrl.replace(/\/$/, "");
@@ -306,6 +342,13 @@ const articleSchema = frontmatter
       },
     }
   : null;
+
+const hasArticleDates = Boolean(frontmatter?.pubDate);
+const ogType = hasArticleDates ? "article" : "website";
+const articlePublishedMeta = hasArticleDates ? toIso(frontmatter?.pubDate) : undefined;
+const articleModifiedMeta = hasArticleDates
+  ? toIso(frontmatter?.updatedDate) ?? toIso(frontmatter?.pubDate)
+  : undefined;
 
 const normalizedFaqItems = Array.isArray(faqItems) ? faqItems : [];
 const fallbackFaqItems =
@@ -385,17 +428,19 @@ const socialLinks = [
 
 ---
 <!doctype html>
-<html lang="he" dir="rtl">
+<html lang="he" dir="rtl" class="scroll-smooth">
   <head>
-    <meta charset="utf-8" />
+    <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{pageTitle}</title>
     <meta name="description" content={pageDescription} />
     <meta
       name="robots"
-      content={effectiveNoIndex ? "noindex, nofollow" : "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"}
+      content={robotsContent}
     />
-    <link rel="canonical" href={pageUrl} />
+    <link rel="canonical" href={canonicalURL} />
+    <link rel="alternate" hreflang="he" href={canonicalURL} />
+    <link rel="dns-prefetch" href="https://api.web3forms.com" />
 
     <link rel="icon" href={iconPath} type="image/svg+xml" />
     <link rel="apple-touch-icon" href={iconPath} />
@@ -406,7 +451,9 @@ const socialLinks = [
     <meta property="og:site_name" content={siteTitle} />
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={pageDescription} />
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content={ogType} />
+    {articlePublishedMeta ? <meta property="article:published_time" content={articlePublishedMeta} /> : null}
+    {articleModifiedMeta ? <meta property="article:modified_time" content={articleModifiedMeta} /> : null}
     <meta property="og:url" content={pageUrl} />
     <meta property="og:image" content={ogImage} />
     <meta property="og:image:alt" content={ogImageAlt} />
@@ -469,11 +516,11 @@ const socialLinks = [
             >
               <img
                 src={logoPath}
-                alt=""
+                alt="NeverMind"
                 width="36"
                 height="36"
                 class="h-9 w-9 shrink-0 object-contain"
-                loading="lazy"
+                fetchpriority="high"
                 decoding="async"
               />
               <span class="truncate">{wordmarkHe}</span>
@@ -508,6 +555,7 @@ const socialLinks = [
             <div class="nm-header-actions col-start-2 row-start-1 flex shrink-0 items-center justify-end gap-2 md:col-start-3 md:row-start-1">
               <a
                 href="/services/"
+                data-astro-prefetch
                 class="nm-header-services-link inline-flex min-h-[44px] items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-[color-mix(in_srgb,var(--nm-bg-canvas)_88%,transparent)] px-3 text-sm font-medium text-[color-mix(in_srgb,var(--nm-fg)_82%,var(--nm-bg))] no-underline transition-colors duration-200 [transition-timing-function:ease] hover:border-[color-mix(in_srgb,var(--nm-accent)_24%,transparent)] hover:text-[var(--nm-accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-red)] sm:px-3.5"
               >
                 שירותים
@@ -553,7 +601,7 @@ const socialLinks = [
 
     <footer data-footer class="mt-20 border-t border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] px-4 py-14 sm:px-6">
       <div class="mx-auto max-w-6xl space-y-10">
-        <div class="grid gap-10 sm:grid-cols-2 lg:grid-cols-4" dir="rtl">
+        <div class="grid gap-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5" dir="rtl">
           {
             footerLinkColumns.map((col) => (
               <div class="space-y-3 text-right">
@@ -625,26 +673,22 @@ const socialLinks = [
                   שלח מייל
                 </button>
               ) : null}
-              {emailUser && emailDomain && telHref ? <span class="text-[color-mix(in_srgb,var(--nm-fg)_40%,var(--nm-bg))]">·</span> : null}
-              {phonePrefix && phoneRest ? (
-                <button
-                  type="button"
-                  data-phone-cta
-                  data-phone-prefix={phonePrefix}
-                  data-phone-rest={phoneRest}
-                  class="inline-flex min-h-[40px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-4 py-1.5 font-semibold transition-colors hover:border-[color-mix(in_srgb,var(--nm-accent)_24%,transparent)] hover:text-[var(--nm-accent)]"
-                >
-                  התקשר עכשיו
-                </button>
-              ) : null}
+              {emailUser && emailDomain ? <span class="text-[color-mix(in_srgb,var(--nm-fg)_40%,var(--nm-bg))]">·</span> : null}
+              <a
+                href="/intake/"
+                data-astro-prefetch
+                class="inline-flex min-h-[40px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-4 py-1.5 font-semibold transition-colors hover:border-[color-mix(in_srgb,var(--nm-accent)_24%,transparent)] hover:text-[var(--nm-accent)]"
+              >
+                צור קשר (אונליין)
+              </a>
               {waDigits ? (
                 <>
-                  {emailStr || telHref ? <span class="text-[color-mix(in_srgb,var(--nm-fg)_40%,var(--nm-bg))]">·</span> : null}
+                  <span class="text-[color-mix(in_srgb,var(--nm-fg)_40%,var(--nm-bg))]">·</span>
                   <a
                     href={`https://wa.me/${waDigits}`}
                     target="_blank"
                     rel="noreferrer"
-                    class="font-semibold underline-offset-2 hover:text-[var(--nm-accent)] hover:underline"
+                    class="inline-flex min-h-[40px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-4 py-1.5 font-semibold transition-colors hover:border-[color-mix(in_srgb,var(--nm-accent)_24%,transparent)] hover:text-[var(--nm-accent)]"
                   >
                     וואטסאפ
                   </a>
@@ -675,9 +719,11 @@ const socialLinks = [
             </div>
             <a
               href="https://tally.so/r/3N0x0q"
+              target="_blank"
+              rel="noreferrer"
               class="text-sm font-semibold text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))] transition-colors duration-200 hover:text-[var(--nm-accent)]"
             >
-              יצירת קשר
+              שאלון קצר (Tally)
             </a>
           </div>
         </div>

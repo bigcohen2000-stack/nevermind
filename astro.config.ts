@@ -15,7 +15,7 @@ export default defineConfig({
   },
   compressHTML: true,
   prefetch: {
-    prefetchAll: true,
+    prefetchAll: false,
     defaultStrategy: "hover",
   },
   image: {
@@ -51,11 +51,35 @@ export default defineConfig({
         })();
         if (pathname === "/404") return false;
         if (pathname.startsWith("/admin")) return false;
-        if (pathname === "/intake") return false;
         if (pathname === "/premium-access") return false;
         return true;
       },
-      serialize: (item) => ({ ...item, priority: 0.7 }),
+      serialize: (item) => {
+        const rawUrl =
+          typeof item === "object" && item !== null && "url" in item && typeof (item as { url: unknown }).url === "string"
+            ? (item as { url: string }).url
+            : String(item);
+        let pathname = "/";
+        try {
+          pathname = new URL(rawUrl).pathname.replace(/\/$/, "") || "/";
+        } catch {
+          /* ignore */
+        }
+        let priority = 0.65;
+        let changefreq: "weekly" | "monthly" | "yearly" = "monthly";
+        if (pathname === "/") {
+          priority = 1.0;
+          changefreq = "weekly";
+        } else if (pathname === "/intake") {
+          priority = 0.9;
+          changefreq = "monthly";
+        } else if (pathname === "/services" || pathname.startsWith("/services/")) {
+          priority = 0.85;
+        } else if (pathname === "/articles" || pathname.startsWith("/articles/")) {
+          priority = 0.75;
+        }
+        return { ...item, priority, changefreq };
+      },
     }),
     pagefind(),
   ],

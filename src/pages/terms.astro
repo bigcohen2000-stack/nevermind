@@ -1,0 +1,59 @@
+---
+import Layout from "../layouts/Layout.astro";
+import appConfig from "../config/appConfig.json";
+---
+
+<Layout
+  title="תנאי התקשרות"
+  description="כללי שימוש באתר, הגבלות אחריות, ושינויים עתידיים."
+>
+  <article class="mx-auto max-w-[65ch] space-y-8 px-4 py-14 text-right text-[var(--nm-fg)]" data-content="long-form">
+    <header class="space-y-3">
+      <h1 class="text-[clamp(1.75rem,1.4rem+1.2vw,2.5rem)] font-semibold">תנאי התקשרות</h1>
+      <p class="text-sm text-[color-mix(in_srgb,var(--nm-fg)_65%,var(--nm-bg))]">
+        עדכון אחרון: מרץ 2026 · מפעיל: {appConfig.site.name}
+      </p>
+    </header>
+
+    <section class="space-y-3">
+      <h2 class="text-xl font-semibold">1. קבלת השירות</h2>
+      <p class="leading-[var(--line-height-ui)] text-[color-mix(in_srgb,var(--nm-fg)_88%,var(--nm-bg))]">
+        התוכן באתר הוא חומרי מקור, לא מחייב התחייבות לתוצאה אישית. מסלולים בתשלום מפורטים בעמוד השירותים וכפופים לתיאום ולתשלום בפועל.
+      </p>
+    </section>
+
+    <section class="space-y-3">
+      <h2 class="text-xl font-semibold">2. קניין רוחני</h2>
+      <p class="leading-[var(--line-height-ui)] text-[color-mix(in_srgb,var(--nm-fg)_88%,var(--nm-bg))]">
+        הטקסטים, העיצוב והמיתוג שמורים למפעיל או לבעלי זכויות לפי העניין. אין להעתיק לשימוש מסחרי בלי אישור.
+      </p>
+    </section>
+
+    <section class="space-y-3">
+      <h2 class="text-xl font-semibold">3. הגבלת אחריות</h2>
+      <p class="leading-[var(--line-height-ui)] text-[color-mix(in_srgb,var(--nm-fg)_88%,var(--nm-bg))]">
+        האתר מסופק כמות שהוא. אין אחריות לזמינות רציפה, לשגיאות צד שלישי, או לתוצאות שימוש אישי בתוכן.
+      </p>
+    </section>
+
+    <section class="space-y-3">
+      <h2 class="text-xl font-semibold">4. שינויים</h2>
+      <p class="leading-[var(--line-height-ui)] text-[color-mix(in_srgb,var(--nm-fg)_88%,var(--nm-bg))]">
+        התנאים יכולים להתעדכן. התאריך בראש העמוד משקף את הגרסה האחרונה.
+      </p>
+    </section>
+
+    <section class="space-y-3">
+      <h2 class="text-xl font-semibold">5. דין וסמכות</h2>
+      <p class="leading-[var(--line-height-ui)] text-[color-mix(in_srgb,var(--nm-fg)_88%,var(--nm-bg))]">
+        הדין החל הוא לפי התחום הרלוונטי בישראל, ככל שיחול. אם יש סתירה בין טקסט שיווקי לבין טקסט משפטי מפורט, גובר הטקסט המפורט בגרסה העדכנית.
+      </p>
+    </section>
+
+    <p class="text-sm">
+      <a href="/privacy/" class="text-[var(--nm-accent)] underline-offset-2 hover:underline">מדיניות פרטיות</a>
+      {" · "}
+      <a href="/contact/" class="text-[var(--nm-accent)] underline-offset-2 hover:underline">יצירת קשר</a>
+    </p>
+  </article>
+</Layout>

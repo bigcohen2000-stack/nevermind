@@ -1,13 +1,27 @@
 ---
+import { getCollection } from "astro:content";
 import Layout from "../layouts/Layout.astro";
 import SubscribeBanner from "../components/SubscribeBanner.astro";
 import { FloatingInput } from "../components/ui/FloatingInput";
 
 const whatsappGroupUrl = "https://chat.whatsapp.com/C5M4j0ZCUPa3D3A4zCrCrL";
 const web3formsKey = "94b32b6c-7590-4ac6-b8b4-1bc73dd2e5c8";
+
+const allArticles = await getCollection("articles", ({ data }) => data.draft !== true);
+const sortedArticles = allArticles.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+const carouselPool = [...sortedArticles].sort(() => Math.random() - 0.5).slice(0, 14);
+
+const siteUpdates = [
+  { label: "קביעת שיחה", href: "/book/" },
+  { label: "יצירת קשר", href: "/contact/" },
+  { label: "שאלות נפוצות", href: "/faq/" },
+  { label: "ספרייה מובנית", href: "/library/" },
+  { label: "הגדרות מחדש", href: "/glossary/" },
+];
 ---
+
 <Layout title="מה המצב עכשיו?" description="רגע שקט לבדוק מה באמת קורה כאן עכשיו.">
-  <section class="mx-auto flex min-h-[70vh] max-w-3xl flex-col items-center justify-center gap-6 text-center">
+  <section class="mx-auto flex min-h-[50vh] max-w-3xl flex-col items-center justify-center gap-6 px-4 text-center">
     <div class="flex items-center justify-center gap-3">
       <h1 class="nm-breathe text-[clamp(2.2rem,1.7rem+2.2vw,3.4rem)] font-semibold text-[var(--nm-fg)]">
         מה המצב עכשיו?
@@ -27,11 +41,62 @@ const web3formsKey = "94b32b6c-7590-4ac6-b8b4-1bc73dd2e5c8";
     </a>
   </section>
 
-  <section class="mx-auto mt-[clamp(3rem,6vw,5rem)] max-w-2xl space-y-6">
+  <section class="mx-auto mt-[clamp(2.5rem,5vw,4rem)] max-w-6xl px-4" aria-labelledby="now-updates">
+    <h2 id="now-updates" class="mb-4 text-right text-[clamp(1.05rem,0.98rem+0.5vw,1.25rem)] font-semibold text-[var(--nm-fg)]">
+      חדש ומעודכן באתר
+    </h2>
+    <ul class="flex flex-wrap justify-end gap-2" role="list">
+      {
+        siteUpdates.map((item) => (
+          <li>
+            <a
+              href={item.href}
+              class="inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-2 text-sm font-semibold text-[var(--nm-fg)] transition hover:border-[color-mix(in_srgb,var(--nm-accent)_24%,transparent)] hover:bg-[var(--nm-tint)]"
+            >
+              {item.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section class="mx-auto mt-[clamp(2rem,4vw,3rem)] max-w-6xl px-4 pb-4" aria-labelledby="now-carousel">
+    <div class="mb-3 flex items-end justify-between gap-4">
+      <h2 id="now-carousel" class="text-right text-[clamp(1.15rem,1rem+0.5vw,1.35rem)] font-semibold text-[var(--nm-fg)]">
+        מהארכיון עכשיו
+      </h2>
+      <a href="/articles/" class="text-sm font-semibold text-[var(--nm-accent)]">לכל המאמרים</a>
+    </div>
+    <p class="mb-4 text-right text-sm leading-[var(--line-height-ui)] text-[color-mix(in_srgb,var(--nm-fg)_62%,var(--nm-bg))]">
+      גלילה אופקית. נושאים שונים בכל כניסה.
+    </p>
+    <div
+      class="nm-now-carousel flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      tabindex="0"
+      aria-roledescription="carousel"
+    >
+      {
+        carouselPool.map((article) => (
+          <a
+            href={`/articles/${article.slug}/`}
+            class="w-[min(100%,18rem)] shrink-0 snap-start rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)]/95 p-4 text-right shadow-sm transition hover:border-[color-mix(in_srgb,var(--nm-accent)_30%,transparent)]"
+          >
+            <p class="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--nm-accent)]">מאמר</p>
+            <h3 class="mt-2 line-clamp-2 text-base font-semibold text-[var(--nm-fg)]">{article.data.title}</h3>
+            <p class="mt-2 line-clamp-2 text-sm text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">{article.data.description}</p>
+          </a>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="mx-auto mt-[clamp(2rem,4vw,3rem)] max-w-2xl space-y-6 px-4">
     <h2 class="text-center text-[clamp(1.4rem,1.15rem+1vw,2rem)] font-semibold text-[var(--nm-fg)]">
       אפשר גם להשאיר הודעה
     </h2>
     <form
+      id="contact-form"
       data-contact-form
       class="space-y-4 rounded-3xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/70 p-6"
       action="https://api.web3forms.com/submit"
@@ -125,11 +190,45 @@ const web3formsKey = "94b32b6c-7590-4ac6-b8b4-1bc73dd2e5c8";
       }
 
       const form = document.querySelector("[data-contact-form]");
+      const contactForm = document.querySelector("#contact-form");
       const status = document.querySelector("[data-form-status]");
       const postReturn = document.querySelector("[data-nm-post-form-return]");
       const postReturnLink = postReturn?.querySelector("[data-nm-return-cta-link]");
 
-      if (!form) return;
+      if (!form || !(contactForm instanceof HTMLFormElement)) return;
+
+      const fields = ["name", "email", "message"];
+      fields.forEach((field) => {
+        const savedValue = localStorage.getItem(`form_${field}`);
+        const control = contactForm.elements.namedItem(field);
+        if (!savedValue || !control) return;
+        if (
+          control instanceof HTMLInputElement ||
+          control instanceof HTMLTextAreaElement ||
+          control instanceof HTMLSelectElement
+        ) {
+          control.value = savedValue;
+        }
+      });
+
+      let inputDebounce = 0;
+      const onInput = (event) => {
+        const target = event.target;
+        if (
+          !(target instanceof HTMLInputElement) &&
+          !(target instanceof HTMLTextAreaElement) &&
+          !(target instanceof HTMLSelectElement)
+        ) {
+          return;
+        }
+        const fieldName = String(target.name || "").trim();
+        if (!fieldName) return;
+        window.clearTimeout(inputDebounce);
+        inputDebounce = window.setTimeout(() => {
+          localStorage.setItem(`form_${fieldName}`, String(target.value ?? ""));
+        }, 150);
+      };
+      contactForm.addEventListener("input", onInput);
 
       const onSubmit = async (event) => {
         event.preventDefault();
@@ -143,6 +242,7 @@ const web3formsKey = "94b32b6c-7590-4ac6-b8b4-1bc73dd2e5c8";
 
           if (response.ok) {
             form.reset();
+            fields.forEach((field) => localStorage.removeItem(`form_${field}`));
             if (status) {
               status.textContent = "נשלח - אני בדרך כלל חוזר ממש מהר.";
               status.classList.add("opacity-100");
@@ -168,6 +268,8 @@ const web3formsKey = "94b32b6c-7590-4ac6-b8b4-1bc73dd2e5c8";
       form.addEventListener("submit", onSubmit);
 
       window.__nmNowFormCleanup = () => {
+        contactForm.removeEventListener("input", onInput);
+        window.clearTimeout(inputDebounce);
         form.removeEventListener("submit", onSubmit);
       };
     });

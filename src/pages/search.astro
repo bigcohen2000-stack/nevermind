@@ -1,0 +1,23 @@
+---
+import Layout from "../layouts/Layout.astro";
+
+const robots = "noindex, nofollow";
+---
+
+<Layout title="חיפוש | NeverMind" robots={robots}>
+  <section class="flex min-h-[50vh] flex-col items-center justify-center px-4 text-center">
+    <h1 class="mb-4 text-2xl font-bold text-[#1A1A1A] md:text-3xl">
+      החיפוש מתחדש בקרוב.
+    </h1>
+    <p class="mb-8 text-lg text-[#1A1A1A]/80">
+      בינתיים, בואו נתחיל מנקודה טובה.
+    </p>
+
+    <a
+      href="/archive/"
+      class="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded bg-[#1A1A1A] px-6 py-3 text-[#FAFAF8] transition-colors hover:bg-[#D42B2B] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1A1A1A]"
+    >
+      גלו מסלול מומלץ בינתיים ←
+    </a>
+  </section>
+</Layout>

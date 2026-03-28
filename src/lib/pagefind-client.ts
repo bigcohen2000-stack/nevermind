@@ -27,7 +27,17 @@ export const loadPagefind = () =>
 
     const script = document.createElement("script");
     script.src = "/pagefind/pagefind.js";
-    script.onload = () => resolve();
+    script.async = true;
+    script.onload = () => {
+      const waitUntil = async () => {
+        for (let i = 0; i < 60; i += 1) {
+          if (window.pagefind && typeof window.pagefind.search === "function") return;
+          await new Promise((r) => window.setTimeout(r, 50));
+        }
+        throw new Error("pagefind API not ready");
+      };
+      void waitUntil().then(resolve).catch(reject);
+    };
     script.onerror = () => reject(new Error("pagefind script failed"));
     document.head.appendChild(script);
   });
