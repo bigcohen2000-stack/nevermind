@@ -1,4 +1,4 @@
-﻿backend:
+backend:
   name: github
   repo: bigcohen2000-stack/nevermind
   branch: main
@@ -55,6 +55,7 @@ collections:
       - label: תאריך פרסום
         name: pubDate
         widget: datetime
+        required: true
         format: "YYYY-MM-DD"
         date_format: "YYYY-MM-DD"
         time_format: false
@@ -84,6 +85,38 @@ collections:
           - פילוסופיה וחברה
           - תודעה ורצון
           - חשיבה ביקורתית
+          - שאלות גדולות
+          - רגשות
+          - ניסויי מחשבה
+      - label: רמת עומק (MDX)
+        name: difficultyLevel
+        widget: select
+        required: false
+        options:
+          - { label: מתחילים, value: beginner }
+          - { label: מתקדמים, value: advanced }
+          - { label: עומק, value: deep }
+      - label: עוצמת שינוי תפיסתי (1–5)
+        name: mindShiftIntensity
+        widget: number
+        required: false
+        value_type: int
+        min: 1
+        max: 5
+        step: 1
+      - label: תובנת ליבה (originalInsight)
+        name: originalInsight
+        widget: text
+        required: false
+      - label: שאלה לסכמת TruthBlock / SEO (questionForSchema)
+        name: questionForSchema
+        widget: string
+        required: false
+      - label: תיאור קונספט לתמונה (imageAlt)
+        name: imageAlt
+        widget: string
+        required: false
+        hint: "לא רק מה מופיע בפריים — מה הרעיון שהתמונה נושאת (למשל מראה שבורה כמטאפורה לפירוק האגו). עברית. חיזוק הקשר סמנטי לחיפוש."
       - label: תמונה ראשית
         name: image
         widget: image

@@ -1,8 +1,19 @@
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
+import appConfig from "../config/appConfig.json";
 import { validateAntispamFields } from "../lib/form-antispam";
+import { pickIntakeHumanChallenge, type IntakeHumanChallenge } from "../lib/intake-human-check";
+import { WEB3FORMS_ACCESS_KEY } from "../lib/web3forms-access";
 import { FloatingInput } from "./ui/FloatingInput";
 
-const WEB3_KEY = "94b32b6c-7590-4ac6-b8b4-1bc73dd2e5c8";
+const WA_MAX_CHARS = 3600;
+const INTAKE_HUMAN_EMPTY = "נדרשת תשובה קצרה לשאלה למעלה.";
+const INTAKE_HUMAN_WRONG = "משהו לא מדויק בתשובה, נסה שוב.";
+const INTAKE_HONEYPOT_FAIL = "לא נשלח. רענן את העמוד ונסה שוב.";
+
+const waDigits = String((appConfig as { contact?: { whatsAppNumber?: string } }).contact?.whatsAppNumber ?? "").replace(
+  /\D/g,
+  "",
+);
 const DRAFT_KEY = "nm-intake-draft-v1";
 
 type ExpressionMode = "" | "write" | "select" | "both";
@@ -128,12 +139,15 @@ export default function IntakeForm() {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [intent, setIntent] = useState("");
-  const [status, setStatus] = useState<"idle" | "sending" | "ok" | "err">("idle");
+  const [humanChallenge] = useState<IntakeHumanChallenge>(() => pickIntakeHumanChallenge());
+  const [humanAnswer, setHumanAnswer] = useState("");
+  const [status, setStatus] = useState<"idle" | "sending" | "ok">("idle");
   const [clientError, setClientError] = useState("");
   const successRef = useRef<HTMLParagraphElement | null>(null);
   const openedAtRef = useRef(Date.now());
   const botcheckRef = useRef<HTMLInputElement | null>(null);
   const hpRef = useRef<HTMLInputElement | null>(null);
+  const faxHoneypotRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     const d = loadDraft();
@@ -198,13 +212,14 @@ export default function IntakeForm() {
   }, [expressionMode, lastTag]);
 
   const bumpStatusAfterEdit = useCallback(() => {
-    setStatus((s) => (s === "ok" || s === "err" ? "idle" : s));
+    setStatus((s) => (s === "ok" ? "idle" : s));
+    setClientError("");
   }, []);
 
   const applyExpressionMode = useCallback((id: ExpressionMode) => {
     setExpressionMode(id);
     setClientError("");
-    setStatus((s) => (s === "ok" || s === "err" ? "idle" : s));
+    setStatus((s) => (s === "ok" ? "idle" : s));
     if (id === "write") {
       setTags([]);
       setLastTag(null);
@@ -241,6 +256,18 @@ export default function IntakeForm() {
       setClientError("כתובת אימייל תקינה נדרשת לפני שליחה.");
       return false;
     }
+    if ((faxHoneypotRef.current?.value ?? "").trim().length > 0) {
+      setClientError(INTAKE_HONEYPOT_FAIL);
+      return false;
+    }
+    if (!humanAnswer.trim()) {
+      setClientError(INTAKE_HUMAN_EMPTY);
+      return false;
+    }
+    if (!humanChallenge.verify(humanAnswer)) {
+      setClientError(INTAKE_HUMAN_WRONG);
+      return false;
+    }
     const t = freeText.trim();
     if (expressionMode === "write" && t.length < 20) {
       setClientError("במצב כתיבה: כמה משפטים פתוחים (לפחות כ־20 תווים) כדי שיהיה מה להבין.");
@@ -268,7 +295,7 @@ export default function IntakeForm() {
     }
     setClientError("");
     return true;
-  }, [expressionMode, name, email, freeText, tags]);
+  }, [expressionMode, name, email, freeText, tags, humanAnswer, humanChallenge]);
 
   const buildBody = () => {
     const lines: string[] = [];
@@ -298,6 +325,48 @@ export default function IntakeForm() {
     return lines.join("\n");
   };
 
+  const buildWhatsAppFullText = () => {
+    const bodyText = buildBody();
+    const lines = [
+      "הכרות לפני שיחה | NeverMind",
+      "",
+      `שם: ${name.trim()}`,
+      `אימייל: ${email.trim()}`,
+      phone.trim() ? `טלפון: ${phone.trim()}` : "",
+      "",
+      bodyText,
+    ].filter(Boolean);
+    let t = lines.join("\n");
+    if (t.length > WA_MAX_CHARS) {
+      t = `${t.slice(0, WA_MAX_CHARS - 40)}\n\n[הודעה קוצרה — השלם בצ'אט]`;
+    }
+    return t;
+  };
+
+  const handleWhatsAppClick = () => {
+    if (!validate()) return;
+    const bodyText = buildBody();
+    const tagLabels = tags.map((k) => TAG_DEFS.find((d) => d.key === k)?.label ?? k).join(" ");
+    const spam = validateAntispamFields({
+      botcheckValue: botcheckRef.current?.value ?? "",
+      honeypotWebsiteValue: hpRef.current?.value ?? "",
+      faxHoneypotValue: faxHoneypotRef.current?.value ?? "",
+      startedAtMs: openedAtRef.current,
+      messageTexts: [bodyText, name, email, phone, tagLabels],
+    });
+    if (!spam.ok) {
+      setClientError(spam.userMessage);
+      return;
+    }
+    if (!waDigits) {
+      setClientError("מספר וואטסאפ לא מוגדר באתר. השתמש בשליחה רגילה.");
+      return;
+    }
+    const text = buildWhatsAppFullText();
+    const url = `https://wa.me/${waDigits}?text=${encodeURIComponent(text)}`;
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
+
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
@@ -307,6 +376,7 @@ export default function IntakeForm() {
     const spam = validateAntispamFields({
       botcheckValue: botcheckRef.current?.value ?? "",
       honeypotWebsiteValue: hpRef.current?.value ?? "",
+      faxHoneypotValue: faxHoneypotRef.current?.value ?? "",
       startedAtMs: openedAtRef.current,
       messageTexts: [bodyText, name, email, phone, tagLabels],
     });
@@ -317,17 +387,33 @@ export default function IntakeForm() {
 
     setStatus("sending");
     const fd = new FormData();
-    fd.append("access_key", WEB3_KEY);
+    fd.append("access_key", WEB3FORMS_ACCESS_KEY);
     fd.append("subject", "הכרות לפני שיחה | NeverMind");
     fd.append("name", name.trim());
+    fd.append("from_name", name.trim());
     fd.append("email", email.trim());
     fd.append("message", bodyText);
+    fd.append("page", "intake");
+    if (phone.trim()) {
+      fd.append("phone", phone.trim());
+    }
     fd.append("botcheck", botcheckRef.current?.value ?? "");
     fd.append("nm_hp_website", hpRef.current?.value ?? "");
     fd.append("nm_form_started_ms", String(openedAtRef.current));
     try {
-      const res = await fetch("https://api.web3forms.com/submit", { method: "POST", body: fd });
-      if (res.ok) {
+      const res = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        headers: { Accept: "application/json" },
+        body: fd,
+      });
+      let apiJson: { success?: boolean; message?: string } = {};
+      try {
+        apiJson = (await res.json()) as { success?: boolean; message?: string };
+      } catch {
+        apiJson = {};
+      }
+      const delivered = res.ok && apiJson.success === true;
+      if (delivered) {
         try {
           localStorage.removeItem(DRAFT_KEY);
         } catch {
@@ -337,23 +423,33 @@ export default function IntakeForm() {
         setTags([]);
         setIntent("");
         setLastTag(null);
+        setHumanAnswer("");
         setStatus("ok");
         (window as unknown as { __nmAnnounce?: (m: string) => void }).__nmAnnounce?.("הטופס נשלח");
       } else {
-        setStatus("err");
+        setStatus("idle");
+        const hint =
+          typeof apiJson.message === "string" && apiJson.message.trim().length > 0
+            ? ` (${apiJson.message.trim()})`
+            : "";
+        setClientError(`השרת לא אישר קבלה${hint}. אפשר לנסות שוב או לשלוח בוואטסאפ.`);
       }
     } catch {
-      setStatus("err");
+      setStatus("idle");
+      setClientError("רשת או חסימה. נסה שוב או שלח בוואטסאפ.");
     }
   };
 
   const showWrite = expressionMode === "write" || expressionMode === "both";
   const showTags = expressionMode === "select" || expressionMode === "both";
 
+  const humanCheckFieldError =
+    clientError === INTAKE_HUMAN_WRONG || clientError === INTAKE_HUMAN_EMPTY;
+
   return (
     <form
       id={formId}
-      className="space-y-10 text-right"
+      className="relative space-y-10 text-right"
       onSubmit={onSubmit}
       dir="rtl"
       noValidate
@@ -366,7 +462,7 @@ export default function IntakeForm() {
         autoComplete="off"
         aria-hidden
         defaultValue=""
-        className="pointer-events-none absolute left-[9999px] h-px w-px overflow-hidden border-0 p-0 opacity-0"
+        className="pointer-events-none absolute start-[10000px] top-0 h-px w-px overflow-hidden border-0 p-0 opacity-0"
       />
       <input
         ref={hpRef}
@@ -377,7 +473,18 @@ export default function IntakeForm() {
         aria-hidden
         title=""
         defaultValue=""
-        className="pointer-events-none absolute left-[9999px] h-px w-px overflow-hidden border-0 p-0 opacity-0"
+        className="pointer-events-none absolute start-[10000px] top-0 h-px w-px overflow-hidden border-0 p-0 opacity-0"
+      />
+      <input
+        ref={faxHoneypotRef}
+        type="text"
+        name="fax_number"
+        tabIndex={-1}
+        autoComplete="off"
+        aria-hidden
+        title=""
+        defaultValue=""
+        className="pointer-events-none absolute start-[10000px] top-0 h-px w-[1px] overflow-hidden border-0 p-0 [clip:rect(0,0,0,0)]"
       />
 
       <section className="space-y-4 rounded-[1.5rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)]/95 p-6">
@@ -549,19 +656,72 @@ export default function IntakeForm() {
         />
       </section>
 
+      <section
+        className="space-y-4 border border-black bg-white p-6 text-black"
+        aria-labelledby={`${formId}-human-h`}
+      >
+        <h3 id={`${formId}-human-h`} className="text-lg font-semibold tracking-tight text-black">
+          רגע של בהירות
+        </h3>
+        <p className="text-sm font-normal leading-relaxed text-black">
+          בוטים עובדים על אוטומט. לצערי, גם רוב האנשים. בוא נוודא שאתה באמת נוכח כאן:
+        </p>
+        <p id={`${formId}-human-prompt`} className="text-base font-medium leading-snug text-black">
+          {humanChallenge.prompt}
+        </p>
+        <div className="space-y-1">
+          <label htmlFor={`${formId}-human`} className="sr-only">
+            תשובה קצרה לשאלה למעלה
+          </label>
+          <input
+            id={`${formId}-human`}
+            name="intake_human_gate"
+            type="text"
+            value={humanAnswer}
+            onChange={(e) => {
+              setHumanAnswer(e.target.value);
+              bumpStatusAfterEdit();
+            }}
+            autoComplete="off"
+            dir="rtl"
+            placeholder="מילה אחת של אמת..."
+            aria-invalid={humanCheckFieldError || undefined}
+            className={`w-full border-0 border-b-2 bg-white py-2 text-base text-black placeholder:text-neutral-500 outline-none ring-0 focus-visible:ring-0 ${
+              humanCheckFieldError ? "border-red-600" : "border-black focus-visible:border-black"
+            }`}
+          />
+        </div>
+      </section>
+
       {clientError ? (
-        <p className="text-sm font-semibold text-[color-mix(in_srgb,var(--nm-accent)_80%,var(--nm-fg))]" role="alert">
+        <p
+          className={`text-sm font-semibold ${humanCheckFieldError ? "text-red-600" : "text-black"}`}
+          role="alert"
+        >
           {clientError}
         </p>
       ) : null}
 
-      <button
-        type="submit"
-        disabled={status === "sending"}
-        className="w-full rounded-full bg-[var(--nm-inverse)] px-6 py-4 text-sm font-bold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-accent)] disabled:opacity-60"
-      >
-        {status === "sending" ? "שולחים…" : "שליחה"}
-      </button>
+      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:justify-stretch">
+        <button
+          type="submit"
+          disabled={status === "sending"}
+          className="min-h-[48px] w-full flex-1 rounded-full bg-[var(--nm-inverse)] px-6 py-4 text-sm font-bold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-accent)] disabled:opacity-60 sm:min-w-[12rem]"
+        >
+          {status === "sending" ? "שולחים…" : "שליחה לאימייל"}
+        </button>
+        <button
+          type="button"
+          onClick={handleWhatsAppClick}
+          disabled={status === "sending"}
+          className="min-h-[48px] w-full flex-1 rounded-full border-2 border-[color-mix(in_srgb,var(--nm-fg)_18%,transparent)] bg-[var(--nm-bg-canvas)] px-6 py-4 text-sm font-bold text-[var(--nm-fg)] transition hover:border-[color-mix(in_srgb,var(--nm-accent)_40%,transparent)] hover:bg-[var(--nm-tint)] disabled:opacity-60 sm:min-w-[12rem]"
+        >
+          שליחה לוואטסאפ (אותו תוכן)
+        </button>
+      </div>
+      <p className="text-center text-xs leading-relaxed text-[color-mix(in_srgb,var(--nm-fg)_55%,var(--nm-bg))]">
+        שני הערוצים עוברים את אותו רגע בהירות ואת אותן בדיקות שקטות לפני פתיחה. בוואטסאפ נפתח חלון עם כל התוכן כטקסט אחד.
+      </p>
 
       {status === "ok" ? (
         <p
@@ -571,11 +731,6 @@ export default function IntakeForm() {
           aria-live="polite"
         >
           התקבל. אם צריך עוד פרטים, נחזור למייל שציינת.
-        </p>
-      ) : null}
-      {status === "err" ? (
-        <p className="text-center text-sm font-semibold text-[color-mix(in_srgb,var(--nm-accent)_70%,var(--nm-fg))]">
-          לא נשלח הפעם. נסה שוב בעוד רגע.
         </p>
       ) : null}
     </form>

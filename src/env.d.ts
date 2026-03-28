@@ -1,6 +1,7 @@
 /// <reference types="astro/client" />
 
 interface ImportMetaEnv {
+  readonly PUBLIC_WEB3FORMS_ACCESS_KEY?: string;
   readonly PUBLIC_CLIENT_LOG_URL?: string;
   readonly PUBLIC_WHATSAPP_NUMBER?: string;
   readonly NEXT_PUBLIC_WHATSAPP_NUMBER?: string;
@@ -9,6 +10,11 @@ interface ImportMetaEnv {
 
 interface ImportMeta {
   readonly env: ImportMetaEnv;
+}
+
+interface Window {
+  __nmArticleCleanup?: () => void;
+  __nmAnnounce?: (message: string) => void;
 }
 
 declare namespace astroHTML.JSX {

@@ -1,0 +1,44 @@
+---
+/**
+ * קריאה להרשמה מעל אזור תוכן נעול (פרימיום). רקע off-white וגבול אדום מותג.
+ */
+interface Props {
+  articleTitle: string;
+  ctaHref: string;
+  ctaLabel?: string;
+  hookLine?: string;
+}
+
+const {
+  articleTitle,
+  ctaHref,
+  ctaLabel = "לפתיחת הגישה המלאה",
+  hookLine,
+} = Astro.props;
+
+const line =
+  hookLine ??
+  `עצרת בשיא. המנגנון שמאחורי ${articleTitle.trim() || "המאמר"} נחשף במועדון.`;
+---
+
+<section
+  class="nm-subscription-callout not-prose my-6 rounded-2xl border-2 border-[#D42B2B] bg-[#FAFAF8] px-5 py-5 text-right shadow-sm"
+  dir="rtl"
+  aria-label="הרשמה לתוכן מלא"
+>
+  <p class="text-xs font-semibold uppercase tracking-[0.16em] text-[#D42B2B]">מועדון NeverMind</p>
+  <p class="mt-3 text-[clamp(0.98rem,0.92rem+0.25vw,1.12rem)] font-semibold leading-8 text-[#1a1a1a]">
+    {line}
+  </p>
+  <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,#1a1a1a_68%,#FAFAF8)]">
+    כדי לראות את האמת במלואה, נכנסים דרך המסלול המלא. הבסיס נשאר פתוח. ההמשך מדויק יותר.
+  </p>
+  <div class="mt-5 flex flex-wrap justify-end gap-3">
+    <a
+      href={ctaHref}
+      class="inline-flex min-h-[44px] items-center justify-center rounded-full bg-[#1a1a1a] px-6 py-2.5 text-sm font-semibold text-white no-underline transition hover:bg-[#2a2a2a]"
+    >
+      {ctaLabel}
+    </a>
+  </div>
+</section>

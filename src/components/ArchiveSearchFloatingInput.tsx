@@ -16,6 +16,8 @@ type Props = {
   label: string;
   pagefindInput?: boolean;
   autoFocus?: boolean;
+  /** ערך התחלתי (למשל מפרמטר ?q= בדף חיפוש) */
+  defaultValue?: string;
   className?: string;
   fieldInnerEnd?: ReactNode;
   fieldPaddingEndClass?: string;
@@ -26,6 +28,7 @@ export function ArchiveSearchFloatingInput({
   label,
   pagefindInput,
   autoFocus,
+  defaultValue,
   className,
   fieldInnerEnd,
   fieldPaddingEndClass = "pr-12",
@@ -40,6 +43,7 @@ export function ArchiveSearchFloatingInput({
       hideValidation
       pagefindInput={pagefindInput}
       autoFocus={autoFocus}
+      defaultValue={defaultValue}
       className={className}
       fieldInnerEnd={fieldInnerEnd ?? searchGlyph}
       fieldPaddingEndClass={fieldPaddingEndClass}

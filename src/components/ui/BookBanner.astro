@@ -1,4 +1,6 @@
 ---
+import { jsonLdForInlineScript } from "../../lib/json-ld-inline";
+
 interface Props {
   eyebrow?: string;
   title?: string;
@@ -11,39 +13,39 @@ const {
   eyebrow = "לפני שמתחילים לפרק",
   title = "אהבה ב-20 עמודים",
   body = "כתבתי ספר קצר שמפרק את מה שבאמת קורה ביחסים, בלי לעטוף שום דבר בצמר גפן. רק הלוגיקה של הקשר. זמין בגרסה דיגיטלית או בעותק פיזי - מה שנוח לך.",
-  digitalHref = "/product/אהבה-ב-20-עמודים/",
-  physicalHref = "/product/לרכישת-הספר-אהבה-ב-20-עמודים/",
+  digitalHref = "/book/",
+  physicalHref = "/book/",
   questionHref = "/studio/?topic=book-question",
 } = Astro.props as Props;
+
+const bookSchema = {
+  "@context": "https://schema.org",
+  "@type": "Book",
+  name: title,
+  author: {
+    "@type": "Person",
+    name: "השם לא משנה",
+  },
+  inLanguage: "he",
+  bookFormat: ["EBook", "Paperback"],
+  description: body,
+  url: "/book/",
+  offers: [
+    {
+      "@type": "Offer",
+      name: "גרסה דיגיטלית",
+      priceCurrency: "ILS",
+    },
+    {
+      "@type": "Offer",
+      name: "עותק פיזי",
+      priceCurrency: "ILS",
+    },
+  ],
+};
 ---
 
-<script type="application/ld+json">
-  {JSON.stringify({
-    "@context": "https://schema.org",
-    "@type": "Book",
-    name: title,
-    author: {
-      "@type": "Person",
-      name: "השם לא משנה",
-    },
-    inLanguage: "he",
-    bookFormat: ["EBook", "Paperback"],
-    description: body,
-    url: "/product/אהבה-ב-20-עמודים/",
-    offers: [
-      {
-        "@type": "Offer",
-        name: "גרסה דיגיטלית",
-        priceCurrency: "ILS",
-      },
-      {
-        "@type": "Offer",
-        name: "עותק פיזי",
-        priceCurrency: "ILS",
-      },
-    ],
-  })}
-</script>
+<script is:inline type="application/ld+json" set:html={jsonLdForInlineScript(bookSchema)}></script>
 
 <aside
   aria-label={`המלצת ספר: ${title}`}

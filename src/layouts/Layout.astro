@@ -9,6 +9,7 @@ import WhatsAppButton from "../components/WhatsAppButton.astro";
 import WhisperBanner from "../components/WhisperBanner.astro";
 import appConfig from "../config/appConfig.json";
 import siteSettings from "../config/siteSettings.json";
+import { jsonLdForInlineScript } from "../lib/json-ld-inline";
 import { disclaimerLong } from "../lib/services";
 
 type StagingBannerCfg = { enabled?: boolean; message?: string };
@@ -53,6 +54,8 @@ const {
   noIndex = false,
   robots = "index, follow",
   waArticleSlug = "",
+  seoArticleBody = "",
+  articlePaywalled = false,
 } = Astro.props;
 
 const waTags = Array.isArray(frontmatter?.tags) ? frontmatter.tags : [];
@@ -118,7 +121,12 @@ const resolveOgImage = (): string => {
 const ogImage = resolveOgImage();
 const showOgRasterDimensions =
   ogImage === defaultOgAbsolute && /\.(jpe?g|png|webp)$/i.test(defaultOgPath);
-const ogImageAlt = frontmatter?.title ? String(frontmatter.title) : pageTitle;
+const ogImageAlt =
+  typeof frontmatter?.imageAlt === "string" && frontmatter.imageAlt.trim().length > 0
+    ? frontmatter.imageAlt.trim()
+    : frontmatter?.title
+      ? String(frontmatter.title)
+      : pageTitle;
 const clientLogUrl = (import.meta.env.PUBLIC_CLIENT_LOG_URL ?? "").trim();
 const logoAbsolute = new URL(logoPath.replace(/^\//, ""), siteUrlSlash).toString();
 const wordmarkHe =
@@ -251,6 +259,7 @@ const footerLinkColumns: { title: string; links: { href: string; label: string }
       { href: "/articles/", label: "ארכיון מאמרים" },
       { href: "/library/", label: "ספרייה מובנית" },
       { href: "/about/", label: "איך זה עובד כאן" },
+      { href: "/about/#nm-about-faq", label: "שאלות ותשובות על השיטה" },
       { href: "/glossary/", label: "הגדרות מחדש" },
       { href: "/questions/", label: "שאלות קצרות" },
       { href: "/now/", label: "מה המצב עכשיו" },
@@ -277,7 +286,7 @@ const footerLinkColumns: { title: string; links: { href: string; label: string }
     title: "מערכת",
     links: [
       { href: "/contact/", label: "יצירת קשר" },
-      { href: "/faq/", label: "שאלות נפוצות" },
+      { href: "/about/#nm-about-faq", label: "שאלות ותשובות" },
       { href: "/testimonials/", label: "המלצות" },
       { href: "/privacy/", label: "מדיניות פרטיות" },
       { href: "/terms/", label: "תנאי התקשרות" },
@@ -320,6 +329,7 @@ const toIso = (value: string | Date | undefined) => {
   return Number.isNaN(date.getTime()) ? undefined : date.toISOString();
 };
 
+const seoBodyTrimmed = typeof seoArticleBody === "string" ? seoArticleBody.trim() : "";
 const articleSchema = frontmatter
   ? {
       "@context": "https://schema.org",
@@ -340,6 +350,8 @@ const articleSchema = frontmatter
         name: siteTitle,
         url: siteUrl,
       },
+      ...(articlePaywalled ? { isAccessibleForFree: false } : {}),
+      ...(seoBodyTrimmed.length > 0 ? { articleBody: seoBodyTrimmed } : {}),
     }
   : null;
 
@@ -408,14 +420,13 @@ const videoObjectSchema =
       }
     : null;
 
-const schemas = [
+const coreStructuredData = [
   organizationSchema,
   websiteSchema,
   professionalServiceSchema,
   breadcrumbSchema,
   articleSchema,
   videoObjectSchema,
-  faqSchema,
 ].filter(Boolean);
 const randomArticlePaths = (await getCollection("articles", ({ data }) => data.draft !== true)).map((entry) => `/articles/${entry.slug}`);
 
@@ -469,11 +480,13 @@ const socialLinks = [
     <meta name="twitter:description" content={pageDescription} />
     <meta name="twitter:image" content={ogImage} />
 
-    <script is:inline type="application/ld+json" set:html={JSON.stringify(schemas)}></script>
+    <script is:inline type="application/ld+json" set:html={jsonLdForInlineScript(coreStructuredData)}></script>
+    {faqSchema ? <script is:inline type="application/ld+json" set:html={jsonLdForInlineScript(faqSchema)} /> : null}
     <ClientRouter />
     <script>
       import "../scripts/form-antispam-bootstrap.ts";
       import "../scripts/site-search-bootstrap.ts";
+      import "../scripts/glossary-tooltip-bootstrap.ts";
     </script>
 
   </head>

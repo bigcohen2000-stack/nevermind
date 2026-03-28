@@ -1,5 +1,6 @@
 ---
 import { buildArticleContextWhatsAppHref } from "../lib/services";
+import { WEB3FORMS_ACCESS_KEY } from "../lib/web3forms-access";
 import { microPosts } from "../data/microPosts";
 import BigQuestionLayout from "./BigQuestionLayout.astro";
 import FormAntispamFields from "./FormAntispamFields.astro";
@@ -13,13 +14,12 @@ interface GlossaryTerm {
 interface Props {
   pageTitle: string;
   pageUrl: string;
-  web3formsKey: string;
   tags?: string[];
   articleTitle?: string;
   glossaryTerms?: GlossaryTerm[];
 }
 
-const { pageTitle, pageUrl, web3formsKey, tags = [], articleTitle = "", glossaryTerms } = Astro.props as Props;
+const { pageTitle, pageUrl, tags = [], articleTitle = "", glossaryTerms } = Astro.props as Props;
 const recentMicroPosts = microPosts.slice(0, 3);
 const contextWaHref = buildArticleContextWhatsAppHref({ tags, articleTitle: articleTitle || pageTitle });
 ---
@@ -45,7 +45,7 @@ const contextWaHref = buildArticleContextWhatsAppHref({ tags, articleTitle: arti
       action="https://api.web3forms.com/submit"
       method="POST"
     >
-      <input type="hidden" name="access_key" value={web3formsKey} />
+      <input type="hidden" name="access_key" value={WEB3FORMS_ACCESS_KEY} />
       <input type="hidden" name="subject" value="שאלה לוגית חדשה מ-NeverMind" />
       <input type="hidden" name="source_page" value={pageTitle} />
       <input type="hidden" name="source_url" value={pageUrl} />

@@ -4,8 +4,12 @@
     "private": true,
     "scripts": {
         "dev": "astro dev",
+        "validate:articles": "tsx scripts/validate-article-frontmatter.ts",
+        "validate": "npm run validate:articles && node scripts/pre-publish-check.mjs",
+        "migration:report": "node scripts/migration-orphan-report.mjs",
+        "prebuild": "npm run validate",
         "build": "astro build",
-        "postbuild": "node scripts/check-internal-links.mjs",
+        "postbuild": "node scripts/check-internal-links.mjs && node scripts/postbuild-article-seo-check.mjs",
         "preview": "astro preview",
         "check": "astro check",
         "format": "prettier --write .",
@@ -14,6 +18,7 @@
         "deploy": "npm run pre-deploy && npm run build && wrangler pages deploy dist"
     },
     "dependencies": {
+        "@astrojs/cloudflare": "^12.6.13",
         "@astrojs/mdx": "^4.3.14",
         "@astrojs/react": "^4.4.2",
         "@astrojs/rss": "^4.0.17",
@@ -21,10 +26,13 @@
         "@fontsource-variable/assistant": "^5.2.9",
         "astro": "^5.18.1",
         "astro-pagefind": "^1.8.5",
+        "gray-matter": "^4.0.3",
         "js-yaml": "^4.1.1",
         "lite-youtube-embed": "^0.3.4",
+        "marked": "^17.0.5",
         "react": "^18.3.1",
-        "react-dom": "^18.3.1"
+        "react-dom": "^18.3.1",
+        "unist-util-visit": "^5.1.0"
     },
     "devDependencies": {
         "@astrojs/check": "^0.9.8",
@@ -36,6 +44,7 @@
         "prettier": "^3.5.3",
         "prettier-plugin-tailwindcss": "^0.6.11",
         "tailwindcss": "^4.2.1",
+        "tsx": "^4.19.4",
         "typescript": "^5.6.3",
         "unist-util-visit-parents": "^6.0.1"
     },

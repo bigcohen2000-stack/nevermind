@@ -1,15 +1,51 @@
+import fs from "node:fs";
+import path from "node:path";
+import cloudflare from "@astrojs/cloudflare";
 import { defineConfig } from "astro/config";
 import mdx from "@astrojs/mdx";
 import react from "@astrojs/react";
 import sitemap from "@astrojs/sitemap";
 import pagefind from "astro-pagefind";
 import tailwindcss from "@tailwindcss/vite";
+import matter from "gray-matter";
 import remarkGlossaryLinks from "./src/plugins/remark-glossary-links";
+import rehypeGlossaryPreviews from "./src/plugins/rehype-glossary-previews";
+import { premiumMdxStripPlugin } from "./src/vite-plugins/premium-mdx-strip";
+
+const articlesDir = path.resolve("src/content/articles");
+
+/** lastmod לפי frontmatter (updatedDate או pubDate) למסלולי /articles/... */
+function articlePathToLastmod(): Map<string, Date> {
+  const map = new Map<string, Date>();
+  if (!fs.existsSync(articlesDir)) return map;
+  for (const name of fs.readdirSync(articlesDir)) {
+    if (!name.endsWith(".mdx")) continue;
+    const raw = fs.readFileSync(path.join(articlesDir, name), "utf8");
+    let data: Record<string, unknown>;
+    try {
+      data = matter(raw).data as Record<string, unknown>;
+    } catch {
+      continue;
+    }
+    if (data.draft === true) continue;
+    const slug = name.replace(/\.mdx$/i, "");
+    const pathname = `/articles/${slug}`;
+    const updated = data.updatedDate ?? data.pubDate;
+    if (updated == null) continue;
+    const d = new Date(updated as string | number | Date);
+    if (Number.isNaN(d.getTime())) continue;
+    map.set(pathname, d);
+  }
+  return map;
+}
+
+const articleLastmodByPath = articlePathToLastmod();
 
 export default defineConfig({
   site: "https://www.nevermind.co.il",
   publicDir: "./public",
   output: "static",
+  adapter: cloudflare(),
   build: {
     format: "directory",
   },
@@ -22,7 +58,10 @@ export default defineConfig({
     domains: ["youtube.com", "i.ytimg.com", "img.youtube.com"],
   },
   integrations: [
-    mdx({ remarkPlugins: [remarkGlossaryLinks] }),
+    mdx({
+      remarkPlugins: [remarkGlossaryLinks],
+      rehypePlugins: [rehypeGlossaryPreviews],
+    }),
     react(),
     sitemap({
       filter: (page) => {
@@ -78,13 +117,15 @@ export default defineConfig({
         } else if (pathname === "/articles" || pathname.startsWith("/articles/")) {
           priority = 0.75;
         }
-        return { ...item, priority, changefreq };
+        const articleMod = articleLastmodByPath.get(pathname);
+        const lastmod = articleMod ?? (item as { lastmod?: Date }).lastmod;
+        return { ...item, priority, changefreq, ...(lastmod ? { lastmod } : {}) };
       },
     }),
     pagefind(),
   ],
   vite: {
-    plugins: [tailwindcss()],
+    plugins: [tailwindcss(), premiumMdxStripPlugin()],
     build: {
       minify: "esbuild",
       cssMinify: true,

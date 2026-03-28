@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="he" dir="rtl">
   <head>
     <meta charset="utf-8" />
@@ -84,6 +84,59 @@
               <div>${(data.content || "").replace(/\n/g, "<br>")}</div>
             </div>
           `;
+        },
+      });
+
+      const ALLOWED_ARTICLE_TAGS = [
+        "חופש",
+        "מכניקת מחשבה",
+        "העצמי",
+        "בהירות",
+        "בחירה",
+        "זוגיות",
+        "משפחה וחינוך",
+        "פילוסופיה וחברה",
+        "תודעה ורצון",
+        "חשיבה ביקורתית",
+        "שאלות גדולות",
+        "רגשות",
+        "ניסויי מחשבה",
+      ];
+      const ALLOWED_SET = new Set(ALLOWED_ARTICLE_TAGS);
+
+      CMS.registerEventListener({
+        name: "preSave",
+        handler: ({ entry }) => {
+          const js = typeof entry.toJS === "function" ? entry.toJS() : entry;
+          if (js.collection !== "articles") return;
+          const data = js.data || {};
+
+          const pub = data.pubDate;
+          let pubStr = "";
+          if (pub instanceof Date) {
+            pubStr = pub.toISOString().slice(0, 10);
+          } else if (typeof pub === "string") {
+            pubStr = pub.trim().slice(0, 10);
+          }
+          if (!pubStr || !/^\d{4}-\d{2}-\d{2}$/.test(pubStr) || Number.isNaN(Date.parse(pubStr))) {
+            return {
+              error: {
+                message: "שמירה נחסמה: חובה למלא pubDate בפורמט YYYY-MM-DD בדיוק.",
+              },
+            };
+          }
+
+          const tags = Array.isArray(data.tags) ? data.tags : [];
+          for (const t of tags) {
+            const key = String(t).trim();
+            if (!ALLOWED_SET.has(key)) {
+              return {
+                error: {
+                  message: `שמירה נחסמה: התגית "${key}" לא ברשימה המאושרת.`,
+                },
+              };
+            }
+          }
         },
       });
 

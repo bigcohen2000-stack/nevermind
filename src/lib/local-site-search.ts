@@ -37,6 +37,11 @@ const STATIC_HITS: SiteSearchHit[] = [
     title: "צור קשר (אונליין)",
     excerpt: "כתיבה או סימון לפני שיחה.",
   },
+  {
+    url: "/about/#nm-about-faq",
+    title: "שאלות ותשובות על שיטת NeverMind",
+    excerpt: "מה זו השיטה, איך שונה, זמן, אגו, זוגיות, מסלול ופרטיות.",
+  },
 ];
 
 function normalizeQuery(raw: string): string {

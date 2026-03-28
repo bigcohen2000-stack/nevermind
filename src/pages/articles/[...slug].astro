@@ -1,40 +1,46 @@
 ---
 import { getCollection, render, type CollectionEntry } from "astro:content";
-import Layout from "../layouts/Layout.astro";
-import siteSettings from "../config/siteSettings.json";
-import appConfig from "../config/appConfig.json";
-import { glossaryConcepts } from "../data/glossary";
-import { buildArticleMeetingWhatsAppMessage, buildWhatsAppHref } from "../lib/services";
-import InquiryBox from "../components/InquiryBox.astro";
-import InquirySection from "../components/InquirySection.astro";
-import SubscribeBanner from "../components/SubscribeBanner.astro";
-import VideoPlayer from "../components/VideoPlayer.astro";
-import SkepticBox from "../components/SkepticBox.astro";
-import ConceptCallout from "../components/ConceptCallout.astro";
-import BottomLineSummary from "../components/BottomLineSummary.astro";
-import PremiumLock from "../components/PremiumLock.astro";
-import PremiumBreak from "../components/PremiumBreak.astro";
-import RevealInsight from "../components/RevealInsight.astro";
-import ReflectionQuestions from "../components/ReflectionQuestions.astro";
-import LogicalQuestionBox from "../components/LogicalQuestionBox.astro";
-import PerspectiveToggle from "../components/PerspectiveToggle.astro";
-import RefutationBox from "../components/RefutationBox.astro";
-import DeepDiveConcepts from "../components/DeepDiveConcepts.astro";
-import LogicNote from "../components/LogicNote.astro";
-import WhatsAppButton from "../components/WhatsAppButton.astro";
-import ThoughtReveal from "../components/ThoughtReveal.astro";
-import AudioNarrative from "../components/AudioNarrative.astro";
-import { DirectLink } from "../components/ui/DirectLink";
-import TruthBlock from "../components/ui/TruthBlock";
-import SocialParadoxes from "../components/SocialParadoxes.astro";
-import DeepDiveInquiry from "../components/DeepDiveInquiry.astro";
-import ClarityAnalogy from "../components/ClarityAnalogy.astro";
-import ArticleShareActions from "../components/ArticleShareActions.astro";
-import ArticleBenefits from "../components/ArticleBenefits.astro";
-import TenSecondExercise from "../components/TenSecondExercise.astro";
-import NextNaturalStep from "../components/NextNaturalStep.astro";
-import DepthSideNav from "../components/DepthSideNav.astro";
-import BookBanner from "../components/ui/BookBanner.astro";
+import Layout from "../../layouts/Layout.astro";
+import siteSettings from "../../config/siteSettings.json";
+import appConfig from "../../config/appConfig.json";
+import { glossaryConcepts } from "../../data/glossary";
+import { buildArticleMeetingWhatsAppMessage, buildWhatsAppHref } from "../../lib/services";
+import InquiryBox from "../../components/InquiryBox.astro";
+import InquirySection from "../../components/InquirySection.astro";
+import SubscribeBanner from "../../components/SubscribeBanner.astro";
+import VideoPlayer from "../../components/VideoPlayer.astro";
+import SkepticBox from "../../components/SkepticBox.astro";
+import ConceptCallout from "../../components/ConceptCallout.astro";
+import BottomLineSummary from "../../components/BottomLineSummary.astro";
+import PremiumLock from "../../components/PremiumLock.astro";
+import PremiumBreak from "../../components/PremiumBreak.astro";
+import RevealInsight from "../../components/RevealInsight.astro";
+import ReflectionQuestions from "../../components/ReflectionQuestions.astro";
+import LogicalQuestionBox from "../../components/LogicalQuestionBox.astro";
+import PerspectiveToggle from "../../components/PerspectiveToggle.astro";
+import RefutationBox from "../../components/RefutationBox.astro";
+import DeepDiveConcepts from "../../components/DeepDiveConcepts.astro";
+import LogicNote from "../../components/LogicNote.astro";
+import WhatsAppButton from "../../components/WhatsAppButton.astro";
+import ThoughtReveal from "../../components/ThoughtReveal.astro";
+import AudioNarrative from "../../components/AudioNarrative.astro";
+import { DirectLink } from "../../components/ui/DirectLink";
+import TruthBlockBound from "../../components/TruthBlockBound.astro";
+import { setArticleRenderContext } from "../../lib/article-render-context";
+import { getSeoArticlePlainText } from "../../lib/article-seo-plain";
+import { resolveArticleHeroImage } from "../../lib/resolve-article-hero-image";
+import { MIND_SHIFT_INACTIVE_HEX, MIND_SHIFT_SCALE_HEX } from "../../data/mind-shift-scale";
+import { signPremiumFragmentForSlug } from "../../lib/premium-fragment-signing";
+import SocialParadoxes from "../../components/SocialParadoxes.astro";
+import DeepDiveInquiry from "../../components/DeepDiveInquiry.astro";
+import ClarityAnalogy from "../../components/ClarityAnalogy.astro";
+import ArticleShareActions from "../../components/ArticleShareActions.astro";
+import ArticleBenefits from "../../components/ArticleBenefits.astro";
+import TenSecondExercise from "../../components/TenSecondExercise.astro";
+import NextNaturalStep from "../../components/NextNaturalStep.astro";
+import DepthSideNav from "../../components/DepthSideNav.astro";
+import BookBanner from "../../components/ui/BookBanner.astro";
+import SubscriptionCallout from "../../components/SubscriptionCallout.astro";
 
 type ArticleEntry = CollectionEntry<"articles">;
 type InternalLink = {
@@ -101,19 +107,27 @@ const kindLabelMap = {
 export async function getStaticPaths() {
   const entries = await getCollection("articles", ({ data }) => data.draft !== true);
   return entries.map((entry) => ({
-    params: { slug: `articles/${entry.id.replace(/\.mdx$/, "")}` },
+    params: { slug: entry.id.replace(/\.mdx$/, "") },
     props: { entry },
   }));
 }
 
 const allEntries = await getCollection("articles", ({ data }) => data.draft !== true);
 const { entry } = Astro.props as { entry: ArticleEntry };
-const { Content } = await render(entry);
 const frontmatter = entry.data;
 const rawContent = entry.body ?? "";
 const title = frontmatter.title;
 const description = frontmatter.description;
 const bottomLine = frontmatter.bottomLine ?? frontmatter.description;
+const originalInsight =
+  typeof frontmatter.originalInsight === "string" ? frontmatter.originalInsight.trim() : "";
+const questionForSchemaFromFm =
+  typeof frontmatter.questionForSchema === "string" ? frontmatter.questionForSchema.trim() : "";
+setArticleRenderContext({
+  questionForSchema: questionForSchemaFromFm,
+  originalInsight,
+});
+const { Content } = await render(entry);
 const youtubeId = typeof frontmatter.youtubeId === "string" ? frontmatter.youtubeId.trim() : "";
 const videoSummaryPoints = Array.isArray(frontmatter.videoSummaryPoints)
   ? frontmatter.videoSummaryPoints.map((point) => String(point).trim()).filter(Boolean)
@@ -129,10 +143,25 @@ const shareUrl = Astro.url ? new URL(Astro.url.pathname, siteUrl).toString() : s
 const whatsappShareUrl = `https://wa.me/?text=${encodeURIComponent(
   `קראתי את זה וחשבתי עליך, זה בדיוק מה שדיברנו עליו:\n${title}\n${shareUrl}`
 )}`;
-const web3formsKey = "94b32b6c-7590-4ac6-b8b4-1bc73dd2e5c8";
-const currentSlug = `articles/${toArticleSlug(entry)}`;
+const articleFileSlug = toArticleSlug(entry);
+const heroImageSrc = resolveArticleHeroImage(articleFileSlug, frontmatter.image);
+const heroImageAlt =
+  typeof frontmatter.imageAlt === "string" && frontmatter.imageAlt.trim().length > 0
+    ? frontmatter.imageAlt.trim()
+    : title;
+const rawMind = frontmatter.mindShiftIntensity;
+const mindShiftIntensity =
+  typeof rawMind === "number" && rawMind >= 1 && rawMind <= 5
+    ? rawMind
+    : typeof rawMind === "string" && /^[1-5]$/.test(rawMind.trim())
+      ? Number(rawMind.trim())
+      : undefined;
+const currentSlug = `articles/${articleFileSlug}`;
+const premiumFragmentSignature = frontmatter.isPremium ? signPremiumFragmentForSlug(articleFileSlug) : "";
 const plainText = rawContent.replace(/<[^>]*>/g, " ");
 const wordCount = plainText.split(/\s+/).filter(Boolean).length;
+const hasTruthBlockInBody = /<TruthBlock\b/i.test(rawContent);
+const seoArticlePlain = getSeoArticlePlainText(entry.id, Boolean(frontmatter.isPremium), rawContent);
 const readingMinutes = Math.max(1, Math.ceil(wordCount / 200));
 const difficultyKey: DifficultyKey =
   frontmatter.difficultyLevel && frontmatter.difficultyLevel in difficultyConfig
@@ -178,7 +207,6 @@ const meetingMessage = buildArticleMeetingWhatsAppMessage({
   slug: currentSlug,
 });
 const reflectionWhatsAppUrl = buildWhatsAppHref(meetingMessage);
-const originalInsight = typeof frontmatter.originalInsight === "string" ? frontmatter.originalInsight.trim() : "";
 const premiumVault = siteSettings.premiumVault;
 const premiumAccess = appConfig.premiumAccess;
 const manualRelatedConcepts = Array.isArray(frontmatter.relatedConcepts) ? frontmatter.relatedConcepts : [];
@@ -403,7 +431,7 @@ const components = {
   VideoPlayer,
   PerspectiveToggle,
   ThoughtReveal,
-  TruthBlock,
+  TruthBlock: TruthBlockBound,
   SocialParadoxes,
   DeepDiveInquiry,
   ClarityAnalogy,
@@ -416,17 +444,48 @@ const components = {
   frontmatter={frontmatter}
   hasInquirySection={hasInquirySection}
   faqItems={faqItems}
-  image={frontmatter.image}
+  image={heroImageSrc}
   waArticleSlug={currentSlug}
+  seoArticleBody={seoArticlePlain.slice(0, 120000)}
+  articlePaywalled={Boolean(frontmatter.isPremium)}
 >
   <div aria-hidden="true" class="fixed inset-x-0 top-0 z-40 h-px bg-transparent">
     <span id="reading-progress" class="block h-px w-0 bg-[var(--nm-inverse)]"></span>
   </div>
 
-  <div class="mx-auto max-w-7xl lg:grid lg:grid-cols-[minmax(0,72ch)_minmax(280px,340px)] lg:gap-10">
-    <article class="min-w-0 space-y-[clamp(1.75rem,3vw,2.5rem)]">
-      <nav aria-label="פירורי לחם" class="text-right">
-        <ol class="flex w-full flex-wrap items-center justify-start gap-2 text-sm text-[color-mix(in_srgb,var(--nm-fg)_58%,var(--nm-bg))]">
+  {
+    originalInsight && hasTruthBlockInBody ? (
+      <div
+        class="nm-insight-sticky pointer-events-none fixed left-0 right-0 top-[4.75rem] z-[48] mx-auto flex w-full max-w-[min(100%,72ch)] items-center gap-3 px-4 py-2.5"
+        data-insight-sticky
+        dir="rtl"
+      >
+        <p class="pointer-events-none min-w-0 flex-1 truncate text-sm font-semibold leading-snug text-[var(--nm-fg)]">{originalInsight}</p>
+        <button
+          type="button"
+          data-copy-insight
+          data-insight={originalInsight}
+          data-article-title={title}
+          data-copy-plain="true"
+          aria-label="העתק תובנה"
+          class="pointer-events-auto inline-flex size-9 shrink-0 items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-white text-[var(--nm-fg)] transition hover:border-[color-mix(in_srgb,var(--nm-accent)_35%,transparent)] hover:text-[var(--nm-accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--nm-accent)]"
+        >
+          <svg class="size-[1.05rem]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+            />
+          </svg>
+        </button>
+      </div>
+    ) : null
+  }
+
+  <div class="mx-auto w-full min-w-0 max-w-7xl lg:grid lg:grid-cols-[minmax(0,72ch)_minmax(280px,340px)] lg:gap-10">
+    <article class="min-w-0 max-w-full space-y-[clamp(1.75rem,3vw,2.5rem)]">
+      <nav aria-label="פירורי לחם" class="min-w-0 text-right">
+        <ol class="flex w-full min-w-0 flex-wrap items-center justify-start gap-2 text-sm text-[color-mix(in_srgb,var(--nm-fg)_58%,var(--nm-bg))]">
           <li>
             <a
               href="/"
@@ -445,12 +504,56 @@ const components = {
             </a>
           </li>
           <li aria-hidden="true" class="text-[color-mix(in_srgb,var(--nm-fg)_36%,var(--nm-bg))]">›</li>
-          <li class="font-semibold text-[color-mix(in_srgb,var(--nm-fg)_76%,var(--nm-bg))]">{title}</li>
+          <li class="min-w-0 max-w-full break-words font-semibold text-[color-mix(in_srgb,var(--nm-fg)_76%,var(--nm-bg))]">{title}</li>
         </ol>
       </nav>
 
       <header class="space-y-5 text-right">
-        <h1 class="text-[clamp(2.1rem,1.65rem+2vw,4rem)] font-semibold leading-[1.04] text-[var(--nm-fg)]">{title}</h1>
+        <div class="flex flex-wrap items-start justify-end gap-3 gap-y-2">
+          <h1 class="min-w-0 flex-1 text-balance break-words text-[clamp(2.1rem,1.65rem+2vw,4rem)] font-semibold leading-[1.04] text-[var(--nm-fg)]">{title}</h1>
+          <div class="flex shrink-0 flex-wrap items-center justify-end gap-2">
+            {mindShiftIntensity != null ? (
+              <span
+                class="inline-flex items-center gap-0.5 rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-white/85 px-2 py-1.5"
+                title={`עוצמת שינוי תפיסתי ${mindShiftIntensity} מתוך 5`}
+                aria-label={`עוצמת שינוי תפיסתי ${mindShiftIntensity} מתוך 5`}
+              >
+                {[1, 2, 3, 4, 5].map((step) => (
+                  <svg
+                    class="size-[1.15rem] shrink-0"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    aria-hidden="true"
+                    style={`color: ${step <= mindShiftIntensity! ? MIND_SHIFT_SCALE_HEX[step - 1] : MIND_SHIFT_INACTIVE_HEX}; opacity: ${step <= mindShiftIntensity! ? 1 : 0.38};`}
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M13 10V3L4 14h7v7l9-11h-7z"
+                    />
+                  </svg>
+                ))}
+              </span>
+            ) : null}
+            {frontmatter.isPremium ? (
+              <span
+                class="inline-flex shrink-0 items-center gap-1 rounded-full border border-[color-mix(in_srgb,var(--nm-accent)_40%,transparent)] bg-[color-mix(in_srgb,var(--nm-accent)_08%,var(--nm-bg))] px-2.5 py-1 text-[0.65rem] font-bold uppercase tracking-[0.14em] text-[var(--nm-accent)]"
+                title="תוכן מועדון"
+              >
+                <svg class="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                  />
+                </svg>
+                Premium
+              </span>
+            ) : null}
+          </div>
+        </div>
         <section
           aria-label="תקציר המאמר"
           class="rounded-[1.4rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] border-r-4 border-r-[var(--nm-accent)] bg-[var(--nm-bg-canvas)]/85 px-5 py-4"
@@ -459,14 +562,14 @@ const components = {
           <p class="mt-2 text-[clamp(1.08rem,1rem+0.35vw,1.35rem)] font-semibold leading-8 text-[color-mix(in_srgb,var(--nm-fg)_80%,var(--nm-bg))]">{description}</p>
         </section>
 
-        {frontmatter.image && frontmatter.image !== "/images/logo.svg" ? (
+        {heroImageSrc && heroImageSrc !== "/images/logo.svg" ? (
           <section
             class="mx-auto max-w-[72ch] overflow-hidden rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/70"
             aria-label="תמונה ראשית"
           >
             <img
-              src={frontmatter.image}
-              alt={title}
+              src={heroImageSrc}
+              alt={heroImageAlt}
               loading="lazy"
               decoding="async"
               width="1280"
@@ -479,22 +582,32 @@ const components = {
         <ArticleBenefits reflectionQuestions={reflectionQuestions} bottomLine={bottomLine} />
 
         {originalInsight && (
-          <section class="rounded-[1.35rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-5 py-4">
-            <div class="flex flex-wrap items-start justify-between gap-3">
+          <section
+            class="rounded-[1.35rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-5 py-4"
+            data-insight-hero
+            dir="rtl"
+          >
+            <div class="flex flex-wrap items-center justify-between gap-3">
               <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">תובנת ליבה</p>
               <button
                 type="button"
                 data-copy-insight
                 data-insight={originalInsight}
                 data-article-title={title}
-                class="inline-flex items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-white px-3 py-1.5 text-xs font-semibold text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))] transition hover:border-[color-mix(in_srgb,var(--nm-accent)_30%,transparent)] hover:text-[var(--nm-accent)]"
+                data-copy-plain="true"
+                aria-label="העתק תובנה"
+                class="inline-flex size-9 shrink-0 items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-white text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))] transition hover:border-[color-mix(in_srgb,var(--nm-accent)_30%,transparent)] hover:text-[var(--nm-accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--nm-accent)]"
               >
-                העתק תובנה
+                <svg class="size-[1.05rem]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                  />
+                </svg>
               </button>
             </div>
-            <p class="mt-3 text-[clamp(1rem,0.95rem+0.25vw,1.15rem)] font-semibold leading-8 text-[var(--nm-fg)]">
-              {originalInsight}
-            </p>
+            <p class="mt-3 text-[clamp(1rem,0.95rem+0.25vw,1.15rem)] font-semibold leading-8 text-[var(--nm-fg)]">{originalInsight}</p>
           </section>
         )}
 
@@ -562,9 +675,12 @@ const components = {
       )}
 
       <div
-        class="nm-mdx-flow space-y-6"
+        class:list={["space-y-6", frontmatter.isPremium ? "" : "nm-mdx-flow"]}
         data-content="long-form"
         data-premium-body
+        data-premium-article-slug={articleFileSlug}
+        data-premium-fragment-sig={premiumFragmentSignature}
+        data-premium-article-title={title}
         data-premium-active={frontmatter.isPremium ? "true" : "false"}
         data-premium-marker={premiumVault.cutoffMarker}
         data-premium-title={premiumVault.title}
@@ -575,9 +691,57 @@ const components = {
         data-premium-access-route={premiumAccess.unlockRoute}
         data-premium-access-session-hours={String(premiumAccess.sessionHours || 168)}
         data-premium-access-helper={premiumAccess.helperText}
+        data-premium-ratio-split={frontmatter.isPremium ? "true" : "false"}
       >
-        <Content components={components} />
+        {
+          frontmatter.isPremium ? (
+            <>
+              <div class="nm-premium-teaser-stack relative">
+                <div class="nm-mdx-flow nm-premium-teaser-stack__inner space-y-6">
+                  <Content components={components} />
+                </div>
+                <div class="nm-premium-teaser-fade" aria-hidden="true" />
+              </div>
+              <div data-premium-callout-anchor class="nm-premium-callout-anchor">
+                <SubscriptionCallout
+                  articleTitle={title}
+                  ctaHref={premiumVault.ctaHref}
+                  ctaLabel={premiumVault.ctaLabel}
+                  hookLine={`עצרת בשיא. המנגנון שמאחורי ${title} נחשף במועדון.`}
+                />
+              </div>
+              <div
+                id="nm-premium-skeleton"
+                class="nm-premium-skeleton nm-premium-fog-wrap"
+                data-premium-skeleton
+                role="status"
+                aria-busy="true"
+                aria-label="טוען המשך המאמר"
+              >
+                <div class="nm-premium-skeleton-inner">
+                  <span class="nm-premium-skeleton-line nm-premium-skeleton-line--w90"></span>
+                  <span class="nm-premium-skeleton-line nm-premium-skeleton-line--w100"></span>
+                  <span class="nm-premium-skeleton-line nm-premium-skeleton-line--w72"></span>
+                  <span class="nm-premium-skeleton-line nm-premium-skeleton-line--w88"></span>
+                  <span class="nm-premium-skeleton-line nm-premium-skeleton-line--w56"></span>
+                </div>
+              </div>
+              <div
+                id="locked-content-wrapper"
+                class="nm-locked-content-wrapper nm-mdx-flow space-y-6"
+                data-premium-locked-wrap
+                hidden
+              />
+              <div id="nm-premium-paywall-root" class="nm-premium-paywall-root" data-premium-paywall-root hidden />
+            </>
+          ) : (
+            <div class="nm-mdx-flow space-y-6">
+              <Content components={components} />
+            </div>
+          )
+        }
       </div>
+
       {inversionNote ? (
         <section
           class="mx-auto max-w-[72ch] rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-5 py-4 text-right"
@@ -696,13 +860,12 @@ const components = {
       </div>
     </article>
 
-    <aside class="mt-10 space-y-5 lg:mt-0">
+    <aside class="mt-10 min-w-0 max-w-full space-y-5 lg:mt-0">
       <DepthSideNav currentKey={difficultyKey} items={depthNavItems} />
       <DeepDiveConcepts concepts={relatedConcepts} />
       <LogicalQuestionBox
         pageTitle={title}
         pageUrl={shareUrl}
-        web3formsKey={web3formsKey}
         tags={tags}
         articleTitle={title}
         glossaryTerms={glossaryTerms}
@@ -739,6 +902,59 @@ const components = {
       margin-block-start: clamp(1.75rem, 3.5vw, 3rem);
     }
 
+    article .nm-mdx-flow :global(pre),
+    article .nm-mdx-flow :global(video),
+    article .nm-mdx-flow :global(iframe) {
+      max-width: 100%;
+    }
+
+    article .nm-mdx-flow :global(pre) {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    article .nm-mdx-flow :global(img) {
+      height: auto;
+      max-width: 100%;
+    }
+
+    .nm-premium-teaser-stack {
+      position: relative;
+    }
+
+    .nm-premium-teaser-stack__inner {
+      position: relative;
+    }
+
+    .nm-premium-teaser-fade {
+      pointer-events: none;
+      position: absolute;
+      inset-inline: 0;
+      bottom: 0;
+      height: min(42%, 11rem);
+      background: linear-gradient(
+        to top,
+        color-mix(in srgb, var(--nm-bg) 98%, transparent) 0%,
+        color-mix(in srgb, var(--nm-bg) 40%, transparent) 45%,
+        transparent 100%
+      );
+      -webkit-backdrop-filter: blur(12px) saturate(1.15);
+      backdrop-filter: blur(12px) saturate(1.15);
+      mask-image: linear-gradient(to bottom, transparent 0%, black 32%, black 100%);
+      -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 32%, black 100%);
+    }
+
+    .nm-premium-teaser-fade.nm-premium-teaser-fade--off {
+      display: none !important;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .nm-premium-teaser-fade {
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+      }
+    }
+
     article :global(ul),
     article :global(ol) {
       padding-inline-start: 1.4rem;
@@ -760,6 +976,11 @@ const components = {
       border-bottom: 1px solid rgba(26, 26, 26, 0.3);
     }
 
+    article :global(a.nm-glossary-tip) {
+      border-bottom: 1px dotted color-mix(in srgb, var(--nm-accent) 55%, transparent);
+      text-decoration: none;
+    }
+
     article :global(code) {
       font-size: clamp(0.9rem, 0.86rem + 0.2vw, 1.05rem);
       background: rgba(26, 26, 26, 0.06);
@@ -767,8 +988,91 @@ const components = {
       border-radius: 0.4rem;
     }
 
-    [data-premium-body][data-premium-pending="true"] {
+    @keyframes nm-premium-sk-shimmer {
+      0%,
+      100% {
+        opacity: 0.2;
+        transform: translateX(0);
+      }
+      50% {
+        opacity: 0.55;
+        transform: translateX(2px);
+      }
+    }
+
+    .nm-premium-skeleton-inner {
+      display: flex;
+      flex-direction: column;
+      gap: 0.7rem;
+      padding: 0.25rem 0;
+    }
+
+    .nm-premium-skeleton-line {
+      display: block;
+      height: 0.55rem;
+      border-radius: 0.35rem;
+      background: color-mix(in srgb, var(--nm-fg) 14%, var(--nm-bg));
+      animation: nm-premium-sk-shimmer 1.15s ease-in-out infinite;
+    }
+
+    .nm-premium-skeleton-line:nth-child(2) {
+      animation-delay: 0.12s;
+    }
+    .nm-premium-skeleton-line:nth-child(3) {
+      animation-delay: 0.24s;
+    }
+    .nm-premium-skeleton-line:nth-child(4) {
+      animation-delay: 0.36s;
+    }
+    .nm-premium-skeleton-line:nth-child(5) {
+      animation-delay: 0.48s;
+    }
+
+    .nm-premium-skeleton-line--w100 {
+      width: 100%;
+    }
+    .nm-premium-skeleton-line--w90 {
+      width: 90%;
+    }
+    .nm-premium-skeleton-line--w88 {
+      width: 88%;
+    }
+    .nm-premium-skeleton-line--w72 {
+      width: 72%;
+    }
+    .nm-premium-skeleton-line--w56 {
+      width: 56%;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .nm-premium-skeleton-line {
+        animation: none;
+        opacity: 0.35;
+      }
+    }
+
+    .nm-locked-content-wrapper {
       opacity: 0;
+      transform: translateY(10px);
+      transition:
+        opacity 0.5s ease,
+        transform 0.5s ease;
+    }
+
+    .nm-locked-content-wrapper.nm-locked-content--visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .nm-locked-content-wrapper {
+        transition: none;
+        transform: none;
+      }
+    }
+
+    .nm-premium-skeleton.is-premium-skeleton--done {
+      display: none !important;
     }
 
     .nm-premium-shell {
@@ -786,33 +1090,85 @@ const components = {
       box-shadow: 0 24px 70px rgba(26, 26, 26, 0.08);
     }
 
-    .nm-premium-preview {
+    .nm-premium-fog-wrap {
       position: relative;
       overflow: hidden;
       border: 1px solid rgba(26, 26, 26, 0.08);
       border-radius: 2rem;
-      background: rgba(255, 255, 255, 0.82);
-      padding: 1.5rem;
+      background: rgba(255, 255, 255, 0.72);
+      padding: 1.25rem;
+      min-height: 7.5rem;
     }
 
-    .nm-premium-preview__inner {
-      max-height: 16rem;
-      overflow: hidden;
-      filter: blur(10px);
-      opacity: 0.72;
-      pointer-events: none;
-      user-select: none;
+    .nm-premium-fog {
+      min-height: 6rem;
+      width: 100%;
+      border-radius: 1rem;
+      background: linear-gradient(
+        180deg,
+        rgba(26, 26, 26, 0.07) 0%,
+        rgba(250, 250, 248, 0.45) 42%,
+        rgba(250, 250, 248, 0.98) 100%
+      );
+      -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.92) 0%, rgba(0, 0, 0, 0.28) 58%, rgba(0, 0, 0, 0) 100%);
+      mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.92) 0%, rgba(0, 0, 0, 0.28) 58%, rgba(0, 0, 0, 0) 100%);
     }
 
-    .nm-premium-preview__fade {
-      position: absolute;
-      inset: auto 0 0 0;
-      height: 7rem;
-      background: linear-gradient(to top, rgba(250, 250, 248, 0.98), rgba(250, 250, 248, 0));
+    [data-truth-block].nm-truth-collapsed {
+      visibility: hidden;
+      height: 0 !important;
+      min-height: 0 !important;
+      margin-top: 0 !important;
+      margin-bottom: 0 !important;
+      padding: 0 !important;
+      overflow: hidden !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+      border: none !important;
+      transition:
+        opacity 0.35s ease,
+        height 0.4s ease;
+    }
+
+    .nm-insight-sticky {
+      border-bottom: 1px solid color-mix(in srgb, var(--nm-fg) 6%, transparent);
+      background: color-mix(in srgb, var(--nm-bg-canvas) 88%, transparent);
+      box-shadow: none;
+      opacity: 0;
+      transform: translate3d(0, calc(-100% - 0.5rem), 0);
+      transition:
+        transform 0.42s cubic-bezier(0.32, 0.72, 0, 1),
+        opacity 0.36s ease,
+        background 0.35s ease,
+        backdrop-filter 0.35s ease,
+        box-shadow 0.35s ease,
+        border-color 0.35s ease;
+      will-change: transform, opacity;
+    }
+
+    .nm-insight-sticky.nm-insight-sticky--visible {
+      opacity: 1 !important;
+      transform: translate3d(0, 0, 0) !important;
+      pointer-events: auto !important;
+      background: color-mix(in srgb, var(--nm-bg-canvas) 58%, rgba(255, 255, 255, 0.06));
+      -webkit-backdrop-filter: blur(22px) saturate(1.65);
+      backdrop-filter: blur(22px) saturate(1.65);
+      border-bottom-color: color-mix(in srgb, var(--nm-fg) 5%, transparent);
+      box-shadow:
+        0 1px 0 color-mix(in srgb, var(--nm-fg) 4%, transparent),
+        0 12px 40px color-mix(in srgb, var(--nm-fg) 5%, transparent);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .nm-insight-sticky {
+        transition-duration: 0.05s;
+      }
     }
   </style>
 
-  <script is:inline>
+  <script lang="ts">
+    import { actions } from "astro:actions";
+
     document.addEventListener("astro:page-load", () => {
       if (window.__nmArticleCleanup) {
         window.__nmArticleCleanup();
@@ -821,12 +1177,11 @@ const components = {
       const progressBar = document.getElementById("reading-progress");
       const focusToggle = document.querySelector("[data-focus-toggle]");
       const copyButton = document.querySelector("[data-copy-link]");
-      const insightCopyButton = document.querySelector("[data-copy-insight]");
       const toast = document.querySelector("[data-copy-toast]");
       const premiumBody = document.querySelector("[data-premium-body]");
-      const cleanups = [];
+      const cleanups: Array<() => void> = [];
       let ticking = false;
-      let toastTimeout;
+      let toastTimeout: ReturnType<typeof window.setTimeout> | undefined;
 
       const updateProgress = () => {
         const doc = document.documentElement;
@@ -846,7 +1201,7 @@ const components = {
         }
       };
 
-      const setFocusMode = (enabled) => {
+      const setFocusMode = (enabled: boolean) => {
         document.body.classList.toggle("is-focus-mode", enabled);
         if (focusToggle instanceof HTMLButtonElement) {
           focusToggle.setAttribute("aria-pressed", String(enabled));
@@ -866,12 +1221,11 @@ const components = {
         }, 1400);
       };
 
-      const applyPremiumVault = () => {
+      const applyPremiumVault = async () => {
         if (!(premiumBody instanceof HTMLElement)) return;
         if (premiumBody.dataset.premiumInitialized === "true") return;
 
         const SETTINGS_STORAGE_KEY = "nm-site-settings-overrides";
-        const ACCESS_STORAGE_KEY = "nm-premium-access";
 
         const readOverrides = () => {
           try {
@@ -881,142 +1235,151 @@ const components = {
           }
         };
 
-        const hasActivePremiumSession = () => {
-          try {
-            const raw = window.localStorage.getItem(ACCESS_STORAGE_KEY);
-            if (!raw) return false;
-            const parsed = JSON.parse(raw);
-            const expiresAt = Date.parse(parsed?.expiresAt || "");
-            if (!Number.isFinite(expiresAt) || expiresAt <= Date.now()) {
-              window.localStorage.removeItem(ACCESS_STORAGE_KEY);
-              return false;
-            }
-            return true;
-          } catch {
-            window.localStorage.removeItem(ACCESS_STORAGE_KEY);
-            return false;
-          }
-        };
-
-        const normalizeMarker = (marker) => (marker || "premium-break").replace(/<!--|-->/g, "").trim();
         const overrides = readOverrides()?.premiumVault || {};
         const premiumEnabled = overrides.enabled ?? (premiumBody.dataset.premiumActive === "true");
 
         if (!premiumEnabled) {
-          premiumBody.dataset.premiumPending = "false";
           premiumBody.dataset.premiumInitialized = "true";
           return;
         }
 
-        premiumBody.dataset.premiumPending = "true";
-        const markerNeedle = normalizeMarker(
-          overrides.cutoffMarker || premiumBody.dataset.premiumMarker || "<!--premium-break-->"
-        );
+        const articleSlug = (premiumBody.dataset.premiumArticleSlug || "").trim();
+        const fragmentSig = (premiumBody.dataset.premiumFragmentSig || "").trim();
+        const skeleton = document.getElementById("nm-premium-skeleton");
+        const lockedWrap = document.getElementById("locked-content-wrapper");
+        const paywallRoot = document.getElementById("nm-premium-paywall-root");
 
-        const walker = document.createTreeWalker(premiumBody, NodeFilter.SHOW_COMMENT);
-        let markerNode = null;
-        while (walker.nextNode()) {
-          const current = walker.currentNode;
-          if ((current.nodeValue || "").includes(markerNeedle)) {
-            markerNode = current;
-            break;
+        const finishSkeleton = () => {
+          if (skeleton instanceof HTMLElement) {
+            skeleton.classList.add("is-premium-skeleton--done");
+            skeleton.setAttribute("aria-busy", "false");
           }
-        }
+        };
 
-        if (!markerNode) {
-          // Fail-closed: without marker, lock all premium content.
-          const range = document.createRange();
-          range.selectNodeContents(premiumBody);
-          range.deleteContents();
+        const revealLockedHtml = (html: string) => {
+          if (!(lockedWrap instanceof HTMLElement)) return;
+          lockedWrap.innerHTML = html;
+          lockedWrap.removeAttribute("hidden");
+          lockedWrap.classList.remove("nm-locked-content--visible");
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              lockedWrap.classList.add("nm-locked-content--visible");
+            });
+          });
+        };
 
-          const lockCard = document.createElement("section");
-          lockCard.className = "nm-premium-card";
-          lockCard.innerHTML = `
-            <p style="font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--nm-accent)">Premium</p>
-            <h2 style="margin-top:12px;font-size:1.4rem;font-weight:600;color:var(--nm-fg)">התוכן שמור לחברי פרימיום</h2>
-            <p style="margin-top:12px;font-size:1rem;line-height:1.8;color:color-mix(in srgb,var(--nm-fg) 68%,transparent)">
-              המאמר סומן כפרימיום. לגישה מלאה - פנה דרך השירותים.
-            </p>
-            <div style="margin-top:20px">
-              <a href="/services/" style="display:inline-flex;align-items:center;border-radius:9999px;background:var(--nm-accent);padding:12px 20px;font-size:14px;font-weight:600;color:var(--nm-on-accent);text-decoration:none">
-                לשירותים ומחירים
-              </a>
-            </div>
-          `;
-          premiumBody.appendChild(lockCard);
-          premiumBody.dataset.premiumPending = "false";
-          premiumBody.dataset.premiumInitialized = "true";
-          return;
-        }
+        const buildPremiumVaultShell = () => {
+          if (!(paywallRoot instanceof HTMLElement)) return;
+          paywallRoot.innerHTML = "";
 
-        const contentStartRef = markerNode.nextSibling;
-        markerNode.parentNode?.removeChild(markerNode);
+          const accessEnabled = premiumBody.dataset.premiumAccessEnabled === "true";
+          const vaultTitle = overrides.title || premiumBody.dataset.premiumTitle || "מכאן הלאה - נכנסים לפרטים";
+          const description =
+            overrides.description ||
+            premiumBody.dataset.premiumDescription ||
+            "הבסיס תמיד יהיה פתוח לכולם. ההמשך של המאמר הזה מיועד למי שרוצה לקחת את ההבנה צעד אחד קדימה ולהשקיע בתהליך. הגישה פתוחה לחברי המסלול המלא.";
+          const fallbackCtaLabel = overrides.ctaLabel || premiumBody.dataset.premiumCtaLabel || "איך מצטרפים?";
+          const fallbackCtaHref = overrides.ctaHref || premiumBody.dataset.premiumCtaHref || "/services/";
+          const accessRoute = premiumBody.dataset.premiumAccessRoute || "/dashboard/";
+          const helperText =
+            premiumBody.dataset.premiumAccessHelper || "גישה לתוכן פרימיום נפתחת כרגע דרך קוד גישה מתחלף.";
+          const returnTo = encodeURIComponent(window.location.pathname);
+          const primaryHref = accessEnabled ? `${accessRoute}?returnTo=${returnTo}` : fallbackCtaHref;
+          const primaryLabel = accessEnabled ? "להזין קוד גישה" : fallbackCtaLabel;
 
-        if (hasActivePremiumSession()) {
-          premiumBody.dataset.premiumPending = "false";
-          premiumBody.dataset.premiumInitialized = "true";
-          return;
-        }
-
-        const accessEnabled = premiumBody.dataset.premiumAccessEnabled === "true";
-        const title = overrides.title || premiumBody.dataset.premiumTitle || "מכאן הלאה - נכנסים לפרטים";
-        const description =
-          overrides.description ||
-          premiumBody.dataset.premiumDescription ||
-          "הבסיס תמיד יהיה פתוח לכולם. ההמשך של המאמר הזה מיועד למי שרוצה לקחת את ההבנה צעד אחד קדימה ולהשקיע בתהליך. הגישה פתוחה לחברי המסלול המלא.";
-        const fallbackCtaLabel = overrides.ctaLabel || premiumBody.dataset.premiumCtaLabel || "איך מצטרפים?";
-        const fallbackCtaHref = overrides.ctaHref || premiumBody.dataset.premiumCtaHref || "/services/";
-        const accessRoute = premiumBody.dataset.premiumAccessRoute || "/dashboard/";
-        const helperText =
-          premiumBody.dataset.premiumAccessHelper || "גישה לתוכן פרימיום נפתחת כרגע דרך קוד גישה מתחלף.";
-        const returnTo = encodeURIComponent(window.location.pathname);
-        const primaryHref = accessEnabled ? `${accessRoute}?returnTo=${returnTo}` : fallbackCtaHref;
-        const primaryLabel = accessEnabled ? "להזין קוד גישה" : fallbackCtaLabel;
-
-        const actionsHtml = accessEnabled
-          ? `<a href="${primaryHref}" class="inline-flex items-center rounded-full bg-[var(--nm-inverse)] px-5 py-3 text-sm font-semibold text-[var(--nm-inverse-fg)] no-underline transition hover:bg-[var(--nm-inverse-hover)]">${primaryLabel}</a>
+          const vaultPaywallCtasHtml = accessEnabled
+            ? `<a href="${primaryHref}" class="inline-flex items-center rounded-full bg-[var(--nm-inverse)] px-5 py-3 text-sm font-semibold text-[var(--nm-inverse-fg)] no-underline transition hover:bg-[var(--nm-inverse-hover)]">${primaryLabel}</a>
             <a href="${fallbackCtaHref}" class="inline-flex items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white px-5 py-3 text-sm font-semibold text-[var(--nm-fg)] no-underline transition hover:bg-[var(--nm-surface-muted)]">${fallbackCtaLabel}</a>`
-          : `<a href="${primaryHref}" class="inline-flex items-center rounded-full bg-[var(--nm-inverse)] px-5 py-3 text-sm font-semibold text-[var(--nm-inverse-fg)] no-underline transition hover:bg-[var(--nm-inverse-hover)]">${primaryLabel}</a>`;
+            : `<a href="${primaryHref}" class="inline-flex items-center rounded-full bg-[var(--nm-inverse)] px-5 py-3 text-sm font-semibold text-[var(--nm-inverse-fg)] no-underline transition hover:bg-[var(--nm-inverse-hover)]">${primaryLabel}</a>`;
 
-        const range = document.createRange();
-        if (contentStartRef) {
-          range.setStartBefore(contentStartRef);
-        } else {
-          range.setStart(premiumBody, premiumBody.childNodes.length);
-        }
-        range.setEndAfter(premiumBody.lastChild);
-        const hiddenContent = range.extractContents();
+          const shell = document.createElement("div");
+          shell.className = "nm-premium-shell";
 
-        const previewShell = document.createElement("section");
-        previewShell.className = "nm-premium-shell";
+          const calloutSrc = premiumBody.querySelector("[data-premium-callout-anchor]");
+          if (calloutSrc) {
+            const co = calloutSrc.querySelector(".nm-subscription-callout");
+            if (co) shell.appendChild(co.cloneNode(true));
+          }
 
-        const card = document.createElement("section");
-        card.className = "nm-premium-card";
-        card.innerHTML = `
+          const fogWrap = document.createElement("div");
+          fogWrap.className = "nm-premium-fog-wrap";
+          fogWrap.setAttribute("aria-hidden", "true");
+          const fog = document.createElement("div");
+          fog.className = "nm-premium-fog";
+          fogWrap.appendChild(fog);
+          shell.appendChild(fogWrap);
+
+          const card = document.createElement("section");
+          card.className = "nm-premium-card";
+          card.innerHTML = `
           <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">Premium Vault</p>
-          <h2 class="mt-3 text-[clamp(1.4rem,1.1rem+0.8vw,1.9rem)] font-semibold text-[var(--nm-fg)]">${title}</h2>
+          <h2 class="mt-3 text-[clamp(1.4rem,1.1rem+0.8vw,1.9rem)] font-semibold text-[var(--nm-fg)]">${vaultTitle}</h2>
           <p class="mt-3 text-[1rem] leading-8 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">${description}</p>
           <p class="mt-3 text-sm leading-7 text-[var(--nm-fg)]/56">${helperText}</p>
           <div class="mt-5 flex flex-wrap gap-3">
-            ${actionsHtml}
+            ${vaultPaywallCtasHtml}
           </div>
         `;
 
-        const preview = document.createElement("div");
-        preview.className = "nm-premium-preview";
-        const inner = document.createElement("div");
-        inner.className = "nm-premium-preview__inner";
-        inner.appendChild(hiddenContent);
-        const fade = document.createElement("div");
-        fade.className = "nm-premium-preview__fade";
-        preview.appendChild(inner);
-        preview.appendChild(fade);
+          shell.appendChild(card);
+          paywallRoot.appendChild(shell);
+          paywallRoot.removeAttribute("hidden");
+        };
 
-        previewShell.appendChild(card);
-        previewShell.appendChild(preview);
-        premiumBody.appendChild(previewShell);
+        if (
+          !articleSlug ||
+          !fragmentSig ||
+          !(skeleton instanceof HTMLElement) ||
+          !(lockedWrap instanceof HTMLElement) ||
+          !(paywallRoot instanceof HTMLElement)
+        ) {
+          premiumBody.dataset.premiumInitialized = "true";
+          return;
+        }
 
-        premiumBody.dataset.premiumPending = "false";
+        try {
+          const gaCid = (() => {
+            try {
+              const m = document.cookie.match(/(?:^|;\s*)_ga=([^;]+)/);
+              if (!m) return "";
+              const v = decodeURIComponent(m[1].trim());
+              const parts = v.split(".");
+              if (parts.length >= 4) {
+                return `${parts[parts.length - 2]}.${parts[parts.length - 1]}`.slice(0, 120);
+              }
+              return v.slice(0, 120);
+            } catch {
+              return "";
+            }
+          })();
+          const docEl = document.documentElement;
+          const scrollRange = docEl.scrollHeight - docEl.clientHeight;
+          const scrollRatio =
+            scrollRange > 0
+              ? Math.min(1, Math.max(0, (docEl.scrollTop || 0) / scrollRange))
+              : 0;
+          const { data, error } = await actions.premium.getFragment({
+            slug: articleSlug,
+            signature: fragmentSig,
+            gaClientId: gaCid || undefined,
+            scrollRatio: Math.round(scrollRatio * 1000) / 1000,
+          });
+
+          finishSkeleton();
+
+          if (!error && data?.html && data.html.trim().length > 0) {
+            revealLockedHtml(data.html);
+            premiumBody.querySelector(".nm-premium-teaser-fade")?.classList.add("nm-premium-teaser-fade--off");
+            paywallRoot.setAttribute("hidden", "");
+            paywallRoot.innerHTML = "";
+          } else {
+            buildPremiumVaultShell();
+          }
+        } catch {
+          finishSkeleton();
+          buildPremiumVaultShell();
+        }
+
         premiumBody.dataset.premiumInitialized = "true";
       };
 
@@ -1035,22 +1398,63 @@ const components = {
         cleanups.push(() => copyButton.removeEventListener("click", onCopyClick));
       }
 
-      if (insightCopyButton instanceof HTMLButtonElement) {
+      const stripInsightPlain = (raw: unknown) => {
+        const s = String(raw || "").trim();
+        if (!s) return "";
+        const div = document.createElement("div");
+        div.innerHTML = s;
+        const fromDom = div.textContent?.replace(/\s+/g, " ").trim();
+        if (fromDom) return fromDom;
+        return s.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+      };
+
+      document.querySelectorAll("[data-copy-insight]").forEach((node) => {
         const onInsightCopy = async () => {
-          const insight = (insightCopyButton.getAttribute("data-insight") || "").trim();
-          const articleTitle = (insightCopyButton.getAttribute("data-article-title") || "").trim();
+          if (!(node instanceof HTMLElement)) return;
+          const insightRaw = (node.getAttribute("data-insight") || "").trim();
+          if (!insightRaw) return;
+          const usePlain = node.getAttribute("data-copy-plain") === "true";
+          const articleTitle = (node.getAttribute("data-article-title") || "").trim();
+          const insight = usePlain ? stripInsightPlain(insightRaw) : insightRaw;
           if (!insight) return;
-          const payload = `"${insight}" - מתוך המאמר: ${articleTitle}. לקריאה המלאה ב-NeverMind: https://milog.co.il/%D7%9E%D7%90%D7%9E%D7%A8`;
+          const payload = usePlain
+            ? insight
+            : `"${insight}" - מתוך המאמר: ${articleTitle}. לקריאה המלאה ב-NeverMind: https://milog.co.il/%D7%9E%D7%90%D7%9E%D7%A8`;
           try {
             await navigator.clipboard.writeText(payload);
-            showToast("התובנה הועתקה, אפשר להדביק בוואטסאפ!");
+            showToast(usePlain ? "הועתק" : "התובנה הועתקה, אפשר להדביק בוואטסאפ!");
           } catch {
             window.prompt("העתק תובנה", payload);
           }
         };
 
-        insightCopyButton.addEventListener("click", onInsightCopy);
-        cleanups.push(() => insightCopyButton.removeEventListener("click", onInsightCopy));
+        node.addEventListener("click", onInsightCopy);
+        cleanups.push(() => node.removeEventListener("click", onInsightCopy));
+      });
+
+      const truthBlock = document.querySelector("[data-truth-block]");
+      const insightSticky = document.querySelector("[data-insight-sticky]");
+      if (truthBlock instanceof HTMLElement && insightSticky instanceof HTMLElement) {
+        type TruthStickyEntry = Pick<IntersectionObserverEntry, "isIntersecting" | "boundingClientRect">;
+        const syncTruthSticky = (entry: TruthStickyEntry) => {
+          const rect = entry.boundingClientRect;
+          const fullyAboveViewport = !entry.isIntersecting && rect.bottom <= 0;
+          truthBlock.classList.toggle("nm-truth-collapsed", fullyAboveViewport);
+          insightSticky.classList.toggle("nm-insight-sticky--visible", fullyAboveViewport);
+        };
+        const io = new IntersectionObserver(
+          (entries) => {
+            const entry = entries[0];
+            if (entry) syncTruthSticky(entry);
+          },
+          { threshold: 0, root: null, rootMargin: "0px" }
+        );
+        io.observe(truthBlock);
+        cleanups.push(() => io.disconnect());
+        const vh = window.innerHeight || document.documentElement.clientHeight;
+        const r0 = truthBlock.getBoundingClientRect();
+        const initiallyIntersecting = r0.bottom > 0 && r0.top < vh;
+        syncTruthSticky({ isIntersecting: initiallyIntersecting, boundingClientRect: r0 });
       }
 
       if (focusToggle instanceof HTMLButtonElement) {
@@ -1067,7 +1471,11 @@ const components = {
       cleanups.push(() => document.removeEventListener("scroll", onScroll));
       updateProgress();
       setFocusMode(false);
-      applyPremiumVault();
+      void applyPremiumVault().catch(() => {
+        if (premiumBody instanceof HTMLElement) {
+          premiumBody.dataset.premiumInitialized = "true";
+        }
+      });
 
       window.__nmArticleCleanup = () => {
         cleanups.forEach((cleanup) => cleanup());

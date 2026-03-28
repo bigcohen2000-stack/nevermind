@@ -120,6 +120,24 @@ const recommended = (
 
   <script is:inline>
     document.addEventListener("astro:page-load", () => {
+      const pathRaw = window.location.pathname || "";
+      const path = pathRaw.replace(/\/$/, "") || "/";
+      if (
+        !path.startsWith("/admin") &&
+        !path.startsWith("/_astro") &&
+        !path.startsWith("/pagefind") &&
+        path !== "/search" &&
+        !path.startsWith("/search/")
+      ) {
+        const parts = path.split("/").filter(Boolean);
+        const last = parts[parts.length - 1];
+        if (last && last.length > 0) {
+          const q = decodeURIComponent(last).replace(/-/g, " ");
+          window.location.replace("/search/?q=" + encodeURIComponent(q));
+          return;
+        }
+      }
+
       if (window.__nm404Cleanup) {
         window.__nm404Cleanup();
       }

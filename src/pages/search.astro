@@ -1,23 +1,99 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import { ArchiveSearchFloatingInput } from "../components/ArchiveSearchFloatingInput";
 
-const robots = "noindex, nofollow";
+const robots = "noindex, follow";
+const q = Astro.url.searchParams.get("q")?.trim() ?? "";
 ---
 
 <Layout title="חיפוש | NeverMind" robots={robots}>
-  <section class="flex min-h-[50vh] flex-col items-center justify-center px-4 text-center">
-    <h1 class="mb-4 text-2xl font-bold text-[#1A1A1A] md:text-3xl">
-      החיפוש מתחדש בקרוב.
-    </h1>
-    <p class="mb-8 text-lg text-[#1A1A1A]/80">
-      בינתיים, בואו נתחיל מנקודה טובה.
-    </p>
+  <section class="mx-auto max-w-2xl space-y-6 px-4 py-10 text-right">
+    <header class="space-y-2">
+      <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--nm-accent)]">חיפוש</p>
+      <h1 class="text-[clamp(1.75rem,1.4rem+1.2vw,2.5rem)] font-semibold text-[var(--nm-fg)]">חיפוש במרכז הידע</h1>
+      <p class="text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] text-[color-mix(in_srgb,var(--nm-fg)_65%,var(--nm-bg))]">
+        מילות מפתח מהכתובת הקודמת מולאו בשדה. אפשר לערוך ולחפש שוב.
+      </p>
+    </header>
 
-    <a
-      href="/archive/"
-      class="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded bg-[#1A1A1A] px-6 py-3 text-[#FAFAF8] transition-colors hover:bg-[#D42B2B] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1A1A1A]"
-    >
-      גלו מסלול מומלץ בינתיים ←
-    </a>
+    <div class="rounded-3xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)]/80 p-4">
+      <ArchiveSearchFloatingInput
+        client:load
+        id="nm-search-pagefind"
+        label="מה לחפש עכשיו"
+        pagefindInput={true}
+        autoFocus={true}
+        defaultValue={q}
+      />
+    </div>
+    <div data-pagefind-results class="space-y-3"></div>
   </section>
+
+  <script is:inline define:vars={{ initialQuery: q }}>
+    document.addEventListener("astro:page-load", () => {
+      const input = document.querySelector("[data-pagefind-input]");
+      const resultsContainer = document.querySelector("[data-pagefind-results]");
+      let timeoutId;
+
+      const ensurePagefind = async () => {
+        if (window.pagefind) return;
+        await new Promise((resolve, reject) => {
+          const script = document.createElement("script");
+          script.src = "/pagefind/pagefind.js";
+          script.onload = resolve;
+          script.onerror = reject;
+          document.head.appendChild(script);
+        });
+      };
+
+      const renderResults = (items) => {
+        if (!resultsContainer) return;
+        resultsContainer.innerHTML = "";
+        if (!items.length) {
+          resultsContainer.innerHTML =
+            '<p class="text-[clamp(0.9rem,0.85rem+0.2vw,1.05rem)] text-[color-mix(in_srgb,var(--nm-fg)_55%,var(--nm-bg))]">אין תוצאות כרגע.</p>';
+          return;
+        }
+        items.forEach((item) => {
+          const wrapper = document.createElement("a");
+          wrapper.href = item.url;
+          wrapper.className =
+            "block rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/70 px-4 py-3 transition-colors duration-300 hover:bg-white";
+          wrapper.innerHTML =
+            `<p class="text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] font-semibold text-[var(--nm-fg)]">${item.title}</p>` +
+            `<p class="mt-1 text-[clamp(0.85rem,0.8rem+0.2vw,1rem)] text-[color-mix(in_srgb,var(--nm-fg)_60%,var(--nm-bg))]">${item.excerpt}</p>`;
+          resultsContainer.appendChild(wrapper);
+        });
+      };
+
+      const runSearch = async (value) => {
+        if (!value.trim()) {
+          renderResults([]);
+          return;
+        }
+        await ensurePagefind();
+        const search = await window.pagefind?.search(value);
+        const data = await Promise.all((search?.results ?? []).slice(0, 12).map((result) => result.data()));
+        renderResults(
+          data.map((item) => ({
+            url: item.url,
+            title: item.meta?.title ?? "",
+            excerpt: item.excerpt ?? "",
+          }))
+        );
+      };
+
+      const onInput = (event) => {
+        const value = event.target.value;
+        window.clearTimeout(timeoutId);
+        timeoutId = window.setTimeout(() => runSearch(value), 200);
+      };
+
+      input?.addEventListener("input", onInput);
+      if (initialQuery && input instanceof HTMLInputElement) {
+        input.value = initialQuery;
+        runSearch(initialQuery);
+      }
+    });
+  </script>
 </Layout>

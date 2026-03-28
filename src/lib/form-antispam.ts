@@ -25,6 +25,8 @@ export function looksLikeRepeatedCharSpam(text: string): boolean {
 export function validateAntispamFields(params: {
   botcheckValue: string;
   honeypotWebsiteValue: string;
+  /** שדה fax_number בטופס intake (מחוץ למסך, לא display:none) */
+  faxHoneypotValue?: string;
   startedAtMs: number;
   messageTexts: string[];
 }): AntispamResult {
@@ -32,6 +34,9 @@ export function validateAntispamFields(params: {
     return { ok: false, userMessage: "לא נשלח. רענן את העמוד ונסה שוב." };
   }
   if (params.honeypotWebsiteValue.trim().length > 0) {
+    return { ok: false, userMessage: "לא נשלח. רענן את העמוד ונסה שוב." };
+  }
+  if ((params.faxHoneypotValue?.trim() ?? "").length > 0) {
     return { ok: false, userMessage: "לא נשלח. רענן את העמוד ונסה שוב." };
   }
 

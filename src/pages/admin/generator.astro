@@ -44,12 +44,38 @@ const pageDescription = "אשף 3 שלבים ליצירת Master Prompt מדוי
         <FloatingInput
           client:load
           id="wiz-aha"
-          label="Aha! Moment - מה הדבר האחד שהם חייבים להבין"
+          label="originalInsight (תובנת ליבה — משפט אחד עד שלושה)"
           multiline
           rows={3}
           hideValidation={true}
           className="[&_.nm-floating-control]:bg-transparent"
         />
+        <FloatingInput
+          client:load
+          id="wiz-question-schema"
+          label="questionForSchema — שאלה מזוקקת למנועי חיפוש (עברית)"
+          hideValidation={true}
+          className="[&_.nm-floating-control]:bg-transparent"
+        />
+        <FloatingInput
+          client:load
+          id="wiz-image-alt"
+          label="imageAlt — מה התמונה מייצגת (קונספט + נגישות), לא רק 'מה רואים'"
+          multiline
+          rows={2}
+          hideValidation={true}
+          className="[&_.nm-floating-control]:bg-transparent"
+        />
+        <label class="block space-y-2">
+          <span class="text-sm font-semibold">mindShiftIntensity (1–5)</span>
+          <select id="wiz-mind-shift" class="w-full rounded-[1rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-transparent px-4 py-3 outline-none focus:border-[color-mix(in_srgb,var(--nm-accent)_35%,transparent)]">
+            <option value="1">1 — עדין</option>
+            <option value="2">2</option>
+            <option value="3" selected>3 — איזון</option>
+            <option value="4">4</option>
+            <option value="5">5 — חד</option>
+          </select>
+        </label>
         <FloatingInput
           client:load
           id="wiz-bottom-line"
@@ -156,11 +182,16 @@ const pageDescription = "אשף 3 שלבים ליצירת Master Prompt מדוי
         />
         <p id="wiz-word-count" class="text-xs font-semibold text-[color-mix(in_srgb,var(--nm-fg)_55%,var(--nm-bg))]">מילים בטיוטה: 0</p>
         <div
+          id="wiz-blockers"
+          class="hidden rounded-[1rem] border border-red-600/35 bg-red-50 px-4 py-3 text-xs font-semibold leading-6 text-red-900"
+          aria-live="assertive"
+        />
+        <div
           id="wiz-preflight"
           class="rounded-[1rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3 text-xs leading-6 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]"
           aria-live="polite"
         >
-          בדיקות לפני שלב 3 יופיעו כאן (אזהרות בלבד, לא חוסמות).
+          בדיקות לפני שלב 3: חסימות באדום למעלה. כאן אזהרות בלבד.
           </div>
       </section>
 
@@ -201,20 +232,12 @@ const pageDescription = "אשף 3 שלבים ליצירת Master Prompt מדוי
     </article>
   </section>
 
-  <script>
-    import { glossaryConcepts } from "../../data/glossary";
+  <script lang="ts">
+    import { ARTICLE_TAG_WHITELIST, ARTICLE_TAG_WHITELIST_SET } from "../../data/article-tags";
+    import { ROBOTIC_BLOCKLIST, SENSITIVE_TOPIC_WARNING, validateAndClassify } from "../../utils/contentValidator";
+    import { validateContent } from "../../utils/validateContent";
 
-    function buildGlossaryAllowedSet(): Set<string> {
-      const s = new Set<string>();
-      for (const c of glossaryConcepts) {
-        s.add(c.title.trim().toLowerCase());
-        for (const t of c.tags) s.add(String(t).trim().toLowerCase());
-        for (const k of c.keywords) s.add(String(k).trim().toLowerCase());
-      }
-      return s;
-    }
-
-    const glossaryAllowed = buildGlossaryAllowedSet();
+    const SLUG_EN_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
     const YOUTUBE_ID_RE = /^[a-zA-Z0-9_-]{11}$/;
     const WORD_WARN = 900;
     const WORD_DEEP = 1400;
@@ -224,6 +247,54 @@ const pageDescription = "אשף 3 שלבים ליצירת Master Prompt מדוי
         .trim()
         .split(/\s+/)
         .filter((w) => w.length > 0).length;
+    }
+
+    function runBlockingChecks(data: {
+      tags: string;
+      body: string;
+      summary: string;
+      bottomLine: string;
+      topic: string;
+      aha: string;
+      questionForSchema: string;
+      imageAlt: string;
+      slug: string;
+    }): string[] {
+      const errors: string[] = [];
+      const slug = data.slug.trim();
+      if (!slug) errors.push("חסר slug באנגלית.");
+      else if (!SLUG_EN_RE.test(slug)) errors.push("slug חייב באנגלית קטנה, מקפים בלבד, בלי רווחים.");
+
+      const tagParts = data.tags
+        .split(/[,،]/)
+        .map((t) => t.trim())
+        .filter(Boolean);
+      if (tagParts.length === 0) errors.push("חסרות תגיות. רק מהרשימה הקנונית ב-src/data/article-tags.ts.");
+      for (const t of tagParts) {
+        if (!ARTICLE_TAG_WHITELIST_SET.has(t)) {
+          errors.push(`תגית לא ברשימה המאושרת: "${t}".`);
+        }
+      }
+
+      const scanBlob = [
+        data.body,
+        data.summary,
+        data.bottomLine,
+        data.topic,
+        data.aha,
+        data.questionForSchema,
+        data.imageAlt,
+      ].join("\n");
+      const { hits } = validateContent(scanBlob);
+      if (hits.length > 0) {
+        errors.push(`מילים/ביטויים חסומים ב-Content Score: ${hits.join(", ")}.`);
+      }
+
+      if (!data.questionForSchema.trim()) errors.push("חסר questionForSchema.");
+      if (!data.aha.trim()) errors.push("חסר originalInsight (שדה תובנת ליבה).");
+      if (!data.imageAlt.trim()) errors.push("חסר imageAlt.");
+
+      return errors;
     }
 
     function runPreflight(data: {
@@ -240,15 +311,6 @@ const pageDescription = "אשף 3 שלבים ליצירת Master Prompt מדוי
       const desc = data.summary.trim();
       if (desc.length > 0 && (desc.length < 150 || desc.length > 160)) {
         warnings.push(`Meta description צריך להיות בין 150 ל-160 תווים. כעת: ${desc.length}.`);
-      }
-      const tagParts = data.tags
-        .split(/[,،]/)
-        .map((t) => t.trim())
-              .filter(Boolean);
-      for (const t of tagParts) {
-        if (!glossaryAllowed.has(t.toLowerCase())) {
-          warnings.push(`התג "${t}" לא נמצא במילות המפתח של הגלוסה. כדאי לבדוק איות או להוסיף למאמר רק אם זה מכוון.`);
-        }
       }
       const wc = countWords(data.body);
       if (wc > 0 && wc < 120) {
@@ -284,6 +346,9 @@ const pageDescription = "אשף 3 שלבים ליצירת Master Prompt מדוי
       const isPremium = document.getElementById("wiz-is-premium");
       const difficulty = document.getElementById("wiz-difficulty");
       const slug = document.getElementById("wiz-slug");
+      const questionSchema = document.getElementById("wiz-question-schema");
+      const imageAlt = document.getElementById("wiz-image-alt");
+      const mindShift = document.getElementById("wiz-mind-shift");
       const summary = document.getElementById("wiz-summary");
       const tone = document.getElementById("wiz-tone");
       const points = document.getElementById("wiz-points");
@@ -293,6 +358,7 @@ const pageDescription = "אשף 3 שלבים ליצירת Master Prompt מדוי
       const body = document.getElementById("wiz-body");
       const wordCountEl = document.getElementById("wiz-word-count");
       const preflightEl = document.getElementById("wiz-preflight");
+      const blockersEl = document.getElementById("wiz-blockers");
 
       let current = 1;
 
@@ -305,6 +371,15 @@ const pageDescription = "אשף 3 שלבים ליצירת Master Prompt מדוי
         isPremium: isPremium instanceof HTMLInputElement ? isPremium.checked : false,
         difficultyLevel: difficulty instanceof HTMLSelectElement ? difficulty.value : "beginner",
         slug: slug instanceof HTMLInputElement ? slug.value.trim() : "",
+        questionForSchema:
+          questionSchema instanceof HTMLInputElement || questionSchema instanceof HTMLTextAreaElement
+            ? questionSchema.value.trim()
+            : "",
+        imageAlt:
+          imageAlt instanceof HTMLInputElement || imageAlt instanceof HTMLTextAreaElement
+            ? imageAlt.value.trim()
+            : "",
+        mindShiftIntensity: mindShift instanceof HTMLSelectElement ? mindShift.value : "3",
         summary: summary instanceof HTMLInputElement ? summary.value.trim() : "",
         tone: tone instanceof HTMLSelectElement ? tone.value : "",
         points: points instanceof HTMLTextAreaElement ? points.value : "",
@@ -318,10 +393,35 @@ const pageDescription = "אשף 3 שלבים ליצירת Master Prompt מדוי
         const data = collectData();
         const wc = countWords(data.body);
         if (wordCountEl) wordCountEl.textContent = `מילים בטיוטה: ${wc}`;
-        if (preflightEl && current === 2) {
+        if (current === 2) {
+          const blockers = runBlockingChecks(data);
+          if (blockersEl) {
+            if (blockers.length > 0) {
+              blockersEl.classList.remove("hidden");
+              blockersEl.textContent = ["חסימות (לא עוברים לשלב 3):", ...blockers.map((x) => `• ${x}`)].join("\n");
+            } else {
+              blockersEl.classList.add("hidden");
+              blockersEl.textContent = "";
+            }
+          }
+        if (preflightEl) {
           const w = runPreflight(data);
+          const scanBlob = [
+            data.body,
+            data.summary,
+            data.bottomLine,
+            data.topic,
+            data.aha,
+            data.questionForSchema,
+            data.imageAlt,
+          ].join("\n");
+          const c = validateAndClassify(scanBlob);
+          if (c.recommendPremium) {
+            w.push(`${SENSITIVE_TOPIC_WARNING} — זוהו: ${c.matchedSensitive.join(", ")}`);
+          }
           preflightEl.textContent =
-            w.length > 0 ? ["בדיקות (אזהרות בלבד):", ...w.map((x) => `• ${x}`)].join("\n") : "אין אזהרות בבדיקה האוטומטית. אפשר להמשיך.";
+            w.length > 0 ? ["אזהרות:", ...w.map((x) => `• ${x}`)].join("\n") : "אין אזהרות. אם אין חסימות באדום, אפשר לשלב 3.";
+        }
         }
       }
 
@@ -333,6 +433,8 @@ const pageDescription = "אשף 3 שלבים ליצירת Master Prompt מדוי
         if (nextBtn instanceof HTMLButtonElement) nextBtn.classList.toggle("hidden", current === 3);
         if (current === 2) updateWordCountAndPreflight();
       };
+
+      const canonicalTagsCsv = ARTICLE_TAG_WHITELIST.join(", ");
 
       const depthBlock = `[Depth layers for NeverMind]
 - Level 1 (beginner): plain language, clarity at a level a smart reader can follow without jargon.
@@ -349,10 +451,46 @@ const pageDescription = "אשף 3 שלבים ליצירת Master Prompt מדוי
           .join(", ");
         const inv = data.inversionNote ? ` Inversion / depth notes: ${data.inversionNote}.` : "";
         const bl = data.bottomLine ? ` Bottom line for the reader: ${data.bottomLine}.` : "";
+        const defaultImagePath = data.slug ? `/uploads/${data.slug}.jpg` : "/uploads/[slug].jpg";
+        const roboticBannedList = ROBOTIC_BLOCKLIST.join(", ");
         return `[Role: Strategic Content Expert]
 [Context: NeverMind Project]
-Act as a high-end content strategist for NeverMind. Write an article about ${data.topic || "[Topic]"} for ${data.audience || "[Audience]"}. The core insight is ${data.aha || "[Aha Moment]"}.${bl}${inv}
-Frontmatter targets: description (summary)=${data.summary || "[Summary]"}; slug=${data.slug || "[Slug]"}; tags=[${data.tags || "[Tags]"}]; isPremium=${data.isPremium}; difficultyLevel=${data.difficultyLevel}; youtubeId=${data.youtubeId || "[optional]"}; bottomLine=${data.bottomLine || "[optional]"}; inversionNote=${data.inversionNote || "[optional]"}; reflectionQuestions=[3 questions]; faq=[3 Q/A objects derived from the reflectionQuestions].
+Act as a high-end content strategist for NeverMind. Write an article about ${data.topic || "[Topic]"} for ${data.audience || "[Audience]"}. The core insight is ${data.aha || "[originalInsight]"}.${bl}${inv}
+
+[Content policy — Hebrew instruction for the model]
+חוקי תוכן: היה מודע לכך שנושאים כמו סמים, מין, פורנו, הימורים והתמכרויות (וביטויים קרובים באנגלית כגון drugs, porn, gambling, addiction) גורמים לזיהוי פרימיום בזרימת האתר. אם הנושא נוגע לכך, הגדר isPremium: true. השתמש בשפה ישירה אך אחראית. בלי סנסציה. בלי הנחיות מפרות חוק.
+
+You MUST output a single MDX file with YAML frontmatter.
+
+Mandatory frontmatter — always generate these keys with real, non-empty values (never placeholder text, never skip):
+- questionForSchema
+- originalInsight
+- difficultyLevel (beginner | advanced | deep)
+- mindShiftIntensity (integer 1–5)
+- imageAlt
+
+Forbidden robotic / corporate cliché vocabulary — do NOT use these strings anywhere in the entire output (including YAML values, title, description, and body). Case-insensitive; includes multi-word phrases:
+${roboticBannedList}
+
+Required frontmatter keys (all must be present with non-empty values where noted):
+- title: Hebrew title
+- description: meta description ~150-160 chars
+- pubDate: YYYY-MM-DD
+- author: default "השם לא משנה"
+- questionForSchema: distilled search-facing question (Hebrew) — ${data.questionForSchema || "[fill]"}
+- originalInsight: same core as the article spine — ${data.aha || "[fill]"}
+- difficultyLevel: one of beginner | advanced | deep — use ${data.difficultyLevel}
+- mindShiftIntensity: integer 1-5 — use ${data.mindShiftIntensity}
+- imageAlt: Hebrew. Describe the CONCEPT the hero image stands for, not only pixels. Pattern: [brief visible scene] — [semantic role for the article]. Example shape: "אדם עומד מול מראה שבורה — ייצוג ויזואלי לפירוק האגו". Search engines use this for topical/philosophical context; keep concrete + interpretive in one line. Wizard draft: ${data.imageAlt || "[fill]"}
+- slug: REQUIRED, English only, kebab-case, aligned with title — ${data.slug || "[Slug]"}
+- tags: array; ONLY these exact Hebrew strings (comma-separated canonical list): ${canonicalTagsCsv}
+- image: default hero path ${defaultImagePath} unless a different asset is explicitly intended
+- isPremium: ${data.isPremium}
+- youtubeId, bottomLine, inversionNote, reflectionQuestions, faq: as in project conventions
+
+Tags rule: never invent a tag outside the canonical list. Slug rule: [a-z0-9-] only.
+imageAlt rule: must fuse literal scene with symbolic meaning tied to the article thesis; avoid generic stock phrases ("תמונה של אדם").
+
 Style: ${data.tone || "[Tone]"}. Ensure the piece includes: ${normalizedPoints || "[Key Points]"}. Length intent: ${data.length || "[Length]"}. Draft body (if any) should be refined, not duplicated blindly:
 [DRAFT_BODY_START]
 ${data.body.trim() || "[no draft yet]"}
@@ -377,7 +515,11 @@ Follow the brand identity: zero fluff, focus on thought-shifts, NeverMind voice 
       });
 
       nextBtn?.addEventListener("click", () => {
-        if (current === 2) updateWordCountAndPreflight();
+        if (current === 2) {
+          updateWordCountAndPreflight();
+          const blockers = runBlockingChecks(collectData());
+          if (blockers.length > 0) return;
+        }
         current = Math.min(3, current + 1);
         render();
       });
@@ -418,6 +560,16 @@ Follow the brand identity: zero fluff, focus on thought-shifts, NeverMind voice 
             difficulty.value = ["beginner", "advanced", "deep"].includes(d) ? d : "beginner";
           }
           if (slug instanceof HTMLInputElement) slug.value = String(data.slug ?? "");
+          if (questionSchema instanceof HTMLInputElement || questionSchema instanceof HTMLTextAreaElement) {
+            questionSchema.value = String(data.questionForSchema ?? "");
+          }
+          if (imageAlt instanceof HTMLInputElement || imageAlt instanceof HTMLTextAreaElement) {
+            imageAlt.value = String(data.imageAlt ?? "");
+          }
+          if (mindShift instanceof HTMLSelectElement) {
+            const m = String(data.mindShiftIntensity ?? "3");
+            mindShift.value = ["1", "2", "3", "4", "5"].includes(m) ? m : "3";
+          }
           if (summary instanceof HTMLInputElement) summary.value = String(data.summary ?? "");
           if (tone instanceof HTMLSelectElement) tone.value = String(data.tone ?? "Provocative");
           if (points instanceof HTMLTextAreaElement) points.value = String(data.points ?? "");
@@ -443,6 +595,9 @@ Follow the brand identity: zero fluff, focus on thought-shifts, NeverMind voice 
         isPremium,
         difficulty,
         slug,
+        questionSchema,
+        imageAlt,
+        mindShift,
         summary,
         tone,
         points,

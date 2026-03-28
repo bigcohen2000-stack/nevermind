@@ -1,5 +1,6 @@
 import servicesConfig from "../config/services.json";
 import appConfig from "../config/appConfig.json";
+import { WEB3FORMS_ACCESS_KEY } from "./web3forms-access";
 
 type ServicesConfig = typeof servicesConfig;
 export type PaymentMethod = ServicesConfig["payment_methods"][number];
@@ -283,7 +284,7 @@ export async function notifyServiceInterest(params: {
 }): Promise<void> {
   try {
     const formData = new FormData();
-    formData.append("access_key", "94b32b6c-7590-4ac6-b8b4-1bc73dd2e5c8");
+    formData.append("access_key", WEB3FORMS_ACCESS_KEY);
     formData.append("subject", `NeverMind - עניין ב: ${params.serviceTitle}`);
     formData.append("message", `שירות: ${params.serviceId}\nזרימה: ${params.flow}\nזמן: ${new Date().toISOString()}`);
     await fetch("https://api.web3forms.com/submit", {

@@ -2,7 +2,12 @@
 import { getCollection } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
 import fs from "node:fs/promises";
+import fsSync from "node:fs";
 import path from "node:path";
+import appConfig from "../../config/appConfig.json";
+import { buildArticleJsonLdPreview, buildTruthBlockPreview } from "../../lib/article-schema-preview";
+import { resolveArticleHeroImage } from "../../lib/resolve-article-hero-image";
+import { validateAndClassify } from "../../utils/contentValidator";
 
 const pageTitle = "Content Health Dashboard";
 const pageDescription = "ציון בריאות תוכן לכל מאמר לפי Insight, עדכניות ויחס רכיבי QA.";
@@ -11,6 +16,9 @@ const dayMs = 24 * 60 * 60 * 1000;
 const recencyWindowDays = 90;
 
 const articles = await getCollection("articles");
+
+const siteUrlRaw = String((appConfig as { site?: { url?: string } }).site?.url ?? "").replace(/\/$/, "");
+const siteUrlSlash = siteUrlRaw ? `${siteUrlRaw}/` : "https://www.nevermind.co.il/";
 
 const countQaComponents = (body: string) => {
   const patterns = [/<SkepticBox\b/g, /<FAQ\b/g, /<Reflection\b/g];
@@ -64,6 +72,27 @@ const rows = articles
     const slugTail = idBase.split("/").pop() || entry.slug || "article";
     const generatorHref = `/admin/generator/?slug=${encodeURIComponent(slugTail)}&title=${encodeURIComponent(title)}`;
 
+    const articleFilePath = path.join(process.cwd(), "src/content/articles", entry.id);
+    let rawDisk = "";
+    try {
+      rawDisk = fsSync.readFileSync(articleFilePath, "utf8");
+    } catch {
+      rawDisk = "";
+    }
+    const classified = validateAndClassify(rawDisk);
+    const forbiddenHits = classified.matchedBlocklist;
+    const sensitiveHits = classified.matchedSensitive;
+
+    const slugForUrl = entry.slug || slugTail;
+    const hero = resolveArticleHeroImage(slugForUrl, entry.data.image);
+    const ogAbs = hero.startsWith("http") ? hero : new URL(hero.replace(/^\//, ""), siteUrlSlash).toString();
+    const previewJsonLd = buildArticleJsonLdPreview(entry, {
+      pagePath: `/articles/${slugForUrl}/`,
+      ogImageAbsolute: ogAbs,
+      articlePaywalled: Boolean(entry.data.isPremium),
+    });
+    const truthPreview = buildTruthBlockPreview(entry);
+
     return {
       title,
       score,
@@ -79,9 +108,21 @@ const rows = articles
           )
         : "לא זמין",
       generatorHref,
+      previewKey: slugForUrl,
+      forbiddenHits,
+      sensitiveHits,
+      previewJsonLd,
+      truthPreview,
     };
   })
   .sort((a, b) => a.score - b.score);
+
+const previewPack = rows.map((r) => ({
+  key: r.previewKey,
+  jsonLd: r.previewJsonLd,
+  truth: r.truthPreview,
+}));
+const previewPackJson = JSON.stringify(previewPack).replace(/</g, "\\u003c");
 
 type SearchGapRow = {
   query: string;
@@ -126,6 +167,7 @@ try {
             <th class="px-4 py-3">מאמר</th>
             <th class="px-4 py-3">Health</th>
             <th class="px-4 py-3">פירוק ציון</th>
+            <th class="px-4 py-3">Content Score</th>
             <th class="px-4 py-3">עדכון אחרון</th>
             <th class="px-4 py-3">Actions</th>
           </tr>
@@ -148,14 +190,41 @@ try {
                   {row.wordCount} מילים · {row.qaCount} רכיבי QA
                 </div>
               </td>
+              <td class="px-4 py-4 align-top">
+                <div class="flex max-w-[16rem] flex-col gap-2">
+                  {row.forbiddenHits.length > 0 ? (
+                    <span class="inline-flex flex-col gap-1 rounded-xl border border-red-600/35 bg-red-50 px-3 py-2 text-xs font-semibold text-red-900">
+                      <span>חסומים בבילד:</span>
+                      <span>{row.forbiddenHits.join(", ")}</span>
+                    </span>
+                  ) : (
+                    <span class="text-xs text-[color-mix(in_srgb,var(--nm-fg)_58%,var(--nm-bg))]">פסילה: נקי</span>
+                  )}
+                  {row.sensitiveHits.length > 0 ? (
+                    <span class="inline-flex flex-col gap-1 rounded-xl border border-amber-600/40 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-950">
+                      <span>נושא רגיש — המלצת פרימיום:</span>
+                      <span>{row.sensitiveHits.join(", ")}</span>
+                    </span>
+                  ) : null}
+                </div>
+              </td>
               <td class="px-4 py-4 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">{row.updatedLabel}</td>
               <td class="px-4 py-4">
-                <a
-                  href={row.generatorHref}
-                  class="inline-flex items-center rounded-full bg-[var(--nm-accent)] px-4 py-2 text-xs font-semibold text-white transition hover:bg-[var(--nm-accent-hover)]"
-                >
-                  עריכה ב-Generator
-                </a>
+                <div class="flex flex-col items-end gap-2">
+                  <button
+                    type="button"
+                    class="nm-preview-schema-btn inline-flex items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-white px-4 py-2 text-xs font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]"
+                    data-preview-key={row.previewKey}
+                  >
+                    Preview Schema
+                  </button>
+                  <a
+                    href={row.generatorHref}
+                    class="inline-flex items-center rounded-full bg-[var(--nm-accent)] px-4 py-2 text-xs font-semibold text-white transition hover:bg-[var(--nm-accent-hover)]"
+                  >
+                    עריכה ב-Generator
+                  </a>
+                </div>
               </td>
             </tr>
           ))}
@@ -209,8 +278,137 @@ try {
     </section>
   </section>
 
+  <dialog
+    id="nm-schema-preview-dialog"
+    class="fixed inset-0 z-[200] max-h-[90vh] w-[min(100%,42rem)] max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-[var(--nm-bg-canvas)] p-0 text-right shadow-2xl backdrop:bg-black/40 open:top-1/2 open:left-1/2"
+  >
+    <div class="max-h-[90vh] overflow-auto p-5">
+      <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <h2 class="text-lg font-semibold text-[var(--nm-fg)]">Preview Schema</h2>
+        <div class="flex flex-wrap items-center justify-end gap-2">
+          <button
+            type="button"
+            class="inline-flex items-center rounded-full bg-[var(--nm-accent)] px-4 py-2 text-xs font-semibold text-white transition hover:bg-[var(--nm-accent-hover)]"
+            data-rich-results-copy
+          >
+            Copy to Rich Results Tester
+          </button>
+          <button
+            type="button"
+            class="rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-4 py-2 text-sm font-semibold text-[var(--nm-fg)]"
+            data-schema-preview-close
+          >
+            סגור
+          </button>
+        </div>
+      </div>
+      <p id="nm-rich-results-hint" class="mb-3 text-xs text-[color-mix(in_srgb,var(--nm-fg)_58%,var(--nm-bg))]" aria-live="polite"></p>
+      <p class="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--nm-accent)]">JSON-LD Article</p>
+      <pre
+        id="nm-schema-preview-ld"
+        class="mb-6 max-h-[40vh] overflow-auto rounded-xl bg-[var(--nm-surface-muted)] p-4 text-left text-xs leading-relaxed text-[var(--nm-fg)] whitespace-pre-wrap"
+      />
+      <p class="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--nm-accent)]">TruthBlock / שדות</p>
+      <div id="nm-schema-preview-truth" class="space-y-2 rounded-xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/80 p-4 text-sm text-[var(--nm-fg)]" />
+    </div>
+  </dialog>
+
+  <script id="nm-dashboard-schema-pack" type="application/json" set:html={previewPackJson} />
+
   <script is:inline>
     document.addEventListener("astro:page-load", async () => {
+      const packEl = document.getElementById("nm-dashboard-schema-pack");
+      const dialog = document.getElementById("nm-schema-preview-dialog");
+      const preLd = document.getElementById("nm-schema-preview-ld");
+      const truthBox = document.getElementById("nm-schema-preview-truth");
+      const closeBtn = document.querySelector("[data-schema-preview-close]");
+      const richResultsCopyBtn = document.querySelector("[data-rich-results-copy]");
+      const richResultsHint = document.getElementById("nm-rich-results-hint");
+
+      let previewMap = {};
+      /** @type {Record<string, unknown> | null} */
+      let lastArticleJsonLd = null;
+
+      const buildRichResultsPasteHtml = (jsonLd) => {
+        const json = JSON.stringify(jsonLd);
+        const closeLd = "\u003c/script\u003e";
+        return `<!DOCTYPE html>
+<html lang="he">
+<head><meta charset="utf-8"><title>NeverMind schema</title></head>
+<body>
+<script type="application/ld+json">
+${json}
+${closeLd}
+</body>
+</html>`;
+      };
+      if (packEl?.textContent) {
+        try {
+          const arr = JSON.parse(packEl.textContent);
+          if (Array.isArray(arr)) {
+            previewMap = Object.fromEntries(arr.map((item) => [item.key, item]));
+          }
+        } catch {
+          previewMap = {};
+        }
+      }
+
+      const openPreview = (key) => {
+        const row = previewMap[key];
+        if (!row || !(dialog instanceof HTMLDialogElement) || !(preLd instanceof HTMLElement) || !(truthBox instanceof HTMLElement)) return;
+        lastArticleJsonLd = row.jsonLd && typeof row.jsonLd === "object" ? row.jsonLd : null;
+        if (richResultsHint) richResultsHint.textContent = "";
+        preLd.textContent = JSON.stringify(row.jsonLd, null, 2);
+        const q = row.truth?.questionForSchema || "";
+        const o = row.truth?.originalInsight || "";
+        truthBox.replaceChildren();
+        const line = (label, val) => {
+          const p = document.createElement("p");
+          const s = document.createElement("span");
+          s.className = "font-semibold";
+          s.textContent = label + " ";
+          p.appendChild(s);
+          p.appendChild(document.createTextNode(val || "—"));
+          return p;
+        };
+        truthBox.appendChild(line("questionForSchema:", q));
+        truthBox.appendChild(line("originalInsight:", o));
+        dialog.showModal();
+      };
+
+      document.querySelectorAll(".nm-preview-schema-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const key = btn.getAttribute("data-preview-key") || "";
+          openPreview(key);
+        });
+      });
+
+      closeBtn?.addEventListener("click", () => {
+        if (dialog instanceof HTMLDialogElement) dialog.close();
+      });
+
+      richResultsCopyBtn?.addEventListener("click", async () => {
+        if (!lastArticleJsonLd) {
+          if (richResultsHint) richResultsHint.textContent = "אין JSON-LD טעון. פתח תחילה Preview Schema למאמר.";
+          return;
+        }
+        const html = buildRichResultsPasteHtml(lastArticleJsonLd);
+        try {
+          await navigator.clipboard.writeText(html);
+          window.open("https://search.google.com/test/rich-results", "_blank", "noopener,noreferrer");
+          if (richResultsHint) {
+            richResultsHint.textContent =
+              "הועתק HTML מלא. בכלי של גוגל: בחר Code (לא URL), הדבק, הרץ בדיקה.";
+          }
+        } catch {
+          window.open("https://search.google.com/test/rich-results", "_blank", "noopener,noreferrer");
+          if (richResultsHint) {
+            richResultsHint.textContent =
+              "לא ניתן להעתיק אוטומטית. פתח את הכלי, בחר Code, והעתק ידנית את תוכן ה־JSON-LD מהחלון.";
+          }
+        }
+      });
+
       const tableBody = document.getElementById("insight-gaps-body");
       const emptyState = document.getElementById("insight-gaps-empty");
       const tableWrap = document.getElementById("insight-gaps-table-wrap");

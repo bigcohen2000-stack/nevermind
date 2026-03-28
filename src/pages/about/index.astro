@@ -1,26 +1,56 @@
 ---
 import Layout from "../../layouts/Layout.astro";
+import {
+  aboutExtraMethodFaq,
+  aboutMethodFaq,
+  aboutPageFaqForSchema,
+  aboutPracticalFaq,
+} from "../../data/about-method-faq";
 ---
 
 <Layout
   title="שיטת NEVERMIND | NeverMind"
-  description="איך זה עובד בפשטות. בלבול, בהירות, הבנה, פעולה וקשר אישי."
+  description="איך השיטה עובדת: לא עוד טכניקה — הסרת בלבול, איחוד מה שעובד, והמשך עד השורש. שאלות ותשובות מלאות על NeverMind."
+  faqItems={aboutPageFaqForSchema}
 >
-  <div class="mx-auto max-w-6xl space-y-20 px-4 py-14 text-right text-[var(--nm-fg)]">
-    <header class="space-y-4">
+  <div class="mx-auto max-w-6xl space-y-16 px-4 py-14 text-right text-[var(--nm-fg)] md:space-y-20">
+    <header class="space-y-5">
       <p class="text-sm font-semibold uppercase tracking-[0.2em] text-[var(--nm-accent)]">שיטת NEVERMIND</p>
       <h1 class="text-[clamp(2rem,1.4rem+2.2vw,3.4rem)] font-light leading-tight">כאן הכל נהיה פשוט</h1>
       <p class="max-w-3xl text-base leading-8 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
-        זה דף קצר. בלי רעש. אתה קורא. אתה רואה מה נכון. אתה זז.
+        דף אחד שמסביר את השיטה בלי רעש. קוראים. בודקים. מחליטים אם זה מתאים.
       </p>
     </header>
 
-    <section aria-labelledby="about-personal" class="space-y-4 rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white p-6 text-right">
+    <section aria-labelledby="method-core" class="space-y-6 rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white p-6 md:p-8">
+      <h2 id="method-core" class="text-[clamp(1.35rem,1.15rem+0.6vw,1.85rem)] font-semibold leading-snug">
+        מה NeverMind עושה בפועל
+      </h2>
+      <div class="space-y-5 text-[clamp(1rem,0.95rem+0.2vw,1.12rem)] leading-8 text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))]">
+        <p>
+          שיטת NeverMind <strong class="font-semibold text-[var(--nm-fg)]">לא מוסיפה עוד טכניקה</strong>
+          — היא מסירה את כל מה שמבלבל אותך.
+        </p>
+        <p>
+          היא מאחדת את מה שעובד בכל גישה אחרת, וממשיכה עד השורש. כאן תבין למה גישה שחסרה בה נקודה אחת כבר לא יכולה להיות
+          הכי טובה בשבילך, ולמה NeverMind בנויה כרצף בלי חורים שמפילים באמצע.
+          <strong class="font-semibold text-[var(--nm-fg)]">
+            NeverMind היא השיטה היחידה שלא חסר בה שום חלק, ולכן היא עובדת תמיד
+          </strong>
+          כשאתה הולך איתה עד הסוף ולא עוצר באמצע.
+        </p>
+        <p class="border-r-4 border-[var(--nm-accent)] pr-4 text-[var(--nm-fg)]">
+          כולם מחפשים שיטה נכונה. NeverMind מראה שאין שיטה אחת שסוגרת הכול — יש אמת אחת שמאחדת את כל מה ששם עבד באמת.
+        </p>
+      </div>
+    </section>
+
+    <section aria-labelledby="about-personal" class="space-y-4 rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-6 text-right">
       <h2 id="about-personal" class="text-[clamp(1.35rem,1.15rem+0.6vw,1.75rem)] font-semibold">
         מי עומד מאחורי המסלול
       </h2>
       <p class="text-sm leading-[var(--line-height-ui)] text-[color-mix(in_srgb,var(--nm-fg)_76%,var(--nm-bg))]">
-        זה לא סיפור חיים ארוך. זה עיקרון: אני מחזיק מרחב שבו אפשר לפרק את מה שמסתובב בראש בלי לשחק חכם. אם זה נשמע לך נכון, אפשר להמשיך דרך ארכיון או דרך שיחה ממוקדת.
+        זה לא סיפור חיים ארוך. זה עיקרון: מרחב שבו אפשר לפרק את מה שמסתובב בראש בלי לשחק חכם. אם זה נשמע לך נכון, אפשר להמשיך דרך ארכיון או דרך שיחה ממוקדת.
       </p>
       <div class="flex flex-wrap gap-3">
         <a
@@ -85,21 +115,86 @@ import Layout from "../../layouts/Layout.astro";
       </button>
     </section>
 
-    <section aria-labelledby="faq-short" class="space-y-4">
-      <h2 id="faq-short" class="text-[clamp(1.4rem,1.2rem+0.8vw,1.9rem)] font-light">שאלות נפוצות</h2>
-      <div class="space-y-4">
-        <article class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white p-5">
-          <h3 class="text-lg font-semibold">זה עבודה קלינית קלאסית?</h3>
-          <p class="mt-2 text-sm leading-8 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">לא. אנחנו לא נוברים בעבר, אנחנו מפרקים את מה שתוקע אותך עכשיו.</p>
-        </article>
-        <article class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white p-5">
-          <h3 class="text-lg font-semibold">כמה זמן זה לוקח?</h3>
-          <p class="mt-2 text-sm leading-8 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">הבנה יכולה לקרות ברגע אחד. לפעמים מספיקה שיחה אחת כדי לשנות הכל.</p>
-        </article>
-        <article class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white p-5">
-          <h3 class="text-lg font-semibold">חייבים לבוא עם זוג הצידה?</h3>
-          <p class="mt-2 text-sm leading-8 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">ממש לא. השינוי תמיד מתחיל בראייה שלך, גם אם הקשר הוא הבעיה.</p>
-        </article>
+    <section id="nm-about-faq" aria-labelledby="faq-method-heading" class="scroll-mt-28 space-y-6">
+      <div class="space-y-2">
+        <h2 id="faq-method-heading" class="text-[clamp(1.5rem,1.25rem+1vw,2rem)] font-semibold">
+          שאלות ותשובות על השיטה
+        </h2>
+        <p class="max-w-3xl text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_65%,var(--nm-bg))]">
+          כל מה שביקשת לדעת לפני שמחליטים. חסר משהו?
+          <a href="/contact/" class="font-semibold text-[var(--nm-accent)] underline-offset-2 hover:underline">יצירת קשר</a>
+          .
+        </p>
+      </div>
+      <div class="space-y-3">
+        {
+          aboutMethodFaq.map((item) => (
+            <details class="group rounded-[1.25rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white p-4 open:bg-[var(--nm-bg-canvas)] md:p-5">
+              <summary class="cursor-pointer list-none text-right text-base font-semibold text-[var(--nm-fg)] marker:content-none [&::-webkit-details-marker]:hidden">
+                <span class="inline-flex w-full items-start justify-between gap-3">
+                  <span class="min-w-0 flex-1 leading-snug">{item.question}</span>
+                  <span
+                    class="mt-0.5 shrink-0 text-[var(--nm-accent)] transition group-open:rotate-180"
+                    aria-hidden="true"
+                  >
+                    ▼
+                  </span>
+                </span>
+              </summary>
+              <p class="mt-4 border-t border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] pt-4 text-sm leading-[var(--line-height-ui)] text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))]">
+                {item.answer}
+              </p>
+            </details>
+          ))
+        }
+      </div>
+    </section>
+
+    <section aria-labelledby="faq-extra-heading" class="space-y-4">
+      <h2 id="faq-extra-heading" class="text-[clamp(1.35rem,1.15rem+0.6vw,1.75rem)] font-semibold">עוד נקודות שעולות הרבה</h2>
+      <div class="space-y-3">
+        {
+          aboutExtraMethodFaq.map((item) => (
+            <details class="group rounded-[1.25rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white p-4 open:bg-[var(--nm-bg-canvas)] md:p-5">
+              <summary class="cursor-pointer list-none text-right text-base font-semibold text-[var(--nm-fg)] marker:content-none [&::-webkit-details-marker]:hidden">
+                <span class="inline-flex w-full items-start justify-between gap-3">
+                  <span class="min-w-0 flex-1 leading-snug">{item.question}</span>
+                  <span class="mt-0.5 shrink-0 text-[var(--nm-accent)] transition group-open:rotate-180" aria-hidden="true">
+                    ▼
+                  </span>
+                </span>
+              </summary>
+              <p class="mt-4 border-t border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] pt-4 text-sm leading-[var(--line-height-ui)] text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))]">
+                {item.answer}
+              </p>
+            </details>
+          ))
+        }
+      </div>
+    </section>
+
+    <section id="nm-about-faq-practical" aria-labelledby="faq-practical-heading" class="scroll-mt-28 space-y-4">
+      <h2 id="faq-practical-heading" class="text-[clamp(1.35rem,1.15rem+0.6vw,1.75rem)] font-semibold">
+        שאלות מעשיות (מסלול ופרטיות)
+      </h2>
+      <div class="space-y-3">
+        {
+          aboutPracticalFaq.map((item) => (
+            <details class="group rounded-[1.25rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-4 open:bg-white md:p-5">
+              <summary class="cursor-pointer list-none text-right text-base font-semibold text-[var(--nm-fg)] marker:content-none [&::-webkit-details-marker]:hidden">
+                <span class="inline-flex w-full items-start justify-between gap-3">
+                  <span class="min-w-0 flex-1 leading-snug">{item.question}</span>
+                  <span class="mt-0.5 shrink-0 text-[var(--nm-accent)] transition group-open:rotate-180" aria-hidden="true">
+                    ▼
+                  </span>
+                </span>
+              </summary>
+              <p class="mt-4 border-t border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] pt-4 text-sm leading-[var(--line-height-ui)] text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))]">
+                {item.answer}
+              </p>
+            </details>
+          ))
+        }
       </div>
     </section>
   </div>
