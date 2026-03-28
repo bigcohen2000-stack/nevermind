@@ -11,6 +11,12 @@ import appConfig from "../config/appConfig.json";
 import siteSettings from "../config/siteSettings.json";
 import { jsonLdForInlineScript } from "../lib/json-ld-inline";
 import { disclaimerLong } from "../lib/services";
+import SiteBreadcrumbs from "../components/SiteBreadcrumbs.astro";
+import {
+  buildSiteBreadcrumbTrail,
+  parseBreadcrumbOverride,
+  breadcrumbTrailToJsonLd,
+} from "../lib/site-breadcrumbs";
 
 type StagingBannerCfg = { enabled?: boolean; message?: string };
 type SeoCfg = { allowIndexing?: boolean };
@@ -56,6 +62,8 @@ const {
   waArticleSlug = "",
   seoArticleBody = "",
   articlePaywalled = false,
+  breadcrumbCurrentLabel,
+  breadcrumbItems: breadcrumbItemsProp,
 } = Astro.props;
 
 const waTags = Array.isArray(frontmatter?.tags) ? frontmatter.tags : [];
@@ -180,39 +188,6 @@ const professionalServiceSchema = {
   },
 };
 
-const normalizeSegment = (segment: string) => {
-  const map: Record<string, string> = {
-    articles: "מאמרים",
-    topics: "נושאים",
-    now: "מה המצב עכשיו",
-    training: "הכשרות",
-    admin: "ניהול",
-    services: "שירותים",
-    glossary: "הגדרות מחדש",
-    questions: "שאלות קצרות",
-    intake: "צור קשר (אונליין)",
-    archive: "ארכיון",
-    studio: "סטודיו",
-    about: "להבין",
-    "personal-consultation": "שיחה אישית",
-    "premium-access": "גישת פרימיום",
-    journey: "מסלולי בהירות",
-    "root-problem-tree": "עץ שורש הבעיה",
-    "forbidden-library": "הספרייה האסורה",
-    accessibility: "הצהרת נגישות",
-    book: "קביעת שיחה",
-    contact: "יצירת קשר",
-    privacy: "מדיניות פרטיות",
-    faq: "שאלות נפוצות",
-    testimonials: "המלצות",
-    terms: "תנאי התקשרות",
-    library: "ספרייה מובנית",
-    search: "חיפוש",
-  };
-
-  return map[segment] ?? segment;
-};
-
 const pathName = Astro.url?.pathname ?? "/";
 const normalizeNavPath = (raw: string) => {
   const trimmed = String(raw || "").trim();
@@ -301,27 +276,34 @@ const robotsContent =
     : effectiveNoIndex
       ? "noindex, nofollow"
       : "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1";
-const pathSegments = pathName.split("/").filter(Boolean);
-const breadcrumbItems = [{ name: "בית", item: siteUrl }];
-let runningUrl = siteUrl.replace(/\/$/, "");
+const breadcrumbOverride = parseBreadcrumbOverride(breadcrumbItemsProp);
+const bcLabelProp =
+  typeof breadcrumbCurrentLabel === "string" ? breadcrumbCurrentLabel.trim() : "";
+const fmTitleForCrumb =
+  typeof frontmatter?.title === "string" ? String(frontmatter.title).trim() : "";
+const currentPageTitleForCrumb = bcLabelProp || fmTitleForCrumb || null;
+const breadcrumbCrumbs = pathName.startsWith("/admin")
+  ? []
+  : (breadcrumbOverride ?? buildSiteBreadcrumbTrail(pathName, { currentPageTitle: currentPageTitleForCrumb }));
 
-pathSegments.forEach((segment: string, index: number) => {
-  runningUrl = `${runningUrl}/${segment}`;
-  const isLast = index === pathSegments.length - 1;
-  const label = isLast && frontmatter?.title ? frontmatter.title : normalizeSegment(segment);
-  breadcrumbItems.push({ name: label, item: runningUrl });
-});
+const breadcrumbJsonLdItems =
+  breadcrumbCrumbs.length > 0
+    ? breadcrumbTrailToJsonLd(breadcrumbCrumbs, canonicalURL, siteUrlSlash)
+    : [];
 
-const breadcrumbSchema = {
-  "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
-  itemListElement: breadcrumbItems.map((item, index) => ({
-    "@type": "ListItem",
-    position: index + 1,
-    name: item.name,
-    item: item.item,
-  })),
-};
+const breadcrumbSchema =
+  breadcrumbJsonLdItems.length > 0
+    ? {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        itemListElement: breadcrumbJsonLdItems.map((item, index) => ({
+          "@type": "ListItem",
+          position: index + 1,
+          name: item.name,
+          item: item.item,
+        })),
+      }
+    : null;
 
 const toIso = (value: string | Date | undefined) => {
   if (!value) return undefined;
@@ -424,7 +406,7 @@ const coreStructuredData = [
   organizationSchema,
   websiteSchema,
   professionalServiceSchema,
-  breadcrumbSchema,
+  ...(breadcrumbSchema ? [breadcrumbSchema] : []),
   articleSchema,
   videoObjectSchema,
 ].filter(Boolean);
@@ -607,6 +589,7 @@ const socialLinks = [
       role="main"
       class={`relative z-10 mx-auto w-full max-w-6xl px-4 pb-20 sm:px-6 ${mainPadTopClass}`}
     >
+      {breadcrumbCrumbs.length > 0 ? <SiteBreadcrumbs items={breadcrumbCrumbs} /> : null}
       <slot />
     </main>
     <div

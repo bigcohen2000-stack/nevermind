@@ -4,18 +4,21 @@ import ServiceCard from "../components/ServiceCard.astro";
 import appConfig from "../config/appConfig.json";
 import { findServiceById, type FlatService } from "../lib/services";
 
-const archiveSubscription = findServiceById("archive-subscription");
+const portalAccess = findServiceById("portal-access");
 const phonePerspective = findServiceById("phone-perspective");
 
-const fallbackArchiveSubscription = ({
-  id: "archive-subscription",
-  title: "למידה עצמאית",
-  subtitle: "המקום שלך לראות ולהבין",
+const fallbackPortalAccess = ({
+  id: "portal-access",
+  title: "מנוי ארכיון NeverMind",
+  subtitle: "גישה מלאה · קצב שלך",
   description:
     "גישה לכל המאמרים והסרטונים - כולל הפודקאסט המלא. יותר מ-12,000 שעות שפותחות הכל: יחסים, אהבה, פחדים ומה שקורה באמת.",
-  price_full: 390,
-  action_type: "whatsapp",
-  action_text: "אני רוצה להצטרף",
+  price_full: 175,
+  payment_flow: "direct",
+  payment_link: "https://mrng.to/by3pWXMyqz",
+  payment_cta: "הצטרפות (175 ₪/חודש)",
+  action_type: "payment",
+  action_text: "הצטרפות (175 ₪/חודש)",
   visible: true,
   badges: ["מנוי הארכיון"],
   features: [],
@@ -38,9 +41,9 @@ const fallbackPhonePerspective = ({
   targetAudience: "מי שצריך בהירות מהירה",
 } satisfies Partial<FlatService>) as FlatService;
 
-const archiveCard = archiveSubscription
-  ? { ...archiveSubscription, title: "למידה עצמאית", badges: ["מנוי הארכיון"], action_text: "אני רוצה להצטרף" }
-  : fallbackArchiveSubscription;
+const archiveCard = portalAccess
+  ? { ...portalAccess, title: "למידה עצמאית", badges: ["מנוי הארכיון"] }
+  : fallbackPortalAccess;
 const consultationCard = phonePerspective ?? fallbackPhonePerspective;
 
 const whatsAppNumber =

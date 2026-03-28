@@ -12,6 +12,7 @@ import {
   type FlatService,
 } from "../lib/services";
 import AvailabilityBadge from "./AvailabilityBadge.astro";
+import ServicePricingBlock from "./ServicePricingBlock";
 
 interface Props {
   service: FlatService;
@@ -43,6 +44,8 @@ const normalizedFeatures = (service.features ?? [])
       : { text: feature?.text?.trim() || "", icon: feature?.icon?.trim() || "default" }
   )
   .filter((feature) => feature.text);
+const hasServiceExtensions = Array.isArray(service.extensions) && service.extensions.length > 0;
+const serviceJson = JSON.stringify(service);
 ---
 
 <article
@@ -117,34 +120,53 @@ const normalizedFeatures = (service.features ?? [])
     ) : null
   }
 
-  <div class="mt-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-    <div class="text-right">
-      <p class="text-sm font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">כולל מע״מ</p>
-      <p class="mt-2 text-4xl font-semibold text-[var(--nm-fg)]">{formatMoney(service.price_full)}</p>
-      <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_64%,var(--nm-bg))]">
-        {formatMoney(netPrice)} לפני מע״מ + {formatMoney(vatAmount)} מע״מ
-      </p>
-    </div>
+  {
+    hasServiceExtensions ? (
+      <div class="mt-8">
+        <ServicePricingBlock client:load serviceJson={serviceJson} layout="full" />
+      </div>
+    ) : (
+      <div class="mt-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+        <div class="text-right">
+          <p class="text-sm font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">כולל מע״מ</p>
+          <p class="mt-2 text-4xl font-semibold text-[var(--nm-fg)]">{formatMoney(service.price_full)}</p>
+          <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_64%,var(--nm-bg))]">
+            {formatMoney(netPrice)} לפני מע״מ + {formatMoney(vatAmount)} מע״מ
+          </p>
+        </div>
 
-    <div class="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-stretch sm:justify-start sm:gap-2">
-      <a
-        href={actionWhatsAppHref}
-        data-service-cta=""
-        data-service-id={service.id}
-        data-service-title={service.title}
-        data-flow="whatsapp-first"
-        class="inline-flex min-h-[2.75rem] items-center justify-center rounded-full bg-[var(--nm-accent)] px-5 py-3 text-sm font-semibold text-[var(--nm-on-accent)] transition-colors duration-200 hover:bg-[var(--nm-accent-hover)]"
-      >
-        {action.label || "לתיאום קצר בוואטסאפ"}
-      </a>
-      <a
-        href={preStartWhatsAppHref}
-        class="inline-flex min-h-[2.75rem] items-center justify-center rounded-full border-2 border-[var(--nm-fg)] bg-transparent px-5 py-3 text-sm font-medium text-[var(--nm-fg)] transition-colors duration-200 hover:bg-[var(--nm-surface-muted)]"
-      >
-        שאלה לפני שמתחילים?
-      </a>
-    </div>
-  </div>
+        <div class="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-stretch sm:justify-start sm:gap-2">
+          <a
+            href={action.href}
+            {...(action.external ? { target: "_blank", rel: "noreferrer" } : {})}
+            data-service-cta=""
+            data-service-id={service.id}
+            data-service-title={service.title}
+            data-flow={action.kind === "payment" ? "payment-first" : "whatsapp-first"}
+            class="inline-flex min-h-[2.75rem] items-center justify-center rounded-full bg-[var(--nm-accent)] px-5 py-3 text-sm font-semibold text-[var(--nm-on-accent)] transition-colors duration-200 hover:bg-[var(--nm-accent-hover)]"
+          >
+            {action.label || "לתיאום קצר בוואטסאפ"}
+          </a>
+          <a
+            href={actionWhatsAppHref}
+            target="_blank"
+            rel="noreferrer"
+            class="inline-flex min-h-[2.75rem] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_14%,transparent)] px-5 py-3 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-tint)]"
+          >
+            הודעת פתיחה עם מחיר
+          </a>
+          <a
+            href={preStartWhatsAppHref}
+            target="_blank"
+            rel="noreferrer"
+            class="inline-flex min-h-[2.75rem] items-center justify-center rounded-full border-2 border-[var(--nm-fg)] bg-transparent px-5 py-3 text-sm font-medium text-[var(--nm-fg)] transition-colors duration-200 hover:bg-[var(--nm-surface-muted)]"
+          >
+            שאלה לפני שמתחילים?
+          </a>
+        </div>
+      </div>
+    )
+  }
 
   {
     installmentsLabel ? (

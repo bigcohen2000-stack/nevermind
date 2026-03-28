@@ -100,7 +100,11 @@ const articles = topicInfo.tag
   ? allArticles.filter((article) => article.tags.includes(topicInfo.tag))
   : [];
 ---
-<Layout title={topicInfo.label} description={`מאמרים בנושא ${topicInfo.label}`}>
+<Layout
+  title={topicInfo.label}
+  description={`מאמרים בנושא ${topicInfo.label}`}
+  breadcrumbCurrentLabel={topicInfo.label}
+>
   <section class="space-y-8">
     <header class="space-y-3">
       <p class="text-[clamp(0.85rem,0.8rem+0.2vw,1rem)] text-[color-mix(in_srgb,var(--nm-fg)_50%,var(--nm-bg))]">נושא</p>

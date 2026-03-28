@@ -1,0 +1,48 @@
+---
+import type { SiteBreadcrumbCrumb } from "../lib/site-breadcrumbs";
+
+interface Props {
+  items: SiteBreadcrumbCrumb[];
+}
+
+const { items } = Astro.props;
+---
+
+{
+  items.length > 0 ? (
+    <nav
+      class="nm-breadcrumb-strip mb-5 min-w-0 border-b border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] pb-4"
+      aria-label="מיקום באתר"
+    >
+      <ol
+        class="flex min-w-0 list-none flex-nowrap items-center gap-x-0 gap-y-1 overflow-x-auto overflow-y-hidden overscroll-x-contain py-0.5 [-webkit-overflow-scrolling:touch] [scrollbar-width:thin]"
+        dir="rtl"
+      >
+        {items.map((item, i) => (
+          <li class="flex min-w-0 shrink-0 items-center">
+            {i > 0 ? (
+              <span class="mx-2 shrink-0 select-none text-[color-mix(in_srgb,var(--nm-fg)_38%,var(--nm-bg))]" aria-hidden="true">
+                ·
+              </span>
+            ) : null}
+            {item.href ? (
+              <a
+                href={item.href}
+                class="whitespace-nowrap text-sm text-[color-mix(in_srgb,var(--nm-fg)_62%,var(--nm-bg))] underline-offset-4 transition-colors hover:text-[var(--nm-accent)] hover:underline"
+              >
+                {item.label}
+              </a>
+            ) : (
+              <span
+                class="max-w-[min(72vw,28rem)] truncate text-sm font-semibold text-[color-mix(in_srgb,var(--nm-fg)_88%,var(--nm-bg))]"
+                aria-current="page"
+              >
+                {item.label}
+              </span>
+            )}
+          </li>
+        ))}
+      </ol>
+    </nav>
+  ) : null
+}

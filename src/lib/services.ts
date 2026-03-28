@@ -16,6 +16,17 @@ export type ServiceAvailability = {
   label?: string;
 };
 
+/** הרחבת מחיר/אורך לשירות (טלפון, אולפן, מנוי) */
+export type ServiceExtension = {
+  id: string;
+  label: string;
+  price: number;
+  description: string;
+  action_text: string;
+  /** אם true: מחיר מוצג = מחיר בסיס + price */
+  price_additive?: boolean;
+};
+
 export type StageService = ServiceStage["services"][number] & {
   action_link?: string;
   action_href?: string;
@@ -29,6 +40,9 @@ export type StageService = ServiceStage["services"][number] & {
   whatsapp_template?: string | null;
   features?: Array<string | { text?: string; icon?: string }>;
   friendly_note?: string;
+  extensions?: ServiceExtension[];
+  update?: boolean;
+  override_on_extension?: boolean;
 };
 export type AddOn = ServicesConfig["add_ons"][number];
 export type ThoughtShift = ServicesConfig["trust_elements"]["thought_shifts"][number];
@@ -147,6 +161,89 @@ export const servicesTrust = servicesConfig.trust_elements;
 export const servicesThoughtShifts = servicesConfig.trust_elements.thought_shifts as ThoughtShift[];
 export const servicesPaymentMethods = servicesConfig.payment_methods as PaymentMethod[];
 
+export type TopicLandingCtaButton = {
+  text: string;
+  plan: string;
+  price: number;
+};
+
+export type TopicLandingHeader = {
+  label: string;
+  title: string;
+  subtitle: string;
+  cta_buttons: TopicLandingCtaButton[];
+};
+
+export type ServicesTopicLandingConfig = {
+  update?: boolean;
+  extend?: boolean;
+  override_base_cta?: boolean;
+  override_on_extension?: boolean;
+  topic_header: TopicLandingHeader;
+  pricing: { monthly: number; yearly: number; two_years: number };
+};
+
+const defaultTopicLanding: ServicesTopicLandingConfig = {
+  update: true,
+  extend: true,
+  override_base_cta: false,
+  override_on_extension: true,
+  topic_header: {
+    label: "הנחה למנוי שנתי · לזמן מוגבל",
+    title: "ללמוד את השיטה NEVERMIND",
+    subtitle:
+      "אם הגעת לכאן בגלל {topic}, יש סיכוי טוב שהתשובה כבר מחכה בארכיון. המנוי פותח לך גישה לכל החקירות, לכל התכנים, לכל השאלות, בלי הגבלה.",
+    cta_buttons: [
+      { text: "מנוי חודשי · 175 ₪", plan: "monthly", price: 175 },
+      { text: "מנוי שנתי · 1,850 ₪", plan: "yearly", price: 1850 },
+      { text: "מנוי לשנתיים · 3,450 ₪", plan: "two_years", price: 3450 },
+    ],
+  },
+  pricing: { monthly: 175, yearly: 1850, two_years: 3450 },
+};
+
+export const servicesTopicLanding: ServicesTopicLandingConfig = (() => {
+  const raw = (servicesConfig as Record<string, unknown>).topic_landing as Partial<ServicesTopicLandingConfig> | undefined;
+  if (!raw || typeof raw !== "object" || !raw.topic_header || !raw.pricing) {
+    return defaultTopicLanding;
+  }
+  const th = raw.topic_header;
+  const buttons = Array.isArray(th.cta_buttons) ? th.cta_buttons : defaultTopicLanding.topic_header.cta_buttons;
+  return {
+    ...defaultTopicLanding,
+    ...raw,
+    topic_header: {
+      ...defaultTopicLanding.topic_header,
+      ...th,
+      label: typeof th.label === "string" && th.label.trim() ? th.label.trim() : defaultTopicLanding.topic_header.label,
+      title: typeof th.title === "string" && th.title.trim() ? th.title.trim() : defaultTopicLanding.topic_header.title,
+      subtitle:
+        typeof th.subtitle === "string" && th.subtitle.trim()
+          ? th.subtitle.trim()
+          : defaultTopicLanding.topic_header.subtitle,
+      cta_buttons: (() => {
+        const filtered = buttons.filter(
+          (b): b is TopicLandingCtaButton =>
+            Boolean(
+              b && typeof b.text === "string" && b.text.trim() && typeof b.plan === "string" && typeof b.price === "number"
+            )
+        );
+        return filtered.length > 0 ? filtered : defaultTopicLanding.topic_header.cta_buttons;
+      })(),
+    },
+    pricing: {
+      ...defaultTopicLanding.pricing,
+      ...raw.pricing,
+    },
+  };
+})();
+
+/** מילוי {topic} בכותרת משנה של כניסת topic */
+export function formatTopicLandingSubtitle(template: string, topic: string): string {
+  const t = topic.trim() || "מה שחיפשת";
+  return template.replace(/\{topic\}/g, t);
+}
+
 export const formatMoney = (value: number) => `${Math.round(value).toLocaleString("he-IL")} ${servicesCurrency}`;
 export const getNetPrice = (grossPrice: number, taxPercent: number) => Math.round(grossPrice / (1 + taxPercent / 100));
 export const getVatAmount = (grossPrice: number, taxPercent: number) => grossPrice - getNetPrice(grossPrice, taxPercent);
@@ -222,35 +319,80 @@ export function formatAvailabilityLabel(spotsLeft: number, updatedAt: string): s
   return `נותרו ${spotsLeft} מקומות · עודכן ${prefix} ${hh}:${mm}`;
 }
 
-function applyWhatsappTemplate(template: string, service: StageService | FlatService): string {
+function applyWhatsappTemplate(
+  template: string,
+  service: StageService | FlatService,
+  extensionLabel?: string
+): string {
   const price = Math.round(service.price_full).toLocaleString("he-IL");
-  return template.replace(/\{title\}/g, service.title).replace(/\{price\}/g, price);
+  const label = (extensionLabel ?? "").trim() || "בסיס";
+  return template
+    .replace(/\{title\}/g, service.title)
+    .replace(/\{price\}/g, price)
+    .replace(/\{label\}/g, label);
+}
+
+/** מחיר אפקטיבי לפי הרחבה (מלא או תוספת על בסיס) */
+export function effectiveExtensionPrice(basePrice: number, ext: ServiceExtension | null | undefined): number {
+  if (!ext) return basePrice;
+  if (ext.price_additive === true) return basePrice + ext.price;
+  return ext.price;
+}
+
+/** עותק שירות עם מחיר ו־CTA מותאמים לבחירת הרחבה */
+export function mergeServiceWithExtension(
+  service: StageService | FlatService,
+  ext: ServiceExtension | null
+): FlatService {
+  const price_full = effectiveExtensionPrice(service.price_full, ext);
+  const base = { ...service, price_full } as FlatService;
+  if (ext && service.override_on_extension === true) {
+    base.action_text = ext.action_text;
+    base.payment_cta = ext.action_text;
+  }
+  return base;
 }
 
 /** קישור וואטסאפ לשירות. תבנית מה־JSON או ברירת מחדל, אחרת הודעה כללית */
-export function buildServiceWhatsAppHref(service: StageService | FlatService): string {
+export function buildServiceWhatsAppHref(
+  service: StageService | FlatService,
+  selectedExtension?: ServiceExtension | null
+): string {
+  const merged = mergeServiceWithExtension(service, selectedExtension ?? null);
   const raw = (service.whatsapp_template ?? defaultWhatsappServiceTemplate).trim();
   if (raw) {
-    return buildWhatsAppHref(applyWhatsappTemplate(raw, service));
+    return buildWhatsAppHref(applyWhatsappTemplate(raw, merged, selectedExtension?.label));
   }
-  const actionText = service.action_text || `אני רוצה להתקדם עם ${service.title}`;
-  const defaultMessage = `שלום, אני רוצה להתקדם עם ${service.title}. ראיתי את המסלול באתר במחיר ${formatMoney(service.price_full)}. אפשר לשלוח לי את הפרטים המלאים?`;
-  return buildWhatsAppHref(actionText === service.action_text ? `${actionText}. ${defaultMessage}` : defaultMessage);
+  const actionText = merged.action_text || `אני רוצה להתקדם עם ${service.title}`;
+  const defaultMessage = `שלום, אני רוצה להתקדם עם ${merged.title}. ראיתי את המסלול באתר במחיר ${formatMoney(merged.price_full)}. אפשר לשלוח לי את הפרטים המלאים?`;
+  return buildWhatsAppHref(
+    actionText === (service.action_text || "") ? `${actionText}. ${defaultMessage}` : defaultMessage
+  );
 }
 
-export function buildServiceActionWhatsAppHref(service: StageService | FlatService): string {
+export function buildServiceActionWhatsAppHref(
+  service: StageService | FlatService,
+  selectedExtension?: ServiceExtension | null
+): string {
+  const merged = mergeServiceWithExtension(service, selectedExtension ?? null);
   const preface = buildWhatsAppCrmPreface(service.title);
   const paymentLink = typeof service.payment_link === "string" ? service.payment_link.trim() : "";
-  const actionLine = service.action_text?.trim() || `אני רוצה להתקדם עם ${service.title}`;
+  const actionLine = merged.action_text?.trim() || `אני רוצה להתקדם עם ${service.title}`;
   const paymentLine = paymentLink ? `לינק תשלום לשלב הבא: ${paymentLink}` : "אשמח ללינק תשלום אחרי התאמה קצרה.";
-  const body = `${actionLine}\nמחיר: ${formatMoney(service.price_full)}\n${paymentLine}`;
+  const variant =
+    selectedExtension?.label?.trim() ? `\nאופציה נבחרה: ${selectedExtension.label.trim()}` : "";
+  const body = `${actionLine}${variant}\nמחיר: ${formatMoney(merged.price_full)}\n${paymentLine}`;
   return buildWhatsAppHref(`${preface}\n\n${body}`);
 }
 
 /** שיריון / התעניינות: פירוט חבילה ולינק תשלום רק בהקשר שיחה סגורה */
-export function buildServiceReservationWhatsAppHref(service: StageService | FlatService): string {
+export function buildServiceReservationWhatsAppHref(
+  service: StageService | FlatService,
+  selectedExtension?: ServiceExtension | null
+): string {
+  const merged = mergeServiceWithExtension(service, selectedExtension ?? null);
   const preface = buildWhatsAppCrmPreface(service.title);
-  const price = formatMoney(service.price_full);
+  const price = formatMoney(merged.price_full);
   const paymentLink = typeof service.payment_link === "string" ? service.payment_link.trim() : "";
   const featureLines = Array.isArray(service.features)
     ? service.features.map((f) => (typeof f === "string" ? f : f.text ?? "").trim()).filter(Boolean)
@@ -264,8 +406,12 @@ export function buildServiceReservationWhatsAppHref(service: StageService | Flat
   const paymentLine = paymentLink
     ? `לינק לתשלום מאושר (מיועד להמשך רק בתוך השיחה הזו אחרי התאמה קצרה, לא כפרסום חיצוני): ${paymentLink}`
     : "מבקש לינק תשלום מאושר אחרי תיאום קצר כאן בשיחה.";
+  const variantLine = selectedExtension?.label?.trim()
+    ? `אופציה: ${selectedExtension.label.trim()}`
+    : "";
   const body = [
     `היי, אני מתעניין ב${service.title} (${price}).`,
+    variantLine,
     includesLine,
     paymentLine,
     "",
@@ -302,6 +448,24 @@ const WA_CRM_TAGLINE = "מחשבה אחת נקייה - ישר לוואטסאפ";
 export function buildWhatsAppCrmPreface(sourceTitle: string): string {
   const title = String(sourceTitle || "NeverMind").trim() || "NeverMind";
   return `[Lead | Source: ${title}]\n${WA_CRM_TAGLINE}`;
+}
+
+/** וואטסאפ: כניסה מ־/services/?topic= + בחירת תוכנית מנוי (מחיר ומזהה לשיחה) */
+export function buildTopicLandingPlanWhatsAppHref(args: {
+  topic: string;
+  plan: string;
+  price: number;
+  ctaLabel: string;
+  paymentLink?: string;
+}): string {
+  const preface = buildWhatsAppCrmPreface("מנוי ארכיון NeverMind");
+  const topicLine = args.topic.trim() || "ללא ציון נושא";
+  const money = formatMoney(args.price);
+  const pay = args.paymentLink?.trim()
+    ? `לינק תשלום (אחרי אישור קצר בשיחה): ${args.paymentLink.trim()}`
+    : "מבקש לינק תשלום מותאם אחרי אישור קצר.";
+  const body = `הגעתי מ־/services/?topic עם נושא מהכניסה.\nנושא: ${topicLine}\nבחירה: ${args.ctaLabel}\nמזהה תוכנית: ${args.plan}\nמחיר מוצג: ${money}\n${pay}`;
+  return buildWhatsAppHref(`${preface}\n\n${body}`);
 }
 
 /** הודעת וואטסאפ אחידה לתיאום פגישה ממאמר */

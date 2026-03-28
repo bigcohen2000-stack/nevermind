@@ -12,6 +12,7 @@ import {
   servicesHero,
   servicesStages,
 } from "../lib/services";
+import ServicePricingBlock from "../components/ServicePricingBlock";
 import { jsonLdForInlineScript } from "../lib/json-ld-inline";
 
 const allArticles = await getCollection("articles", ({ data }) => data.draft !== true);
@@ -43,6 +44,10 @@ const homeArticleListSchema = {
   })),
 };
 const balconyExperience = findServiceById("balcony-experience");
+const balconyHasExtensions = Boolean(
+  balconyExperience && Array.isArray(balconyExperience.extensions) && balconyExperience.extensions.length > 0
+);
+const balconyJson = balconyExperience ? JSON.stringify(balconyExperience) : "";
 const balconyReserveHref = balconyExperience ? buildServiceReservationWhatsAppHref(balconyExperience) : "";
 const balconyPayHref = balconyExperience ? resolveServiceAction(balconyExperience) : null;
 const stageCards = servicesStages
@@ -121,7 +126,7 @@ const stageCards = servicesStages
     </section>
   </section>
 
-  {balconyExperience && balconyPayHref && balconyReserveHref ? (
+  {balconyExperience && balconyJson && (balconyHasExtensions || (balconyPayHref && balconyReserveHref)) ? (
     <section
       id="balcony-experience"
       class="mx-auto max-w-7xl scroll-mt-[100px] border-t border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-5 py-16 sm:px-8 lg:px-12"
@@ -130,27 +135,35 @@ const stageCards = servicesStages
         <p class="text-sm font-semibold uppercase tracking-[0.2em] text-[var(--nm-accent)]">שלב 1</p>
         <h2 class="mt-2 text-[clamp(1.2rem,1.05rem+0.45vw,1.45rem)] font-semibold text-[var(--nm-fg)]">{balconyExperience.title}</h2>
         <p class="mt-2 text-sm leading-[var(--line-height-ui)] text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))]">{balconyExperience.subtitle}</p>
-        <p class="mt-2 text-sm font-semibold text-[var(--nm-fg)]">
-          מחיר: <span class="price-tag">{balconyExperience.price_full.toLocaleString("he-IL")} ₪</span>
-        </p>
-        <div class="mt-5 flex flex-wrap gap-2">
-          <a
-            href={balconyPayHref.href}
-            target={balconyPayHref.external ? "_blank" : undefined}
-            rel={balconyPayHref.external ? "noreferrer" : undefined}
-            class="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full bg-[var(--nm-accent)] px-5 py-3 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]"
-          >
-            {balconyExperience.payment_cta || balconyExperience.action_text}
-          </a>
-          <a
-            href={balconyReserveHref}
-            target="_blank"
-            rel="noreferrer"
-            class="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] px-5 py-3 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-tint)]"
-          >
-            שיריון מקום
-          </a>
-        </div>
+        {balconyHasExtensions ? (
+          <div class="mt-5">
+            <ServicePricingBlock client:load serviceJson={balconyJson} layout="compact" />
+          </div>
+        ) : balconyPayHref && balconyReserveHref ? (
+          <>
+            <p class="mt-2 text-sm font-semibold text-[var(--nm-fg)]">
+              מחיר: <span class="price-tag">{balconyExperience.price_full.toLocaleString("he-IL")} ₪</span>
+            </p>
+            <div class="mt-5 flex flex-wrap gap-2">
+              <a
+                href={balconyPayHref.href}
+                target={balconyPayHref.external ? "_blank" : undefined}
+                rel={balconyPayHref.external ? "noreferrer" : undefined}
+                class="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full bg-[var(--nm-accent)] px-5 py-3 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]"
+              >
+                {balconyExperience.payment_cta || balconyExperience.action_text}
+              </a>
+              <a
+                href={balconyReserveHref}
+                target="_blank"
+                rel="noreferrer"
+                class="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] px-5 py-3 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-tint)]"
+              >
+                שיריון מקום
+              </a>
+            </div>
+          </>
+        ) : null}
       </div>
     </section>
   ) : null}
