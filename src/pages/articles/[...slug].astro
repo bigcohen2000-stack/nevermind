@@ -850,6 +850,14 @@ const components = {
   </div>
 
   <style>
+    article {
+      font-family:
+        "Assistant Variable",
+        "Assistant",
+        "Heebo",
+        system-ui,
+        sans-serif;
+    }
     article :global(h2) {
       font-size: clamp(1.6rem, 1.25rem + 1.2vw, 2.2rem);
       line-height: 1.2;
@@ -867,7 +875,15 @@ const components = {
     article :global(p),
     article :global(li) {
       font-size: clamp(1rem, 0.95rem + 0.35vw, 1.2rem);
+      line-height: 1.6;
       letter-spacing: 0;
+    }
+
+    article .nm-mdx-flow :global(.nm-mechanism-grid) {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+      gap: 1rem;
+      margin-block: clamp(1.25rem, 2.4vw, 2rem);
     }
 
     article .nm-mdx-flow :global(p) {
@@ -1107,6 +1123,8 @@ const components = {
     import "../../scripts/article-logic.js";
   </script>
 </Layout>
+
+
 
 
 
