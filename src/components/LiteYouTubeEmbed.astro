@@ -1,0 +1,16 @@
+---
+/**
+ * תאימות לאחור ל-MDX / גנרטור - מפנה ל-VideoPlayer (lite-youtube-embed).
+ */
+import VideoPlayer from "./VideoPlayer.astro";
+
+interface Props {
+  youtubeId: string;
+  title?: string;
+  videoSummaryPoints?: string[];
+}
+
+const { youtubeId, title, videoSummaryPoints } = Astro.props;
+---
+
+<VideoPlayer youtubeId={youtubeId} title={title} videoSummaryPoints={videoSummaryPoints} />

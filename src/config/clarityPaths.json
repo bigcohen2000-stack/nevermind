@@ -1,0 +1,39 @@
+{
+  "paths": [
+    {
+      "id": "thought-loop",
+      "title": "אני בלופ של מחשבות",
+      "emoji": "🔄",
+      "shortDescription": "שלושה צעדים קצרים לפרק לולאה ולחזור לשאלה אמיתית אחת.",
+      "articleSlugs": ["understanding-anger", "what-is-success", "resolving-fights"]
+    },
+    {
+      "id": "specific-fear",
+      "title": "אני מפחד ממשהו ספציפי",
+      "emoji": "⚖️",
+      "shortDescription": "להבדיל בין איום אמיתי לבין סיפור שהמוח מספר.",
+      "articleSlugs": ["why-bad-things-happen", "feeling-alone", "understanding-anger"]
+    },
+    {
+      "id": "emptiness",
+      "title": "אני מרגיש ריקנות / חוסר משמעות",
+      "emoji": "⚪",
+      "shortDescription": "מקום להתבונן בלי למלא רעש - ואז לבחור כיוון קטן.",
+      "articleSlugs": ["what-is-success", "feeling-alone", "why-bad-things-happen", "what-is-god"]
+    },
+    {
+      "id": "how-mind-works",
+      "title": "אני רוצה להבין איך המוח שלי עובד",
+      "emoji": "🧠",
+      "shortDescription": "מבנה, עיוותים, ואיך לא להאמין לכל קול פנימי באותה עוצמה.",
+      "articleSlugs": ["why-bad-things-happen", "understanding-anger", "what-is-success"]
+    },
+    {
+      "id": "big-questions",
+      "title": "שאלות גדולות",
+      "emoji": "❔",
+      "shortDescription": "מאמרים שמפרקים הנחות גדולות ומחזירים את הבחירה למילים.",
+      "articleSlugs": ["why-not-only-health", "what-is-god", "root-of-desire"]
+    }
+  ]
+}

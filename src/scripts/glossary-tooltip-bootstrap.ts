@@ -1,5 +1,5 @@
 /**
- * תצוגת תקציר מושג ב-hover לקישורי .nm-glossary-tip (ללא ספרייה חיצונית).
+ * ????? ????? ???? ?-hover ??????? .nm-glossary-tip (??? ?????? ???????).
  */
 let glossaryTooltipBound = false;
 
@@ -7,7 +7,6 @@ function initGlossaryTooltips() {
   if (glossaryTooltipBound) return;
   glossaryTooltipBound = true;
   let tip: HTMLDivElement | null = null;
-  let activeAnchor: HTMLAnchorElement | null = null;
 
   const ensureTip = () => {
     if (tip) return tip;
@@ -24,7 +23,6 @@ function initGlossaryTooltips() {
     if (!tip) return;
     tip.classList.add("opacity-0");
     tip.hidden = true;
-    activeAnchor = null;
   };
 
   const position = (anchor: HTMLAnchorElement, el: HTMLDivElement) => {
@@ -48,25 +46,24 @@ function initGlossaryTooltips() {
   const onEnter = (e: Event) => {
     const target = e.target;
     if (!(target instanceof Element)) return;
-    const a = target.closest("a.nm-glossary-tip");
-    if (!(a instanceof HTMLAnchorElement)) return;
-    const preview = a.getAttribute("data-glossary-preview");
+    const anchor = target.closest("a.nm-glossary-tip");
+    if (!(anchor instanceof HTMLAnchorElement)) return;
+    const preview = anchor.getAttribute("data-glossary-preview");
     if (!preview) return;
-    activeAnchor = a;
     const el = ensureTip();
     el.textContent = preview;
     el.hidden = false;
-    position(a, el);
+    position(anchor, el);
     requestAnimationFrame(() => el.classList.remove("opacity-0"));
   };
 
   const onLeave = (e: Event) => {
     const target = e.target;
     if (!(target instanceof Element)) return;
-    const a = target.closest("a.nm-glossary-tip");
-    if (!a) return;
-    const rel = e.relatedTarget;
-    if (rel instanceof Node && a.contains(rel)) return;
+    const anchor = target.closest("a.nm-glossary-tip");
+    if (!anchor) return;
+    const rel = e instanceof MouseEvent ? e.relatedTarget : null;
+    if (rel instanceof Node && anchor.contains(rel)) return;
     hide();
   };
 

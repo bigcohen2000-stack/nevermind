@@ -1,3 +1,5 @@
 ---
-return Astro.redirect("/intake/", 302);
+import StaticRedirectPage from "../../components/StaticRedirectPage.astro";
 ---
+
+<StaticRedirectPage to="/intake/" title="Redirecting..." message="This page has moved." />

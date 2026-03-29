@@ -1,0 +1,216 @@
+---
+import Layout from "../layouts/Layout.astro";
+import FormAntispamFields from "../components/FormAntispamFields.astro";
+import Web3FormsHcaptcha from "../components/Web3FormsHcaptcha.astro";
+import { FloatingInput } from "../components/ui/FloatingInput";
+import appConfig from "../config/appConfig.json";
+import { buildWhatsAppHref } from "../lib/services";
+import { WEB3FORMS_ACCESS_KEY } from "../lib/web3forms-access";
+const waGeneral = buildWhatsAppHref(
+  "היי, פניתי מעמוד יצירת הקשר באתר. אפשר לחזור אליי כאן?"
+);
+const tel = appConfig.contact.phoneTel?.trim() || "";
+---
+
+<Layout
+  title="יצירת קשר"
+  description="מייל, טלפון, וואטסאפ או טופס קצר. מסלול נפרד לפני שיחה: צור קשר (אונליין) עם כתיבה או סימון."
+>
+  <section class="mx-auto max-w-3xl space-y-12 px-4 py-14 text-right text-[var(--nm-fg)]">
+    <header class="space-y-4">
+      <p class="text-sm font-semibold uppercase tracking-[0.2em] text-[var(--nm-accent)]">רב־ערוצי</p>
+      <h1 class="text-[clamp(2rem,1.5rem+2vw,3rem)] font-semibold leading-tight">יצירת קשר</h1>
+      <p class="text-[clamp(1rem,0.95rem+0.25vw,1.15rem)] leading-[var(--line-height-ui)] text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+        הכפתור הצף בוואטסאפ מופיע אחרי גלילה בעמודים רבים. כאן יש גם ערוצים ישירים בלי תלות בגלילה.
+      </p>
+    </header>
+
+    <aside
+      class="rounded-2xl border border-[color-mix(in_srgb,var(--nm-accent)_24%,transparent)] bg-[var(--nm-tint)] p-5 text-right"
+      aria-label="מסלול מומלץ לפני שיחה"
+    >
+      <p class="text-sm font-semibold text-[var(--nm-fg)]">רוצה קודם להביע בקצב שלך בלי ערוץ פתוח?</p>
+      <p class="mt-2 text-sm leading-[var(--line-height-ui)] text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
+        עמוד נפרד לכתיבה או סימון, עם הערות בדרך לפי מה שבחרת.
+      </p>
+      <a
+        href="/intake/"
+        data-astro-prefetch
+        class="mt-4 inline-flex min-h-[44px] w-full items-center justify-center rounded-full bg-[var(--nm-inverse)] px-5 py-3 text-sm font-semibold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-inverse-hover)] sm:w-auto"
+      >
+        צור קשר (אונליין)
+      </a>
+    </aside>
+
+    <nav aria-label="ערוצי קשר מהירים" class="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:justify-end">
+      <a
+        href={waGeneral}
+        target="_blank"
+        rel="noreferrer"
+        class="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full bg-[var(--nm-accent)] px-5 py-3 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]"
+        title="מועדף לתגובה מהירה"
+      >
+        וואטסאפ (מועדף)
+      </a>
+      {tel ? (
+        <a
+          href={`tel:${tel.replace(/\s/g, "")}`}
+          class="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-5 py-3 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]"
+          title="שיחה — לא תמיד זמינות מיידית"
+        >
+          טלפון: {appConfig.contact.phoneDisplay}
+        </a>
+      ) : null}
+      <a
+        href={`mailto:${appConfig.contact.email}`}
+        class="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-5 py-3 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]"
+      >
+        מייל
+      </a>
+    </nav>
+
+    <section aria-labelledby="contact-form-heading" class="space-y-4">
+      <h2 id="contact-form-heading" class="text-xl font-semibold">
+        טופס קצר
+      </h2>
+      <p class="text-sm leading-[var(--line-height-ui)] text-[color-mix(in_srgb,var(--nm-fg)_65%,var(--nm-bg))]">
+        שדות חובה מסומנים בטופס. גודל טקסט מינימלי במובייל מונע זום אוטומטי ב-iOS.
+      </p>
+
+      <form
+        id="contact-form"
+        data-nm-antispam
+        class="space-y-4 rounded-3xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/80 p-6"
+        action="https://api.web3forms.com/submit"
+        method="POST"
+      >
+        <input type="hidden" name="access_key" value={WEB3FORMS_ACCESS_KEY} />
+        <input type="hidden" name="subject" value="פנייה מעמוד יצירת קשר | NeverMind" />
+        <input type="hidden" name="page" value="contact" />
+        <input type="text" name="botcheck" class="hidden" tabindex="-1" autocomplete="off" aria-hidden="true" />
+        <FormAntispamFields />
+
+        <FloatingInput client:load id="contact-name" name="name" label="שם" required dir="rtl" autoComplete="name" />
+        <FloatingInput client:load id="contact-email" name="email" label="אימייל" type="email" required dir="rtl" autoComplete="email" />
+        <FloatingInput
+          client:load
+          id="contact-message"
+          name="message"
+          label="הודעה"
+          multiline
+          rows={5}
+          required
+          dir="rtl"
+          autoComplete="off"
+        />
+
+        <Web3FormsHcaptcha idSuffix="contact" />
+
+        <button
+          type="submit"
+          class="w-full rounded-full bg-[var(--nm-inverse)] px-5 py-4 text-sm font-bold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-accent)]"
+        >
+          שליחה
+        </button>
+        <p data-contact-status aria-live="polite" class="text-center text-sm text-[color-mix(in_srgb,var(--nm-fg)_58%,var(--nm-bg))] opacity-0 transition-opacity">
+          נשלח.
+        </p>
+      </form>
+    </section>
+
+    <p class="text-xs leading-[var(--line-height-ui)] text-[color-mix(in_srgb,var(--nm-fg)_52%,var(--nm-bg))]">
+      <a href="/accessibility/" class="underline underline-offset-2 hover:text-[var(--nm-accent)]">הצהרת נגישות</a>
+    </p>
+  </section>
+
+  <script is:inline>
+    document.addEventListener("astro:page-load", () => {
+      if (window.__nmContactCleanup) window.__nmContactCleanup();
+
+      const contactForm = document.querySelector("#contact-form");
+      const status = document.querySelector("[data-contact-status]");
+      if (!(contactForm instanceof HTMLFormElement)) return;
+
+      if (typeof window.__nmStampFormAntispam === "function") {
+        window.__nmStampFormAntispam(contactForm);
+      }
+
+      let unmountHcaptcha = () => {};
+      if (typeof window.__nmMountHcaptcha === "function") {
+        unmountHcaptcha = window.__nmMountHcaptcha(contactForm);
+      }
+
+      const fields = ["name", "email", "message"];
+      fields.forEach((field) => {
+        const saved = localStorage.getItem(`form_${field}`);
+        const el = contactForm.elements.namedItem(field);
+        if (saved && el && ("value" in el)) el.value = saved;
+      });
+
+      let debounce = 0;
+      const onInput = (e) => {
+        const t = e.target;
+        if (!t || !("name" in t) || !t.name) return;
+        window.clearTimeout(debounce);
+        debounce = window.setTimeout(() => {
+          localStorage.setItem(`form_${t.name}`, t.value);
+        }, 150);
+      };
+
+      const onSubmit = async (event) => {
+        event.preventDefault();
+        const fd = new FormData(contactForm);
+        const msg = String(fd.get("message") || "").trim();
+        const read = window.__nmReadAntispamFromForm;
+        const validate = window.__nmValidateAntispamFields;
+        if (typeof read === "function" && typeof validate === "function") {
+          const as = read(contactForm);
+          const check = validate({ ...as, messageTexts: [msg] });
+          if (!check.ok && status instanceof HTMLElement) {
+            status.textContent = check.userMessage;
+            status.classList.add("opacity-100");
+            return;
+          }
+        }
+        if (typeof window.__nmHcaptchaOk === "function" && !window.__nmHcaptchaOk(contactForm)) {
+          if (status instanceof HTMLElement) {
+            status.textContent = "נא להשלים את האימות למטה.";
+            status.classList.add("opacity-100");
+          }
+          return;
+        }
+        try {
+          const res = await fetch("https://api.web3forms.com/submit", { method: "POST", body: fd });
+          if (res.ok) {
+            contactForm.reset();
+            fields.forEach((f) => localStorage.removeItem(`form_${f}`));
+            if (status instanceof HTMLElement) {
+              status.textContent = "נשלח.";
+              status.classList.add("opacity-100");
+            }
+            window.dispatchEvent(new CustomEvent("nm-analytics", { detail: { name: "contact_form_submit" } }));
+            window.__nmAnnounce?.("הטופס נשלח");
+          } else if (status instanceof HTMLElement) {
+            status.textContent = "לא נשלח הפעם. נסה שוב.";
+            status.classList.add("opacity-100");
+          }
+        } catch {
+          if (status instanceof HTMLElement) {
+            status.textContent = "לא נשלח הפעם. נסה שוב.";
+            status.classList.add("opacity-100");
+          }
+        }
+      };
+
+      contactForm.addEventListener("input", onInput);
+      contactForm.addEventListener("submit", onSubmit);
+
+      window.__nmContactCleanup = () => {
+        unmountHcaptcha();
+        contactForm.removeEventListener("input", onInput);
+        contactForm.removeEventListener("submit", onSubmit);
+        window.clearTimeout(debounce);
+      };
+    });
+  </script>
+</Layout>

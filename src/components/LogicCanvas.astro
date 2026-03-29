@@ -1,0 +1,154 @@
+---
+/**
+ * Logic Canvas - בנטו בדף הבית: מסלולי Clarity, ציטוט, וידאו, מגמות, שאלה פתוחה.
+ */
+import TrendGraph from "./TrendGraph.astro";
+import VideoPlayer from "./VideoPlayer.astro";
+import { getCollection } from "astro:content";
+import defaultCanvas from "../config/homeCanvas.json";
+import clarityPathsFile from "../config/clarityPaths.json";
+
+export interface HomeCanvasConfig {
+  heroEyebrow?: string;
+  heroTitle?: string;
+  heroSubtitle?: string;
+  dailyQuote: { text: string; attribution?: string };
+  featuredVideo: { youtubeId: string; title?: string; videoSummaryPoints?: string[] };
+  showTrendGraph: boolean;
+  openQuestion: { text: string; href?: string };
+}
+
+interface Props {
+  canvas?: HomeCanvasConfig;
+}
+
+const { canvas: canvasProp } = Astro.props;
+const canvas = (canvasProp ?? defaultCanvas) as HomeCanvasConfig;
+
+const publishedArticles = await getCollection("articles", ({ data }) => data.draft !== true);
+const availableSlugs = new Set<string>();
+for (const article of publishedArticles) {
+  const base = article.id.replace(/\.mdx$/i, "");
+  const tail = base.split("/").pop();
+  [article.slug, base, tail].filter(Boolean).forEach((key) => availableSlugs.add(String(key)));
+}
+
+// מציגים תמיד את המסלולים. גם אם חלק מהמאמרים לא זמינים אחרי העלאה/שינוי slug,
+// לפחות יהיה קישור יציב ל־/journey/<id>.
+const paths = clarityPathsFile.paths;
+const videoId = String(canvas.featuredVideo?.youtubeId ?? "").trim();
+const videoTitle = canvas.featuredVideo?.title ?? "סרטון מומלץ";
+const videoPoints = Array.isArray(canvas.featuredVideo?.videoSummaryPoints)
+  ? canvas.featuredVideo.videoSummaryPoints
+  : [];
+---
+
+<section class="mx-auto max-w-7xl space-y-10 px-5 pt-16 sm:px-8 lg:px-12" aria-labelledby="logic-canvas-title" dir="rtl">
+  <header class="max-w-4xl space-y-3 text-right">
+    {
+      canvas.heroEyebrow && (
+        <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--nm-accent)]">{canvas.heroEyebrow}</p>
+      )
+    }
+    <h1
+      id="logic-canvas-title"
+      class="text-[clamp(2rem,1.6rem+2vw,3.4rem)] font-semibold leading-[1.08] text-[var(--nm-fg)]"
+    >
+      {canvas.heroTitle}
+    </h1>
+    {
+      canvas.heroSubtitle && (
+        <p class="max-w-3xl text-[clamp(1.05rem,0.98rem+0.5vw,1.25rem)] leading-relaxed text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+          {canvas.heroSubtitle}
+        </p>
+      )
+    }
+  </header>
+
+  <div class="space-y-4">
+    <h2 class="text-right text-lg font-semibold text-[var(--nm-fg-secondary)]">בחירת מסלול לפי נקודת פתיחה</h2>
+    <p class="text-right text-sm text-[color-mix(in_srgb,var(--nm-fg-secondary)_75%,var(--nm-bg))]">
+      ארבעה מסלולים. בכל אחד שלושה מאמרים בסדר קריאה קבוע. בוחרים מסלול, קוראים לפי הסדר, בודקים איפה המשפט הבא נשבר.
+    </p>
+    <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      {
+        paths.map((p) => (
+          <a
+            href={`/journey/${p.id}`}
+            title={p.title}
+            class="group flex flex-col rounded-[1.5rem] border border-[color-mix(in_srgb,var(--nm-fg-secondary)_16%,transparent)] bg-[var(--nm-bg-canvas)]/95 p-5 text-right shadow-[0_18px_50px_color-mix(in_srgb,var(--nm-fg-secondary)_8%,transparent)] transition hover:border-[color-mix(in_srgb,var(--nm-accent)_35%,transparent)] hover:shadow-[0_22px_60px_color-mix(in_srgb,var(--nm-accent)_12%,transparent)]"
+          >
+            <span class="text-3xl" aria-hidden="true">
+              {p.emoji}
+            </span>
+            <span class="mt-3 text-base font-semibold text-[var(--nm-fg-secondary)] group-hover:text-[var(--nm-accent)]">{p.title}</span>
+            <span class="mt-2 text-sm leading-6 text-[color-mix(in_srgb,var(--nm-fg-secondary)_70%,var(--nm-bg))]">{p.shortDescription}</span>
+            <span class="mt-4 text-sm font-semibold text-[var(--nm-accent)]">למסלול ←</span>
+          </a>
+        ))
+      }
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:gap-8">
+    <div
+      class:list={[
+        "flex flex-col justify-center rounded-[1.75rem] border border-[color-mix(in_srgb,var(--nm-fg-secondary)_14%,transparent)] bg-[var(--nm-bg-canvas)] p-6 text-right shadow-sm lg:min-h-[220px] lg:p-10",
+        videoId ? "lg:col-span-6" : "lg:col-span-12",
+      ]}
+    >
+      <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">ציטוט היום</p>
+      <blockquote class="mt-4 text-[clamp(1.15rem,1rem+0.6vw,1.45rem)] font-medium leading-[1.75] text-[var(--nm-fg-secondary)]">
+        {canvas.dailyQuote.text}
+      </blockquote>
+      {
+        canvas.dailyQuote.attribution && (
+          <footer class="mt-4 text-sm text-[color-mix(in_srgb,var(--nm-fg-secondary)_65%,var(--nm-bg))]">
+            {canvas.dailyQuote.attribution}
+          </footer>
+        )
+      }
+    </div>
+
+    {
+      videoId && (
+        <div class="rounded-[1.75rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)]/95 p-4 lg:col-span-6">
+          <VideoPlayer
+            youtubeId={videoId}
+            title={videoTitle}
+            videoSummaryPoints={videoPoints}
+            posterLoading="eager"
+            posterFetchPriority="high"
+          />
+        </div>
+      )
+    }
+
+    {
+      canvas.showTrendGraph && (
+        <div class="lg:col-span-6">
+          <TrendGraph />
+        </div>
+      )
+    }
+
+    <div
+      class="flex flex-col justify-center rounded-[1.75rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-6 text-right lg:col-span-6 lg:p-8"
+    >
+      <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[color-mix(in_srgb,var(--nm-fg)_55%,var(--nm-bg))]">שאלה פתוחה</p>
+      <p class="mt-3 text-[clamp(1.05rem,0.98rem+0.35vw,1.2rem)] font-medium leading-relaxed text-[var(--nm-fg)]">
+        {canvas.openQuestion.text}
+      </p>
+      {
+        canvas.openQuestion.href && (
+          <a
+            href={canvas.openQuestion.href}
+            class="mt-5 inline-flex w-fit rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_15%,transparent)] bg-[var(--nm-bg-canvas)] px-4 py-2 text-sm font-semibold text-[var(--nm-fg)]/80 transition hover:bg-[var(--nm-surface-muted)]"
+          >
+            להמשך
+          </a>
+        )
+      }
+    </div>
+  </div>
+</section>

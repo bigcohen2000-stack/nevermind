@@ -1,0 +1,84 @@
+---
+import { jsonLdForInlineScript } from "../../lib/json-ld-inline";
+
+interface Props {
+  eyebrow?: string;
+  title?: string;
+  body?: string;
+  digitalHref?: string;
+  physicalHref?: string;
+  questionHref?: string;
+}
+const {
+  eyebrow = "לפני שמתחילים לפרק",
+  title = "אהבה ב-20 עמודים",
+  body = "כתבתי ספר קצר שמפרק את מה שבאמת קורה ביחסים, בלי לעטוף שום דבר בצמר גפן. רק הלוגיקה של הקשר. זמין בגרסה דיגיטלית או בעותק פיזי - מה שנוח לך.",
+  digitalHref = "/book/",
+  physicalHref = "/book/",
+  questionHref = "/studio/?topic=book-question",
+} = Astro.props as Props;
+
+const bookSchema = {
+  "@context": "https://schema.org",
+  "@type": "Book",
+  name: title,
+  author: {
+    "@type": "Person",
+    name: "השם לא משנה",
+  },
+  inLanguage: "he",
+  bookFormat: ["EBook", "Paperback"],
+  description: body,
+  url: "/book/",
+  offers: [
+    {
+      "@type": "Offer",
+      name: "גרסה דיגיטלית",
+      priceCurrency: "ILS",
+    },
+    {
+      "@type": "Offer",
+      name: "עותק פיזי",
+      priceCurrency: "ILS",
+    },
+  ],
+};
+---
+
+<script is:inline type="application/ld+json" set:html={jsonLdForInlineScript(bookSchema)}></script>
+
+<aside
+  aria-label={`המלצת ספר: ${title}`}
+  class="my-12 rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] bg-[var(--nm-surface-muted)] px-8 py-10 text-right transition-all duration-300"
+>
+  <p class="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--nm-accent)]">{eyebrow}</p>
+
+  <h2 class="mt-3 text-[clamp(1.5rem,1.2rem+1vw,2rem)] font-semibold text-[var(--nm-fg)]">{title}</h2>
+
+  <p class="mt-4 max-w-2xl text-base leading-7 text-[color-mix(in_srgb,var(--nm-fg)_75%,var(--nm-bg))]">
+    {body}
+  </p>
+
+  <div class="mt-8 flex flex-wrap items-center justify-end gap-4">
+    <a
+      href={digitalHref}
+      class="inline-flex min-h-[48px] items-center justify-center rounded-full bg-[var(--nm-accent)] px-8 py-2.5 text-sm font-semibold text-[var(--nm-on-accent)] transition-colors duration-300 hover:bg-[var(--nm-accent-hover)]"
+    >
+      לגרסה הדיגיטלית
+    </a>
+
+    <a
+      href={physicalHref}
+      class="inline-flex min-h-[48px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_15%,transparent)] bg-transparent px-8 py-2.5 text-sm font-semibold text-[var(--nm-fg)] transition-colors duration-300 hover:bg-[color-mix(in_srgb,var(--nm-fg)_4%,transparent)]"
+    >
+      לעמוד הספר הפיזי
+    </a>
+
+    <a
+      href={questionHref}
+      class="inline-flex min-h-[48px] items-center justify-center px-4 py-2.5 text-sm text-[color-mix(in_srgb,var(--nm-fg)_50%,var(--nm-bg))] underline-offset-8 transition-colors duration-300 hover:text-[var(--nm-fg)] hover:underline"
+    >
+      יש לי שאלה לפני
+    </a>
+  </div>
+</aside>

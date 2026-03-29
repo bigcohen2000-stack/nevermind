@@ -1,3 +1,5 @@
 ---
-return Astro.redirect("/premium-access/", 301);
+import StaticRedirectPage from "../components/StaticRedirectPage.astro";
 ---
+
+<StaticRedirectPage to="/premium-access/" title="Redirecting..." message="This page has moved." />

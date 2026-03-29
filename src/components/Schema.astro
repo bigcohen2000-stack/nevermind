@@ -1,0 +1,16 @@
+---
+import { jsonLdForInlineScript } from "../lib/json-ld-inline";
+
+interface Props {
+  graphs: unknown[];
+}
+
+const { graphs } = Astro.props;
+const list = (graphs ?? []).filter(Boolean);
+---
+
+{
+  list.map((graph) => (
+    <script type="application/ld+json" is:inline set:html={jsonLdForInlineScript(graph)} />
+  ))
+}

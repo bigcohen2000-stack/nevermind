@@ -18,7 +18,7 @@ const fallbackConsultation = ({
   features: ["בהירות לוגית לפני פעולה", "מיפוי צומת טיפולי בזמן אמת", "כיוון פרקטי למפגש הבא"],
   stageName: "דיוק קליני",
   targetAudience: "מטפלים ומאמנים שרוצים בהירות בזמן עומס",
-} satisfies Partial<FlatService>) as FlatService;
+} as unknown as FlatService);
 
 const featuredService: FlatService = consultation ?? fallbackConsultation;
 ---

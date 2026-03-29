@@ -1,4 +1,5 @@
 ---
-/** נתיב מיגרציה מ-WordPress. יעד זמני עד עמוד ייעודי לזוגי. */
-return Astro.redirect("/personal-consultation/", 302);
+import StaticRedirectPage from "../../../components/StaticRedirectPage.astro";
 ---
+
+<StaticRedirectPage to="/personal-consultation/" title="Redirecting..." message="This page has moved." />

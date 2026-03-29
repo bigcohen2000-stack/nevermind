@@ -1,4 +1,5 @@
 ---
+import StaticRedirectPage from "../../components/StaticRedirectPage.astro";
 import { CORE_REDIRECTS } from "../../data/migration-map";
 
 export function getStaticPaths() {
@@ -9,6 +10,6 @@ export function getStaticPaths() {
   }
   return [...slugs].map((slug) => ({ params: { slug } }));
 }
-
-return Astro.redirect("/book/", 302);
 ---
+
+<StaticRedirectPage to="/book/" title="Redirecting..." message="This page has moved." />

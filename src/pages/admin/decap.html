@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>NeverMind CMS</title>
+    <meta name="robots" content="noindex,nofollow" />
+    <link rel="preconnect" href="https://unpkg.com" />
+    <style>
+      :root {
+        color-scheme: light;
+        font-family: "Assistant", system-ui, sans-serif;
+      }
+
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+        background: #f9f8f6;
+        direction: rtl;
+      }
+
+      #nc-root,
+      #nc-root * {
+        font-family: "Assistant", system-ui, sans-serif;
+      }
+    </style>
+  </head>
+  <body>
+    <script>
+      window.CMS_MANUAL_INIT = true;
+    </script>
+    <script src="https://unpkg.com/decap-cms@^3.6.0/dist/decap-cms.js"></script>
+    <script>
+      const AUTH_STORAGE_KEY = "decap-cms-oauth-result";
+
+      function relayStoredAuth() {
+        const message = window.localStorage.getItem(AUTH_STORAGE_KEY);
+        if (!message) return;
+
+        let attempts = 0;
+        const relay = () => {
+          attempts += 1;
+          window.postMessage(message, window.location.origin);
+
+          if (attempts >= 6) {
+            window.localStorage.removeItem(AUTH_STORAGE_KEY);
+            return;
+          }
+
+          window.setTimeout(relay, 250);
+        };
+
+        relay();
+      }
+
+      window.addEventListener("storage", (event) => {
+        if (event.key === AUTH_STORAGE_KEY && event.newValue) {
+          relayStoredAuth();
+        }
+      });
+
+      CMS.registerEditorComponent({
+        id: "inquiry-box",
+        label: "InquiryBox",
+        fields: [
+          { name: "title", label: "כותרת", widget: "string", default: "חקירה פתוחה" },
+          { name: "content", label: "תוכן", widget: "text" },
+        ],
+        pattern: /^<InquiryBox\s+title="([^"]+)">\s*([\s\S]*?)\s*<\/InquiryBox>$/m,
+        fromBlock(match) {
+          return {
+            title: match[1],
+            content: match[2].trim(),
+          };
+        },
+        toBlock(data) {
+          return `<InquiryBox title="${data.title}">\n${data.content || ""}\n</InquiryBox>`;
+        },
+        toPreview(data) {
+          return `
+            <div style="border:1px solid rgba(26,26,26,.12);border-radius:20px;padding:16px;background:#fffaf5;direction:rtl;">
+              <div style="font-weight:700;margin-bottom:8px;">${data.title || "חקירה פתוחה"}</div>
+              <div>${(data.content || "").replace(/\n/g, "<br>")}</div>
+            </div>
+          `;
+        },
+      });
+
+      const ALLOWED_ARTICLE_TAGS = [
+        "חופש",
+        "מכניקת מחשבה",
+        "העצמי",
+        "בהירות",
+        "בחירה",
+        "זוגיות",
+        "משפחה וחינוך",
+        "פילוסופיה וחברה",
+        "תודעה ורצון",
+        "חשיבה ביקורתית",
+        "שאלות גדולות",
+        "רגשות",
+        "ניסויי מחשבה",
+      ];
+      const ALLOWED_SET = new Set(ALLOWED_ARTICLE_TAGS);
+
+      CMS.registerEventListener({
+        name: "preSave",
+        handler: ({ entry }) => {
+          const js = typeof entry.toJS === "function" ? entry.toJS() : entry;
+          if (js.collection !== "articles") return;
+          const data = js.data || {};
+
+          const pub = data.pubDate;
+          let pubStr = "";
+          if (pub instanceof Date) {
+            pubStr = pub.toISOString().slice(0, 10);
+          } else if (typeof pub === "string") {
+            pubStr = pub.trim().slice(0, 10);
+          }
+          if (!pubStr || !/^\d{4}-\d{2}-\d{2}$/.test(pubStr) || Number.isNaN(Date.parse(pubStr))) {
+            return {
+              error: {
+                message: "שמירה נחסמה: חובה למלא pubDate בפורמט YYYY-MM-DD בדיוק.",
+              },
+            };
+          }
+
+          const tags = Array.isArray(data.tags) ? data.tags : [];
+          for (const t of tags) {
+            const key = String(t).trim();
+            if (!ALLOWED_SET.has(key)) {
+              return {
+                error: {
+                  message: `שמירה נחסמה: התגית "${key}" לא ברשימה המאושרת.`,
+                },
+              };
+            }
+          }
+        },
+      });
+
+      CMS.init();
+      window.setTimeout(relayStoredAuth, 300);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,27 @@
+---
+/** מיכל + שדה טוקן לטפסי Web3Forms כשמוגדר מפתח אתר. */
+export interface Props {
+  idSuffix?: string;
+}
+const { idSuffix = "form" } = Astro.props;
+const siteKey = String(import.meta.env.PUBLIC_HCAPTCHA_SITE_KEY ?? "").trim();
+const enabled = siteKey.length > 0;
+const labelId = `nm-hcaptcha-label-${idSuffix}`;
+---
+
+{
+  enabled ? (
+    <div class="flex flex-col items-end gap-2 py-2" data-nm-hcaptcha-wrap>
+      <p id={labelId} class="text-xs text-[color-mix(in_srgb,var(--nm-fg)_55%,var(--nm-bg))]">
+        אימות לפני שליחה
+      </p>
+      <div
+        class="nm-hcaptcha-container min-h-[78px]"
+        data-sitekey={siteKey}
+        role="group"
+        aria-labelledby={labelId}
+      />
+      <input type="hidden" name="h-captcha-response" value="" autocomplete="off" />
+    </div>
+  ) : null
+}

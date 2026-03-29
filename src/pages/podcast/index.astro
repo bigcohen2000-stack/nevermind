@@ -1,4 +1,5 @@
 ---
-/** פודקאסט מרפסת (מיגרציה) → סטודיו והמשך דרך טופס. */
-return Astro.redirect("/studio/", 302);
+import StaticRedirectPage from "../../components/StaticRedirectPage.astro";
 ---
+
+<StaticRedirectPage to="/studio/" title="Redirecting to studio..." message="This page has moved." />

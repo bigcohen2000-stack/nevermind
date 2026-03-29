@@ -1,0 +1,267 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+import siteSettings from "../../config/siteSettings.json";
+import ArticlesTable from "../../components/admin/ArticlesTable.astro";
+import ServicesControlPanel from "../../components/admin/ServicesControlPanel.astro";
+import AppConfigControlPanel from "../../components/admin/AppConfigControlPanel.astro";
+import HomeCanvasControlPanel from "../../components/admin/HomeCanvasControlPanel.astro";
+import ClarityPathsControlPanel from "../../components/admin/ClarityPathsControlPanel.astro";
+import appConfig from "../../config/appConfig.json";
+import homeCanvas from "../../config/homeCanvas.json";
+import clarityPathsFile from "../../config/clarityPaths.json";
+import { flattenVisibleServices } from "../../lib/services";
+
+const pageTitle = "מרכז השליטה של NeverMind";
+const pageDescription = "מרכז תפעולי פרטי לניהול מאמרים, שירותים, קונפיגורציה וכלי היצירה של NeverMind.";
+const githubArticleBase = `https://github.com/${appConfig.github.owner}/${appConfig.github.repo}/blob/${appConfig.github.branch}/${appConfig.github.articlesPath}/`;
+const formatDate = new Intl.DateTimeFormat("he-IL", {
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+});
+
+const workflowConfig = {
+  writing: {
+    label: "בכתיבה",
+    tone: "bg-[var(--nm-tint)] text-[var(--nm-fg)] border-[color-mix(in_srgb,var(--nm-accent)_20%,transparent)]",
+  },
+  review: {
+    label: "לבדיקה",
+    tone: "bg-[var(--nm-surface-muted)] text-[var(--nm-fg)] border-[color-mix(in_srgb,var(--nm-fg)_14%,transparent)]",
+  },
+  ready: {
+    label: "מוכן לפרסום",
+    tone: "bg-[var(--nm-tint-strong)] text-[var(--nm-fg)] border-[color-mix(in_srgb,var(--nm-accent)_26%,transparent)]",
+  },
+  published: {
+    label: "פורסם",
+    tone: "bg-[var(--nm-inverse)] text-[var(--nm-inverse-fg)] border-[color-mix(in_srgb,var(--nm-fg)_22%,transparent)]",
+  },
+} as const;
+
+type WorkflowKey = keyof typeof workflowConfig;
+
+const difficultyConfig = {
+  beginner: {
+    label: "מתחילים",
+    tone: "bg-[var(--nm-tint)] text-[var(--nm-fg)] border-[color-mix(in_srgb,var(--nm-accent)_18%,transparent)]",
+  },
+  advanced: {
+    label: "מתקדמים",
+    tone: "bg-[var(--nm-tint-strong)] text-[var(--nm-fg)] border-[color-mix(in_srgb,var(--nm-accent)_26%,transparent)]",
+  },
+  deep: {
+    label: "חקירה עמוקה",
+    tone: "bg-[var(--nm-inverse)] text-[var(--nm-inverse-fg)] border-[color-mix(in_srgb,var(--nm-fg)_22%,transparent)]",
+  },
+} as const;
+
+type DifficultyKey = keyof typeof difficultyConfig;
+
+const resolveWorkflowStatus = (workflowStatus: WorkflowKey | undefined, draft: boolean): WorkflowKey => {
+  if (workflowStatus && workflowStatus in workflowConfig) {
+    return workflowStatus;
+  }
+
+  return draft ? "writing" : "published";
+};
+
+const resolveDifficulty = (difficultyLevel: DifficultyKey | undefined, body: string): DifficultyKey => {
+  if (difficultyLevel && difficultyLevel in difficultyConfig) {
+    return difficultyLevel;
+  }
+
+  const wordCount = body.replace(/<[^>]*>/g, " ").split(/\s+/).filter(Boolean).length;
+  if (wordCount > 1400) return "deep";
+  if (wordCount > 900) return "advanced";
+  return "beginner";
+};
+
+const articles = (await getCollection("articles"))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .map((article) => {
+    const workflowKey = resolveWorkflowStatus(article.data.workflowStatus as WorkflowKey | undefined, article.data.draft);
+    const workflowMeta = workflowConfig[workflowKey];
+    const difficultyKey = resolveDifficulty(article.data.difficultyLevel as DifficultyKey | undefined, article.body ?? "");
+    const difficultyMeta = difficultyConfig[difficultyKey];
+    const slug = article.slug || article.id.replace(/\.mdx$/, "");
+
+    return {
+      title: article.data.title,
+      workflowStatus: workflowMeta.label,
+      workflowTone: workflowMeta.tone,
+      difficulty: difficultyMeta.label,
+      difficultyTone: difficultyMeta.tone,
+      status: article.data.draft ? "טיוטה" : "באוויר",
+      statusTone: article.data.draft
+        ? "bg-[var(--nm-tint)] text-[var(--nm-accent)] border-[color-mix(in_srgb,var(--nm-accent)_14%,transparent)]"
+        : "bg-[var(--nm-tint)] text-[var(--nm-fg)] border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)]",
+      premium: article.data.isPremium ? "כן" : "לא",
+      premiumTone: article.data.isPremium
+        ? "bg-[var(--nm-inverse)] text-[var(--nm-inverse-fg)] border-[color-mix(in_srgb,var(--nm-fg)_22%,transparent)]"
+        : "bg-[var(--nm-bg-canvas)] text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))] border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)]",
+      dateLabel: formatDate.format(article.data.pubDate),
+      editHref: `${githubArticleBase}${article.id}`,
+      viewHref: `/articles/${slug}/`,
+      slug: `articles/${slug}`,
+      workflowKey,
+    };
+  });
+
+const quickActions = [
+  {
+    title: "מאמר חדש",
+    description: "מחולל prompt, sandbox ל־MDX, autofix וייצוא לקובץ לפני commit.",
+    href: "/admin/generator/",
+    cta: "לפתוח את המחולל",
+  },
+  {
+    title: "Content Health",
+    description: "ציון בריאות לכל מאמר לפי Insight, עדכניות SEO ויחס רכיבי QA.",
+    href: "/admin/dashboard/",
+    cta: "לפתוח את הדשבורד",
+  },
+  {
+    title: "עמוד השירותים",
+    description: "מסלולים לפי שלבים, כפתורי וואטסאפ או חשבונית, ותמחור ברור.",
+    href: "/services/",
+    cta: "לבדוק את העמוד",
+  },
+  {
+    title: "טופס intake",
+    description: "הכרות לפני שיחה: כתיבה, סימון או שניהם, עם הערות בדרך לפי בחירה.",
+    href: "/intake/",
+    cta: "לפתוח את הטופס",
+  },
+  {
+    title: "מחולל פרדוקסים",
+    description: "כלי מהיר ליצירת 20 פרדוקסים חדים לסטוריז, הוקים וכותרות משנה.",
+    href: "/admin/paradoxes/",
+    cta: "לייצר פרדוקסים",
+  },
+  {
+    title: "עץ שורש הבעיה",
+    description: "אינפוגרפיקה אינטראקטיבית שמפרקת בעיה גלויה לשורשים תודעתיים עמוקים יותר.",
+    href: "/root-problem-tree/",
+    cta: "לפתוח את המפה",
+  },
+  {
+    title: "הספרייה האסורה",
+    description: "ריכוז המאמרים ששוברים פרות קדושות ויוצרים curiosity gap חזק יותר.",
+    href: "/forbidden-library/",
+    cta: "להיכנס לספרייה",
+  },
+];
+
+const visibleServices = flattenVisibleServices();
+const stats = {
+  totalArticles: articles.length,
+  drafts: articles.filter((article) => article.status === "טיוטה").length,
+  live: articles.filter((article) => article.status === "באוויר").length,
+  writing: articles.filter((article) => article.workflowKey === "writing").length,
+  review: articles.filter((article) => article.workflowKey === "review").length,
+  ready: articles.filter((article) => article.workflowKey === "ready").length,
+  published: articles.filter((article) => article.workflowKey === "published").length,
+  activeServices: visibleServices.length,
+  featuredServices: visibleServices.filter((service) => Array.isArray(service.badges) && service.badges.length > 0).length,
+  homeCanvasTrend: homeCanvas.showTrendGraph ? "מופעל" : "כבוי",
+  clarityJourneys: Array.isArray(clarityPathsFile.paths) ? clarityPathsFile.paths.length : 0,
+};
+
+const topPriority =
+  stats.ready > 0
+    ? `${stats.ready} מאמרים מוכנים לפרסום.`
+    : stats.review > 0
+      ? `${stats.review} מאמרים מחכים לבדיקה.`
+      : "אין צוואר בקבוק כרגע. אפשר לעבור ליצירה או לשיפור השירותים.";
+---
+
+<Layout title={pageTitle} description={pageDescription} noIndex={true}>
+  <section class="mx-auto max-w-7xl space-y-10 px-4 pb-12 text-[var(--nm-fg)]">
+    <header class="grid gap-6 rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/82 p-6 shadow-[0_30px_90px_rgba(26,26,26,0.08)] backdrop-blur-md lg:grid-cols-[minmax(0,1fr)_20rem]">
+      <div class="space-y-5 text-right">
+        <p class="text-sm font-semibold uppercase tracking-[0.26em] text-[var(--nm-accent)]">Creator Dashboard</p>
+        <h1 class="text-[clamp(2.4rem,1.8rem+2vw,4rem)] font-semibold leading-[1.05]">מרכז השליטה של התוכן והמערכת</h1>
+        <p class="max-w-3xl text-[clamp(1rem,0.94rem+0.3vw,1.15rem)] leading-8 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">
+          זה הקוקפיט התפעולי שלך. מכאן רואים מה נכתב, מה תקוע, מה מוכן לפרסום, ואילו מנגנונים באתר פעילים כרגע. לא CMS כללי, אלא סביבת עבודה שמותאמת ל־NeverMind.
+        </p>
+      </div>
+      <div class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-accent)_18%,transparent)] bg-[var(--nm-tint)] p-5 text-right">
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">תעדוף להיום</p>
+        <p class="mt-3 text-lg font-semibold text-[var(--nm-fg)]">{topPriority}</p>
+        <p class="mt-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_64%,var(--nm-bg))]">
+          אם אתה רק מתחיל סבב עבודה חדש, המסלול הנכון הוא: מחולל מאמרים, בדיקת QA, ואז קפיצה לטבלת התוכן כדי לקדם את הסטטוס.
+        </p>
+      </div>
+    </header>
+
+    <section class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+      {quickActions.map((item) => (
+        <article class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/82 p-5 shadow-[0_24px_70px_rgba(26,26,26,0.06)]">
+          <h2 class="text-xl font-semibold text-[var(--nm-fg)]">{item.title}</h2>
+          <p class="mt-4 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">{item.description}</p>
+          <a href={item.href} class="mt-6 inline-flex items-center rounded-full bg-[var(--nm-inverse)] px-4 py-2 text-sm font-semibold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-inverse-hover)]">{item.cta}</a>
+        </article>
+      ))}
+    </section>
+
+    <section class="grid gap-4 md:grid-cols-4 xl:grid-cols-8">
+      <article class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-5 text-right"><p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">מאמרים</p><p class="mt-3 text-3xl font-semibold text-[var(--nm-fg)]">{stats.totalArticles}</p></article>
+      <article class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-5 text-right"><p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">טיוטות</p><p class="mt-3 text-3xl font-semibold text-[var(--nm-fg)]">{stats.drafts}</p></article>
+      <article class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-5 text-right"><p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">באוויר</p><p class="mt-3 text-3xl font-semibold text-[var(--nm-fg)]">{stats.live}</p></article>
+      <article class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-5 text-right"><p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">בכתיבה</p><p class="mt-3 text-3xl font-semibold text-[var(--nm-fg)]">{stats.writing}</p></article>
+      <article class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-5 text-right"><p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">לבדיקה</p><p class="mt-3 text-3xl font-semibold text-[var(--nm-fg)]">{stats.review}</p></article>
+      <article class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-5 text-right"><p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">מוכן לפרסום</p><p class="mt-3 text-3xl font-semibold text-[var(--nm-fg)]">{stats.ready}</p></article>
+      <article class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-5 text-right"><p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">פורסם</p><p class="mt-3 text-3xl font-semibold text-[var(--nm-fg)]">{stats.published}</p></article>
+      <article class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-5 text-right"><p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">שירותים פעילים</p><p class="mt-3 text-3xl font-semibold text-[var(--nm-fg)]">{stats.activeServices}</p></article>
+    </section>
+
+    <section id="content-queue">
+      <ArticlesTable articles={articles} />
+    </section>
+
+    <div id="services-config" class="grid gap-8 xl:grid-cols-2">
+      <ServicesControlPanel />
+      <AppConfigControlPanel />
+    </div>
+
+    <div id="canvas-paths" class="grid gap-8 xl:grid-cols-2">
+      <HomeCanvasControlPanel />
+      <ClarityPathsControlPanel />
+    </div>
+
+    <section class="grid gap-4 md:grid-cols-2">
+      <article class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/82 p-5 shadow-[0_24px_70px_rgba(26,26,26,0.06)] text-right">
+        <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--nm-accent)]">System State</p>
+        <h2 class="mt-3 text-2xl font-semibold text-[var(--nm-fg)]">מודולים גלובליים</h2>
+        <ul class="mt-5 space-y-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+          <li class="rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3">Whisper Banner: <strong>{siteSettings.whisperBanner.enabled ? "מופעל" : "כבוי"}</strong></li>
+          <li class="rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3">Premium Vault: <strong>{siteSettings.premiumVault.enabled ? "מופעל" : "כבוי"}</strong></li>
+          <li class="rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3">Logic Canvas / TrendGraph: <strong>{stats.homeCanvasTrend}</strong></li>
+          <li class="rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3">Clarity Journeys: <strong>{stats.clarityJourneys} מסלולים</strong></li>
+        </ul>
+      </article>
+
+      <article class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/82 p-5 shadow-[0_24px_70px_rgba(26,26,26,0.06)] text-right">
+        <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--nm-accent)]">זרימת עבודה מעודכנת</p>
+        <h2 class="mt-3 text-2xl font-semibold text-[var(--nm-fg)]">מה עושים מכאן</h2>
+        <ol class="mt-5 space-y-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+          <li class="rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3">
+            יוצרים טיוטה חדשה ומייצרים תוכן מהמחולל.
+            <a href="/admin/generator/" class="ms-2 font-semibold text-[var(--nm-accent)] underline-offset-4 hover:underline">פתח מחולל</a>
+          </li>
+          <li class="rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3">
+            מקדמים מאמרים דרך התור לפי סטטוס: בכתיבה, לבדיקה, מוכן לפרסום, פורסם.
+            <a href="#content-queue" class="ms-2 font-semibold text-[var(--nm-accent)] underline-offset-4 hover:underline">לתור המאמרים</a>
+          </li>
+          <li class="rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3">
+            לפני push בודקים שירותים, הגדרות כלליות, קנבס ומסלולים.
+            <a href="#services-config" class="ms-2 font-semibold text-[var(--nm-accent)] underline-offset-4 hover:underline">שירותים וקונפיג</a>
+            <a href="#canvas-paths" class="ms-2 font-semibold text-[var(--nm-accent)] underline-offset-4 hover:underline">קנבס ומסלולים</a>
+          </li>
+        </ol>
+      </article>
+    </section>
+  </section>
+</Layout>

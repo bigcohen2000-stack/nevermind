@@ -1,0 +1,138 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+import ArticleCard from "../../components/ArticleCard.astro";
+import type { DifficultyKey } from "../../components/ArticleCard.astro";
+
+const resolveDifficulty = (level: DifficultyKey | undefined, body: string): DifficultyKey => {
+  if (level && (level === "beginner" || level === "advanced" || level === "deep")) return level;
+
+  const wordCount = body.replace(/<[^>]*>/g, " ").split(/\s+/).filter(Boolean).length;
+  if (wordCount > 1400) return "deep";
+  if (wordCount > 900) return "advanced";
+  return "beginner";
+};
+
+const resolveMindShift = (raw: unknown): number | undefined => {
+  if (typeof raw === "number" && raw >= 1 && raw <= 5) return raw;
+  if (typeof raw === "string" && /^[1-5]$/.test(raw.trim())) return Number(raw.trim());
+  return undefined;
+};
+
+const articles = (await getCollection("articles", ({ data }) => data.draft !== true))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .map((article) => {
+    const body = article.body ?? "";
+    const difficultyKey = resolveDifficulty(article.data.difficultyLevel as DifficultyKey | undefined, body);
+    const plain = body.replace(/<[^>]*>/g, " ");
+    const wordCount = plain.split(/\s+/).filter(Boolean).length;
+    const readingMinutes = Math.max(1, Math.ceil(wordCount / 200));
+
+    const pub = article.data.pubDate;
+    const upd = article.data.updatedDate;
+    const freshnessSource = upd ?? pub;
+    const freshnessIso = freshnessSource.toISOString().slice(0, 10);
+
+    return {
+      slug: article.slug,
+      title: article.data.title,
+      description: article.data.description,
+      tags: Array.isArray(article.data.tags) ? article.data.tags : [],
+      date: article.data.pubDate,
+      transitionId: article.slug.replace(/[^\w-]+/g, "-"),
+      difficultyKey,
+      readingMinutes,
+      isPremium: Boolean(article.data.isPremium),
+      mindShiftIntensity: resolveMindShift(article.data.mindShiftIntensity),
+      contentFreshnessIso: freshnessIso,
+      contentFreshnessIsUpdate: Boolean(upd),
+    };
+  });
+
+const tagSet = new Set<string>();
+articles.forEach((article) => article.tags.forEach((tag) => tagSet.add(tag)));
+const tags = Array.from(tagSet);
+---
+<Layout title="מאמרים">
+  <section class="space-y-10">
+    <header class="space-y-4">
+      <div class="flex flex-wrap items-end justify-between gap-4">
+        <div class="space-y-4 text-right">
+          <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--nm-accent)]">מרכז הידע של NeverMind</p>
+          <h1 class="text-[clamp(2.2rem,1.7rem+2vw,3.2rem)] font-semibold text-[var(--nm-fg)]">
+            מאמרים
+          </h1>
+          <p class="text-[clamp(1.05rem,1rem+0.35vw,1.4rem)] text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">
+            ספריית עומק חיה למי שרוצה פחות רעש, יותר דיוק, וכניסה מסודרת לרעיונות שלא נשארים על פני השטח.
+          </p>
+        </div>
+        <button type="button" data-random-article-trigger class="inline-flex items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-accent)_18%,transparent)] bg-[var(--nm-tint)] px-5 py-3 text-sm font-semibold text-[var(--nm-accent)] transition hover:bg-[var(--nm-tint-strong)]">
+          הפתע אותי עם כיוון אקראי
+        </button>
+      </div>
+    </header>
+
+    <div class="space-y-3">
+      <p class="text-right text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_60%,var(--nm-bg))]">
+        אפשר להתחיל מהכול, או להיכנס דרך נושא אחד ברור ולהעמיק ממנו.
+      </p>
+      <div class="flex flex-wrap gap-3">
+      <button type="button" data-filter="all" aria-pressed="true" class="rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/70 px-4 py-2 text-[clamp(0.85rem,0.82rem+0.2vw,1rem)] text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))] transition-colors duration-300 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color-mix(in_srgb,var(--nm-fg)_22%,transparent)]">הכל</button>
+      {tags.map((tag) => (
+        <button type="button" data-filter={tag} aria-pressed="false" class="rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/70 px-4 py-2 text-[clamp(0.85rem,0.82rem+0.2vw,1rem)] text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))] transition-colors duration-300 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color-mix(in_srgb,var(--nm-fg)_22%,transparent)]">{tag}</button>
+      ))}
+    </div>
+
+    <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+      {articles.map((article) => (
+        <ArticleCard
+          slug={article.slug}
+          title={article.title}
+          description={article.description}
+          tagsCsv={article.tags.join(",")}
+          transitionId={article.transitionId}
+          difficultyKey={article.difficultyKey}
+          readingMinutes={article.readingMinutes}
+          isPremium={article.isPremium}
+          mindShiftIntensity={article.mindShiftIntensity}
+          contentFreshnessIso={article.contentFreshnessIso}
+          contentFreshnessIsUpdate={article.contentFreshnessIsUpdate}
+        />
+      ))}
+    </div>
+  </section>
+
+  <script is:inline>
+    document.addEventListener("astro:page-load", () => {
+      const buttons = Array.from(document.querySelectorAll("[data-filter]"));
+      const cards = Array.from(document.querySelectorAll("[data-article-card]"));
+
+      const setActive = (active) => {
+        buttons.forEach((button) => {
+          const isActive = button.dataset.filter === active;
+          button.setAttribute("aria-pressed", String(isActive));
+          button.classList.toggle("bg-white", isActive);
+        });
+      };
+
+      const filterCards = (active) => {
+        cards.forEach((card) => {
+          const cardTags = card.dataset.tags ? card.dataset.tags.split(",") : [];
+          const shouldShow = active === "all" || cardTags.includes(active);
+          card.classList.toggle("hidden", !shouldShow);
+        });
+      };
+
+      buttons.forEach((button) => {
+        button.addEventListener("click", () => {
+          const active = button.dataset.filter || "all";
+          setActive(active);
+          filterCards(active);
+        });
+      });
+    });
+  </script>
+</Layout>
+
+
+

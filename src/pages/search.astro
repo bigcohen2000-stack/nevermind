@@ -1,12 +1,11 @@
----
+﻿---
 import Layout from "../layouts/Layout.astro";
 import { ArchiveSearchFloatingInput } from "../components/ArchiveSearchFloatingInput";
 
-const robots = "noindex, follow";
 const q = Astro.url.searchParams.get("q")?.trim() ?? "";
 ---
 
-<Layout title="חיפוש | NeverMind" robots={robots}>
+<Layout title="חיפוש" noIndex={true}>
   <section class="mx-auto max-w-2xl space-y-6 px-4 py-10 text-right">
     <header class="space-y-2">
       <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--nm-accent)]">חיפוש</p>
@@ -29,91 +28,9 @@ const q = Astro.url.searchParams.get("q")?.trim() ?? "";
     <div data-pagefind-results class="space-y-3"></div>
   </section>
 
-  <script define:vars={{ initialQuery: q }}>
-    import { runPagefindSearch } from "../lib/pagefind-client";
-
-    async function setupSearchPage() {
-      if (window.__nmSearchPageCleanup) window.__nmSearchPageCleanup();
-
-      const input = document.querySelector("[data-pagefind-input]");
-      const resultsContainer = document.querySelector("[data-pagefind-results]");
-      if (!(input instanceof HTMLInputElement) || !(resultsContainer instanceof HTMLElement)) return;
-
-      let timeoutId = 0;
-
-      const renderResults = (items) => {
-        resultsContainer.innerHTML = "";
-        if (!items.length) {
-          resultsContainer.innerHTML = `
-            <div class="space-y-4 rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] bg-[color-mix(in_srgb,var(--nm-surface-muted)_55%,white)] p-5 text-right">
-              <p class="text-[clamp(0.95rem,0.9rem+0.2vw,1.05rem)] font-medium text-[var(--nm-fg)]">לא מצאנו בדיוק את זה. אולי ננסה מילה אחרת, או נכנס מכיוון שכבר פתוח.</p>
-              <p class="text-[clamp(0.85rem,0.8rem+0.2vw,1rem)] text-[color-mix(in_srgb,var(--nm-fg)_58%,var(--nm-bg))]">שלושה כיוונים שמובילים לעומק:</p>
-              <div class="flex flex-wrap justify-end gap-2">
-                <a href="/articles/hidden-assumptions-mechanics/" class="inline-flex min-h-[44px] items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 px-4 py-2 text-sm text-[var(--nm-fg)] transition hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nm-accent)]">הנחה סמויה</a>
-                <a href="/articles/why-bad-things-happen/" class="inline-flex min-h-[44px] items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 px-4 py-2 text-sm text-[var(--nm-fg)] transition hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nm-accent)]">למה דברים רעים קורים</a>
-                <a href="/articles/" class="inline-flex min-h-[44px] items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 px-4 py-2 text-sm text-[var(--nm-fg)] transition hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nm-accent)]">כל המאמרים</a>
-              </div>
-            </div>`;
-          return;
-        }
-        items.forEach((item) => {
-          const wrapper = document.createElement("a");
-          wrapper.href = item.url;
-          wrapper.className =
-            "block rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/70 px-4 py-3 transition-colors duration-300 hover:bg-white";
-          const titleP = document.createElement("p");
-          titleP.className = "text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] font-semibold text-[var(--nm-fg)]";
-          titleP.textContent = item.title;
-          const excerptP = document.createElement("p");
-          excerptP.className =
-            "mt-1 text-[clamp(0.85rem,0.8rem+0.2vw,1rem)] text-[color-mix(in_srgb,var(--nm-fg)_60%,var(--nm-bg))]";
-          excerptP.innerHTML = item.excerpt;
-          wrapper.append(titleP, excerptP);
-          resultsContainer.appendChild(wrapper);
-        });
-      };
-
-      const runSearch = async (value) => {
-        if (!value.trim()) {
-          renderResults([]);
-          return;
-        }
-        const rows = await runPagefindSearch(value, 12);
-        renderResults(rows);
-      };
-
-      const onInput = (event) => {
-        const value = event.target instanceof HTMLInputElement ? event.target.value : "";
-        window.clearTimeout(timeoutId);
-        timeoutId = window.setTimeout(() => {
-          void runSearch(value);
-        }, 200);
-      };
-
-      input.addEventListener("input", onInput);
-      input.addEventListener("search", onInput);
-
-      window.__nmSearchPageCleanup = () => {
-        window.clearTimeout(timeoutId);
-        input.removeEventListener("input", onInput);
-        input.removeEventListener("search", onInput);
-        window.__nmSearchPageCleanup = undefined;
-      };
-
-      if (initialQuery) {
-        input.value = initialQuery;
-        void runSearch(initialQuery);
-      }
-    }
-
-    if (!window.__nmSearchPageLoadBound) {
-      window.__nmSearchPageLoadBound = true;
-      document.addEventListener("astro:page-load", () => {
-        void setupSearchPage();
-      });
-    }
-    requestAnimationFrame(() => {
-      void setupSearchPage();
-    });
+  <script>
+    import "../scripts/search-handler.js";
   </script>
 </Layout>
+
+

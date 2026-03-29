@@ -1,0 +1,15 @@
+---
+import StaticRedirectPage from "../../components/StaticRedirectPage.astro";
+import { CORE_REDIRECTS } from "../../data/migration-map";
+
+export function getStaticPaths() {
+  const slugs = new Set<string>();
+  for (const dest of Object.values(CORE_REDIRECTS)) {
+    const m = String(dest).match(/^\/courses\/(.+)\/$/);
+    if (m) slugs.add(m[1]);
+  }
+  return [...slugs].map((slug) => ({ params: { slug } }));
+}
+---
+
+<StaticRedirectPage to="/archive/" title="Redirecting..." message="This page has moved." />

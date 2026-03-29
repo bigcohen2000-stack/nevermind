@@ -25,7 +25,7 @@ const fallbackConsultation = ({
   features: [],
   stageName: "בהירות מיידית",
   targetAudience: "מי שצריך תשובה עכשיו",
-} satisfies Partial<FlatService>) as FlatService;
+} as unknown as FlatService);
 
 const fallbackSubscription = ({
   id: "retainer-subscription",
@@ -40,7 +40,7 @@ const fallbackSubscription = ({
   features: [],
   stageName: "ליווי והמשכיות",
   targetAudience: "מי שרוצה גב קבוע",
-} satisfies Partial<FlatService>) as FlatService;
+} as unknown as FlatService);
 
 const fallbackAuthority = ({
   id: "podcast-mic",
@@ -55,7 +55,7 @@ const fallbackAuthority = ({
   features: [],
   stageName: "השפעה וסמכות",
   targetAudience: "מי שרוצה להפוך תובנות לנכס",
-} satisfies Partial<FlatService>) as FlatService;
+} as unknown as FlatService);
 
 const featuredServices: FlatService[] = [
   consultationService ?? fallbackConsultation,

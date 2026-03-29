@@ -1,0 +1,1429 @@
+﻿---
+import "@fontsource-variable/assistant/wght.css";
+import "../styles/global.css";
+import { getCollection } from "astro:content";
+import { ClientRouter } from "astro:transitions";
+import A11yWidget from "../components/A11yWidget.astro";
+import Analytics from "../components/Analytics.astro";
+import CookieBanner from "../components/CookieBanner.astro";
+import SearchModal from "../components/SearchModal";
+import WhatsAppButton from "../components/WhatsAppButton.astro";
+import WhisperBanner from "../components/WhisperBanner.astro";
+import appConfig from "../config/appConfig.json";
+import siteSettings from "../config/siteSettings.json";
+import { jsonLdForInlineScript } from "../lib/json-ld-inline";
+import { disclaimerLong } from "../lib/services";
+import SiteBreadcrumbs from "../components/SiteBreadcrumbs.astro";
+import FooterPaymentIcons from "../components/FooterPaymentIcons.astro";
+import {
+  buildSiteBreadcrumbTrail,
+  parseBreadcrumbOverride,
+  breadcrumbTrailToJsonLd,
+} from "../lib/site-breadcrumbs";
+import { GOOGLE_SITE_VERIFICATION } from "../data/migration-map";
+
+type StagingBannerCfg = { enabled?: boolean; message?: string };
+type BrandCfg = {
+  logoPath?: string;
+  defaultOgImagePath?: string;
+  themeColor?: string;
+  backgroundColor?: string;
+  wordmarkHe?: string;
+};
+type ContactCfg = {
+  whatsAppNumber?: string;
+  email?: string;
+  phoneDisplay?: string;
+  phoneTel?: string;
+};
+
+const stagingCfg = (siteSettings as { stagingBanner?: StagingBannerCfg }).stagingBanner;
+const brandCfg = (siteSettings as { brand?: BrandCfg }).brand ?? {};
+const stagingEnabled = Boolean(stagingCfg?.enabled);
+const stagingMessage =
+  typeof stagingCfg?.message === "string" && stagingCfg.message.trim().length > 0
+    ? stagingCfg.message.trim()
+    : "האתר בהרצה";
+const navTopClass = stagingEnabled
+  ? "top-[calc(var(--nm-staging-banner-height)+var(--nm-nav-top,1.5rem))]"
+  : "top-[var(--nm-nav-top,1.5rem)]";
+const mainPadTopClass = stagingEnabled
+  ? "pt-[calc(var(--nm-staging-banner-height)+var(--nm-nav-top,1.5rem)+6.25rem)]"
+  : "pt-32";
+
+const {
+  title,
+  description,
+  frontmatter,
+  hasInquirySection,
+  faqItems,
+  image,
+  noIndex = false,
+  waArticleSlug = "",
+  seoArticleBody = "",
+  articlePaywalled = false,
+  breadcrumbCurrentLabel,
+  breadcrumbItems: breadcrumbItemsProp,
+  skipToContentHref = "#main-content",
+} = Astro.props;
+
+const waTags = Array.isArray(frontmatter?.tags) ? frontmatter.tags : [];
+const waArticleTitle = typeof title === "string" ? title : "";
+const waSlug = typeof waArticleSlug === "string" ? waArticleSlug.trim() : "";
+
+const siteTitle = appConfig.site.name;
+const siteDescription = "מרחב חקירה שקט לבהירות, דיוק רגשי והבנה בגובה העיניים.";
+const siteUrl = appConfig.site.url;
+const siteUrlSlash = siteUrl.endsWith("/") ? siteUrl : `${siteUrl}/`;
+const logoPath =
+  typeof brandCfg.logoPath === "string" && brandCfg.logoPath.startsWith("/")
+    ? brandCfg.logoPath
+    : "/images/logo.svg";
+const iconPath = "/images/logo.svg";
+const defaultOgPath =
+  typeof brandCfg.defaultOgImagePath === "string" && brandCfg.defaultOgImagePath.startsWith("/")
+    ? brandCfg.defaultOgImagePath
+    : "/images/logo.svg";
+const pwaThemeColor = typeof brandCfg.themeColor === "string" ? brandCfg.themeColor : "#1A1A1A";
+const contact = appConfig.contact as ContactCfg;
+const waDigits = String(contact.whatsAppNumber ?? "").replace(/\D/g, "");
+const emailStr = typeof contact.email === "string" ? contact.email.trim() : "";
+const [emailUserRaw = "", emailDomainRaw = ""] = emailStr.includes("@") ? emailStr.split("@") : ["", ""];
+const emailUser = emailUserRaw.trim();
+const emailDomain = emailDomainRaw.trim();
+const normalizeTitle = (value: unknown) => String(value ?? "").trim();
+const rawPageTitle = normalizeTitle(title);
+const pageTitle = rawPageTitle ? `${rawPageTitle} | ${siteTitle}` : siteTitle;
+const trimMetaDescription = (value: string) => {
+  const normalized = String(value || "").trim().replace(/\s+/g, " ");
+  if (normalized.length <= 155) return normalized;
+  return `${normalized.slice(0, 152).trimEnd()}...`;
+};
+const pageDescription = trimMetaDescription(description ?? frontmatter?.description ?? siteDescription);
+const pageUrl = Astro.url ? new URL(Astro.url.pathname, siteUrl).toString() : siteUrl;
+const canonicalURL = Astro.site ? new URL(Astro.url.pathname, Astro.site).toString() : pageUrl;
+const defaultOgAbsolute = new URL(defaultOgPath.replace(/^\//, ""), siteUrlSlash).toString();
+const resolveOgImage = (): string => {
+  if (typeof image === "string" && image.trim().length > 0) {
+    const t = image.trim();
+    if (t.startsWith("http://") || t.startsWith("https://")) return t;
+    return new URL(t.replace(/^\//, ""), siteUrlSlash).toString();
+  }
+  if (frontmatter?.image) {
+    return new URL(String(frontmatter.image).replace(/^\//, ""), siteUrlSlash).toString();
+  }
+  return defaultOgAbsolute;
+};
+const ogImage = resolveOgImage();
+const showOgRasterDimensions =
+  ogImage === defaultOgAbsolute && /\.(jpe?g|png|webp)$/i.test(defaultOgPath);
+const ogImageAlt =
+  typeof frontmatter?.imageAlt === "string" && frontmatter.imageAlt.trim().length > 0
+    ? frontmatter.imageAlt.trim()
+    : frontmatter?.title
+      ? String(frontmatter.title)
+      : pageTitle;
+const clientLogUrl = (import.meta.env.PUBLIC_CLIENT_LOG_URL ?? "").trim();
+const logoAbsolute = new URL(logoPath.replace(/^\//, ""), siteUrlSlash).toString();
+const wordmarkHe =
+  typeof brandCfg.wordmarkHe === "string" && brandCfg.wordmarkHe.trim().length > 0
+    ? brandCfg.wordmarkHe.trim()
+    : "השם לא משנה";
+
+const organizationSchema = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: siteTitle,
+  url: siteUrl,
+  logo: logoAbsolute,
+  image: logoAbsolute,
+  description: siteDescription,
+  inLanguage: "he-IL",
+  sameAs: [
+    "https://www.facebook.com/nevermindyakir",
+    "https://www.instagram.com/nevermind.co.il/",
+    "https://www.tiktok.com/@nevermind.co.il",
+    "https://x.com/nevermindyakir",
+  ],
+};
+
+const websiteSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: siteTitle,
+  url: siteUrl,
+  inLanguage: "he-IL",
+  publisher: {
+    "@type": "Organization",
+    name: siteTitle,
+    url: siteUrl,
+  },
+};
+
+const professionalServiceSchema = {
+  "@context": "https://schema.org",
+  "@type": "ProfessionalService",
+  name: siteTitle,
+  url: new URL("services/", siteUrlSlash).toString(),
+  image: logoAbsolute,
+  description: siteDescription,
+  inLanguage: "he-IL",
+  areaServed: { "@type": "Country", name: "IL" },
+  provider: {
+    "@type": "Organization",
+    name: siteTitle,
+    url: siteUrl,
+  },
+};
+
+const pathName = Astro.url?.pathname ?? "/";
+const normalizeNavPath = (raw: string) => {
+  const trimmed = String(raw || "").trim();
+  if (!trimmed || trimmed === "/") return "/";
+  return trimmed.replace(/\/+$/, "") || "/";
+};
+const currentNavPath = normalizeNavPath(pathName);
+
+const intentNavItems: { href: string; label: string; activePrefixes: string[] }[] = [
+  {
+    href: "/blog/",
+    label: "אני רוצה להעמיק",
+    activePrefixes: ["/blog", "/archive", "/articles", "/journey/mental-health"],
+  },
+  {
+    href: "/studio/",
+    label: "אני רוצה לדבר",
+    activePrefixes: ["/studio", "/services", "/intake", "/personal-consultation", "/contact", "/book"],
+  },
+  { href: "/glossary/", label: "הגדרות מחדש", activePrefixes: ["/glossary"] },
+  { href: "/about/", label: "אודות NeverMind", activePrefixes: ["/about"] },
+];
+
+const intentNavItemIsCurrent = (prefixes: string[]) => {
+  const p = currentNavPath;
+  return prefixes.some((pre) => {
+    const norm = normalizeNavPath(pre);
+    if (norm === "/") return p === "/";
+    return p === norm || p.startsWith(`${norm}/`);
+  });
+};
+
+/** קישורי פוטר: onlyMd מסתיר קישור עד md כדי לרוקן מובייל */
+const footerLinkColumns: {
+  title: string;
+  columnOnlyMd?: boolean;
+  links: { href: string; label: string; onlyMd?: boolean }[];
+}[] = [
+  {
+    title: "מסלול",
+    links: [
+      { href: "/services/", label: "שירותים" },
+      { href: "/book/", label: "קביעת שיחה" },
+      { href: "/intake/", label: "יצירת קשר" },
+      { href: "/studio/", label: "סטודיו" },
+      { href: "/personal-consultation/", label: "שיחה אישית", onlyMd: true },
+    ],
+  },
+  {
+    title: "תוכן",
+    links: [
+      { href: "/blog/", label: "מאמרים" },
+      { href: "/about/", label: "אודות" },
+      { href: "/glossary/", label: "מונחים" },
+      { href: "/blog/", label: "אני רוצה להעמיק", onlyMd: true },
+      { href: "/library/", label: "ספרייה", onlyMd: true },
+    ],
+  },
+  {
+    title: "עומק",
+    columnOnlyMd: true,
+    links: [
+      { href: "/topics/clarity/", label: "בהירות" },
+      { href: "/topics/freedom/", label: "חופש" },
+      { href: "/topics/self/", label: "העצמי" },
+      { href: "/topics/thought-mechanics/", label: "מכניקת מחשבה" },
+      { href: "/forbidden-library/", label: "הספרייה האסורה" },
+      { href: "/root-problem-tree/", label: "עץ שורש הבעיה" },
+    ],
+  },
+  {
+    title: "מערכת",
+    links: [
+      { href: "/contact/", label: "יצירת קשר" },
+      { href: "/privacy/", label: "פרטיות" },
+      { href: "/terms/", label: "תנאים" },
+      { href: "/accessibility/", label: "נגישות" },
+      { href: "/about/#nm-about-faq", label: "שאלות נפוצות", onlyMd: true },
+      { href: "/testimonials/", label: "המלצות", onlyMd: true },
+    ],
+  },
+];
+const isNoIndex =
+  Boolean(frontmatter?.noIndex || noIndex) ||
+  pathName.startsWith("/admin") ||
+  pathName.startsWith("/api");
+const robotsContent = isNoIndex ? "noindex, nofollow" : "index, follow";
+const breadcrumbOverride = parseBreadcrumbOverride(breadcrumbItemsProp);
+const bcLabelProp =
+  typeof breadcrumbCurrentLabel === "string" ? breadcrumbCurrentLabel.trim() : "";
+const fmTitleForCrumb =
+  typeof frontmatter?.title === "string" ? String(frontmatter.title).trim() : "";
+const currentPageTitleForCrumb = bcLabelProp || fmTitleForCrumb || null;
+const breadcrumbCrumbs = pathName.startsWith("/admin")
+  ? []
+  : (breadcrumbOverride ?? buildSiteBreadcrumbTrail(pathName, { currentPageTitle: currentPageTitleForCrumb }));
+
+const breadcrumbJsonLdItems =
+  breadcrumbCrumbs.length > 0
+    ? breadcrumbTrailToJsonLd(breadcrumbCrumbs, canonicalURL, siteUrlSlash)
+    : [];
+
+const breadcrumbSchema =
+  breadcrumbJsonLdItems.length > 0
+    ? {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        itemListElement: breadcrumbJsonLdItems.map((item, index) => ({
+          "@type": "ListItem",
+          position: index + 1,
+          name: item.name,
+          item: item.item,
+        })),
+      }
+    : null;
+
+const toIso = (value: string | Date | undefined) => {
+  if (!value) return undefined;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? undefined : date.toISOString();
+};
+
+const seoBodyTrimmed = typeof seoArticleBody === "string" ? seoArticleBody.trim() : "";
+const articleSchema = frontmatter
+  ? {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      headline: frontmatter.title ?? pageTitle,
+      description: frontmatter.description ?? pageDescription,
+      author: {
+        "@type": "Person",
+        name: frontmatter.author ?? "השם לא משנה",
+      },
+      datePublished: toIso(frontmatter.pubDate),
+      dateModified: toIso(frontmatter.updatedDate) ?? toIso(frontmatter.pubDate),
+      image: ogImage,
+      inLanguage: "he-IL",
+      mainEntityOfPage: pageUrl,
+      publisher: {
+        "@type": "Organization",
+        name: siteTitle,
+        url: siteUrl,
+      },
+      ...(articlePaywalled ? { isAccessibleForFree: false } : {}),
+      ...(seoBodyTrimmed.length > 0 ? { articleBody: seoBodyTrimmed } : {}),
+    }
+  : null;
+
+const hasArticleDates = Boolean(frontmatter?.pubDate);
+const ogType = hasArticleDates ? "article" : "website";
+const articlePublishedMeta = hasArticleDates ? toIso(frontmatter?.pubDate) : undefined;
+const articleModifiedMeta = hasArticleDates
+  ? toIso(frontmatter?.updatedDate) ?? toIso(frontmatter?.pubDate)
+  : undefined;
+
+const normalizedFaqItems = Array.isArray(faqItems) ? faqItems : [];
+const fallbackFaqItems =
+  hasInquirySection && normalizedFaqItems.length === 0 && frontmatter?.description
+    ? [
+        {
+          question: `מה בודקים במאמר "${frontmatter.title ?? pageTitle}"?`,
+          answer: frontmatter.description,
+        },
+      ]
+    : [];
+const faqItemsForSchema = normalizedFaqItems.length > 0 ? normalizedFaqItems : fallbackFaqItems;
+const faqSchema =
+  faqItemsForSchema.length > 0
+    ? {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: faqItemsForSchema.map((item) => ({
+          "@type": "Question",
+          name: item.question,
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: item.answer,
+          },
+        })),
+      }
+    : null;
+
+const youtubeIdRaw = typeof frontmatter?.youtubeId === "string" ? frontmatter.youtubeId.trim() : "";
+const videoSummaryPointsForSchema = Array.isArray(frontmatter?.videoSummaryPoints)
+  ? frontmatter.videoSummaryPoints.map((p: string) => String(p).trim()).filter(Boolean)
+  : [];
+
+const videoObjectSchema =
+  youtubeIdRaw.length > 0
+    ? {
+        "@context": "https://schema.org",
+        "@type": "VideoObject",
+        name: frontmatter?.title ?? pageTitle,
+        description: frontmatter?.description ?? pageDescription,
+        thumbnailUrl: [`https://i.ytimg.com/vi/${youtubeIdRaw}/hqdefault.jpg`],
+        uploadDate: toIso(frontmatter?.pubDate),
+        contentUrl: `https://www.youtube.com/watch?v=${youtubeIdRaw}`,
+        embedUrl: `https://www.youtube-nocookie.com/embed/${youtubeIdRaw}`,
+        ...(videoSummaryPointsForSchema.length > 0
+          ? {
+              keywords: videoSummaryPointsForSchema.join(", "),
+              transcript: videoSummaryPointsForSchema.map((line: string) => `• ${line}`).join("\n"),
+            }
+          : {}),
+        publisher: {
+          "@type": "Organization",
+          name: siteTitle,
+          url: siteUrl,
+        },
+        inLanguage: "he-IL",
+      }
+    : null;
+
+const servicesPageUrl = new URL("services/", siteUrlSlash).toString();
+
+const podcastSessionProductsSchema = [
+  {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: "סשן אולפן פודקאסט — עד חצי שעה",
+    description: "הקלטה באולפן פודקאסט, עד 30 דקות.",
+    brand: { "@type": "Brand", name: siteTitle },
+    sku: "nm-podcast-30",
+    url: servicesPageUrl,
+    offers: {
+      "@type": "Offer",
+      price: "650.00",
+      priceCurrency: "ILS",
+      availability: "https://schema.org/InStock",
+      url: servicesPageUrl,
+      seller: { "@type": "Organization", name: siteTitle, url: siteUrl },
+    },
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: "סשן אולפן פודקאסט — עד שעה",
+    description: "הקלטה באולפן פודקאסט, עד 60 דקות.",
+    brand: { "@type": "Brand", name: siteTitle },
+    sku: "nm-podcast-60",
+    url: servicesPageUrl,
+    offers: {
+      "@type": "Offer",
+      price: "1180.00",
+      priceCurrency: "ILS",
+      availability: "https://schema.org/InStock",
+      url: servicesPageUrl,
+      seller: { "@type": "Organization", name: siteTitle, url: siteUrl },
+    },
+  },
+];
+
+const coreStructuredData = [
+  organizationSchema,
+  websiteSchema,
+  professionalServiceSchema,
+  ...podcastSessionProductsSchema,
+  ...(breadcrumbSchema ? [breadcrumbSchema] : []),
+  articleSchema,
+  videoObjectSchema,
+].filter(Boolean);
+const randomArticlePaths = (await getCollection("articles", ({ data }) => data.draft !== true)).map((entry) => `/articles/${entry.slug}`);
+
+const socialLinks = [
+  { label: "פייסבוק", href: "https://www.facebook.com/nevermindyakir", mark: "f" },
+  { label: "אינסטגרם", href: "https://www.instagram.com/nevermind.co.il/", mark: "IG" },
+  { label: "טיקטוק", href: "https://www.tiktok.com/@nevermind.co.il", mark: "♪" },
+  { label: "X", href: "https://x.com/nevermindyakir", mark: "X" },
+];
+
+---
+<!doctype html>
+<html lang="he" dir="rtl" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={pageDescription} />
+    <meta
+      name="robots"
+      content={robotsContent}
+    />
+    {GOOGLE_SITE_VERIFICATION ? (
+      <meta name="google-site-verification" content={GOOGLE_SITE_VERIFICATION} />
+    ) : null}
+    <link rel="canonical" href={canonicalURL} />
+    <link rel="alternate" hreflang="he-IL" href={canonicalURL} />
+    <link rel="alternate" hreflang="he" href={canonicalURL} />
+    <link rel="alternate" hreflang="x-default" href={canonicalURL} />
+    <link rel="dns-prefetch" href="https://api.web3forms.com" />
+
+    <link rel="icon" href={iconPath} type="image/svg+xml" />
+    <link rel="apple-touch-icon" href={iconPath} />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="theme-color" content={pwaThemeColor} />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+    <meta property="og:site_name" content={siteTitle} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={pageDescription} />
+    <meta property="og:type" content={ogType} />
+    {articlePublishedMeta ? <meta property="article:published_time" content={articlePublishedMeta} /> : null}
+    {articleModifiedMeta ? <meta property="article:modified_time" content={articleModifiedMeta} /> : null}
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:alt" content={ogImageAlt} />
+    {showOgRasterDimensions ? (
+      <>
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+      </>
+    ) : null}
+    <meta property="og:locale" content="he_IL" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={pageDescription} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <script is:inline type="application/ld+json" set:html={jsonLdForInlineScript(coreStructuredData)}></script>
+    {faqSchema ? <script is:inline type="application/ld+json" set:html={jsonLdForInlineScript(faqSchema)} /> : null}
+    <ClientRouter />
+    <script>
+      import "../scripts/form-antispam-bootstrap.ts";
+      import "../scripts/site-search-bootstrap.ts";
+      import "../scripts/glossary-tooltip-bootstrap.ts";
+    </script>
+
+  </head>
+  <body
+    data-whisper-banner-state="hidden"
+    data-staging={stagingEnabled ? "true" : "false"}
+    class={`min-h-screen overflow-x-hidden bg-[var(--nm-bg)] text-[var(--nm-fg)] antialiased selection:bg-[color-mix(in_srgb,var(--nm-accent)_18%,var(--nm-bg))] selection:text-[var(--nm-fg)]`}
+  >
+    <a
+      href={skipToContentHref}
+      class="sr-only transition-colors duration-200 focus:not-sr-only focus:fixed focus:top-4 focus:z-[110] focus:rounded-md focus:bg-[var(--nm-bg-canvas)] focus:px-4 focus:py-2 focus:text-[var(--nm-fg)] focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-[var(--color-red)] shadow-xl focus:start-4"
+    >
+      דלג לתוכן הראשי
+    </a>
+
+    {stagingEnabled ? (
+      <div
+        role="status"
+        aria-live="polite"
+        data-nm-staging
+        class="fixed inset-x-0 top-0 z-[100] flex min-h-[var(--nm-staging-banner-height)] items-center justify-center gap-3 bg-[var(--nm-accent)] px-4 py-3 text-center shadow-[0_4px_24px_color-mix(in_srgb,var(--nm-fg)_12%,transparent)]"
+      >
+        <span
+          class="size-3 shrink-0 rounded-full bg-[var(--nm-on-accent)] ring-2 ring-[color-mix(in_srgb,var(--nm-on-accent)_55%,transparent)]"
+          aria-hidden="true"
+        />
+        <p class="text-[clamp(1.2rem,1.05rem+1vw,1.85rem)] font-bold leading-tight text-[var(--nm-on-accent)]">
+          {stagingMessage}
+        </p>
+      </div>
+    ) : null}
+
+    <WhisperBanner />
+
+    <div
+      class="nm-premium-strip pointer-events-none fixed inset-x-0 z-[95] flex min-h-7 items-center justify-center border-b border-[color-mix(in_srgb,#D42B2B_55%,transparent)] bg-[#1A1A1A] px-3 py-1 text-[0.65rem] font-medium leading-tight text-[#FAFAF8]/95"
+      data-nm-premium-strip
+      role="status"
+      lang="he"
+      dir="rtl"
+    >
+      <span class="nm-premium-strip-text max-w-[min(100%,42rem)] truncate text-center"></span>
+    </div>
+
+    <header>
+      <nav
+        data-nav
+        class={`fixed inset-x-0 z-50 transition-[top] duration-300 ${navTopClass}`}
+        aria-label="ניווט ראשי"
+      >
+        <div data-site-header-bar class="nm-header-bar w-full px-3 sm:px-4">
+          <div class="nm-header-inner mx-auto grid max-w-7xl grid-cols-[1fr_auto] items-center gap-x-3 gap-y-3 py-3 md:grid-cols-[auto_minmax(0,1fr)_auto] md:gap-x-5 md:py-3.5">
+            <a
+              href="/"
+              class="nm-header-brand col-start-1 row-start-1 flex min-w-0 max-w-[min(100%,20rem)] items-center gap-2.5 text-[clamp(1.05rem,1rem+0.35vw,1.25rem)] font-light leading-tight text-[var(--color-black)] no-underline transition-colors duration-200 [transition-timing-function:ease] hover:text-[var(--color-red)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-red)]"
+            >
+              <img
+                src={logoPath}
+                alt="NeverMind"
+                width="36"
+                height="36"
+                class="h-9 w-9 shrink-0 object-contain"
+                fetchpriority="high"
+                decoding="async"
+              />
+              <span class="flex min-w-0 flex-col items-start gap-0.5">
+                <span class="truncate">{wordmarkHe}</span>
+                <span class="flex gap-0.5 text-[0.55rem] leading-none text-[#D42B2B]" aria-label="חמישה כוכבים" title="חמישה כוכבים">
+                  <span aria-hidden="true">★</span>
+                  <span aria-hidden="true">★</span>
+                  <span aria-hidden="true">★</span>
+                  <span aria-hidden="true">★</span>
+                  <span aria-hidden="true">★</span>
+                </span>
+              </span>
+            </a>
+
+            <div class="nm-nav-shell col-span-2 row-start-2 min-w-0 md:col-span-1 md:col-start-2 md:row-start-1 md:justify-self-stretch">
+              <div class="nm-nav-pill overflow-x-auto nm-nav-scroll-hide">
+                <ul class="flex w-max min-w-full flex-nowrap items-stretch justify-center gap-0.5 px-0.5 py-0.5 sm:gap-1" role="list">
+                  {intentNavItems.map((item) => {
+                    const active = intentNavItemIsCurrent(item.activePrefixes);
+                    return (
+                      <li class="shrink-0" role="none">
+                        <a
+                          href={item.href}
+                          tabindex={0}
+                          class={`nm-nav-link inline-flex min-h-[44px] max-w-[min(100vw-2rem,18rem)] items-center whitespace-nowrap rounded-full px-3 py-2 text-[0.9rem] font-normal no-underline transition-colors duration-200 [transition-timing-function:ease] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-red)] sm:px-3.5 ${
+                            active
+                              ? "nm-nav-link--active bg-[color-mix(in_srgb,var(--color-red)_10%,transparent)] font-medium text-[var(--color-red)] shadow-[inset_0_0_0_1px_color-mix(in_srgb,var(--color-red)_22%,transparent)]"
+                              : "text-[color-mix(in_srgb,var(--color-black)_65%,transparent)] hover:bg-[color-mix(in_srgb,var(--color-black)_5%,transparent)] hover:text-[var(--color-black)]"
+                          }`}
+                          {...(active ? ({ "aria-current": "page" } as const) : {})}
+                        >
+                          {item.label}
+                        </a>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            </div>
+
+            <div class="nm-header-actions col-start-2 row-start-1 flex shrink-0 items-center justify-end gap-2 md:col-start-3 md:row-start-1">
+              <a
+                href="/services/"
+                data-astro-prefetch
+                class="nm-header-services-link inline-flex min-h-[44px] items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-[color-mix(in_srgb,var(--nm-bg-canvas)_88%,transparent)] px-3 text-sm font-medium text-[color-mix(in_srgb,var(--nm-fg)_82%,var(--nm-bg))] no-underline transition-colors duration-200 [transition-timing-function:ease] hover:border-[color-mix(in_srgb,var(--nm-accent)_24%,transparent)] hover:text-[var(--nm-accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-red)] sm:px-3.5"
+              >
+                שירותים
+              </a>
+              <button
+                type="button"
+                data-random-article-trigger
+                class="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full bg-[var(--nm-accent)] px-3.5 py-2 text-sm font-medium text-[var(--nm-on-accent)] transition-colors duration-200 [transition-timing-function:ease] hover:bg-[var(--nm-accent-hover)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-red)] sm:px-4"
+              >
+                הפתע אותי
+              </button>
+              <button
+                id="search-trigger"
+                type="button"
+                data-search-trigger
+                aria-label="חיפוש במרכז הידע | מה מעסיק אותך כרגע?"
+                class="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))] transition-colors duration-200 [transition-timing-function:ease] hover:border-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)] hover:text-[var(--nm-accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-red)]"
+              >
+                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <circle cx="11" cy="11" r="8" />
+                  <path d="m21 21-4.3-4.3" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main
+      id="main-content"
+      role="main"
+      class={`relative z-10 mx-auto w-full max-w-7xl px-4 pb-20 sm:px-6 ${mainPadTopClass}`}
+    >
+      {breadcrumbCrumbs.length > 0 ? <SiteBreadcrumbs items={breadcrumbCrumbs} /> : null}
+      <slot />
+    </main>
+    <div
+      id="nm-live-region"
+      aria-live="polite"
+      aria-atomic="true"
+      class="sr-only"
+    ></div>
+
+    <footer
+      data-footer
+      class="mt-20 w-full bg-[#FAFAF8] px-[clamp(1rem,4vw,1.5rem)] pb-14 pt-16 text-[#1A1A1A] sm:mt-24 sm:pb-16 sm:pt-20"
+      dir="rtl"
+    >
+      <div class="mx-auto w-full max-w-7xl">
+        <div
+          class="flex w-full flex-col gap-8 border-b border-[color-mix(in_srgb,#1A1A1A_8%,transparent)] pb-10 lg:flex-row lg:items-start lg:justify-between lg:gap-16 lg:pb-12"
+        >
+          <a
+            href="/"
+            class="group inline-flex max-w-full items-start gap-3 rounded-xl py-1 no-underline transition-colors hover:text-[#D42B2B] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D42B2B]"
+          >
+            <img
+              src={logoPath}
+              alt="NeverMind"
+              width="40"
+              height="40"
+              class="h-10 w-10 shrink-0 object-contain"
+              loading="lazy"
+              decoding="async"
+            />
+            <span class="flex min-w-0 flex-col items-start gap-1 text-right">
+              <span
+                class="text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-[color-mix(in_srgb,#1A1A1A_55%,#FAFAF8)]"
+                lang="en"
+              >
+                neverMind
+              </span>
+              <span class="text-sm font-medium leading-snug text-[#1A1A1A] group-hover:text-[#D42B2B]">{wordmarkHe}</span>
+              <span class="flex gap-0.5 text-[#D42B2B]" aria-label="חמישה כוכבים" title="חמישה כוכבים">
+                <span aria-hidden="true">★</span>
+                <span aria-hidden="true">★</span>
+                <span aria-hidden="true">★</span>
+                <span aria-hidden="true">★</span>
+                <span aria-hidden="true">★</span>
+              </span>
+            </span>
+          </a>
+          <p class="max-w-md shrink-0 text-xs leading-relaxed text-[color-mix(in_srgb,#1A1A1A_52%,#FAFAF8)] lg:max-w-sm lg:text-right">
+            © {new Date().getFullYear()} NeverMind
+            <span class="mx-1 text-[color-mix(in_srgb,#1A1A1A_30%,#FAFAF8)]">·</span>
+            השם לא משנה
+          </p>
+        </div>
+
+        <nav
+          class="mt-14 grid grid-cols-1 gap-y-12 text-right sm:grid-cols-2 lg:grid-cols-4 lg:gap-x-10"
+          aria-label="קישורי תחתית"
+        >
+          {
+            footerLinkColumns.map((col) => (
+              <div class:list={["space-y-4", col.columnOnlyMd ? "hidden md:block" : ""]}>
+                <p class="text-sm font-semibold text-[color-mix(in_srgb,#1A1A1A_62%,#FAFAF8)]">{col.title}</p>
+                <ul class="space-y-2.5 text-sm font-normal" role="list">
+                  {col.links.map((link) => (
+                    <li class:list={[link.onlyMd ? "hidden md:block" : ""]}>
+                      <a
+                        href={link.href}
+                        class="inline-block rounded-md py-0.5 text-[color-mix(in_srgb,#1A1A1A_88%,#FAFAF8)] transition-colors hover:text-[#D42B2B] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D42B2B]"
+                      >
+                        {link.label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))
+          }
+        </nav>
+
+        <div class="mt-12 space-y-8 text-right lg:mt-14 lg:space-y-10">
+          <p
+            id="nm-footer-identity-line"
+            class="hidden text-xs font-medium text-[color-mix(in_srgb,#1A1A1A_58%,#FAFAF8)]"
+          >
+            הזהות האמיתית שלך מתחילה איפה שהשם שלך נגמר
+          </p>
+
+          <div class="flex flex-wrap items-center justify-start gap-3 gap-y-2 text-sm sm:justify-end">
+            {emailUser && emailDomain ? (
+              <button
+                type="button"
+                data-email-cta
+                data-email-user={emailUser}
+                data-email-domain={emailDomain}
+                class="inline-flex min-h-[44px] items-center rounded-full border border-[color-mix(in_srgb,#1A1A1A_12%,transparent)] bg-transparent px-4 py-2 font-semibold text-[#1A1A1A] transition-colors hover:border-[color-mix(in_srgb,#D42B2B_35%,transparent)] hover:text-[#D42B2B] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D42B2B]"
+              >
+                שלח מייל
+              </button>
+            ) : null}
+            <a
+              href="/intake/"
+              data-astro-prefetch
+              class="inline-flex min-h-[44px] items-center rounded-full border border-[color-mix(in_srgb,#1A1A1A_12%,transparent)] px-4 py-2 font-semibold text-[#1A1A1A] transition-colors hover:border-[color-mix(in_srgb,#D42B2B_35%,transparent)] hover:text-[#D42B2B] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D42B2B]"
+            >
+              טופס יצירת קשר
+            </a>
+            {waDigits ? (
+              <a
+                href={`https://wa.me/${waDigits}`}
+                target="_blank"
+                rel="noreferrer"
+                class="hidden min-h-[44px] items-center rounded-full border border-[color-mix(in_srgb,#1A1A1A_12%,transparent)] px-4 py-2 font-semibold text-[#1A1A1A] transition-colors hover:border-[color-mix(in_srgb,#D42B2B_35%,transparent)] hover:text-[#D42B2B] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D42B2B] md:inline-flex"
+              >
+                וואטסאפ
+              </a>
+            ) : null}
+            <a
+              href="/services/#pricing"
+              data-astro-prefetch
+              class="inline-flex min-h-[44px] items-center rounded-full bg-[#1A1A1A] px-4 py-2 text-sm font-semibold text-[#FAFAF8] transition hover:bg-[color-mix(in_srgb,#1A1A1A_88%,#FAFAF8)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D42B2B]"
+            >
+              מחירון
+            </a>
+          </div>
+
+          <div class="hidden flex-wrap items-center justify-start gap-2 sm:flex sm:justify-end">
+            {socialLinks.map(({ label, href, mark }) => (
+              <a
+                href={href}
+                target="_blank"
+                rel="noreferrer"
+                aria-label={label}
+                class="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[color-mix(in_srgb,#1A1A1A_10%,transparent)] bg-white/80 text-sm font-semibold text-[color-mix(in_srgb,#1A1A1A_72%,#FAFAF8)] transition-colors hover:border-[color-mix(in_srgb,#D42B2B_28%,transparent)] hover:text-[#D42B2B] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D42B2B]"
+              >
+                <span aria-hidden="true">{mark}</span>
+              </a>
+            ))}
+          </div>
+
+          <p class="hidden text-[0.7rem] leading-relaxed text-[color-mix(in_srgb,#1A1A1A_48%,#FAFAF8)] md:block">
+            שיתוף מוזמן עם ציון מקור: NeverMind.co.il
+          </p>
+
+          <div class="hidden flex-wrap items-center justify-start gap-2 text-[0.65rem] text-[color-mix(in_srgb,#1A1A1A_45%,#FAFAF8)] md:flex md:justify-end">
+            <span>אתר מאובטח SSL</span>
+            <span class="text-[color-mix(in_srgb,#1A1A1A_28%,#FAFAF8)]">·</span>
+            <span>סליקה דרך Grow</span>
+          </div>
+
+          <div class="flex justify-end">
+            <FooterPaymentIcons />
+          </div>
+
+          <p class="hidden max-w-prose text-[0.65rem] leading-relaxed text-[color-mix(in_srgb,#1A1A1A_48%,#FAFAF8)] md:block">
+            {disclaimerLong}
+          </p>
+
+        </div>
+      </div>
+    </footer>
+
+    <button
+      type="button"
+      id="nm-back-to-top"
+      data-scroll-top
+      hidden
+      class="inline-flex fixed bottom-5 left-5 z-[46] h-11 w-11 items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_14%,transparent)] bg-[var(--nm-bg-canvas)] text-lg font-light leading-none text-[var(--nm-fg)] shadow-[0_6px_20px_color-mix(in_srgb,var(--nm-fg)_8%,transparent)] transition-colors hover:border-[color-mix(in_srgb,var(--nm-accent)_30%,transparent)] hover:text-[var(--nm-accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nm-accent)] md:bottom-6 md:left-6"
+      aria-label="חזרה לראש העמוד"
+      aria-hidden="true"
+    >
+      <span aria-hidden="true">↑</span>
+    </button>
+
+    <WhatsAppButton
+      phone={appConfig.contact.whatsAppNumber}
+      tags={waTags}
+      articleTitle={waArticleTitle}
+      articleSlug={waSlug}
+      meetingIntent={Boolean(waSlug && waArticleTitle)}
+    />
+    <SearchModal client:idle />
+    <A11yWidget />
+    <CookieBanner />
+    <Analytics />
+
+    <script is:inline defer define:vars={{ randomArticlePaths }}>
+      document.addEventListener("astro:page-load", () => {
+        if (window.__nmLayoutCleanup) {
+          window.__nmLayoutCleanup();
+        }
+
+        const titleNode = document.querySelector("title");
+        const titleText = titleNode?.textContent?.trim();
+        if (titleText) {
+          document.title = titleText;
+        }
+
+        const nmNavTrackKeyCurrent = "nm-nav-current";
+        const nmNavTrackKeyPrevious = "nm-nav-previous";
+        const nmShouldTrackPathname = (pathname) => {
+          if (!pathname) return false;
+          if (pathname.startsWith("/admin")) return false;
+          if (pathname.startsWith("/thank-you")) return false;
+          if (pathname === "/404" || pathname.startsWith("/404/")) return false;
+          return true;
+        };
+        const curFull = `${location.pathname}${location.search}`;
+        const curPath = location.pathname;
+        if (nmShouldTrackPathname(curPath)) {
+          try {
+            const last = sessionStorage.getItem(nmNavTrackKeyCurrent);
+            if (last && last !== curFull) {
+              sessionStorage.setItem(nmNavTrackKeyPrevious, last);
+            }
+            sessionStorage.setItem(nmNavTrackKeyCurrent, curFull);
+          } catch {
+            /* ignore */
+          }
+        }
+
+        window.__nmReturnLabelForPath = (pNorm) => {
+          if (pNorm === "/") return "חזור לדף הבית";
+          if (pNorm === "/archive" || pNorm.startsWith("/archive/")) return "חזור לארכיון";
+          if (pNorm === "/articles") return "חזור לארכיון";
+          if (pNorm.startsWith("/articles/")) return "חזור למאמר";
+          if (pNorm === "/studio" || pNorm.startsWith("/studio/")) return "חזור לסטודיו";
+          if (pNorm === "/about" || pNorm.startsWith("/about/")) return "חזור להבנה";
+          if (pNorm.startsWith("/topics/")) return "חזור לנושא";
+          if (pNorm.startsWith("/glossary")) return "חזור להגדרות מחדש";
+          if (pNorm.startsWith("/services") || pNorm.startsWith("/intake")) return "חזור ללוח הלמידה";
+          if (pNorm.startsWith("/questions")) return "חזור לשאלות";
+          if (pNorm === "/now" || pNorm.startsWith("/now/")) return "חזור למה המצב עכשיו";
+          return "חזור לאן שבאת";
+        };
+
+        window.__nmResolveReturnTarget = () => {
+          let href = "/archive/";
+          let label = "חזור לארכיון";
+          const here = `${location.pathname}${location.search}`;
+          const hereNorm = location.pathname.replace(/\/+$/, "") || "/";
+          try {
+            const prev = sessionStorage.getItem(nmNavTrackKeyPrevious);
+            if (prev && prev !== here) {
+              const pathOnly = prev.split("?")[0];
+              const pNorm = pathOnly.replace(/\/+$/, "") || "/";
+              href = prev.startsWith("/") ? prev : `/${prev}`;
+              label = window.__nmReturnLabelForPath(pNorm);
+              return { href, label };
+            }
+            const ref = document.referrer;
+            if (ref && ref.startsWith(location.origin)) {
+              const u = new URL(ref);
+              const refFull = `${u.pathname}${u.search}`;
+              const refNorm = u.pathname.replace(/\/+$/, "") || "/";
+              if (refFull !== here && !refNorm.startsWith("/admin")) {
+                href = `${u.pathname}${u.search}`;
+                label = window.__nmReturnLabelForPath(refNorm);
+                return { href, label };
+              }
+            }
+          } catch {
+            /* ignore */
+          }
+          return { href, label };
+        };
+
+        window.__nmFillReturnLink = (anchor) => {
+          if (!(anchor instanceof HTMLAnchorElement)) return;
+          const target = window.__nmResolveReturnTarget();
+          anchor.setAttribute("href", target.href);
+          anchor.textContent = target.label;
+        };
+
+        document.querySelectorAll("[data-nm-return-cta-link]").forEach((node) => {
+          window.__nmFillReturnLink(node);
+        });
+
+        const searchTriggers = Array.from(document.querySelectorAll("[data-search-trigger]"));
+        const randomTriggers = Array.from(document.querySelectorAll("[data-random-article-trigger]"));
+        const emailTriggers = Array.from(document.querySelectorAll("[data-email-cta]"));
+        const phoneTriggers = Array.from(document.querySelectorAll("[data-phone-cta]"));
+        const footerIdentityLine = document.getElementById("nm-footer-identity-line");
+
+        const onSearchClick = (event) => {
+          event.preventDefault();
+          window.dispatchEvent(new CustomEvent("open-search"));
+        };
+
+        const onRandomClick = (event) => {
+          event.preventDefault();
+          const paths = Array.isArray(randomArticlePaths) ? randomArticlePaths : [];
+          if (!paths.length) return;
+
+          const currentPath = window.location.pathname.replace(/\/$/, "");
+          const pool = paths.filter((path) => path.replace(/\/$/, "") !== currentPath);
+          const source = pool.length ? pool : paths;
+          const target = source[Math.floor(Math.random() * source.length)];
+          if (target) window.location.href = target;
+        };
+        const maybeShowIdentityLine = () => {
+          if (!(footerIdentityLine instanceof HTMLElement)) return;
+          const chance = Math.random();
+          if (chance <= 0.35) {
+            footerIdentityLine.classList.remove("hidden");
+          } else {
+            footerIdentityLine.classList.add("hidden");
+          }
+        };
+        const onEmailClick = (event) => {
+          const trigger = event.currentTarget;
+          if (!(trigger instanceof HTMLElement)) return;
+          const user = String(trigger.getAttribute("data-email-user") || "").trim();
+          const domain = String(trigger.getAttribute("data-email-domain") || "").trim();
+          if (!user || !domain) return;
+          const mailto = `mailto:${user}@${domain}`;
+          window.location.href = mailto;
+        };
+        const onPhoneClick = (event) => {
+          const trigger = event.currentTarget;
+          if (!(trigger instanceof HTMLElement)) return;
+          const prefix = String(trigger.getAttribute("data-phone-prefix") || "").trim();
+          const rest = String(trigger.getAttribute("data-phone-rest") || "").trim();
+          if (!prefix || !rest) return;
+          window.location.href = `tel:${prefix}${rest}`.replace(/\s/g, "");
+        };
+
+        const saveDataMode = Boolean(navigator.connection && navigator.connection.saveData);
+        if (saveDataMode) {
+          document.documentElement.setAttribute("data-save-data", "true");
+        }
+
+        const NM_CLUB_STORAGE_KEY = "nm_club_session";
+        const nmReadClubPremiumActive = () => {
+          try {
+            const raw = window.localStorage.getItem(NM_CLUB_STORAGE_KEY);
+            if (!raw) return false;
+            const o = JSON.parse(raw);
+            if (!o || typeof o !== "object") return false;
+            const memberName = typeof o.memberName === "string" ? o.memberName : "";
+            const expiresAt = typeof o.expiresAt === "string" ? o.expiresAt : "";
+            if (!memberName || !expiresAt) return false;
+            const t = Date.parse(expiresAt);
+            if (Number.isNaN(t) || t < Date.now()) {
+              try {
+                window.localStorage.removeItem(NM_CLUB_STORAGE_KEY);
+              } catch {
+                /* ignore */
+              }
+              return false;
+            }
+            return true;
+          } catch {
+            return false;
+          }
+        };
+        const nmSyncPremiumStripText = () => {
+          const strip = document.querySelector("[data-nm-premium-strip]");
+          const textEl = strip?.querySelector(".nm-premium-strip-text");
+          if (!(strip instanceof HTMLElement) || !(textEl instanceof HTMLElement)) return;
+          if (!nmReadClubPremiumActive()) {
+            textEl.textContent = "";
+            return;
+          }
+          try {
+            const raw = window.localStorage.getItem(NM_CLUB_STORAGE_KEY);
+            if (!raw) return;
+            const o = JSON.parse(raw);
+            const name = typeof o.memberName === "string" ? o.memberName.trim() : "";
+            const phone = typeof o.phone === "string" ? o.phone.trim() : "";
+            const expStr = typeof o.expiresAt === "string" ? o.expiresAt : "";
+            const expDate = expStr ? new Date(expStr) : null;
+            const expLabel =
+              expDate && !Number.isNaN(expDate.getTime())
+                ? expDate.toLocaleDateString("he-IL", { day: "numeric", month: "short", year: "numeric" })
+                : "";
+            const parts = [];
+            if (name) parts.push(`היי ${name}`);
+            if (phone) parts.push(phone);
+            parts.push("מנוי בתוקף");
+            if (expLabel) parts.push(`עד ${expLabel}`);
+            textEl.textContent = parts.join(" · ");
+          } catch {
+            textEl.textContent = "מנוי בתוקף";
+          }
+        };
+        const nmSyncPremiumUi = () => {
+          const active = nmReadClubPremiumActive();
+          document.body.classList.toggle("is-premium", active);
+          nmSyncPremiumStripText();
+        };
+        nmSyncPremiumUi();
+        const onNmClubStorage = (e) => {
+          if (e.key === NM_CLUB_STORAGE_KEY || e.key === null) nmSyncPremiumUi();
+        };
+        window.addEventListener("storage", onNmClubStorage);
+        window.addEventListener("nm-club-session-changed", nmSyncPremiumUi);
+
+        const formatAvailabilityDateHebrew = (isoString) => {
+          const date = new Date(isoString);
+          if (Number.isNaN(date.getTime())) return "";
+          const days = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
+          const day = date.getDay();
+          const prefix = day === 6 ? 'מוצ"ש' : `יום ${days[day]}`;
+          const hours = date.getHours().toString().padStart(2, "0");
+          const minutes = date.getMinutes().toString().padStart(2, "0");
+          return `עודכן ${prefix} ${hours}:${minutes}`;
+        };
+
+        const refreshAvailabilityLines = () => {
+          document.querySelectorAll("[data-nm-availability]").forEach((el) => {
+            const spotsRaw = el.getAttribute("data-spots");
+            const updatedAt = el.getAttribute("data-updated-at")?.trim();
+            const label = (el.getAttribute("data-label") || "נותרו").trim();
+            const spots = spotsRaw != null ? Number(spotsRaw) : NaN;
+            if (!Number.isFinite(spots) || !updatedAt) return;
+            const unit = spots === 1 ? "מקום" : "מקומות";
+            const datePart = formatAvailabilityDateHebrew(updatedAt);
+            el.textContent = datePart ? `${label} ${spots} ${unit} · ${datePart}` : `${label} ${spots} ${unit}`;
+          });
+        };
+
+        searchTriggers.forEach((trigger) => trigger.addEventListener("click", onSearchClick));
+        randomTriggers.forEach((trigger) => trigger.addEventListener("click", onRandomClick));
+        maybeShowIdentityLine();
+        refreshAvailabilityLines();
+
+        const scrollStorageKey = `nm-scroll:${window.location.pathname}${window.location.search}`;
+        const savedScroll = Number(sessionStorage.getItem(scrollStorageKey));
+
+        const backBtn = document.getElementById("nm-back-to-top");
+        const backThreshold = 400;
+        const syncBackToTop = () => {
+          if (!(backBtn instanceof HTMLElement)) return;
+          const y = window.scrollY || document.documentElement.scrollTop || 0;
+          const show = y > backThreshold;
+          backBtn.classList.toggle("hidden", !show);
+          backBtn.toggleAttribute("hidden", !show);
+          backBtn.setAttribute("aria-hidden", show ? "false" : "true");
+        };
+        const onBackToTopScroll = () => syncBackToTop();
+        const onBackToTopClick = () => {
+          const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+          const behavior = reduceMotion ? "auto" : "smooth";
+          const main = document.getElementById("main-content");
+          if (main instanceof HTMLElement) {
+            main.scrollIntoView({ behavior, block: "start" });
+          } else {
+            window.scrollTo({ top: 0, behavior });
+          }
+        };
+        if (backBtn instanceof HTMLElement) {
+          backBtn.addEventListener("click", onBackToTopClick);
+        }
+        window.addEventListener("scroll", onBackToTopScroll, { passive: true });
+
+        const headerBar = document.querySelector("[data-site-header-bar]");
+        const headerScrollThreshold = 50;
+        const syncHeaderBarScrolled = () => {
+          if (!(headerBar instanceof HTMLElement)) return;
+          const y = window.scrollY || document.documentElement.scrollTop || 0;
+          headerBar.classList.toggle("nm-header--scrolled", y >= headerScrollThreshold);
+        };
+        const onHeaderScroll = () => syncHeaderBarScrolled();
+        window.addEventListener("scroll", onHeaderScroll, { passive: true });
+        syncHeaderBarScrolled();
+
+        const hash = String(window.location.hash || "").replace(/^#/, "");
+        if (hash) {
+          const target = document.getElementById(hash);
+          if (target instanceof HTMLElement) {
+            window.requestAnimationFrame(() => {
+              target.scrollIntoView({ behavior: "auto", block: "start" });
+              syncBackToTop();
+              syncHeaderBarScrolled();
+            });
+          } else {
+            syncBackToTop();
+          }
+        } else if (Number.isFinite(savedScroll) && savedScroll > 0) {
+          window.requestAnimationFrame(() => {
+            window.scrollTo(0, savedScroll);
+            syncBackToTop();
+            syncHeaderBarScrolled();
+          });
+        } else {
+          syncBackToTop();
+        }
+
+        const persistScroll = () => {
+          sessionStorage.setItem(scrollStorageKey, String(window.scrollY || 0));
+        };
+        window.addEventListener("scroll", persistScroll, { passive: true });
+        window.addEventListener("beforeunload", persistScroll);
+
+        const formatIsoDates = () => {
+          document.querySelectorAll("[data-iso-date]").forEach((el) => {
+            const raw = el.getAttribute("data-iso-date");
+            if (!raw) return;
+            const date = new Date(raw);
+            if (Number.isNaN(date.getTime())) return;
+            const formatted = new Intl.DateTimeFormat("he-IL", {
+              year: "numeric",
+              month: "2-digit",
+              day: "2-digit",
+              timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+            }).format(date);
+            el.textContent = formatted;
+          });
+        };
+        formatIsoDates();
+        window.__nmAnnounce = (message) => {
+          const region = document.getElementById("nm-live-region");
+          if (!(region instanceof HTMLElement)) return;
+          region.textContent = "";
+          window.setTimeout(() => {
+            region.textContent = String(message || "");
+          }, 20);
+        };
+
+        const showCopyFeedback = (trigger) => {
+          const original = trigger.textContent || "";
+          trigger.textContent = "✓ הועתק";
+          window.setTimeout(() => {
+            trigger.textContent = original;
+          }, 2000);
+        };
+        const copyToClipboard = async (text) => {
+          if (!text) return false;
+          try {
+            await navigator.clipboard.writeText(text);
+            return true;
+          } catch {
+            return false;
+          }
+        };
+        const onCopyClick = async (event) => {
+          const target = event.target;
+          if (!(target instanceof Element)) return;
+          const trigger = target.closest("[data-copy], [data-copy-text]");
+          if (!(trigger instanceof HTMLElement)) return;
+          const value =
+            trigger.getAttribute("data-copy") ||
+            trigger.getAttribute("data-copy-text") ||
+            trigger.getAttribute("data-copy-value") ||
+            "";
+          const ok = await copyToClipboard(value);
+          if (ok) showCopyFeedback(trigger);
+        };
+        document.addEventListener("click", onCopyClick);
+
+        const setupFormPersistence = () => {
+          const path = window.location.pathname.replace(/\/+$/, "") || "/";
+          const isRegistrationPage =
+            path === "/intake" ||
+            path === "/intake/" ||
+            path === "/registration" ||
+            path === "/registration/";
+          if (!isRegistrationPage) return () => {};
+
+          const form = document.querySelector("main form");
+          if (!(form instanceof HTMLFormElement)) return () => {};
+
+          const fields = Array.from(
+            form.querySelectorAll("input, textarea, select")
+          ).filter((field) => {
+            if (!(field instanceof HTMLElement)) return false;
+            const input = field instanceof HTMLInputElement ? field : null;
+            if (input && ["password", "file", "hidden", "submit", "button", "reset"].includes(input.type)) {
+              return false;
+            }
+            return Boolean(field.id || field.getAttribute("name"));
+          });
+          if (!fields.length) return () => {};
+
+          const storageKey = `nm-form-draft:${path}`;
+          const restoreDraft = () => {
+            try {
+              const raw = window.localStorage.getItem(storageKey);
+              if (!raw) return;
+              const draft = JSON.parse(raw);
+              fields.forEach((field) => {
+                const key = field.getAttribute("name") || field.id;
+                if (!key || !(key in draft)) return;
+                if (field instanceof HTMLInputElement && (field.type === "checkbox" || field.type === "radio")) {
+                  field.checked = Boolean(draft[key]);
+                  return;
+                }
+                field.value = String(draft[key] ?? "");
+              });
+            } catch {
+              /* ignore */
+            }
+          };
+
+          const persistDraft = () => {
+            const snapshot = {};
+            fields.forEach((field) => {
+              const key = field.getAttribute("name") || field.id;
+              if (!key) return;
+              if (field instanceof HTMLInputElement && (field.type === "checkbox" || field.type === "radio")) {
+                snapshot[key] = field.checked;
+                return;
+              }
+              snapshot[key] = field.value;
+            });
+            try {
+              window.localStorage.setItem(storageKey, JSON.stringify(snapshot));
+            } catch {
+              /* ignore */
+            }
+          };
+
+          restoreDraft();
+          fields.forEach((field) => field.addEventListener("input", persistDraft));
+          form.addEventListener("submit", () => {
+            try {
+              window.localStorage.removeItem(storageKey);
+            } catch {
+              /* ignore */
+            }
+          });
+
+          return () => {
+            fields.forEach((field) => field.removeEventListener("input", persistDraft));
+          };
+        };
+        const cleanupFormPersistence = setupFormPersistence();
+
+        emailTriggers.forEach((trigger) => trigger.addEventListener("click", onEmailClick));
+        phoneTriggers.forEach((trigger) => trigger.addEventListener("click", onPhoneClick));
+
+        window.addEventListener("nm:focus-target", (event) => {
+          const selector = event?.detail?.selector;
+          if (!selector) return;
+          const target = document.querySelector(selector);
+          if (!(target instanceof HTMLElement)) return;
+          target.setAttribute("tabindex", "-1");
+          target.focus({ preventScroll: true });
+          target.scrollIntoView({ behavior: "smooth", block: "start" });
+          window.__nmAnnounce?.("התוכן עודכן");
+        });
+
+        window.__nmLayoutCleanup = () => {
+          searchTriggers.forEach((trigger) => trigger.removeEventListener("click", onSearchClick));
+          randomTriggers.forEach((trigger) => trigger.removeEventListener("click", onRandomClick));
+          emailTriggers.forEach((trigger) => trigger.removeEventListener("click", onEmailClick));
+          phoneTriggers.forEach((trigger) => trigger.removeEventListener("click", onPhoneClick));
+          document.removeEventListener("click", onCopyClick);
+          cleanupFormPersistence();
+          window.removeEventListener("scroll", persistScroll);
+          window.removeEventListener("beforeunload", persistScroll);
+          window.removeEventListener("scroll", onBackToTopScroll);
+          window.removeEventListener("scroll", onHeaderScroll);
+          window.removeEventListener("storage", onNmClubStorage);
+          window.removeEventListener("nm-club-session-changed", nmSyncPremiumUi);
+          if (backBtn instanceof HTMLElement) {
+            backBtn.removeEventListener("click", onBackToTopClick);
+          }
+        };
+      });
+    </script>
+
+    <script is:inline defer define:vars={{ clientLogUrl }}>
+      (() => {
+        const url = typeof clientLogUrl === "string" ? clientLogUrl.trim() : "";
+        if (!url) return;
+        const send = (payload) => {
+          try {
+            fetch(url, {
+              method: "POST",
+              mode: "cors",
+              credentials: "omit",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload),
+              keepalive: true,
+            }).catch(() => {});
+          } catch {
+            /* ignore */
+          }
+        };
+        window.addEventListener("error", (event) => {
+          send({
+            k: "error",
+            m: String(event.message || "").slice(0, 500),
+            f: String(event.filename || "").split("/").pop() || "",
+            l: event.lineno ?? null,
+            c: event.colno ?? null,
+            p: typeof location !== "undefined" ? location.pathname : "",
+          });
+        });
+        window.addEventListener("unhandledrejection", (event) => {
+          const reason = event.reason;
+          const text =
+            typeof reason === "string"
+              ? reason
+              : reason && typeof reason.message === "string"
+                ? reason.message
+                : "unhandledrejection";
+          send({
+            k: "rejection",
+            m: String(text).slice(0, 500),
+            p: typeof location !== "undefined" ? location.pathname : "",
+          });
+        });
+      })();
+    </script>
+
+    <script is:inline>
+      (function () {
+        if (window.__nmHcaptchaGlobalsRegistered) return;
+        window.__nmHcaptchaGlobalsRegistered = true;
+        window.__nmHcaptchaApiPromise = null;
+        window.__nmLoadHcaptchaApi = function () {
+          if (window.hcaptcha) return Promise.resolve();
+          if (!window.__nmHcaptchaApiPromise) {
+            window.__nmHcaptchaApiPromise = new Promise(function (resolve, reject) {
+              var s = document.createElement("script");
+              s.src = "https://js.hcaptcha.com/1/api.js";
+              s.async = true;
+              s.onload = function () {
+                resolve();
+              };
+              s.onerror = function () {
+                reject(new Error("hcaptcha"));
+              };
+              document.head.appendChild(s);
+            });
+          }
+          return window.__nmHcaptchaApiPromise;
+        };
+        window.__nmMountHcaptcha = function (form) {
+          if (!(form instanceof HTMLFormElement)) return function () {};
+          var wrap = form.querySelector("[data-nm-hcaptcha-wrap]");
+          if (!wrap) return function () {};
+          var container = wrap.querySelector(".nm-hcaptcha-container");
+          var tokenInput = wrap.querySelector('input[name="h-captcha-response"]');
+          if (!container || !tokenInput) return function () {};
+          var sitekey = container.getAttribute("data-sitekey") || "";
+          if (!sitekey) return function () {};
+          var disposed = false;
+          var widgetId = null;
+          window.__nmLoadHcaptchaApi().then(function () {
+            if (disposed) return;
+            if (!container.isConnected) return;
+            widgetId = window.hcaptcha.render(container, {
+              sitekey: sitekey,
+              callback: function (t) {
+                tokenInput.value = t || "";
+              },
+              "expired-callback": function () {
+                tokenInput.value = "";
+              },
+              "error-callback": function () {
+                tokenInput.value = "";
+              },
+            });
+          });
+          return function unmount() {
+            disposed = true;
+            if (widgetId !== null && window.hcaptcha) {
+              try {
+                window.hcaptcha.remove(widgetId);
+              } catch (e) {}
+            }
+            widgetId = null;
+            tokenInput.value = "";
+            if (container) container.innerHTML = "";
+          };
+        };
+        window.__nmHcaptchaOk = function (form) {
+          if (!(form instanceof HTMLFormElement)) return true;
+          var wrap = form.querySelector("[data-nm-hcaptcha-wrap]");
+          if (!wrap) return true;
+          var tokenInput = wrap.querySelector('input[name="h-captcha-response"]');
+          if (!tokenInput) return true;
+          return String(tokenInput.value || "").trim().length > 0;
+        };
+      })();
+    </script>
+  </body>
+</html>
+
+

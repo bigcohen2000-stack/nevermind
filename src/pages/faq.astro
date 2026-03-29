@@ -1,4 +1,5 @@
 ---
-/** התוכן המלא נמצא ב־/about/ (מקטע שאלות ותשובות). שימור נתיב /faq/ לקישורים ישנים. */
-return Astro.redirect("/about/#nm-about-faq", 302);
+import StaticRedirectPage from "../components/StaticRedirectPage.astro";
 ---
+
+<StaticRedirectPage to="/about/#nm-about-faq" title="Redirecting to FAQ..." message="This page has moved." />

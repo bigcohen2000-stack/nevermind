@@ -1,0 +1,25 @@
+---
+import TruthBlock from "./TruthBlock.astro";
+import { getArticleRenderContext } from "../lib/article-render-context";
+
+interface Props {
+  label?: string;
+  questionForSchema?: string;
+}
+
+const props = Astro.props;
+const ctx = getArticleRenderContext();
+const fromFmQ = typeof ctx.questionForSchema === "string" ? ctx.questionForSchema.trim() : "";
+const propQ = typeof props.questionForSchema === "string" ? props.questionForSchema.trim() : "";
+const effectiveQuestion = propQ.length > 0 ? propQ : fromFmQ;
+const originalInsightFallback =
+  typeof ctx.originalInsight === "string" ? ctx.originalInsight.trim() : "";
+---
+
+<TruthBlock
+  label={props.label}
+  questionForSchema={effectiveQuestion}
+  originalInsightFallback={originalInsightFallback}
+>
+  <slot />
+</TruthBlock>
