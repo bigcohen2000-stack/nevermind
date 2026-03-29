@@ -1,5 +1,6 @@
 ---
 import Layout from "../../layouts/Layout.astro";
+import VideoPlayer from "../../components/VideoPlayer.astro";
 import {
   aboutExtraMethodFaq,
   aboutMethodFaq,
@@ -115,6 +116,43 @@ import {
       <article class="rounded-[1.8rem] border-2 border-[var(--nm-accent)] bg-white p-6">
         <p class="text-[clamp(1.15rem,1.05rem+0.3vw,1.35rem)] leading-9">אל תחפש להרגיש טוב יותר. תחפש לראות מה נכון.</p>
       </article>
+    </section>
+
+    <section
+      aria-labelledby="from-articles-definitions"
+      class="space-y-6 rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-6 md:p-8"
+    >
+      <div class="space-y-2">
+        <h2 id="from-articles-definitions" class="text-[clamp(1.35rem,1.15rem+0.6vw,1.85rem)] font-semibold leading-snug">
+          מהמאמרים: השם לא משנה
+        </h2>
+        <p class="max-w-3xl text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+          קטעים מקוצרים ממאמר על נאחזות בהגדרות. המאמר המלא מרחיב את המכניקה ואת שאלות ההיפוך.
+        </p>
+      </div>
+      <div class="space-y-4 border-r-4 border-[var(--nm-accent)] pr-4">
+        <blockquote class="text-base leading-8 text-[color-mix(in_srgb,var(--nm-fg)_88%,var(--nm-bg))]">
+          <p>הגדרה היא לא הבנה. היא רק השם שנתת למשהו כדי להפסיק להסתכל עליו.</p>
+        </blockquote>
+        <blockquote class="text-base leading-8 text-[color-mix(in_srgb,var(--nm-fg)_88%,var(--nm-bg))]">
+          <p>כשהשם לא משנה בתור עוגן של כבוד, נעלם חלק מהצורך להגן על הזהות.</p>
+        </blockquote>
+      </div>
+      <p>
+        <a
+          href="/articles/why-cling-to-definitions/"
+          class="inline-flex min-h-[44px] items-center justify-center rounded-full bg-[var(--nm-inverse)] px-5 py-2.5 text-sm font-semibold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-inverse-hover)]"
+        >
+          למאמר המלא
+        </a>
+      </p>
+      <div class="max-w-3xl">
+        <p class="mb-3 text-sm font-semibold text-[var(--nm-fg)]">וידאו בנושא</p>
+        <VideoPlayer
+          youtubeId="esh2jppdZr4"
+          title="השם לא משנה: הגדרות, תיוג והיפוך שאלות"
+        />
+      </div>
     </section>
 
     <section aria-labelledby="reversal-question" class="space-y-5">

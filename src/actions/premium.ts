@@ -21,6 +21,16 @@ const startSessionInputSchema = z.object({
 });
 
 export const premium = {
+  /** בדיקה אם יש עוגיית סשן פרימיום תקפה (בלי חשיפת תוכן מנעול) */
+  sessionStatus: defineAction({
+    accept: "json",
+    input: z.object({}),
+    handler: async (_input, ctx) => {
+      const raw = ctx.cookies.get(premiumSessionCookieName)?.value;
+      return { active: verifyPremiumCookieValue(raw) } as const;
+    },
+  }),
+
   getFragment: defineAction({
     accept: "json",
     input: premiumFragmentInputSchema,

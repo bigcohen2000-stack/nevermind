@@ -57,6 +57,10 @@ const articles = defineCollection({
       .regex(/^[a-zA-Z0-9._-]+\.(mp3|m4a|ogg|wav)$/)
       .optional(),
     youtubeId: z.string().optional(),
+    /** וידאו נוסף לבעלי סשן פרימיום בלבד (מאמר חינמי) */
+    premiumYoutubeId: z.string().optional(),
+    /** כותרת לווידאון הפרימיום (לנגן ולנגישות) */
+    premiumVideoTitle: z.string().optional(),
     videoSummaryPoints: z.array(z.string()).optional(),
     tallyUrl: z.string().url().optional(),
     isPremium: z.boolean().default(false),

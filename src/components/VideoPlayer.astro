@@ -3,9 +3,16 @@ interface Props {
   youtubeId: string;
   title?: string;
   videoSummaryPoints?: string[];
+  /** ברירת מחדל lazy: פחות עומס על LCP עד לחיצה; eager אם הפוסטר הוא אלמנט ה-LCP המכוון */
+  posterLoading?: "lazy" | "eager";
 }
 
-const { youtubeId, title = "סרטון וידאו", videoSummaryPoints = [] } = Astro.props;
+const {
+  youtubeId,
+  title = "סרטון וידאו",
+  videoSummaryPoints = [],
+  posterLoading = "lazy",
+} = Astro.props;
 const points = videoSummaryPoints.map((point) => String(point).trim()).filter(Boolean);
 const playLabel = `הפעלת וידאו: ${title}`;
 const embedUrl = `https://www.youtube-nocookie.com/embed/${youtubeId}?rel=0&modestbranding=1`;
@@ -23,7 +30,14 @@ const posterUrl = `https://i.ytimg.com/vi/${youtubeId}/hqdefault.jpg`;
         data-youtube-id={youtubeId}
         aria-label={playLabel}
       >
-        <img src={posterUrl} alt={title} loading="lazy" width="1280" height="720" class="nm-video-poster" />
+        <img
+          src={posterUrl}
+          alt={title}
+          loading={posterLoading}
+          width="1280"
+          height="720"
+          class="nm-video-poster"
+        />
         <span class="nm-video-overlay" aria-hidden="true">
           <span class="nm-video-play">▶</span>
           <span class="nm-video-title">{title}</span>

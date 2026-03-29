@@ -41,6 +41,7 @@ import NextNaturalStep from "../../components/NextNaturalStep.astro";
 import DepthSideNav from "../../components/DepthSideNav.astro";
 import BookBanner from "../../components/ui/BookBanner.astro";
 import SubscriptionCallout from "../../components/SubscriptionCallout.astro";
+import PremiumBonusVideo from "../../components/PremiumBonusVideo.astro";
 
 type ArticleEntry = CollectionEntry<"articles">;
 type InternalLink = {
@@ -129,6 +130,10 @@ setArticleRenderContext({
 });
 const { Content } = await render(entry);
 const youtubeId = typeof frontmatter.youtubeId === "string" ? frontmatter.youtubeId.trim() : "";
+const premiumYoutubeId =
+  typeof frontmatter.premiumYoutubeId === "string" ? frontmatter.premiumYoutubeId.trim() : "";
+const premiumVideoTitle =
+  typeof frontmatter.premiumVideoTitle === "string" ? frontmatter.premiumVideoTitle.trim() : "";
 const videoSummaryPoints = Array.isArray(frontmatter.videoSummaryPoints)
   ? frontmatter.videoSummaryPoints.map((point) => String(point).trim()).filter(Boolean)
   : [];
@@ -173,7 +178,6 @@ const difficultyKey: DifficultyKey =
         : "beginner";
 const difficultyMeta = difficultyConfig[difficultyKey];
 const showBottomLine = wordCount >= 900 && Boolean(bottomLine);
-const showPremiumBreak = difficultyKey === "deep" || wordCount >= 1400;
 const primaryTag = tags[0] ?? "הנקודה הזאת";
 const discoveryServicesHref =
   tags.length > 0 ? `/services/?topic=${encodeURIComponent(tags[0])}` : "/services/";
@@ -423,6 +427,7 @@ const components = {
   ConceptCallout,
   BottomLineSummary,
   PremiumLock,
+  PremiumBreak,
   RevealInsight,
   ReflectionQuestions,
   RefutationBox,
@@ -653,7 +658,12 @@ const components = {
       )}
 
       {youtubeId && !hasInlineVideoPlayer && (
-        <VideoPlayer youtubeId={youtubeId} title={title} videoSummaryPoints={videoSummaryPoints} />
+        <VideoPlayer
+          youtubeId={youtubeId}
+          title={title}
+          videoSummaryPoints={videoSummaryPoints}
+          posterLoading="lazy"
+        />
       )}
 
       <div
@@ -724,6 +734,15 @@ const components = {
         }
       </div>
 
+      {!frontmatter.isPremium && premiumYoutubeId ? (
+        <PremiumBonusVideo
+          youtubeId={premiumYoutubeId}
+          title={premiumVideoTitle || `הרחבה מצולמת: ${title}`}
+          unlockHref={premiumAccess.unlockRoute || "/dashboard/"}
+          helperText={premiumAccess.helperText || ""}
+        />
+      ) : null}
+
       {inversionNote ? (
         <section
           class="mx-auto max-w-[72ch] rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-5 py-4 text-right"
@@ -739,10 +758,6 @@ const components = {
       <TenSecondExercise text={reflectionQuestions[0] ?? bottomLine} />
 
       {isRelationshipArticle ? <BookBanner /> : null}
-
-      {showPremiumBreak && (
-        <PremiumBreak servicesHref={discoveryServicesHref} archiveHref={archiveDeepHref} />
-      )}
 
       <section
         class="mx-auto max-w-[72ch] rounded-[1.35rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[color-mix(in_srgb,var(--nm-bg-canvas)_92%,transparent)] px-5 py-5 text-right shadow-sm"
@@ -1454,6 +1469,23 @@ const components = {
           premiumBody.dataset.premiumInitialized = "true";
         }
       });
+
+      const initPremiumBonus = async () => {
+        const root = document.querySelector("[data-premium-bonus-root]");
+        if (!(root instanceof HTMLElement)) return;
+        const locked = root.querySelector("[data-premium-bonus-locked]");
+        const unlocked = root.querySelector("[data-premium-bonus-unlocked]");
+        if (!(locked instanceof HTMLElement) || !(unlocked instanceof HTMLElement)) return;
+        try {
+          const { data, error } = await actions.premium.sessionStatus({});
+          if (error || !data?.active) return;
+          locked.hidden = true;
+          unlocked.hidden = false;
+        } catch {
+          /* נשאר נעול */
+        }
+      };
+      void initPremiumBonus();
 
       window.__nmArticleCleanup = () => {
         cleanups.forEach((cleanup) => cleanup());

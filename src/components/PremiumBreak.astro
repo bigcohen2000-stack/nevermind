@@ -4,7 +4,7 @@ interface Props {
   archiveHref?: string;
 }
 
-const { servicesHref = "/services/", archiveHref = "/archive/" } = Astro.props;
+const { servicesHref = "/services/", archiveHref = "/articles/" } = Astro.props;
 ---
 
 <section
@@ -23,12 +23,14 @@ const { servicesHref = "/services/", archiveHref = "/archive/" } = Astro.props;
     <a
       href={servicesHref}
       class="inline-flex min-h-[44px] items-center justify-center rounded-full bg-[var(--nm-accent)] px-6 py-3 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]"
+      aria-label="להמשיך את השיחה במסלול האישי במקום שלי"
     >
       להמשיך את השיחה במקום שלי
     </a>
     <a
       href={archiveHref}
-      class="inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_14%,transparent)] bg-transparent px-6 py-3 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]"
+      class="inline-flex min-h-[44px] items-center justify-center rounded-full border-2 border-[color-mix(in_srgb,var(--nm-fg)_28%,transparent)] bg-[color-mix(in_srgb,var(--nm-surface-muted)_55%,transparent)] px-6 py-3 text-sm font-semibold text-[color-mix(in_srgb,var(--nm-fg)_96%,var(--nm-bg))] transition hover:bg-[var(--nm-surface-muted)]"
+      aria-label="מעבר לארכיון מאמרים להעמקה עצמאית"
     >
       להעמיק בחקירה עצמאית
     </a>

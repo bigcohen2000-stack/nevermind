@@ -19,6 +19,8 @@ const {
 const line =
   hookLine ??
   `עצרת בשיא. המנגנון שמאחורי ${articleTitle.trim() || "המאמר"} נחשף במועדון.`;
+
+const ctaAriaLabel = `${ctaLabel} — גישה לתוכן מלא במועדון NeverMind, מאמר: ${articleTitle.trim() || "זה"}`;
 ---
 
 <section
@@ -36,7 +38,8 @@ const line =
   <div class="mt-5 flex flex-wrap justify-end gap-3">
     <a
       href={ctaHref}
-      class="inline-flex min-h-[44px] items-center justify-center rounded-full bg-[#1a1a1a] px-6 py-2.5 text-sm font-semibold text-white no-underline transition hover:bg-[#2a2a2a]"
+      class="inline-flex min-h-[44px] items-center justify-center rounded-full bg-[#1a1a1a] px-6 py-2.5 text-sm font-semibold text-[#fafaf8] no-underline transition hover:bg-[#2a2a2a]"
+      aria-label={ctaAriaLabel}
     >
       {ctaLabel}
     </a>

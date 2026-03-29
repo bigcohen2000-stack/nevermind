@@ -4,11 +4,22 @@ const COOKIE = "nm_premium_sess";
 const VERSION = "v1";
 
 /** סוד משותף לעוגיית סשן פרימיום ולחתימת בקשות fragment (רק בצד שרת / בילד) */
+const DEV_FALLBACK_SECRET = "dev-only-insecure-premium-secret-change-me";
+
 export function getPremiumSessionSecret(): string {
-  const s = import.meta.env.PREMIUM_SESSION_SECRET;
-  if (typeof s === "string" && s.trim().length >= 16) return s.trim();
-  if (import.meta.env.DEV) return "dev-only-insecure-premium-secret-change-me";
-  throw new Error("PREMIUM_SESSION_SECRET missing or too short");
+  const fromMeta =
+    typeof import.meta.env.PREMIUM_SESSION_SECRET === "string" ? import.meta.env.PREMIUM_SESSION_SECRET.trim() : "";
+  const fromProcess =
+    typeof process !== "undefined" && typeof process.env?.PREMIUM_SESSION_SECRET === "string"
+      ? process.env.PREMIUM_SESSION_SECRET.trim()
+      : "";
+  const s = fromMeta || fromProcess;
+  if (s.length >= 16) return s;
+  if (import.meta.env.DEV) return DEV_FALLBACK_SECRET;
+  console.warn(
+    "[NeverMind] PREMIUM_SESSION_SECRET חסר או קצר מדי. בפרודקשן יש להגדיר משתנה סביבה (מינימום 16 תווים). בבילד זה משתמש בברירת מחדל פיתוחית."
+  );
+  return DEV_FALLBACK_SECRET;
 }
 
 function getSecret(): string {
