@@ -73,6 +73,13 @@ export function buildSiteBreadcrumbTrail(
   const segments = normalized.split("/").filter(Boolean);
   const titleOpt = options?.currentPageTitle?.trim() || "";
 
+  if (segments[0] === "journey" && segments[1] === "mental-health" && segments.length === 2) {
+    return [
+      { label: BREADCRUMB_HOME_LABEL, href: "/" },
+      { label: "מרכז הקריאה", href: "/blog/" },
+      { label: titleOpt || "מסע בתוך הנפש", href: null },
+    ];
+  }
   /* אין אינדקס ביניים: בית → כותרת */
   if (segments[0] === "journey" && segments.length === 2) {
     return [

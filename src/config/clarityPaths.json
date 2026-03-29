@@ -34,13 +34,6 @@
       "emoji": "❔",
       "shortDescription": "מאמרים שמפרקים הנחות גדולות ומחזירים את הבחירה למילים.",
       "articleSlugs": ["why-not-only-health", "what-is-god", "root-of-desire"]
-    },
-    {
-      "id": "mental-health",
-      "title": "בריאות הנפש",
-      "emoji": "🌿",
-      "shortDescription": "רגש, בדידות, כעס ושפה: לראות מנגנונים בלי לצמצם את החיים לסיסמה אחת.",
-      "articleSlugs": ["why-not-only-health", "feeling-alone", "understanding-anger"]
     }
   ]
 }

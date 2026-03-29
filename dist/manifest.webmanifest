@@ -1,0 +1,20 @@
+{
+  "name": "NeverMind",
+  "short_name": "NeverMind",
+  "description": "מרחב חקירה שקט לבהירות, דיוק רגשי והבנה בגובה העיניים.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#fafaf8",
+  "theme_color": "#092038",
+  "lang": "he",
+  "dir": "rtl",
+  "icons": [
+    {
+      "src": "/images/logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

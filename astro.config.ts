@@ -123,7 +123,12 @@ export default defineConfig({
         return { ...item, priority, changefreq, ...(lastmod ? { lastmod } : {}) };
       },
     }),
-    pagefind(),
+    pagefind({
+      indexConfig: {
+        /** אינדוקס עברית אחיד; מפחית מצב בלי תוצאות בגלל פיצול שפות */
+        forceLanguage: "he",
+      },
+    }),
   ],
   vite: {
     plugins: [tailwindcss(), premiumMdxStripPlugin()],

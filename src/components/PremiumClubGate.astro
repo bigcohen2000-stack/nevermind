@@ -23,6 +23,20 @@ const webhookUrl = (import.meta.env.PUBLIC_NM_CLUB_WEBHOOK_URL ?? "").trim();
   <form id="nm-club-form" class="mt-5 space-y-4">
     <div id="nm-club-fields" class="space-y-4">
     <div class="space-y-1.5">
+      <label for="nm-club-fullname" class="block text-sm font-semibold text-[var(--nm-fg)]">שם מלא</label>
+      <input
+        id="nm-club-fullname"
+        name="fullName"
+        type="text"
+        autocomplete="name"
+        required
+        minlength="2"
+        maxlength="80"
+        class="w-full rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-white px-4 py-3 text-[var(--nm-fg)] outline-none transition focus-visible:ring-2 focus-visible:ring-[var(--nm-accent)]"
+        placeholder="כפי שתרצה שיופיע בברכה"
+      />
+    </div>
+    <div class="space-y-1.5">
       <label for="nm-club-phone" class="block text-sm font-semibold text-[var(--nm-fg)]">טלפון</label>
       <input
         id="nm-club-phone"
@@ -43,8 +57,11 @@ const webhookUrl = (import.meta.env.PUBLIC_NM_CLUB_WEBHOOK_URL ?? "").trim();
         type="password"
         autocomplete="current-password"
         required
+        minlength="4"
+        maxlength="128"
         class="w-full rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-white px-4 py-3 text-[var(--nm-fg)] outline-none transition focus-visible:ring-2 focus-visible:ring-[var(--nm-accent)]"
       />
+      <p class="text-xs text-[color-mix(in_srgb,var(--nm-fg)_48%,var(--nm-bg))]">לפחות 4 תווים. האימות המלא נעשה בצד השרת.</p>
     </div>
     <p id="nm-club-error" class="hidden text-sm font-medium text-[var(--nm-accent)]" role="alert"></p>
     <div class="flex flex-wrap items-center gap-2">
@@ -99,6 +116,7 @@ const webhookUrl = (import.meta.env.PUBLIC_NM_CLUB_WEBHOOK_URL ?? "").trim();
         const o = JSON.parse(raw);
         if (!o || typeof o !== "object") return null;
         const memberName = typeof o.memberName === "string" ? o.memberName : "";
+        const phone = typeof o.phone === "string" ? o.phone : "";
         const expiresAt = typeof o.expiresAt === "string" ? o.expiresAt : "";
         if (!memberName || !expiresAt) return null;
         const t = Date.parse(expiresAt);
@@ -106,7 +124,7 @@ const webhookUrl = (import.meta.env.PUBLIC_NM_CLUB_WEBHOOK_URL ?? "").trim();
           localStorage.removeItem(KEY);
           return null;
         }
-        return { memberName, expiresAt: t };
+        return { memberName, phone, expiresAt: t };
       } catch {
         return null;
       }
@@ -125,7 +143,8 @@ const webhookUrl = (import.meta.env.PUBLIC_NM_CLUB_WEBHOOK_URL ?? "").trim();
     function renderLoggedIn(s) {
       const d = new Date(s.expiresAt);
       const dateStr = d.toLocaleDateString("he-IL", { day: "numeric", month: "long", year: "numeric" });
-      statusEl.textContent = `חבר מועדון: ${s.memberName} | בתוקף עד: ${dateStr}`;
+      const phonePart = s.phone ? ` · ${s.phone}` : "";
+      statusEl.textContent = `היי ${s.memberName}${phonePart} · מנוי בתוקף עד ${dateStr}`;
       statusEl.classList.remove("hidden");
       fieldsEl.classList.add("hidden");
       logoutBtn.classList.remove("hidden");
@@ -192,13 +211,14 @@ const webhookUrl = (import.meta.env.PUBLIC_NM_CLUB_WEBHOOK_URL ?? "").trim();
           showError(data && data.error ? String(data.error) : "הכניסה נדחתה.");
           return;
         }
-        const memberName = String(data.memberName ?? "").trim() || "חבר";
+        const memberName = String(data.memberName ?? fullName ?? "").trim() || "חבר";
         const expiresAt = String(data.expiresAt ?? "").trim();
         if (!expiresAt) {
           showError("תשובת השרת חסרה תאריך תפוגה.");
           return;
         }
-        localStorage.setItem(KEY, JSON.stringify({ memberName, expiresAt }));
+        const phoneStored = typeof data.phone === "string" && data.phone.trim() ? data.phone.trim() : phone;
+        localStorage.setItem(KEY, JSON.stringify({ memberName, expiresAt, phone: phoneStored }));
         const s = readSession();
         if (s) renderLoggedIn(s);
         notifyClubSessionChange();

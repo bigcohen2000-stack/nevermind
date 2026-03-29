@@ -1,6 +1,7 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import FormAntispamFields from "../components/FormAntispamFields.astro";
+import Web3FormsHcaptcha from "../components/Web3FormsHcaptcha.astro";
 import ReturnToContextCta from "../components/ReturnToContextCta.astro";
 import { FloatingInput } from "../components/ui/FloatingInput";
 import { buildWhatsAppHref } from "../lib/services";
@@ -194,6 +195,7 @@ const nextMoves = [
           dir="rtl"
           className="[&_.nm-floating-control--textarea]:min-h-[8rem]"
         />
+        <Web3FormsHcaptcha idSuffix="thank-you" />
         <button
           type="submit"
           class="w-full rounded-full bg-[var(--nm-inverse)] px-5 py-4 text-sm font-bold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-accent)]"
@@ -270,6 +272,13 @@ const nextMoves = [
             return;
           }
         }
+        if (typeof window.__nmHcaptchaOk === "function" && !window.__nmHcaptchaOk(form)) {
+          if (status instanceof HTMLElement) {
+            status.textContent = "נא להשלים את האימות למטה.";
+            status.classList.add("opacity-100");
+          }
+          return;
+        }
         try {
           const res = await fetch("https://api.web3forms.com/submit", { method: "POST", body: fd });
           if (res.ok) {
@@ -295,6 +304,7 @@ const nextMoves = [
       form.addEventListener("submit", onSubmit);
 
       window.__nmThankYouFormCleanup = () => {
+        unmountHcaptcha();
         [nameInput, emailInput, messageInput].forEach((field) => {
           field.removeEventListener("input", onInput);
         });

@@ -1,6 +1,7 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import FormAntispamFields from "../components/FormAntispamFields.astro";
+import Web3FormsHcaptcha from "../components/Web3FormsHcaptcha.astro";
 import { FloatingInput } from "../components/ui/FloatingInput";
 import appConfig from "../config/appConfig.json";
 import { buildWhatsAppHref } from "../lib/services";
@@ -47,13 +48,15 @@ const tel = appConfig.contact.phoneTel?.trim() || "";
         target="_blank"
         rel="noreferrer"
         class="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full bg-[var(--nm-accent)] px-5 py-3 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]"
+        title="מועדף לתגובה מהירה"
       >
-        וואטסאפ
+        וואטסאפ (מועדף)
       </a>
       {tel ? (
         <a
           href={`tel:${tel.replace(/\s/g, "")}`}
           class="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-5 py-3 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]"
+          title="שיחה — לא תמיד זמינות מיידית"
         >
           טלפון: {appConfig.contact.phoneDisplay}
         </a>
@@ -101,6 +104,8 @@ const tel = appConfig.contact.phoneTel?.trim() || "";
           autoComplete="off"
         />
 
+        <Web3FormsHcaptcha idSuffix="contact" />
+
         <button
           type="submit"
           class="w-full rounded-full bg-[var(--nm-inverse)] px-5 py-4 text-sm font-bold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-accent)]"
@@ -128,6 +133,11 @@ const tel = appConfig.contact.phoneTel?.trim() || "";
 
       if (typeof window.__nmStampFormAntispam === "function") {
         window.__nmStampFormAntispam(contactForm);
+      }
+
+      let unmountHcaptcha = () => {};
+      if (typeof window.__nmMountHcaptcha === "function") {
+        unmountHcaptcha = window.__nmMountHcaptcha(contactForm);
       }
 
       const fields = ["name", "email", "message"];
@@ -162,6 +172,13 @@ const tel = appConfig.contact.phoneTel?.trim() || "";
             return;
           }
         }
+        if (typeof window.__nmHcaptchaOk === "function" && !window.__nmHcaptchaOk(contactForm)) {
+          if (status instanceof HTMLElement) {
+            status.textContent = "נא להשלים את האימות למטה.";
+            status.classList.add("opacity-100");
+          }
+          return;
+        }
         try {
           const res = await fetch("https://api.web3forms.com/submit", { method: "POST", body: fd });
           if (res.ok) {
@@ -189,6 +206,7 @@ const tel = appConfig.contact.phoneTel?.trim() || "";
       contactForm.addEventListener("submit", onSubmit);
 
       window.__nmContactCleanup = () => {
+        unmountHcaptcha();
         contactForm.removeEventListener("input", onInput);
         contactForm.removeEventListener("submit", onSubmit);
         window.clearTimeout(debounce);

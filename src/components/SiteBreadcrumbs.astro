@@ -11,11 +11,11 @@ const { items } = Astro.props;
 {
   items.length > 0 ? (
     <nav
-      class="nm-breadcrumb-strip mb-5 min-w-0 border-b border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] pb-4"
+      class="nm-breadcrumb-strip mb-5 min-w-0 border-b border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] pb-4 md:pb-5"
       aria-label="מיקום באתר"
     >
       <ol
-        class="flex min-w-0 list-none flex-nowrap items-center gap-x-0 gap-y-1 overflow-x-auto overflow-y-hidden overscroll-x-contain py-0.5 [-webkit-overflow-scrolling:touch] [scrollbar-width:thin]"
+        class="mx-auto flex min-w-0 max-w-7xl list-none flex-nowrap items-center justify-end gap-x-0 gap-y-2 overflow-x-auto overflow-y-hidden overscroll-x-contain px-1 py-2 [-webkit-overflow-scrolling:touch] [scrollbar-width:thin] md:flex-wrap md:overflow-visible md:px-1 md:py-3 md:leading-relaxed"
         dir="rtl"
       >
         {items.map((item, i) => (
@@ -28,13 +28,13 @@ const { items } = Astro.props;
             {item.href ? (
               <a
                 href={item.href}
-                class="whitespace-nowrap text-sm text-[color-mix(in_srgb,var(--nm-fg)_62%,var(--nm-bg))] underline-offset-4 transition-colors hover:text-[var(--nm-accent)] hover:underline"
+                class="whitespace-nowrap text-sm text-[color-mix(in_srgb,var(--nm-fg)_62%,var(--nm-bg))] underline-offset-4 transition-colors hover:text-[var(--nm-accent)] hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nm-accent)]"
               >
                 {item.label}
               </a>
             ) : (
               <span
-                class="max-w-[min(72vw,28rem)] truncate text-sm font-semibold text-[color-mix(in_srgb,var(--nm-fg)_88%,var(--nm-bg))]"
+                class="max-w-[min(85vw,20rem)] truncate text-sm font-semibold text-[color-mix(in_srgb,var(--nm-fg)_88%,var(--nm-bg))] md:max-w-[min(100%,36rem)] md:whitespace-normal md:leading-snug"
                 aria-current="page"
               >
                 {item.label}

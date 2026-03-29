@@ -16,7 +16,6 @@ import PremiumLock from "../../components/PremiumLock.astro";
 import PremiumBreak from "../../components/PremiumBreak.astro";
 import RevealInsight from "../../components/RevealInsight.astro";
 import ReflectionQuestions from "../../components/ReflectionQuestions.astro";
-import LogicalQuestionBox from "../../components/LogicalQuestionBox.astro";
 import PerspectiveToggle from "../../components/PerspectiveToggle.astro";
 import RefutationBox from "../../components/RefutationBox.astro";
 import DeepDiveConcepts from "../../components/DeepDiveConcepts.astro";
@@ -413,11 +412,6 @@ while (curatedInternalLinks.length < 3) {
     kind: "article",
   });
 }
-
-const glossaryTerms = relatedConcepts.map((concept) => ({
-  term: concept.title,
-  definition: concept.definition,
-}));
 
 const components = {
   InquiryBox,
@@ -862,7 +856,6 @@ const components = {
     <aside class="mt-10 min-w-0 max-w-full space-y-5 lg:mt-0">
       <DepthSideNav currentKey={difficultyKey} items={depthNavItems} />
       <DeepDiveConcepts concepts={relatedConcepts} />
-      <LogicalQuestionBox pageTitle={title} tags={tags} articleTitle={title} glossaryTerms={glossaryTerms} />
     </aside>
   </div>
 

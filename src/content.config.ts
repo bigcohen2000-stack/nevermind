@@ -90,6 +90,8 @@ const articles = defineCollection({
     hubPosition: z.enum(["start", "core", "latest"]).optional(),
     /** סדר בתוך אותה קטגוריית hub (נמוך מופיע ראשון) */
     hubOrder: z.number().optional(),
+    journeyTopic: z.enum(["mental-health", "general"]).optional(),
+    sensitivityWarning: z.boolean().default(false),
     videoContent: z
       .object({
         hook: z.string().optional(),

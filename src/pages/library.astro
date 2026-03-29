@@ -43,13 +43,16 @@ const articles = (await getCollection("articles", ({ data }) => data.draft !== t
 const tagSet = new Set<string>();
 articles.forEach((article) => article.tags.forEach((tag) => tagSet.add(tag)));
 const tags = Array.from(tagSet);
+
+const chipBase =
+  "rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/70 px-4 py-2 text-[clamp(0.85rem,0.82rem+0.2vw,1rem)] text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))] transition-colors duration-300 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color-mix(in_srgb,var(--nm-fg)_22%,transparent)] min-h-11";
 ---
 
 <Layout
   title="ספרייה מובנית"
   description="מאמרים עם סינון לפי נושא. אותו תוכן כמו הארכיון, עם מבנה שמתאים לצמיחה אורגנית."
 >
-  <section class="space-y-10">
+  <section id="library-filter-root" class="space-y-10" data-library-root>
     <header class="space-y-4 text-right">
       <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--nm-accent)]">ספרייה</p>
       <h1 class="text-[clamp(2.2rem,1.7rem+2vw,3.2rem)] font-semibold text-[var(--nm-fg)]">ספרייה מובנית</h1>
@@ -57,39 +60,80 @@ const tags = Array.from(tagSet);
         בוחרים נושא או רואים את הכל. אם אתה מרגיש בנוח יותר ברשימה המלאה, יש גם עמוד מאמרים קלאסי.
       </p>
       <p>
-        <a href="/articles/" class="inline-flex min-h-[44px] items-center font-semibold text-[var(--nm-accent)] underline-offset-2 hover:underline">
+        <a
+          href="/articles/"
+          class="inline-flex min-h-[44px] items-center font-semibold text-[var(--nm-accent)] underline-offset-2 hover:underline"
+        >
           מעבר לעמוד מאמרים
         </a>
       </p>
     </header>
 
-    <div class="space-y-3">
-      <p class="text-right text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_60%,var(--nm-bg))]">סינון לפי תגית</p>
-      <div class="flex flex-wrap gap-3">
-        <button
-          type="button"
-          data-filter="all"
-          aria-pressed="true"
-          class="rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/70 px-4 py-2 text-[clamp(0.85rem,0.82rem+0.2vw,1rem)] text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))] transition-colors duration-300 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color-mix(in_srgb,var(--nm-fg)_22%,transparent)]"
-        >
-          הכל
-        </button>
-        {
-          tags.map((tag) => (
-            <button
-              type="button"
-              data-filter={tag}
-              aria-pressed="false"
-              class="rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/70 px-4 py-2 text-[clamp(0.85rem,0.82rem+0.2vw,1rem)] text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))] transition-colors duration-300 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color-mix(in_srgb,var(--nm-fg)_22%,transparent)]"
-            >
-              {tag}
-            </button>
-          ))
-        }
+    <div class="space-y-6">
+      <div class="space-y-3">
+        <p class="text-right text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_60%,var(--nm-bg))]">סינון לפי תגית</p>
+        <div class="flex flex-wrap gap-3" role="group" aria-label="סינון לפי תגית">
+          <button
+            type="button"
+            data-lib-tag="all"
+            aria-pressed="true"
+            class:list={[chipBase, "bg-white"]}
+          >
+            הכל
+          </button>
+          {
+            tags.map((tag) => (
+              <button type="button" data-lib-tag={tag} aria-pressed="false" class={chipBase}>
+                {tag}
+              </button>
+            ))
+          }
+        </div>
+      </div>
+
+      <div class="space-y-3">
+        <p class="text-right text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_60%,var(--nm-bg))]">רמת עומק</p>
+        <div class="flex flex-wrap gap-3" role="group" aria-label="סינון לפי רמת עומק">
+          <button type="button" data-lib-diff="all" aria-pressed="true" class:list={[chipBase, "bg-white"]}>
+            הכל
+          </button>
+          <button type="button" data-lib-diff="beginner" aria-pressed="false" class={chipBase}>
+            מתחילים
+          </button>
+          <button type="button" data-lib-diff="advanced" aria-pressed="false" class={chipBase}>
+            מתקדמים
+          </button>
+          <button type="button" data-lib-diff="deep" aria-pressed="false" class={chipBase}>
+            חקירה עמוקה
+          </button>
+        </div>
+      </div>
+
+      <div class="space-y-3">
+        <p class="text-right text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_60%,var(--nm-bg))]">גישה</p>
+        <div class="flex flex-wrap gap-3" role="group" aria-label="סינון לפי סוג גישה">
+          <button type="button" data-lib-prem="all" aria-pressed="true" class:list={[chipBase, "bg-white"]}>
+            הכל
+          </button>
+          <button type="button" data-lib-prem="free" aria-pressed="false" class={chipBase}>
+            חינמי
+          </button>
+          <button type="button" data-lib-prem="premium" aria-pressed="false" class={chipBase}>
+            מועדון
+          </button>
+        </div>
       </div>
     </div>
 
-    <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+    <p
+      id="library-empty"
+      class="hidden rounded-2xl border border-dashed border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-[color-mix(in_srgb,var(--nm-bg-canvas)_96%,transparent)] px-5 py-8 text-center text-sm leading-relaxed text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]"
+      role="status"
+    >
+      אין מאמרים שמתאימים לשילוב הסינון הזה. נסה להרחיב תגית או לבחור ״הכל״ באחד השדות.
+    </p>
+
+    <div id="library-grid" class="grid grid-cols-1 gap-6 md:grid-cols-2">
       {
         articles.map((article) => (
           <ArticleCard
@@ -110,33 +154,89 @@ const tags = Array.from(tagSet);
   </section>
 
   <script is:inline>
-    document.addEventListener("astro:page-load", () => {
-      const buttons = Array.from(document.querySelectorAll("[data-filter]"));
-      const cards = Array.from(document.querySelectorAll("[data-article-card]"));
+    (function () {
+      if (window.__nmLibraryFiltersInit) return;
+      window.__nmLibraryFiltersInit = true;
 
-      const setActive = (active) => {
-        buttons.forEach((button) => {
-          const isActive = button.dataset.filter === active;
-          button.setAttribute("aria-pressed", String(isActive));
-          button.classList.toggle("bg-white", isActive);
-        });
-      };
+      const state = { tag: "all", diff: "all", prem: "all" };
 
-      const filterCards = (active) => {
-        cards.forEach((card) => {
-          const cardTags = card.dataset.tags ? card.dataset.tags.split(",") : [];
-          const shouldShow = active === "all" || cardTags.includes(active);
-          card.classList.toggle("hidden", !shouldShow);
+      function setActive(root, group, activeVal) {
+        root.querySelectorAll("[data-lib-" + group + "]").forEach(function (btn) {
+          if (!(btn instanceof HTMLButtonElement)) return;
+          var v = btn.getAttribute("data-lib-" + group) || "";
+          var on = v === activeVal;
+          btn.setAttribute("aria-pressed", String(on));
+          btn.classList.toggle("bg-white", on);
         });
-      };
+      }
 
-      buttons.forEach((button) => {
-        button.addEventListener("click", () => {
-          const active = button.dataset.filter || "all";
-          setActive(active);
-          filterCards(active);
-        });
+      function apply(root) {
+        var cards = root.querySelectorAll("[data-article-card]");
+        var emptyEl = document.getElementById("library-empty");
+        var visible = 0;
+        for (var i = 0; i < cards.length; i++) {
+          var card = cards[i];
+          var cardTags = card.dataset.tags ? card.dataset.tags.split(",").map(function (t) { return t.trim(); }) : [];
+          var diff = card.dataset.difficulty || "";
+          var prem = card.dataset.premium === "true";
+          var ok = true;
+          if (state.tag !== "all" && cardTags.indexOf(state.tag) === -1) ok = false;
+          if (ok && state.diff !== "all" && diff !== state.diff) ok = false;
+          if (ok && state.prem === "free" && prem) ok = false;
+          if (ok && state.prem === "premium" && !prem) ok = false;
+          card.classList.toggle("hidden", !ok);
+          if (ok) visible += 1;
+        }
+        if (emptyEl) emptyEl.classList.toggle("hidden", visible > 0);
+      }
+
+      function resetState(root) {
+        state.tag = "all";
+        state.diff = "all";
+        state.prem = "all";
+        setActive(root, "tag", "all");
+        setActive(root, "diff", "all");
+        setActive(root, "prem", "all");
+        apply(root);
+      }
+
+      document.addEventListener("astro:page-load", function () {
+        var root = document.getElementById("library-filter-root");
+        if (!root) return;
+        resetState(root);
       });
-    });
+
+      document.addEventListener(
+        "click",
+        function (e) {
+          var root = document.getElementById("library-filter-root");
+          if (!root || !e.target || !root.contains(e.target)) return;
+          var t = e.target;
+          if (!(t instanceof Element)) return;
+
+          var tagBtn = t.closest("[data-lib-tag]");
+          if (tagBtn instanceof HTMLButtonElement) {
+            state.tag = tagBtn.getAttribute("data-lib-tag") || "all";
+            setActive(root, "tag", state.tag);
+            apply(root);
+            return;
+          }
+          var diffBtn = t.closest("[data-lib-diff]");
+          if (diffBtn instanceof HTMLButtonElement) {
+            state.diff = diffBtn.getAttribute("data-lib-diff") || "all";
+            setActive(root, "diff", state.diff);
+            apply(root);
+            return;
+          }
+          var premBtn = t.closest("[data-lib-prem]");
+          if (premBtn instanceof HTMLButtonElement) {
+            state.prem = premBtn.getAttribute("data-lib-prem") || "all";
+            setActive(root, "prem", state.prem);
+            apply(root);
+          }
+        },
+        true
+      );
+    })();
   </script>
 </Layout>

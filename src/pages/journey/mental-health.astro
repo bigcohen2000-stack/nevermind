@@ -1,0 +1,129 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+
+const pageTitle = "מסע בתוך הנפש";
+const pageDescription =
+  "מאמרים נבחרים על מנגנוני מחשבה, רגש וזהות — בלי למהר לתייג, ובלי להבטיח תוצאה קבועה מראש.";
+
+const hubOrderVal = (a: { data: { hubOrder?: number } }) => a.data.hubOrder ?? 999;
+
+const entries = await getCollection("articles", ({ data }) => data.draft !== true);
+const mental = entries
+  .filter((e) => e.data.journeyTopic === "mental-health")
+  .sort((a, b) => {
+    const o = hubOrderVal(a) - hubOrderVal(b);
+    if (o !== 0) return o;
+    return b.data.pubDate.valueOf() - a.data.pubDate.valueOf();
+  });
+
+const placeholders = [
+  {
+    title: "פיצול אישיות (DID)",
+    body: "מסלולי זיכרון וזהות בלי לצמצם אדם לתווית אחת.",
+    href: "/search/?q=" + encodeURIComponent("פיצול אישיות"),
+  },
+  {
+    title: "טורדנות כפייתית (OCD)",
+    body: "לפרק מה נשמר ומה נסחף בלי להעמיס אשמה.",
+    href: "/search/?q=" + encodeURIComponent("OCD טורדנות"),
+  },
+  {
+    title: "ריבוי זהויות",
+    body: "שפה שמכבדת כמה קולות באותו מרחב פנימי.",
+    href: "/search/?q=" + encodeURIComponent("זהות ריבוי"),
+  },
+  {
+    title: "כיוון כללי",
+    body: "כשהראש עמוס והמילים עדיין לא יושבות — נקודת פתיחה רכה.",
+    href: "/blog/",
+  },
+];
+---
+
+<Layout title={pageTitle} description={pageDescription} breadcrumbCurrentLabel={pageTitle}>
+  <article
+    class="nm-journey-mh mx-auto max-w-4xl space-y-12 px-5 pb-[max(2.5rem,env(safe-area-inset-bottom,0px))] pt-12 text-right sm:px-6 md:space-y-14 md:pt-16"
+    dir="rtl"
+  >
+    <header class="space-y-5 border-b border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] pb-10">
+      <p class="text-sm font-semibold uppercase tracking-[0.2em] text-[color-mix(in_srgb,#c45c5c_92%,var(--nm-accent))]">
+        מסע
+      </p>
+      <h1 class="text-[clamp(1.85rem,1.35rem+2vw,2.75rem)] font-semibold leading-[1.75] text-[var(--nm-fg)]">
+        {pageTitle}
+      </h1>
+      <p class="max-w-2xl text-[clamp(1.02rem,0.96rem+0.25vw,1.15rem)] leading-[1.75] text-[color-mix(in_srgb,var(--nm-fg)_74%,var(--nm-bg))]">
+        מישהו שיצלול איתך במחשבה: לא כדי לתקן אותך בבת אחת. כדי לפרק ביחד מה נשמע כמו עובדה ומה הוא רק פירוש.
+      </p>
+      <p class="max-w-2xl rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[color-mix(in_srgb,var(--nm-surface-muted)_70%,white)] px-4 py-3 text-sm leading-[1.75] text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))]">
+        התוכן נכתב מתוך ניסיון ומחקר. הוא לא מחליף בדיקה אישית אצל אנשי מקצוע מתאימים כשיש צורך קליני.
+      </p>
+    </header>
+
+    <section aria-labelledby="mh-topics" class="space-y-4">
+      <h2 id="mh-topics" class="text-lg font-semibold text-[var(--nm-fg)]">
+        נושאים לפתיחת חקירה
+      </h2>
+      <ul class="grid gap-4 sm:grid-cols-2" role="list">
+        {
+          placeholders.map((p) => (
+            <li>
+              <a
+                href={p.href}
+                class="flex min-h-11 flex-col rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-5 text-right leading-[1.75] transition hover:border-[color-mix(in_srgb,#c45c5c_35%,transparent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color-mix(in_srgb,#c45c5c_55%,var(--nm-accent))] motion-safe:transition-colors"
+              >
+                <span class="font-semibold text-[var(--nm-fg)]">{p.title}</span>
+                <span class="mt-2 flex-1 text-sm text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">{p.body}</span>
+                <span class="mt-3 text-sm font-semibold text-[color-mix(in_srgb,#b04848_88%,var(--nm-accent))]">פתיחה ←</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <section aria-labelledby="mh-articles" class="space-y-6">
+      <h2 id="mh-articles" class="text-lg font-semibold text-[var(--nm-fg)]">
+        מאמרים במסלול הזה
+      </h2>
+      {
+        mental.length === 0 ? (
+          <p class="rounded-2xl border border-dashed border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-5 py-8 text-sm leading-[1.75] text-[color-mix(in_srgb,var(--nm-fg)_62%,var(--nm-bg))]">
+            עדיין אין מאמרים מתויגים כאן. כשתוסיף בשדה journeyTopic את הערך mental-health בפרונט־מטר של מאמר, הוא יופיע אוטומטית.
+          </p>
+        ) : (
+          <ul class="space-y-4" role="list">
+            {mental.map((e) => (
+              <li>
+                <a
+                  href={`/articles/${e.slug}/`}
+                  class="block min-h-11 rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[color-mix(in_srgb,var(--nm-bg-canvas)_96%,transparent)] p-5 leading-[1.75] transition hover:border-[color-mix(in_srgb,#c45c5c_30%,transparent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color-mix(in_srgb,#c45c5c_50%,var(--nm-accent))]"
+                >
+                  <span class="flex flex-wrap items-baseline justify-between gap-2">
+                    <span class="text-base font-semibold text-[var(--nm-fg)]">{e.data.title}</span>
+                    {e.data.sensitivityWarning ? (
+                      <span class="rounded-full border border-[color-mix(in_srgb,#c45c5c_35%,transparent)] bg-[color-mix(in_srgb,#c45c5c_08%,transparent)] px-2 py-0.5 text-[0.65rem] font-semibold text-[color-mix(in_srgb,#a04040_95%,var(--nm-fg))]">
+                        תוכן רגיש
+                      </span>
+                    ) : null}
+                  </span>
+                  <p class="mt-2 text-sm text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">{e.data.description}</p>
+                </a>
+              </li>
+            ))}
+          </ul>
+        )
+      }
+    </section>
+
+  </article>
+</Layout>
+
+<style>
+  @media (prefers-reduced-motion: reduce) {
+    .nm-journey-mh a {
+      transition: none !important;
+    }
+  }
+</style>

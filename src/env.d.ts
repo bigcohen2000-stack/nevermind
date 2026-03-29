@@ -2,6 +2,7 @@
 
 interface ImportMetaEnv {
   readonly PUBLIC_NM_CLUB_WEBHOOK_URL?: string;
+  readonly PUBLIC_HCAPTCHA_SITE_KEY?: string;
   readonly PUBLIC_WEB3FORMS_ACCESS_KEY?: string;
   readonly PUBLIC_CLIENT_LOG_URL?: string;
   readonly PUBLIC_WHATSAPP_NUMBER?: string;
@@ -16,6 +17,22 @@ interface ImportMeta {
 interface Window {
   __nmArticleCleanup?: () => void;
   __nmAnnounce?: (message: string) => void;
+  __nmMountHcaptcha?: (form: HTMLFormElement) => () => void;
+  __nmHcaptchaOk?: (form: HTMLFormElement) => boolean;
+  __nmHcaptchaGlobalsRegistered?: boolean;
+  __nmHcaptchaApiPromise?: Promise<void> | null;
+  __nmLoadHcaptchaApi?: () => Promise<void>;
+  __nmDiscoveryPageLoadBound?: boolean;
+  __nmSearchPageLoadBound?: boolean;
+  __nmSearchPageCleanup?: () => void;
+  __nmServicesDiscoveryCleanup?: () => void;
+  hcaptcha?: {
+    render: (
+      container: HTMLElement,
+      params: Record<string, unknown>,
+    ) => number;
+    remove: (widgetId: number) => void;
+  };
 }
 
 declare namespace astroHTML.JSX {

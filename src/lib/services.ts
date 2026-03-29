@@ -1,6 +1,5 @@
 import servicesConfig from "../config/services.json";
 import appConfig from "../config/appConfig.json";
-import { WEB3FORMS_ACCESS_KEY } from "./web3forms-access";
 
 type ServicesConfig = typeof servicesConfig;
 export type PaymentMethod = ServicesConfig["payment_methods"][number];
@@ -521,24 +520,13 @@ export function buildServiceReservationWhatsAppHref(
   return buildWhatsAppHref(`${preface}\n\n${body}`);
 }
 
-/** התראת עניין בשירות (best-effort, לא לשבור UX) */
-export async function notifyServiceInterest(params: {
+/** התראת עניין בשירות — ללא Web3Forms (חובת hCaptcha בצד הספק). אפשר לחבר כאן לוג או ערוץ אחר. */
+export async function notifyServiceInterest(_params: {
   serviceId: string;
   serviceTitle: string;
   flow: string;
 }): Promise<void> {
-  try {
-    const formData = new FormData();
-    formData.append("access_key", WEB3FORMS_ACCESS_KEY);
-    formData.append("subject", `NeverMind - עניין ב: ${params.serviceTitle}`);
-    formData.append("message", `שירות: ${params.serviceId}\nזרימה: ${params.flow}\nזמן: ${new Date().toISOString()}`);
-    await fetch("https://api.web3forms.com/submit", {
-      method: "POST",
-      body: formData,
-    });
-  } catch {
-    // silent fail
-  }
+  void _params;
 }
 
 const WA_CRM_TAGLINE = "מחשבה אחת נקייה - ישר לוואטסאפ";

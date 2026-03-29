@@ -54,16 +54,28 @@ const waNumber = String(appConfig.contact.whatsAppNumber ?? "").replace(/\D/g, "
         {servicesHero.subtitle}
       </p>
 
-      <div class="mx-auto max-w-2xl space-y-3 text-right">
-        <p class="text-[clamp(1rem,0.95rem+0.3vw,1.12rem)] font-semibold leading-7 text-[var(--nm-fg)]">
-          יש משהו שמעסיק אותך? בוא נראה מה יש לנו בארכיון על זה.
-        </p>
-        <ArchiveSearchFloatingInput
-          client:load
-          id="discovery-search"
-          label="למשל: בהירות, זוגיות, לחץ"
-          className="shadow-[0_20px_50px_color-mix(in_srgb,var(--nm-fg)_5%,transparent)]"
-        />
+      <div class="mx-auto grid max-w-5xl gap-6 text-right lg:grid-cols-[minmax(0,1fr)_minmax(16rem,22rem)] lg:items-start lg:gap-8">
+        <div class="space-y-3">
+          <p class="text-[clamp(1rem,0.95rem+0.3vw,1.12rem)] font-semibold leading-7 text-[var(--nm-fg)]">
+            יש משהו שמעסיק אותך? בוא נראה מה יש לנו בארכיון על זה.
+          </p>
+          <ArchiveSearchFloatingInput
+            client:load
+            id="discovery-search"
+            label="למשל: בהירות, זוגיות, לחץ"
+            pagefindInput={true}
+            className="shadow-[0_20px_50px_color-mix(in_srgb,var(--nm-fg)_5%,transparent)]"
+          />
+        </div>
+        <div
+          id="discovery-idle"
+          class="rounded-3xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[color-mix(in_srgb,var(--nm-bg-canvas)_94%,transparent)] px-5 py-6 text-right lg:px-6 lg:py-7"
+        >
+          <p class="text-base font-semibold text-[var(--nm-fg)]">בחר נושא וקבל כיוון</p>
+          <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
+            כאן יופיעו תוצאות מהארכיון. אפשר להתחיל מהחיפוש למעלה או ללחוץ על אחת התגיות למטה.
+          </p>
+        </div>
       </div>
 
       <div class="flex flex-wrap items-center justify-center gap-2">
@@ -88,15 +100,6 @@ const waNumber = String(appConfig.contact.whatsAppNumber ?? "").replace(/\D/g, "
           <h2 class="text-xs font-bold uppercase tracking-[0.2em] text-[color-mix(in_srgb,var(--nm-fg)_45%,var(--nm-bg))]">
             מהארכיון
           </h2>
-        </div>
-        <div
-          id="discovery-idle"
-          class="rounded-3xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[color-mix(in_srgb,var(--nm-bg-canvas)_94%,transparent)] px-6 py-8 text-right"
-        >
-          <p class="text-lg font-semibold text-[var(--nm-fg)]">בחר נושא וקבל כיוון</p>
-          <p class="mt-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
-            כאן יופיעו תוצאות מהארכיון. אפשר להתחיל מהחיפוש למעלה או ללחוץ על אחת התגיות.
-          </p>
         </div>
         <p id="discovery-archive-status" class="hidden text-sm text-[color-mix(in_srgb,var(--nm-fg)_55%,var(--nm-bg))]"></p>
         <div id="discovery-archive-list" class="space-y-3"></div>
@@ -261,7 +264,16 @@ const waNumber = String(appConfig.contact.whatsAppNumber ?? "").replace(/\D/g, "
       return `https://wa.me/${waNumber}?text=${encodeURIComponent(body)}`;
     }
 
-    document.addEventListener("astro:page-load", () => {
+    function syncDiscoveryInputValue(input, value) {
+      const v = String(value ?? "");
+      input.value = v;
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+      input.dispatchEvent(new Event("change", { bubbles: true }));
+    }
+
+    async function runDiscoverySetup() {
+      if (window.__nmServicesDiscoveryCleanup) window.__nmServicesDiscoveryCleanup();
+
       const input = document.getElementById("discovery-search");
       const resultsEl = document.getElementById("discovery-results");
       const gapEl = document.getElementById("discovery-gap");
@@ -346,28 +358,48 @@ const waNumber = String(appConfig.contact.whatsAppNumber ?? "").replace(/\D/g, "
         debounceTimer = window.setTimeout(() => runQuery(input.value), DEBOUNCE_MS);
       }
 
-      input.addEventListener("input", scheduleRun);
-      input.addEventListener("search", scheduleRun);
+      const onInput = () => scheduleRun();
+      input.addEventListener("input", onInput);
+      input.addEventListener("search", onInput);
 
-      document.querySelectorAll("[data-discovery-tag]").forEach((btn) => {
-        btn.addEventListener("click", () => {
-          if (!(btn instanceof HTMLElement)) return;
-          const tag = btn.dataset.discoveryTag || "";
-          input.value = tag;
-          window.clearTimeout(debounceTimer);
-          void runQuery(tag);
-        });
-      });
+      const tagButtons = Array.from(document.querySelectorAll("[data-discovery-tag]"));
+      const onTagClick = (event) => {
+        const btn = event.currentTarget;
+        if (!(btn instanceof HTMLElement)) return;
+        const tag = btn.dataset.discoveryTag || "";
+        syncDiscoveryInputValue(input, tag);
+        window.clearTimeout(debounceTimer);
+        void runQuery(tag);
+      };
+      tagButtons.forEach((btn) => btn.addEventListener("click", onTagClick));
 
       const params = new URLSearchParams(window.location.search);
       const fromUrl = (params.get("topic") || params.get("q") || "").trim();
       if (fromUrl.length >= MIN_LEN) {
-        input.value = fromUrl;
+        syncDiscoveryInputValue(input, fromUrl);
         window.clearTimeout(debounceTimer);
         void runQuery(fromUrl);
       } else {
         showIdle();
       }
+
+      window.__nmServicesDiscoveryCleanup = () => {
+        window.clearTimeout(debounceTimer);
+        input.removeEventListener("input", onInput);
+        input.removeEventListener("search", onInput);
+        tagButtons.forEach((btn) => btn.removeEventListener("click", onTagClick));
+        window.__nmServicesDiscoveryCleanup = undefined;
+      };
+    }
+
+    if (!window.__nmDiscoveryPageLoadBound) {
+      window.__nmDiscoveryPageLoadBound = true;
+      document.addEventListener("astro:page-load", () => {
+        void runDiscoverySetup();
+      });
+    }
+    requestAnimationFrame(() => {
+      void runDiscoverySetup();
     });
   </script>
 </Layout>

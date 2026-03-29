@@ -73,6 +73,7 @@ const showPremiumTeaser = difficultyKey === "advanced" || difficultyKey === "dee
   data-article-card
   data-tags={tagsCsv}
   data-difficulty={difficultyKey}
+  data-premium={isPremium ? "true" : "false"}
   class:list={[
     "article-card group relative overflow-hidden rounded-lg border border-[#1A1A1A]/10 bg-white p-6 pb-5 pt-14 transition-all hover:border-[#D42B2B]/30 sm:pt-[3.25rem]",
     difficultyKey === "deep"

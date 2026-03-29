@@ -32,6 +32,32 @@ function normalizeResultUrl(url: string): string {
   return path;
 }
 
+/** נתיב לתיקיית ה־bundle (למשל `/pagefind/` או `/base/pagefind/`) */
+export function getPagefindBundlePath(): string {
+  const raw = import.meta.env.BASE_URL ?? "/";
+  return `${raw}pagefind/`.replace(/\/{2,}/g, "/");
+}
+
+function getPagefindBaseUrlOption(): string {
+  const raw = import.meta.env.BASE_URL ?? "/";
+  return raw.endsWith("/") ? raw : `${raw}/`;
+}
+
+async function applyPagefindOptions(): Promise<void> {
+  if (typeof window.pagefind?.options !== "function") return;
+  const basePath = getPagefindBundlePath();
+  const baseUrl = getPagefindBaseUrlOption();
+  try {
+    await window.pagefind.options({ basePath, baseUrl });
+  } catch {
+    try {
+      await window.pagefind.options({ baseUrl: "/" });
+    } catch {
+      /* ignore */
+    }
+  }
+}
+
 export const loadPagefind = () =>
   new Promise<void>((resolve, reject) => {
     if (typeof window === "undefined") {
@@ -39,12 +65,12 @@ export const loadPagefind = () =>
       return;
     }
     if (window.pagefind) {
-      resolve();
+      void applyPagefindOptions().then(() => resolve()).catch(() => resolve());
       return;
     }
 
     const script = document.createElement("script");
-    script.src = "/pagefind/pagefind.js";
+    script.src = `${getPagefindBundlePath()}pagefind.js`;
     script.async = true;
     script.onload = () => {
       const waitUntil = async () => {
@@ -54,7 +80,10 @@ export const loadPagefind = () =>
         }
         throw new Error("pagefind API not ready");
       };
-      void waitUntil().then(resolve).catch(reject);
+      void waitUntil()
+        .then(() => applyPagefindOptions())
+        .then(resolve)
+        .catch(reject);
     };
     script.onerror = () => reject(new Error("pagefind script failed"));
     document.head.appendChild(script);
@@ -70,13 +99,6 @@ export async function runPagefindSearch(query: string, limit = 6): Promise<Pagef
   let remote: PagefindSearchResult[] = [];
   try {
     await loadPagefind();
-    if (typeof window.pagefind?.options === "function") {
-      try {
-        await window.pagefind.options({ baseUrl: "/" });
-      } catch {
-        /* ignore */
-      }
-    }
     const search = await window.pagefind?.search(trimmed);
     const data = await Promise.all(
       (search?.results ?? []).slice(0, limit).map((result) => result.data())

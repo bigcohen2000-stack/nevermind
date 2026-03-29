@@ -1,6 +1,8 @@
+import HCaptcha from "@hcaptcha/react-hcaptcha";
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import appConfig from "../config/appConfig.json";
 import { validateAntispamFields } from "../lib/form-antispam";
+import { HCAPTCHA_SITE_KEY } from "../lib/hcaptcha-public";
 import { pickIntakeHumanChallenge, type IntakeHumanChallenge } from "../lib/intake-human-check";
 import { WEB3FORMS_ACCESS_KEY } from "../lib/web3forms-access";
 import { FloatingInput } from "./ui/FloatingInput";
@@ -141,9 +143,11 @@ export default function IntakeForm() {
   const [intent, setIntent] = useState("");
   const [humanChallenge] = useState<IntakeHumanChallenge>(() => pickIntakeHumanChallenge());
   const [humanAnswer, setHumanAnswer] = useState("");
+  const [hcaptchaToken, setHcaptchaToken] = useState<string | null>(null);
   const [status, setStatus] = useState<"idle" | "sending" | "ok">("idle");
   const [clientError, setClientError] = useState("");
   const successRef = useRef<HTMLParagraphElement | null>(null);
+  const hcaptchaRef = useRef<HCaptcha | null>(null);
   const openedAtRef = useRef(Date.now());
   const botcheckRef = useRef<HTMLInputElement | null>(null);
   const hpRef = useRef<HTMLInputElement | null>(null);
@@ -385,6 +389,14 @@ export default function IntakeForm() {
       return;
     }
 
+    if (HCAPTCHA_SITE_KEY) {
+      const t = hcaptchaToken?.trim() ?? "";
+      if (!t) {
+        setClientError("נא להשלים את האימות למטה.");
+        return;
+      }
+    }
+
     setStatus("sending");
     const fd = new FormData();
     fd.append("access_key", WEB3FORMS_ACCESS_KEY);
@@ -400,6 +412,9 @@ export default function IntakeForm() {
     fd.append("botcheck", botcheckRef.current?.value ?? "");
     fd.append("nm_hp_website", hpRef.current?.value ?? "");
     fd.append("nm_form_started_ms", String(openedAtRef.current));
+    if (HCAPTCHA_SITE_KEY && hcaptchaToken?.trim()) {
+      fd.append("h-captcha-response", hcaptchaToken.trim());
+    }
     try {
       const res = await fetch("https://api.web3forms.com/submit", {
         method: "POST",
@@ -424,6 +439,12 @@ export default function IntakeForm() {
         setIntent("");
         setLastTag(null);
         setHumanAnswer("");
+        setHcaptchaToken(null);
+        try {
+          hcaptchaRef.current?.resetCaptcha();
+        } catch {
+          /* ignore */
+        }
         setStatus("ok");
         window.dispatchEvent(new CustomEvent("nm-analytics", { detail: { name: "intake_form_submit" } }));
         (window as unknown as { __nmAnnounce?: (m: string) => void }).__nmAnnounce?.("הטופס נשלח");
@@ -693,6 +714,20 @@ export default function IntakeForm() {
           />
         </div>
       </section>
+
+      {HCAPTCHA_SITE_KEY ? (
+        <div className="flex flex-col items-end gap-2 py-2" dir="rtl">
+          <p className="text-xs text-[color-mix(in_srgb,var(--nm-fg)_55%,var(--nm-bg))]">אימות לפני שליחה</p>
+          <HCaptcha
+            ref={hcaptchaRef}
+            sitekey={HCAPTCHA_SITE_KEY}
+            reCaptchaCompat={false}
+            onVerify={(t) => setHcaptchaToken(t)}
+            onExpire={() => setHcaptchaToken(null)}
+            onError={() => setHcaptchaToken(null)}
+          />
+        </div>
+      ) : null}
 
       {clientError ? (
         <p

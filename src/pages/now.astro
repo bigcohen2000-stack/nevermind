@@ -2,6 +2,7 @@
 import { getCollection } from "astro:content";
 import Layout from "../layouts/Layout.astro";
 import FormAntispamFields from "../components/FormAntispamFields.astro";
+import Web3FormsHcaptcha from "../components/Web3FormsHcaptcha.astro";
 import SubscribeBanner from "../components/SubscribeBanner.astro";
 import { FloatingInput } from "../components/ui/FloatingInput";
 import { WEB3FORMS_ACCESS_KEY } from "../lib/web3forms-access";
@@ -118,6 +119,7 @@ const siteUpdates = [
       <FloatingInput client:load id="name" name="name" label="שם מלא" required dir="rtl" />
       <FloatingInput client:load id="email" name="email" label="אימייל" type="email" required dir="rtl" />
       <FloatingInput client:load id="message" name="message" label="הודעה" multiline rows={4} required dir="rtl" />
+      <Web3FormsHcaptcha idSuffix="now" />
       <button
         type="submit"
         class="w-full rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white px-5 py-3 text-[clamp(0.95rem,0.9rem+0.3vw,1.1rem)] text-[var(--nm-fg)]/80 transition-colors duration-300 hover:bg-white/90"
@@ -204,6 +206,11 @@ const siteUpdates = [
         window.__nmStampFormAntispam(contactForm);
       }
 
+      let unmountHcaptcha = () => {};
+      if (typeof window.__nmMountHcaptcha === "function") {
+        unmountHcaptcha = window.__nmMountHcaptcha(contactForm);
+      }
+
       const fields = ["name", "email", "message"];
       fields.forEach((field) => {
         const savedValue = localStorage.getItem(`form_${field}`);
@@ -252,6 +259,13 @@ const siteUpdates = [
             return;
           }
         }
+        if (typeof window.__nmHcaptchaOk === "function" && !window.__nmHcaptchaOk(contactForm)) {
+          if (status instanceof HTMLElement) {
+            status.textContent = "נא להשלים את האימות למטה.";
+            status.classList.add("opacity-100");
+          }
+          return;
+        }
 
         try {
           const response = await fetch("https://api.web3forms.com/submit", {
@@ -287,6 +301,7 @@ const siteUpdates = [
       form.addEventListener("submit", onSubmit);
 
       window.__nmNowFormCleanup = () => {
+        unmountHcaptcha();
         contactForm.removeEventListener("input", onInput);
         window.clearTimeout(inputDebounce);
         form.removeEventListener("submit", onSubmit);
