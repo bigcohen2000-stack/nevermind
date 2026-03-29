@@ -9,7 +9,7 @@ const articlesDir = path.resolve("src/content/articles");
 
 function getCutoffMarker(): string {
   const pv = siteSettings as { premiumVault?: { cutoffMarker?: string } };
-  return typeof pv.premiumVault?.cutoffMarker === "string" ? pv.premiumVault.cutoffMarker : "<!--premium-break-->";
+  return typeof pv.premiumVault?.cutoffMarker === "string" ? pv.premiumVault.cutoffMarker : "[[premium-break]]";
 }
 
 export function premiumMdxStripPlugin(): Plugin {

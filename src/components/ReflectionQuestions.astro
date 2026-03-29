@@ -1,4 +1,4 @@
----
+﻿---
 interface Props {
   title: string;
   questions: string[];
@@ -10,10 +10,10 @@ const { title, questions, whatsappHref } = Astro.props as Props;
 
 <section class="rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/80 p-6 shadow-[0_24px_70px_rgba(26,26,26,0.06)] backdrop-blur-md">
   <div class="space-y-3 text-right">
-    <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--nm-accent)]">לא לסכם. לעצור ולהסתכל.</p>
-    <h2 class="text-[clamp(1.35rem,1.1rem+1vw,1.95rem)] font-semibold text-[var(--nm-fg)]">3 שאלות פתוחות להמשך החקירה</h2>
+    <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--nm-accent)]">לא לסכם. לראות איך זה עובד.</p>
+    <h2 class="text-[clamp(1.35rem,1.1rem+1vw,1.95rem)] font-semibold text-[var(--nm-fg)]">3 שאלות להמשך הבדיקה</h2>
     <p class="text-[clamp(0.95rem,0.9rem+0.25vw,1.08rem)] leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
-      אם {title} פגש משהו חי אצלך, אל תסגור את זה בעוד סיכום. תענה לעצמך בכנות, או תשלח לי את התשובה בוואטסאפ.
+      אם {title} פגש משהו חי, קח את זה לשאלה מדויקת. לא להסכמה כללית. לבדיקה של המנגנון בפועל.
     </p>
   </div>
 
@@ -33,9 +33,9 @@ const { title, questions, whatsappHref } = Astro.props as Props;
       href={whatsappHref}
       target="_blank"
       rel="noreferrer"
-      class="inline-flex items-center justify-center gap-2 rounded-full bg-[#25D366] px-5 py-3 text-[clamp(0.95rem,0.9rem+0.25vw,1.05rem)] font-semibold text-white transition-colors duration-200 hover:bg-[#1FAE55] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#25D366]"
+      class="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full bg-[#25D366] px-5 py-3 text-[clamp(0.95rem,0.9rem+0.25vw,1.05rem)] font-semibold text-white transition-colors duration-200 hover:bg-[#1FAE55] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#25D366]"
     >
-      שלח לי את התשובה שלך בוואטסאפ
+      אני רוצה לבדוק את זה
     </a>
   </div>
 </section>

@@ -13,6 +13,7 @@ const root = path.resolve(__dirname, "..");
 const articlesDir = path.join(root, "src", "content", "articles");
 
 const ISO = /^\d{4}-\d{2}-\d{2}$/;
+const normalizeTag = (tag: string): string => tag.trim().normalize("NFC");
 const WHITELIST = new Set([
   "חופש",
   "מכניקת מחשבה",
@@ -27,7 +28,7 @@ const WHITELIST = new Set([
   "שאלות גדולות",
   "רגשות",
   "ניסויי מחשבה",
-]);
+].map(normalizeTag));
 
 function parseFrontmatter(raw: string) {
   const m = raw.match(/^---\r?\n([\s\S]*?)\r?\n---/);
@@ -69,14 +70,14 @@ for (const name of fs.readdirSync(articlesDir)) {
   }
   const tags = Array.isArray(data.tags) ? data.tags : [];
   for (const t of tags) {
-    if (typeof t === "string" && !WHITELIST.has(t)) {
+    if (typeof t === "string" && !WHITELIST.has(normalizeTag(t))) {
       errors.push(`${name}: תגית לא ברשימה המאושרת: "${t}"`);
     }
   }
 
   const classified = validateAndClassify(raw);
   if (!classified.valid) {
-    errors.push(`${name}: ${classified.error} — ${classified.matchedBlocklist.join(", ")}`);
+    errors.push(`${name}: ${classified.error} - ${classified.matchedBlocklist.join(", ")}`);
   }
 }
 

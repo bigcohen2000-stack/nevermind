@@ -1,6 +1,6 @@
 ---
 /**
- * כרטיס מאמר: תג רמה + זמן קריאה בפינה, טיזר פרימיום למתקדמים/עומק.
+ * ׳›׳¨׳˜׳™׳¡ ׳׳׳׳¨: ׳×׳’ ׳¨׳׳” + ׳–׳׳ ׳§׳¨׳™׳׳” ׳‘׳₪׳™׳ ׳”, ׳˜׳™׳–׳¨ ׳₪׳¨׳™׳׳™׳•׳ ׳׳׳×׳§׳“׳׳™׳/׳¢׳•׳׳§.
  */
 import { MIND_SHIFT_INACTIVE_HEX, MIND_SHIFT_SCALE_HEX } from "../data/mind-shift-scale";
 
@@ -15,11 +15,11 @@ type Props = {
   difficultyKey: DifficultyKey;
   readingMinutes: number;
   isPremium?: boolean;
-  /** 1–5: עוצמת שינוי תפיסתי */
+  /** 1ג€“5: ׳¢׳•׳¦׳׳× ׳©׳™׳ ׳•׳™ ׳×׳₪׳™׳¡׳×׳™ */
   mindShiftIntensity?: number;
-  /** ISO YYYY-MM-DD לסימון עדכון/פרסום בכרטיס */
+  /** ISO YYYY-MM-DD ׳׳¡׳™׳׳•׳ ׳¢׳“׳›׳•׳/׳₪׳¨׳¡׳•׳ ׳‘׳›׳¨׳˜׳™׳¡ */
   contentFreshnessIso?: string;
-  /** true אם התאריך הוא עדכון (לא פרסום ראשון) */
+  /** true ׳׳ ׳”׳×׳׳¨׳™׳ ׳”׳•׳ ׳¢׳“׳›׳•׳ (׳׳ ׳₪׳¨׳¡׳•׳ ׳¨׳׳©׳•׳) */
   contentFreshnessIsUpdate?: boolean;
 };
 
@@ -41,19 +41,19 @@ const freshnessDate =
   typeof contentFreshnessIso === "string" && /^\d{4}-\d{2}-\d{2}$/.test(contentFreshnessIso.trim())
     ? contentFreshnessIso.trim()
     : "";
-const freshnessLabel = contentFreshnessIsUpdate ? "עודכן" : "פורסם";
+const freshnessLabel = contentFreshnessIsUpdate ? "׳¢׳•׳“׳›׳" : "׳₪׳•׳¨׳¡׳";
 
-/** ממוצע ייחוס לפס מלא (למשל 5 דק׳ = 100%) */
+/** ׳׳׳•׳¦׳¢ ׳™׳™׳—׳•׳¡ ׳׳₪׳¡ ׳׳׳ (׳׳׳©׳ 5 ׳“׳§׳³ = 100%) */
 const READING_BASELINE_MINUTES = 5;
 const readingBarPercent = Math.min(100, Math.round((readingMinutes / READING_BASELINE_MINUTES) * 100));
 
 const difficultyLabel: Record<DifficultyKey, string> = {
-  beginner: "מתחילים",
-  advanced: "מתקדמים",
-  deep: "חקירה עמוקה",
+  beginner: "׳׳×׳—׳™׳׳™׳",
+  advanced: "׳׳×׳§׳“׳׳™׳",
+  deep: "׳—׳§׳™׳¨׳” ׳¢׳׳•׳§׳”",
 };
 
-/** פסטל רגוע: מתחילים רך, מתקדמים/עומק מעט חזק יותר בלי להתחרות באדום המותג */
+/** ׳₪׳¡׳˜׳ ׳¨׳’׳•׳¢: ׳׳×׳—׳™׳׳™׳ ׳¨׳, ׳׳×׳§׳“׳׳™׳/׳¢׳•׳׳§ ׳׳¢׳˜ ׳—׳–׳§ ׳™׳•׳×׳¨ ׳‘׳׳™ ׳׳”׳×׳—׳¨׳•׳× ׳‘׳׳“׳•׳ ׳”׳׳•׳×׳’ */
 const difficultyBadgeClass: Record<DifficultyKey, string> = {
   beginner:
     "border border-[#c8e6d8] bg-[#f3faf6] text-[#2a4d3d] ring-0 shadow-none",
@@ -84,7 +84,7 @@ const showPremiumTeaser = difficultyKey === "advanced" || difficultyKey === "dee
   <div
     class="absolute top-3 start-3 z-10 flex max-w-[calc(100%-1.5rem)] flex-wrap items-center justify-end gap-2"
     dir="rtl"
-    aria-label={`רמת עומק: ${difficultyLabel[difficultyKey]}, זמן קריאה משוער`}
+    aria-label={`׳¨׳׳× ׳¢׳•׳׳§: ${difficultyLabel[difficultyKey]}, ׳–׳׳ ׳§׳¨׳™׳׳” ׳׳©׳•׳¢׳¨`}
   >
     <span
       class:list={[
@@ -100,15 +100,15 @@ const showPremiumTeaser = difficultyKey === "advanced" || difficultyKey === "dee
         readingBadgeClass,
       ]}
     >
-      {readingMinutes} דק׳ קריאה
+      {readingMinutes} ׳“׳§׳³ ׳§׳¨׳™׳׳”
     </span>
     {mindShiftIntensity != null && mindShiftIntensity >= 1 && mindShiftIntensity <= 5 ? (
       <span
         class="inline-flex items-center gap-1 rounded-full border border-[#1A1A1A]/12 bg-white/90 px-2 py-1 text-[0.65rem] font-semibold text-[#3d3558]"
-        title={`שינוי תפיסתי: ${mindShiftIntensity}/5`}
-        aria-label={`עוצמת שינוי תפיסתי ${mindShiftIntensity} מתוך 5`}
+        title={`׳©׳™׳ ׳•׳™ ׳×׳₪׳™׳¡׳×׳™: ${mindShiftIntensity}/5`}
+        aria-label={`׳¢׳•׳¦׳׳× ׳©׳™׳ ׳•׳™ ׳×׳₪׳™׳¡׳×׳™ ${mindShiftIntensity} ׳׳×׳•׳ 5`}
       >
-        <span aria-hidden="true">⚡</span>
+        <span aria-hidden="true">ג¡</span>
         <span class="flex gap-0.5" aria-hidden="true">
           {[1, 2, 3, 4, 5].map((step) => (
             <span
@@ -140,7 +140,7 @@ const showPremiumTeaser = difficultyKey === "advanced" || difficultyKey === "dee
     {isPremium ? (
       <span
         class="inline-flex shrink-0 items-center gap-1 rounded-full border border-[color-mix(in_srgb,#D42B2B_28%,#e8e0e0)] bg-gradient-to-l from-[#fff6f6] to-white px-2.5 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.14em] text-[#9a1f1f] shadow-[inset_0_1px_0_rgba(255,255,255,0.85)] ring-1 ring-[color-mix(in_srgb,#D42B2B_12%,transparent)]"
-        title="תוכן מועדון"
+        title="׳×׳•׳›׳ ׳׳•׳¢׳“׳•׳"
       >
         <svg class="size-3.5 shrink-0 opacity-90" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
           <path
@@ -163,12 +163,12 @@ const showPremiumTeaser = difficultyKey === "advanced" || difficultyKey === "dee
   {
     showPremiumTeaser && (
       <p class="mb-4 text-right text-[0.8125rem] leading-relaxed text-[color-mix(in_srgb,var(--nm-fg)_58%,var(--nm-bg))]">
-        החלק הזה הוא רק השער. לפירוק העמוק של המנגנון במועדון NeverMind —{" "}
+        ׳”׳—׳׳§ ׳”׳–׳” ׳”׳•׳ ׳¨׳§ ׳”׳©׳¢׳¨. ׳׳₪׳™׳¨׳•׳§ ׳”׳¢׳׳•׳§ ׳©׳ ׳”׳׳ ׳’׳ ׳•׳ ׳‘׳׳•׳¢׳“׳•׳ NeverMind ג€”{" "}
         <a
           href="/premium"
           class="font-semibold text-[var(--nm-accent)] underline decoration-[color-mix(in_srgb,var(--nm-accent)_35%,transparent)] underline-offset-2 transition hover:decoration-[var(--nm-accent)]"
         >
-          רוצה להעמיק? הצטרף לתכני מועדון ה-NeverMind
+          ׳¨׳•׳¦׳” ׳׳”׳¢׳׳™׳§? ׳”׳¦׳˜׳¨׳£ ׳׳×׳›׳ ׳™ ׳׳•׳¢׳“׳•׳ ׳”-NeverMind
         </a>
       </p>
     )
@@ -176,10 +176,10 @@ const showPremiumTeaser = difficultyKey === "advanced" || difficultyKey === "dee
 
   <a
     href={`/articles/${slug}`}
-    aria-label={`התחל מסלול: ${title}`}
+    aria-label={`׳”׳×׳—׳ ׳׳¡׳׳•׳: ${title}`}
     class="inline-flex min-h-[44px] min-w-[44px] items-center font-bold text-[#D42B2B]"
   >
-    התחל מסלול: {title} ←
+    ׳”׳×׳—׳ ׳׳¡׳׳•׳: {title} ג†
   </a>
 
   <div
@@ -189,8 +189,8 @@ const showPremiumTeaser = difficultyKey === "advanced" || difficultyKey === "dee
     aria-valuemin={0}
     aria-valuemax={100}
     aria-valuenow={readingBarPercent}
-    aria-label={`זמן קריאה משוער ${readingMinutes} דקות, יחס לממוצע ${READING_BASELINE_MINUTES} דקות`}
-    title={`${readingMinutes} דק׳ קריאה · יחס לממוצע ${READING_BASELINE_MINUTES} דק׳`}
+    aria-label={`׳–׳׳ ׳§׳¨׳™׳׳” ׳׳©׳•׳¢׳¨ ${readingMinutes} ׳“׳§׳•׳×, ׳™׳—׳¡ ׳׳׳׳•׳¦׳¢ ${READING_BASELINE_MINUTES} ׳“׳§׳•׳×`}
+    title={`${readingMinutes} ׳“׳§׳³ ׳§׳¨׳™׳׳” ֲ· ׳™׳—׳¡ ׳׳׳׳•׳¦׳¢ ${READING_BASELINE_MINUTES} ׳“׳§׳³`}
   >
     <div
       class="h-full rounded-e-sm bg-gradient-to-l from-[#D42B2B] to-[color-mix(in_srgb,#D42B2B_75%,#1a1a1a)] motion-safe:transition-[width] motion-safe:duration-500 motion-safe:ease-out group-hover:from-[#c52626] group-hover:to-[#D42B2B]"

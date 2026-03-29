@@ -1,4 +1,4 @@
-﻿---
+---
 import { getCollection, render, type CollectionEntry } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
 import siteSettings from "../../config/siteSettings.json";
@@ -175,6 +175,14 @@ const discoveryServicesHref =
   tags.length > 0 ? `/services/?topic=${encodeURIComponent(tags[0])}` : "/services/";
 const inversionNote =
   typeof frontmatter.inversionNote === "string" ? frontmatter.inversionNote.trim() : "";
+const contentTier = frontmatter.isPremium ? "premium" : "public";
+const pageHeading =
+  contentTier === "public" && questionForSchemaFromFm.length > 0 ? questionForSchemaFromFm : title;
+const askOppositeText =
+  inversionNote ||
+  (contentTier === "public"
+    ? "שאלו מה קורה אם הדבר הזה לא קורה עכשיו. שם רואים איזה כלל שקט מפעיל את כל המנגנון."
+    : "");
 const tagPromptMap: Record<string, string> = {
   "חופש": "איפה אתה עדיין מוותר על חופש פנימי כדי לא לשלם מחיר חיצוני?",
   "מכניקת מחשבה": "איזו מחשבה אצלך נשמעת כמו אמת, אבל בפועל מנהלת אותך אוטומטית?",
@@ -192,6 +200,7 @@ const reflectionQuestions =
   Array.isArray(frontmatter.reflectionQuestions) && frontmatter.reflectionQuestions.length === 3
     ? frontmatter.reflectionQuestions
     : fallbackReflectionQuestions;
+const closingQuestion = reflectionQuestions[0] ?? questionForSchemaFromFm ?? description;
 
 if (faqItems.length === 0 && reflectionQuestions.length === 3) {
   const baseAnswer = bottomLine || description;
@@ -483,7 +492,7 @@ const components = {
     >
       <header class="space-y-5 text-right">
         <div class="flex flex-wrap items-start justify-end gap-3 gap-y-2">
-          <h1 class="min-w-0 flex-1 text-balance break-words text-[clamp(2.1rem,1.65rem+2vw,4rem)] font-semibold leading-[1.04] text-[var(--nm-fg)]">{title}</h1>
+          <h1 class="min-w-0 flex-1 text-balance break-words text-[clamp(2.1rem,1.65rem+2vw,4rem)] font-semibold leading-[1.04] text-[var(--nm-fg)]">{pageHeading}</h1>
           <div class="flex shrink-0 flex-wrap items-center justify-end gap-2">
             {mindShiftIntensity != null ? (
               <span
@@ -727,19 +736,19 @@ const components = {
         />
       ) : null}
 
-      {inversionNote ? (
+      {askOppositeText ? (
         <section
           class="mx-auto max-w-[72ch] rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-5 py-4 text-right"
-          aria-label="שכבת עומק והיפוכים"
+          aria-label="שאלו את ההפך"
         >
-          <p class="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--nm-accent)]">זווית היפוך</p>
+          <p class="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--nm-accent)]">{contentTier === "public" ? "שאלו את ההפך" : "זווית היפוך"}</p>
           <p class="mt-2 text-[clamp(0.95rem,0.9rem+0.2vw,1.05rem)] leading-7 text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))]">
-            {inversionNote}
+            {askOppositeText}
           </p>
         </section>
       ) : null}
 
-      <TenSecondExercise text={reflectionQuestions[0] ?? bottomLine} />
+      <TenSecondExercise text={closingQuestion ?? bottomLine} />
 
       {isRelationshipArticle ? <BookBanner /> : null}
 
@@ -759,9 +768,11 @@ const components = {
         </a>
       </section>
 
-      <section class="mx-auto max-w-[72ch]">
-        <ReflectionQuestions title={title} questions={reflectionQuestions} whatsappHref={reflectionWhatsAppUrl} />
-      </section>
+      {contentTier === "premium" ? (
+        <section class="mx-auto max-w-[72ch]">
+          <ReflectionQuestions title={title} questions={reflectionQuestions} whatsappHref={reflectionWhatsAppUrl} />
+        </section>
+      ) : null}
 
       <section class="mx-auto max-w-[72ch] space-y-4">
         <ArticleShareActions whatsappShareUrl={whatsappShareUrl} shareUrl={shareUrl} />
@@ -841,6 +852,16 @@ const components = {
       <div class="mx-auto max-w-[72ch]">
         <SubscribeBanner />
       </div>
+
+      {contentTier === "public" ? (
+        <section
+          class="mx-auto max-w-[72ch] rounded-[1.5rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[color-mix(in_srgb,var(--nm-tint)_18%,transparent)] px-5 py-5 text-right shadow-sm"
+          aria-label="שאלה אחת להמשך"
+        >
+          <p class="text-sm font-semibold text-[var(--nm-accent)]">שאלה אחת להמשך</p>
+          <p class="mt-2 text-[clamp(1rem,0.95rem+0.25vw,1.15rem)] leading-8 text-[var(--nm-fg)]">{closingQuestion}</p>
+        </section>
+      ) : null}
     </article>
 
     <aside class="mt-10 min-w-0 max-w-full space-y-5 lg:mt-0">

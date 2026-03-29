@@ -2,14 +2,15 @@
  * פיצול גוף MDX לפרימיום: מרקר HTML או יחס שורות (~30% ציבורי).
  */
 export function normalizeCutoffMarker(marker: string): string {
-  return (marker || "premium-break").replace(/<!--|-->/g, "").trim();
+  return (marker || "[[premium-break]]").replace(/<!--|-->/g, "").trim();
 }
 
 export function splitPremiumRawBody(
   body: string,
   cutoffMarker: string
 ): { publicPart: string; lockedPart: string } {
-  const needle = `<!--${normalizeCutoffMarker(cutoffMarker)}-->`;
+  const normalizedMarker = normalizeCutoffMarker(cutoffMarker);
+  const needle = normalizedMarker.startsWith("[[") ? normalizedMarker : `<!--${normalizedMarker}-->`;
   const i = body.indexOf(needle);
   if (i !== -1) {
     return {

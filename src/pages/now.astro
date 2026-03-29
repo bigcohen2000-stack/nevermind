@@ -212,37 +212,6 @@ const siteUpdates = [
       }
 
       const fields = ["name", "email", "message"];
-      fields.forEach((field) => {
-        const savedValue = localStorage.getItem(`form_${field}`);
-        const control = contactForm.elements.namedItem(field);
-        if (!savedValue || !control) return;
-        if (
-          control instanceof HTMLInputElement ||
-          control instanceof HTMLTextAreaElement ||
-          control instanceof HTMLSelectElement
-        ) {
-          control.value = savedValue;
-        }
-      });
-
-      let inputDebounce = 0;
-      const onInput = (event) => {
-        const target = event.target;
-        if (
-          !(target instanceof HTMLInputElement) &&
-          !(target instanceof HTMLTextAreaElement) &&
-          !(target instanceof HTMLSelectElement)
-        ) {
-          return;
-        }
-        const fieldName = String(target.name || "").trim();
-        if (!fieldName) return;
-        window.clearTimeout(inputDebounce);
-        inputDebounce = window.setTimeout(() => {
-          localStorage.setItem(`form_${fieldName}`, String(target.value ?? ""));
-        }, 150);
-      };
-      contactForm.addEventListener("input", onInput);
 
       const onSubmit = async (event) => {
         event.preventDefault();
@@ -275,7 +244,6 @@ const siteUpdates = [
 
           if (response.ok) {
             form.reset();
-            fields.forEach((field) => localStorage.removeItem(`form_${field}`));
             if (status) {
               status.textContent = "נשלח - אני בדרך כלל חוזר ממש מהר.";
               status.classList.add("opacity-100");
@@ -302,8 +270,6 @@ const siteUpdates = [
 
       window.__nmNowFormCleanup = () => {
         unmountHcaptcha();
-        contactForm.removeEventListener("input", onInput);
-        window.clearTimeout(inputDebounce);
         form.removeEventListener("submit", onSubmit);
       };
     });

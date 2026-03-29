@@ -1,4 +1,4 @@
-﻿---
+---
 import "@fontsource-variable/assistant/wght.css";
 import "../styles/global.css";
 import { getCollection } from "astro:content";
@@ -1196,78 +1196,93 @@ const socialLinks = [
 
         const setupFormPersistence = () => {
           const path = window.location.pathname.replace(/\/+$/, "") || "/";
-          const isRegistrationPage =
-            path === "/intake" ||
-            path === "/intake/" ||
-            path === "/registration" ||
-            path === "/registration/";
-          if (!isRegistrationPage) return () => {};
+          if (path.startsWith("/admin")) return () => {};
 
-          const form = document.querySelector("main form");
-          if (!(form instanceof HTMLFormElement)) return () => {};
+          const forms = Array.from(document.querySelectorAll("main form")).filter(
+            (form) => form instanceof HTMLFormElement
+          );
+          if (!forms.length) return () => {};
 
-          const fields = Array.from(
-            form.querySelectorAll("input, textarea, select")
-          ).filter((field) => {
-            if (!(field instanceof HTMLElement)) return false;
-            const input = field instanceof HTMLInputElement ? field : null;
-            if (input && ["password", "file", "hidden", "submit", "button", "reset"].includes(input.type)) {
-              return false;
-            }
-            return Boolean(field.id || field.getAttribute("name"));
-          });
-          if (!fields.length) return () => {};
+          const cleanups = [];
 
-          const storageKey = `nm-form-draft:${path}`;
-          const restoreDraft = () => {
-            try {
-              const raw = window.localStorage.getItem(storageKey);
-              if (!raw) return;
-              const draft = JSON.parse(raw);
+          forms.forEach((form, index) => {
+            if (!(form instanceof HTMLFormElement)) return;
+
+            const fields = Array.from(form.querySelectorAll("input, textarea, select")).filter((field) => {
+              if (!(field instanceof HTMLElement)) return false;
+              const input = field instanceof HTMLInputElement ? field : null;
+              if (input && ["password", "file", "hidden", "submit", "button", "reset"].includes(input.type)) {
+                return false;
+              }
+              return Boolean(field.id || field.getAttribute("name"));
+            });
+            if (!fields.length) return;
+
+            const storageKey = `nm-form-draft:${path}:${form.id || index}`;
+
+            const restoreDraft = () => {
+              try {
+                const raw = window.localStorage.getItem(storageKey);
+                if (!raw) return;
+                const draft = JSON.parse(raw);
+                fields.forEach((field) => {
+                  const key = field.getAttribute("name") || field.id;
+                  if (!key || !(key in draft)) return;
+                  if (field instanceof HTMLInputElement && (field.type === "checkbox" || field.type === "radio")) {
+                    field.checked = Boolean(draft[key]);
+                    return;
+                  }
+                  field.value = String(draft[key] ?? "");
+                });
+              } catch {
+                /* ignore */
+              }
+            };
+
+            const persistDraft = () => {
+              const snapshot = {};
               fields.forEach((field) => {
                 const key = field.getAttribute("name") || field.id;
-                if (!key || !(key in draft)) return;
+                if (!key) return;
                 if (field instanceof HTMLInputElement && (field.type === "checkbox" || field.type === "radio")) {
-                  field.checked = Boolean(draft[key]);
+                  snapshot[key] = field.checked;
                   return;
                 }
-                field.value = String(draft[key] ?? "");
+                snapshot[key] = field.value;
               });
-            } catch {
-              /* ignore */
-            }
-          };
-
-          const persistDraft = () => {
-            const snapshot = {};
-            fields.forEach((field) => {
-              const key = field.getAttribute("name") || field.id;
-              if (!key) return;
-              if (field instanceof HTMLInputElement && (field.type === "checkbox" || field.type === "radio")) {
-                snapshot[key] = field.checked;
-                return;
+              try {
+                window.localStorage.setItem(storageKey, JSON.stringify(snapshot));
+              } catch {
+                /* ignore */
               }
-              snapshot[key] = field.value;
-            });
-            try {
-              window.localStorage.setItem(storageKey, JSON.stringify(snapshot));
-            } catch {
-              /* ignore */
-            }
-          };
+            };
 
-          restoreDraft();
-          fields.forEach((field) => field.addEventListener("input", persistDraft));
-          form.addEventListener("submit", () => {
-            try {
-              window.localStorage.removeItem(storageKey);
-            } catch {
-              /* ignore */
-            }
+            const clearDraft = () => {
+              try {
+                window.localStorage.removeItem(storageKey);
+              } catch {
+                /* ignore */
+              }
+            };
+
+            restoreDraft();
+            fields.forEach((field) => {
+              field.addEventListener("input", persistDraft);
+              field.addEventListener("change", persistDraft);
+            });
+            form.addEventListener("submit", clearDraft);
+
+            cleanups.push(() => {
+              fields.forEach((field) => {
+                field.removeEventListener("input", persistDraft);
+                field.removeEventListener("change", persistDraft);
+              });
+              form.removeEventListener("submit", clearDraft);
+            });
           });
 
           return () => {
-            fields.forEach((field) => field.removeEventListener("input", persistDraft));
+            cleanups.forEach((cleanup) => cleanup());
           };
         };
         const cleanupFormPersistence = setupFormPersistence();

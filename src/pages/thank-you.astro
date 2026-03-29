@@ -220,42 +220,15 @@ const nextMoves = [
       const form = document.getElementById("thank-you-form");
       const status = document.querySelector("[data-thank-you-form-status]");
       if (!(form instanceof HTMLFormElement)) return;
+
       if (typeof window.__nmStampFormAntispam === "function") {
         window.__nmStampFormAntispam(form);
       }
 
-      const nameInput = document.getElementById("thank-you-name");
-      const emailInput = document.getElementById("thank-you-email");
-      const messageInput = document.getElementById("thank-you-message");
-      if (!(nameInput instanceof HTMLInputElement)) return;
-      if (!(emailInput instanceof HTMLInputElement)) return;
-      if (!(messageInput instanceof HTMLTextAreaElement)) return;
-
-      const storageKey = "nm-thankyou-draft";
-      const saveDraft = () => {
-        const draft = {
-          name: nameInput.value,
-          email: emailInput.value,
-          message: messageInput.value,
-        };
-        localStorage.setItem(storageKey, JSON.stringify(draft));
-      };
-      const restoreDraft = () => {
-        try {
-          const raw = localStorage.getItem(storageKey);
-          if (!raw) return;
-          const draft = JSON.parse(raw);
-          if (typeof draft.name === "string") nameInput.value = draft.name;
-          if (typeof draft.email === "string") emailInput.value = draft.email;
-          if (typeof draft.message === "string") messageInput.value = draft.message;
-        } catch {}
-      };
-      restoreDraft();
-
-      const onInput = () => saveDraft();
-      [nameInput, emailInput, messageInput].forEach((field) => {
-        field.addEventListener("input", onInput);
-      });
+      let unmountHcaptcha = () => {};
+      if (typeof window.__nmMountHcaptcha === "function") {
+        unmountHcaptcha = window.__nmMountHcaptcha(form);
+      }
 
       const onSubmit = async (event) => {
         event.preventDefault();
@@ -274,7 +247,7 @@ const nextMoves = [
         }
         if (typeof window.__nmHcaptchaOk === "function" && !window.__nmHcaptchaOk(form)) {
           if (status instanceof HTMLElement) {
-            status.textContent = "נא להשלים את האימות למטה.";
+            status.textContent = "�� ������ �� ������ ����.";
             status.classList.add("opacity-100");
           }
           return;
@@ -282,20 +255,19 @@ const nextMoves = [
         try {
           const res = await fetch("https://api.web3forms.com/submit", { method: "POST", body: fd });
           if (res.ok) {
-            localStorage.removeItem(storageKey);
             form.reset();
             if (status instanceof HTMLElement) {
-              status.textContent = "נשלח.";
+              status.textContent = "������ �� ������.";
               status.classList.add("opacity-100");
             }
-            window.__nmAnnounce?.("הטופס נשלח");
+            window.__nmAnnounce?.("������ ������");
           } else if (status instanceof HTMLElement) {
-            status.textContent = "לא נשלח הפעם. נסה שוב.";
+            status.textContent = "�� �� ��� ����. ���� ����� ���.";
             status.classList.add("opacity-100");
           }
         } catch {
           if (status instanceof HTMLElement) {
-            status.textContent = "לא נשלח הפעם. נסה שוב.";
+            status.textContent = "�� �� ��� ����. ���� ����� ���.";
             status.classList.add("opacity-100");
           }
         }
@@ -305,9 +277,6 @@ const nextMoves = [
 
       window.__nmThankYouFormCleanup = () => {
         unmountHcaptcha();
-        [nameInput, emailInput, messageInput].forEach((field) => {
-          field.removeEventListener("input", onInput);
-        });
         form.removeEventListener("submit", onSubmit);
       };
     });

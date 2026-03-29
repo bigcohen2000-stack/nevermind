@@ -1,5 +1,5 @@
 /**
- * תגיות מאמר מאושרות (Whitelist) — מסונכרן עם Master Prompt ועם Decap config.yml
+ * תגיות מאמר מאושרות (Whitelist) - מסונכרן עם Master Prompt ועם Decap config.yml
  */
 export const ARTICLE_TAG_WHITELIST = [
   "חופש",
@@ -19,8 +19,10 @@ export const ARTICLE_TAG_WHITELIST = [
 
 export type ArticleTagWhitelisted = (typeof ARTICLE_TAG_WHITELIST)[number];
 
-export const ARTICLE_TAG_WHITELIST_SET = new Set<string>(ARTICLE_TAG_WHITELIST);
+const normalizeTag = (tag: string): string => tag.trim().normalize("NFC");
+
+export const ARTICLE_TAG_WHITELIST_SET = new Set<string>(ARTICLE_TAG_WHITELIST.map(normalizeTag));
 
 export function isWhitelistedArticleTag(tag: string): boolean {
-  return ARTICLE_TAG_WHITELIST_SET.has(tag.trim());
+  return ARTICLE_TAG_WHITELIST_SET.has(normalizeTag(tag));
 }

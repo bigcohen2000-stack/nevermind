@@ -1,6 +1,6 @@
 ---
 /**
- * בלוק "שאלה גדולה" - היררכיה שטוחה, פונט גדול, מודולים: הפכים, מילון (dfn), מילוי + וואטסאפ.
+ * ׳‘׳׳•׳§ "׳©׳׳׳” ׳’׳“׳•׳׳”" - ׳”׳™׳¨׳¨׳›׳™׳” ׳©׳˜׳•׳—׳”, ׳₪׳•׳ ׳˜ ׳’׳“׳•׳, ׳׳•׳“׳•׳׳™׳: ׳”׳₪׳›׳™׳, ׳׳™׳׳•׳ (dfn), ׳׳™׳׳•׳™ + ׳•׳•׳׳˜׳¡׳׳₪.
  */
 import appConfig from "../config/appConfig.json";
 import { FloatingInput } from "./ui/FloatingInput";
@@ -15,7 +15,7 @@ export interface GlossaryTerm {
 interface Props {
   tags: string[];
   articleTitle?: string;
-  /** מונחים פשוטים להסבר ב-hover - אופציונלי */
+  /** ׳׳•׳ ׳—׳™׳ ׳₪׳©׳•׳˜׳™׳ ׳׳”׳¡׳‘׳¨ ׳‘-hover - ׳׳•׳₪׳¦׳™׳•׳ ׳׳™ */
   glossaryTerms?: GlossaryTerm[];
 }
 
@@ -23,12 +23,12 @@ const { tags, articleTitle = "", glossaryTerms } = Astro.props;
 
 const defaultGlossary: GlossaryTerm[] = [
   {
-    term: "נקודה חיה",
-    definition: "משהו שכואב או מפחיד עכשיו, לא רק רעיון יפה על הדף.",
+    term: "׳ ׳§׳•׳“׳” ׳—׳™׳”",
+    definition: "׳׳©׳”׳• ׳©׳›׳•׳׳‘ ׳׳• ׳׳₪׳—׳™׳“ ׳¢׳›׳©׳™׳•, ׳׳ ׳¨׳§ ׳¨׳¢׳™׳•׳ ׳™׳₪׳” ׳¢׳ ׳”׳“׳£.",
   },
   {
-    term: "הפך",
-    definition: "מה הייתי חושב אם הייתי הופך את המשפט בראש - כמו לראות את אותו חדר מחלון אחר.",
+    term: "׳”׳₪׳",
+    definition: "׳׳” ׳”׳™׳™׳×׳™ ׳—׳•׳©׳‘ ׳׳ ׳”׳™׳™׳×׳™ ׳”׳•׳₪׳ ׳׳× ׳”׳׳©׳₪׳˜ ׳‘׳¨׳׳© - ׳›׳׳• ׳׳¨׳׳•׳× ׳׳× ׳׳•׳×׳• ׳—׳“׳¨ ׳׳—׳׳•׳ ׳׳—׳¨.",
   },
 ];
 
@@ -36,7 +36,7 @@ const terms = glossaryTerms?.length ? glossaryTerms : defaultGlossary;
 
 const waPhone = appConfig.contact.whatsAppNumber;
 const readContextLine = buildArticleReadContextLine({ tags, articleTitle });
-const leadSourceTitle = (articleTitle || "מאמר").trim() || "מאמר";
+const leadSourceTitle = (articleTitle || "׳׳׳׳¨").trim() || "׳׳׳׳¨";
 ---
 
 <section
@@ -44,39 +44,39 @@ const leadSourceTitle = (articleTitle || "מאמר").trim() || "מאמר";
   aria-labelledby="bq-heading"
 >
   <h2 id="bq-heading" class="text-[clamp(1.35rem,1.15rem+1vw,1.75rem)] font-semibold text-[var(--nm-fg)] [letter-spacing:0]">
-    עצור רגע לפני ששולחים שאלה
+    ׳¢׳¦׳•׳¨ ׳¨׳’׳¢ ׳׳₪׳ ׳™ ׳©׳©׳•׳׳—׳™׳ ׳©׳׳׳”
   </h2>
 
   <p class="mt-3 max-w-prose">
-    אני לא בודק אותך כאן. אני רק מזמין אותך לנסח לעצמך בבהירות - כמו לדבר בקול רגוע לפני שאתה שולח הודעה.
+    ׳׳ ׳™ ׳׳ ׳‘׳•׳“׳§ ׳׳•׳×׳ ׳›׳׳. ׳׳ ׳™ ׳¨׳§ ׳׳–׳׳™׳ ׳׳•׳×׳ ׳׳ ׳¡׳— ׳׳¢׳¦׳׳ ׳‘׳‘׳”׳™׳¨׳•׳× - ׳›׳׳• ׳׳“׳‘׳¨ ׳‘׳§׳•׳ ׳¨׳’׳•׳¢ ׳׳₪׳ ׳™ ׳©׳׳×׳” ׳©׳•׳׳— ׳”׳•׳“׳¢׳”.
   </p>
 
   <!-- Method of Opposites -->
   <div
     class="bq-opposites mt-8 overflow-hidden rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] shadow-sm"
     role="region"
-    aria-label="תרגיל שאל את ההפך"
+    aria-label="׳×׳¨׳’׳™׳ ׳©׳׳ ׳׳× ׳”׳”׳₪׳"
   >
     <p class="border-b border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3 text-center text-[clamp(0.95rem,0.9rem+0.2vw,1.05rem)] font-semibold text-[var(--nm-fg)]">
-      שאל את ההפך
+      ׳©׳׳ ׳׳× ׳”׳”׳₪׳
     </p>
     <div class="grid md:grid-cols-2">
       <div
         class="bq-opposites__red min-h-[9rem] border-b border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] p-5 md:border-b-0 md:border-e"
         style="background: linear-gradient(165deg, rgba(212, 43, 43, 0.12) 0%, rgba(212, 43, 43, 0.04) 100%);"
       >
-        <p class="text-[0.7rem] font-bold uppercase text-[var(--nm-accent)] [letter-spacing:0]">מה נוטה לצאת ממני</p>
+        <p class="text-[0.7rem] font-bold uppercase text-[var(--nm-accent)] [letter-spacing:0]">׳׳” ׳ ׳•׳˜׳” ׳׳¦׳׳× ׳׳׳ ׳™</p>
         <p class="mt-3">
-          איזה משפט אני אומר לעצמי כשאני לחוץ? מה אני מנסה להגן עליו כשאני כועס או נסוג?
+          ׳׳™׳–׳” ׳׳©׳₪׳˜ ׳׳ ׳™ ׳׳•׳׳¨ ׳׳¢׳¦׳׳™ ׳›׳©׳׳ ׳™ ׳׳—׳•׳¥? ׳׳” ׳׳ ׳™ ׳׳ ׳¡׳” ׳׳”׳’׳ ׳¢׳׳™׳• ׳›׳©׳׳ ׳™ ׳›׳•׳¢׳¡ ׳׳• ׳ ׳¡׳•׳’?
         </p>
       </div>
       <div
         class="bq-opposites__navy min-h-[9rem] p-5"
         style="background: linear-gradient(165deg, rgba(26, 26, 26, 0.08) 0%, rgba(26, 26, 26, 0.03) 100%);"
       >
-        <p class="text-[0.7rem] font-bold uppercase text-[var(--nm-fg-secondary)] [letter-spacing:0]">מה קורה אם הופכים</p>
+        <p class="text-[0.7rem] font-bold uppercase text-[var(--nm-fg-secondary)] [letter-spacing:0]">׳׳” ׳§׳•׳¨׳” ׳׳ ׳”׳•׳₪׳›׳™׳</p>
         <p class="mt-3">
-          אם הייתי אומר את ההפך בקול שקט - מה היה משתנה? לא צריך תשובה נכונה; צריך כיוון אחר לנסות.
+          ׳׳ ׳”׳™׳™׳×׳™ ׳׳•׳׳¨ ׳׳× ׳”׳”׳₪׳ ׳‘׳§׳•׳ ׳©׳§׳˜ - ׳׳” ׳”׳™׳” ׳׳©׳×׳ ׳”? ׳׳ ׳¦׳¨׳™׳ ׳×׳©׳•׳‘׳” ׳ ׳›׳•׳ ׳”; ׳¦׳¨׳™׳ ׳›׳™׳•׳•׳ ׳׳—׳¨ ׳׳ ׳¡׳•׳×.
         </p>
       </div>
     </div>
@@ -85,7 +85,7 @@ const leadSourceTitle = (articleTitle || "מאמר").trim() || "מאמר";
   <!-- Glossary (dfn + CSS tooltip) -->
   <div class="mt-8 rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)]/80 px-4 py-5">
     <p class="mb-3 text-[clamp(1rem,0.95rem+0.2vw,1.1rem)] font-medium text-[color-mix(in_srgb,var(--nm-fg)_90%,var(--nm-bg))]">
-      שני מילים שעוזרות לי לא לאבד את עצמי בטקסט:
+      ׳©׳ ׳™ ׳׳™׳׳™׳ ׳©׳¢׳•׳–׳¨׳•׳× ׳׳™ ׳׳ ׳׳׳‘׳“ ׳׳× ׳¢׳¦׳׳™ ׳‘׳˜׳§׳¡׳˜:
     </p>
     <ul class="flex flex-wrap gap-x-3 gap-y-2">
       {terms.map((item) => (
@@ -103,37 +103,37 @@ const leadSourceTitle = (articleTitle || "מאמר").trim() || "מאמר";
     </ul>
   </div>
 
-  <!-- Fill-in-the-blanks → WhatsApp -->
+  <!-- Fill-in-the-blanks ג†’ WhatsApp -->
   <form
     class="bq-fill mt-8 space-y-4 rounded-2xl border border-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)] bg-[var(--nm-tint)] p-5"
     data-bq-fill-form
     dir="rtl"
   >
     <p class="text-[clamp(1rem,0.95rem+0.25vw,1.15rem)] font-medium text-[var(--nm-fg)]">
-      משפט אחד בשבילך - בלי טפסים ומיילים, רק שיחה בוואטסאפ כשתרצה:
+      ׳׳©׳₪׳˜ ׳׳—׳“ ׳‘׳©׳‘׳™׳׳ - ׳‘׳׳™ ׳˜׳₪׳¡׳™׳ ׳•׳׳™׳™׳׳™׳, ׳¨׳§ ׳©׳™׳—׳” ׳‘׳•׳•׳׳˜׳¡׳׳₪ ׳›׳©׳×׳¨׳¦׳”:
     </p>
     <p class="text-[color-mix(in_srgb,var(--nm-fg)_85%,var(--nm-bg))]">
-      אם הייתי מפסיק/ת לפחד מ־
+      ׳׳ ׳”׳™׳™׳×׳™ ׳׳₪׳¡׳™׳§/׳× ׳׳₪׳—׳“ ׳ײ¾
       <FloatingInput
         client:load
         variant="embed"
         embedShowCaption={true}
         id="bq-fear-field"
         name="fear_blank"
-        label="מה מפחדים ממנו במשפט, למשל להישאר בלי תשובה"
+        label="׳׳” ׳׳₪׳—׳“׳™׳ ׳׳׳ ׳• ׳‘׳׳©׳₪׳˜, ׳׳׳©׳ ׳׳”׳™׳©׳׳¨ ׳‘׳׳™ ׳×׳©׳•׳‘׳”"
         autoComplete="off"
         hideValidation={true}
         datasetMarker="bq-fear"
         className="mx-1"
       />
-      , הייתי
+      , ׳”׳™׳™׳×׳™
       <FloatingInput
         client:load
         variant="embed"
         embedShowCaption={true}
         id="bq-would-field"
         name="would_blank"
-        label="מה הייתי עושה במקום, למשל לבקש פעולה אחת קטנה ממישהו אחר"
+        label="׳׳” ׳”׳™׳™׳×׳™ ׳¢׳•׳©׳” ׳‘׳׳§׳•׳, ׳׳׳©׳ ׳׳‘׳§׳© ׳₪׳¢׳•׳׳” ׳׳—׳× ׳§׳˜׳ ׳” ׳׳׳™׳©׳”׳• ׳׳—׳¨"
         autoComplete="off"
         hideValidation={true}
         datasetMarker="bq-would"
@@ -144,16 +144,16 @@ const leadSourceTitle = (articleTitle || "מאמר").trim() || "מאמר";
     <button
       type="button"
       data-bq-fill-submit
-      data-label-pending="מלאו את שני הריבועים - ואז נפתחת שיחה מיידית עם השם לא משנה"
-      data-label-ready="שלח להשם לא משנה לקבלת תובנה"
+      data-label-pending="׳׳׳׳• ׳׳× ׳©׳ ׳™ ׳”׳¨׳™׳‘׳•׳¢׳™׳ - ׳•׳׳– ׳ ׳₪׳×׳—׳× ׳©׳™׳—׳” ׳׳™׳™׳“׳™׳× ׳¢׳ ׳”׳©׳ ׳׳ ׳׳©׳ ׳”"
+      data-label-ready="׳©׳׳— ׳׳”׳©׳ ׳׳ ׳׳©׳ ׳” ׳׳§׳‘׳׳× ׳×׳•׳‘׳ ׳”"
       disabled
       class="bq-fill-wa-btn w-full rounded-full px-5 py-3 text-[clamp(1rem,0.95rem+0.2vw,1.1rem)] font-semibold transition-colors duration-200 md:w-auto [letter-spacing:0]"
     >
-      מלאו את שני הריבועים - ואז נפתחת שיחה מיידית עם השם לא משנה
+      ׳׳׳׳• ׳׳× ׳©׳ ׳™ ׳”׳¨׳™׳‘׳•׳¢׳™׳ - ׳•׳׳– ׳ ׳₪׳×׳—׳× ׳©׳™׳—׳” ׳׳™׳™׳“׳™׳× ׳¢׳ ׳”׳©׳ ׳׳ ׳׳©׳ ׳”
     </button>
   </form>
 
-  <div class="mt-8 flex justify-end" aria-label="פתיחת שיחה אחרי קריאה">
+  <div class="mt-8 flex justify-end" aria-label="׳₪׳×׳™׳—׳× ׳©׳™׳—׳” ׳׳—׳¨׳™ ׳§׳¨׳™׳׳”">
     <DirectLink
       client:load
       whatsAppNumber={appConfig.contact.whatsAppNumber}
@@ -163,7 +163,7 @@ const leadSourceTitle = (articleTitle || "מאמר").trim() || "מאמר";
 </section>
 
 <style is:global>
-  /* מוגבל לתוך .bq-root - tooltips ל-dfn */
+  /* ׳׳•׳’׳‘׳ ׳׳×׳•׳ .bq-root - tooltips ׳-dfn */
   .bq-root .bq-dfn {
     position: relative;
     cursor: help;
@@ -256,9 +256,9 @@ const leadSourceTitle = (articleTitle || "מאמר").trim() || "מאמר";
       if (btn.disabled) return;
       const a = fear.value.trim();
       const b = would.value.trim();
-      const line = `אם הייתי מפסיק/ת לפחד מ־${a}, הייתי ${b}.`;
-      const preface = `[Lead | Source: ${leadSourceTitle}]\nמחשבה אחת נקייה - ישר לוואטסאפ`;
-      const full = `${preface}\n\nהיי השם לא משנה,\n${readContextLine}\n\n${line}\n\nרציתי תובנה קצרה על המשפט הזה - אפשר להמשיך כאן בשיחה.`;
+      const line = `׳׳ ׳”׳™׳™׳×׳™ ׳׳₪׳¡׳™׳§/׳× ׳׳₪׳—׳“ ׳ײ¾${a}, ׳”׳™׳™׳×׳™ ${b}.`;
+      const preface = `[Lead | Source: ${leadSourceTitle}]\n׳׳—׳©׳‘׳” ׳׳—׳× ׳ ׳§׳™׳™׳” - ׳™׳©׳¨ ׳׳•׳•׳׳˜׳¡׳׳₪`;
+      const full = `${preface}\n\n׳”׳™׳™ ׳”׳©׳ ׳׳ ׳׳©׳ ׳”,\n${readContextLine}\n\n${line}\n\n׳¨׳¦׳™׳×׳™ ׳×׳•׳‘׳ ׳” ׳§׳¦׳¨׳” ׳¢׳ ׳”׳׳©׳₪׳˜ ׳”׳–׳” - ׳׳₪׳©׳¨ ׳׳”׳׳©׳™׳ ׳›׳׳ ׳‘׳©׳™׳—׳”.`;
       const url = `https://wa.me/${waPhone}?text=${encodeURIComponent(full)}`;
       window.open(url, "_blank", "noopener,noreferrer");
     };
