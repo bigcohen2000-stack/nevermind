@@ -40,11 +40,35 @@ export type StageService = ServiceStage["services"][number] & {
   whatsapp_template?: string | null;
   features?: Array<string | { text?: string; icon?: string }>;
   friendly_note?: string;
+  /** מה קורה בפועל (3), מתאים כש (2), לא מתאים כש (1) — כרטיס מחירון */
+  what_happens?: string[];
+  fits_when?: string[];
+  not_when?: string;
   extensions?: ServiceExtension[];
   /** אם true: בוחרים תחילה הרחבה (בלי ברירת מחדל), ואז נפתחים מחיר וכפתורים — כמו שלבים בטופס */
   extensions_gated?: boolean;
   update?: boolean;
   override_on_extension?: boolean;
+};
+
+export type PremiumMemberPriceRow = { service_id: string; member_price: number; label: string };
+export type PremiumExclusiveCard = {
+  title: string;
+  summary: string;
+  href: string;
+  cta_label: string;
+};
+export type PremiumBonusesConfig = {
+  section_title?: string;
+  section_intro?: string;
+  exclusive?: PremiumExclusiveCard[];
+  member_prices?: PremiumMemberPriceRow[];
+};
+
+export const getPremiumBonuses = (): PremiumBonusesConfig => {
+  const raw = (servicesConfig as Record<string, unknown>).premium_bonuses;
+  if (!raw || typeof raw !== "object") return { exclusive: [], member_prices: [] };
+  return raw as PremiumBonusesConfig;
 };
 export type AddOn = ServicesConfig["add_ons"][number];
 export type ThoughtShift = ServicesConfig["trust_elements"]["thought_shifts"][number];
@@ -254,7 +278,9 @@ export function formatTopicLandingSubtitle(template: string, topic: string): str
   return template.replace(/\{topic\}/g, t);
 }
 
-export const formatMoney = (value: number) => `${Math.round(value).toLocaleString("he-IL")} ${servicesCurrency}`;
+/** מחיר לתצוגה: מספר ממוספר + רווח לא שביר לפני ₪ */
+export const formatMoney = (value: number) =>
+  `${Math.round(value).toLocaleString("he-IL")}\u00A0${servicesCurrency}`;
 export const getNetPrice = (grossPrice: number, taxPercent: number) => Math.round(grossPrice / (1 + taxPercent / 100));
 export const getVatAmount = (grossPrice: number, taxPercent: number) => grossPrice - getNetPrice(grossPrice, taxPercent);
 

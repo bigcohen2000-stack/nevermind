@@ -90,6 +90,7 @@ export default defineConfig({
         })();
         if (pathname === "/404") return false;
         if (pathname.startsWith("/admin")) return false;
+        if (pathname.startsWith("/dashboard")) return false;
         if (pathname === "/premium-access") return false;
         return true;
       },

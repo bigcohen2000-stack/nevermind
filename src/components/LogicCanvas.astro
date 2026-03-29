@@ -66,8 +66,10 @@ const videoPoints = Array.isArray(canvas.featuredVideo?.videoSummaryPoints)
   </header>
 
   <div class="space-y-4">
-    <h2 class="text-right text-lg font-semibold text-[var(--nm-fg-secondary)]">איך אתה מרגיש עכשיו?</h2>
-    <p class="text-right text-sm text-[color-mix(in_srgb,var(--nm-fg-secondary)_75%,var(--nm-bg))]">ארבעה מסלולי קריאה קצרים - שלושה מאמרים בכל אחד.</p>
+    <h2 class="text-right text-lg font-semibold text-[var(--nm-fg-secondary)]">בחירת מסלול לפי נקודת פתיחה</h2>
+    <p class="text-right text-sm text-[color-mix(in_srgb,var(--nm-fg-secondary)_75%,var(--nm-bg))]">
+      ארבעה מסלולים. בכל אחד שלושה מאמרים בסדר קריאה קבוע. בוחרים מסלול, קוראים לפי הסדר, בודקים איפה המשפט הבא נשבר.
+    </p>
     <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
       {
         paths.map((p) => (
@@ -111,7 +113,13 @@ const videoPoints = Array.isArray(canvas.featuredVideo?.videoSummaryPoints)
     {
       videoId && (
         <div class="rounded-[1.75rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)]/95 p-4 lg:col-span-6">
-          <VideoPlayer youtubeId={videoId} title={videoTitle} videoSummaryPoints={videoPoints} />
+          <VideoPlayer
+            youtubeId={videoId}
+            title={videoTitle}
+            videoSummaryPoints={videoPoints}
+            posterLoading="eager"
+            posterFetchPriority="high"
+          />
         </div>
       )
     }

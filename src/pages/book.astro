@@ -1,7 +1,26 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import Schema from "../components/Schema.astro";
 import appConfig from "../config/appConfig.json";
 import { buildServiceReservationWhatsAppHref, buildWhatsAppHref, findServiceById } from "../lib/services";
+
+const siteUrlSlash = appConfig.site.url.endsWith("/") ? appConfig.site.url : `${appConfig.site.url}/`;
+const bookProductSchema = [
+  {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: "NeverMind — קביעת שיחה",
+    description: "שלושה צעדים: התאמה קצרה, בחירת מסלול, תיאום בפועל.",
+    url: new URL("book/", siteUrlSlash).toString(),
+    brand: { "@type": "Brand", name: appConfig.site.name },
+    offers: {
+      "@type": "Offer",
+      priceCurrency: "ILS",
+      availability: "https://schema.org/InStock",
+      url: new URL("services/", siteUrlSlash).toString(),
+    },
+  },
+];
 
 const phonePerspective = findServiceById("phone-perspective");
 const waBook = phonePerspective
@@ -15,6 +34,7 @@ const waBook = phonePerspective
   title="קביעת שיחה"
   description="שלושה צעדים ברורים: התאמה קצרה, בחירת מסלול, תיאום בפועל."
 >
+  <Schema graphs={bookProductSchema} />
   <section class="mx-auto max-w-3xl space-y-10 px-4 py-14 text-right text-[var(--nm-fg)]">
     <header class="space-y-4">
       <p class="text-sm font-semibold uppercase tracking-[0.2em] text-[var(--nm-accent)]">המרה ישירה</p>

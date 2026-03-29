@@ -17,6 +17,7 @@ import { DirectLink } from "../components/ui/DirectLink";
 import ServicePricingBlock from "../components/ServicePricingBlock";
 import ServicesPricingStickyBar from "../components/ServicesPricingStickyBar";
 import TopicQueryLandingBanner from "../components/TopicQueryLandingBanner";
+import PremiumClubGate from "../components/PremiumClubGate.astro";
 
 const services = flattenVisibleServices();
 const popularTags = glossaryConcepts.slice(0, 6).map((c) => ({
@@ -31,7 +32,7 @@ const waNumber = String(appConfig.contact.whatsAppNumber ?? "").replace(/\D/g, "
   description="חיפוש בארכיון התכנים ודרכים להעמיק בשיחה, בלי אשף שלבים."
 >
   <TopicQueryLandingBanner client:load />
-  <section class="mx-auto max-w-6xl space-y-12 px-4 pb-28 pt-16 text-[var(--nm-fg)] md:pb-20 md:py-20">
+  <section class="mx-auto max-w-7xl space-y-12 px-4 pb-28 pt-16 text-[var(--nm-fg)] md:pb-20 md:py-20">
     <nav
       aria-label="קפיצה לחלקי העמוד"
       class="flex flex-wrap items-center justify-center gap-2 border-b border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] pb-6 text-sm font-semibold text-[var(--nm-accent)]"
@@ -112,7 +113,11 @@ const waNumber = String(appConfig.contact.whatsAppNumber ?? "").replace(/\D/g, "
         >
           נדבר על זה בוואטסאפ
         </a>
-      </div>
+    </div>
+  </div>
+
+    <div class="mx-auto max-w-3xl">
+      <PremiumClubGate />
     </div>
 
     <div id="pricing" class="scroll-mt-28 space-y-6" tabindex="-1">
@@ -134,6 +139,7 @@ const waNumber = String(appConfig.contact.whatsAppNumber ?? "").replace(/\D/g, "
             return (
               <div
                 id={service.id}
+                data-nm-service-card
                 class="group rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-6 shadow-[0_12px_32px_color-mix(in_srgb,var(--nm-fg)_4%,transparent)] transition hover:border-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)]"
               >
                 <div class="flex flex-wrap items-start justify-between gap-3">
@@ -204,13 +210,30 @@ const waNumber = String(appConfig.contact.whatsAppNumber ?? "").replace(/\D/g, "
     </div>
   </section>
 
-  <div class="mx-auto flex max-w-6xl justify-end px-4 pb-16" aria-label="פתיחת שיחה אחרי קריאה">
+  <div class="mx-auto flex max-w-7xl justify-end px-4 pb-16" aria-label="פתיחת שיחה אחרי קריאה">
     <DirectLink
       client:load
       whatsAppNumber={appConfig.contact.whatsAppNumber}
       fallbackEmail={appConfig.contact.email}
     />
   </div>
+
+  <section
+    class="mx-auto max-w-7xl border-t border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] px-4 pb-24 text-[var(--nm-fg)]"
+    aria-labelledby="services-next-step"
+  >
+    <h2 id="services-next-step" class="text-sm font-semibold uppercase tracking-[0.2em] text-[var(--nm-accent)]">
+      צעד הבא
+    </h2>
+    <p class="mt-4 max-w-3xl text-right text-[clamp(1.05rem,0.98rem+0.35vw,1.2rem)] font-medium leading-relaxed">
+      אחרי שמצאת נושא או מסלול: <a href="/intake/" class="text-[var(--nm-accent)] underline-offset-4 hover:underline">טופס לפני שיחה</a>
+      <span class="text-[color-mix(in_srgb,var(--nm-fg)_35%,var(--nm-bg))]"> · </span>
+      <a href="/book/" class="text-[var(--nm-accent)] underline-offset-4 hover:underline">קביעת שיחה</a>
+    </p>
+    <p class="mt-6 max-w-3xl text-right text-base leading-8 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
+      איזה חוסר התאמה בין עובדה לפירוש תרצה לבדוק קודם.
+    </p>
+  </section>
 
   <script
     define:vars={{

@@ -71,9 +71,9 @@ const stageCards = servicesStages
   >
     <header class="max-w-4xl space-y-5 text-right">
       <p class="text-sm font-semibold uppercase tracking-[0.26em] text-[var(--nm-accent)]">NeverMind</p>
-      <h1 id="intent-title" class="text-[clamp(2.2rem,1.7rem+2.4vw,3.8rem)] font-semibold leading-[1.08] text-[var(--nm-fg)]">
+      <h2 id="intent-title" class="text-[clamp(2.2rem,1.7rem+2.4vw,3.8rem)] font-semibold leading-[1.08] text-[var(--nm-fg)]">
         {servicesHero.title}
-      </h1>
+      </h2>
       <p class="max-w-3xl text-[clamp(1.05rem,0.98rem+0.5vw,1.3rem)] leading-8 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
         {servicesHero.subtitle}
       </p>
@@ -186,23 +186,44 @@ const stageCards = servicesStages
     </p>
     <div class="mt-12 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3 lg:gap-10">
       {recentArticles.map((article) => (
-        <a
-          href={`/articles/${article.slug}`}
-          title={`לקריאת המאמר: ${article.data.title}`}
-          class="group block rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)]/90 p-6 backdrop-blur-md transition-all duration-300 hover:border-[color-mix(in_srgb,var(--nm-accent)_28%,transparent)] md:p-8"
-        >
-          <div class="mb-4 flex items-center gap-2 text-[var(--nm-accent)]">
-            <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-            </svg>
-            <span class="text-xs font-semibold uppercase tracking-[0.16em]">חקירה שקטה</span>
-          </div>
-          <h3 class="mb-4 text-xl font-bold text-[var(--nm-fg)] decoration-[color-mix(in_srgb,var(--nm-fg)_35%,transparent)] underline-offset-4 group-hover:underline md:text-2xl">{article.data.title}</h3>
-          <p class="mb-6 text-base text-[color-mix(in_srgb,var(--nm-fg)_65%,var(--nm-bg))]">{article.data.description}</p>
-          <span class="inline-block border-b border-[var(--nm-fg)] pb-0.5 text-sm font-semibold text-[var(--nm-fg)]">לקריאה שקטה ←</span>
-        </a>
+        <article class="h-full min-h-0">
+          <a
+            href={`/articles/${article.slug}`}
+            title={`לקריאת המאמר: ${article.data.title}`}
+            class="group flex h-full min-h-0 flex-col rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)]/90 p-6 backdrop-blur-md transition-all duration-300 hover:border-[color-mix(in_srgb,var(--nm-accent)_28%,transparent)] md:p-8"
+          >
+            <div class="mb-4 flex items-center gap-2 text-[var(--nm-accent)]">
+              <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+              </svg>
+              <span class="text-xs font-semibold uppercase tracking-[0.16em]">חקירה שקטה</span>
+            </div>
+            <h3 class="mb-4 text-xl font-bold text-[var(--nm-fg)] decoration-[color-mix(in_srgb,var(--nm-fg)_35%,transparent)] underline-offset-4 group-hover:underline md:text-2xl">{article.data.title}</h3>
+            <p class="mb-6 flex-1 text-base text-[color-mix(in_srgb,var(--nm-fg)_65%,var(--nm-bg))]">{article.data.description}</p>
+            <span class="mt-auto inline-block border-b border-[var(--nm-fg)] pb-0.5 text-sm font-semibold text-[var(--nm-fg)]">לקריאה שקטה ←</span>
+          </a>
+        </article>
       ))}
     </div>
+  </section>
+
+  <section
+    class="mx-auto max-w-7xl border-t border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-6 py-16 md:py-20"
+    aria-labelledby="home-next-step"
+  >
+    <h2 id="home-next-step" class="text-sm font-semibold uppercase tracking-[0.2em] text-[var(--nm-accent)]">
+      צעד הבא
+    </h2>
+    <p class="mt-4 max-w-3xl text-right text-[clamp(1.05rem,0.98rem+0.35vw,1.2rem)] font-medium leading-relaxed text-[var(--nm-fg)]">
+      מיפוי מסלול: <a href="/services/" class="text-[var(--nm-accent)] underline-offset-4 hover:underline">שירותים</a>
+      <span class="text-[color-mix(in_srgb,var(--nm-fg)_35%,var(--nm-bg))]"> · </span>
+      <a href="/intake/" class="text-[var(--nm-accent)] underline-offset-4 hover:underline">טופס לפני שיחה</a>
+      <span class="text-[color-mix(in_srgb,var(--nm-fg)_35%,var(--nm-bg))]"> · </span>
+      <a href="/blog/" class="text-[var(--nm-accent)] underline-offset-4 hover:underline">מרכז הקריאה</a>
+    </p>
+    <p class="mt-6 max-w-3xl text-right text-base leading-8 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
+      איזו שאלה תשאיר פתוחה אחרי שתסיים כאן.
+    </p>
   </section>
 
   <script is:inline type="application/ld+json" set:html={jsonLdForInlineScript(homeArticleListSchema)} />

@@ -171,6 +171,7 @@ const tel = appConfig.contact.phoneTel?.trim() || "";
               status.textContent = "נשלח.";
               status.classList.add("opacity-100");
             }
+            window.dispatchEvent(new CustomEvent("nm-analytics", { detail: { name: "contact_form_submit" } }));
             window.__nmAnnounce?.("הטופס נשלח");
           } else if (status instanceof HTMLElement) {
             status.textContent = "לא נשלח הפעם. נסה שוב.";

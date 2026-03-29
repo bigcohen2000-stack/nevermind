@@ -12,6 +12,7 @@ export type SiteBreadcrumbCrumb = {
 
 /** תווית לסגמנט URL בודד (לא לכותרת מאמר/מושג) */
 const SEGMENT_LABELS: Record<string, string> = {
+  blog: "מרכז הקריאה",
   articles: "מאמרים",
   topics: "נושאים",
   now: "מה המצב עכשיו",

@@ -17,6 +17,10 @@ type Props = {
   isPremium?: boolean;
   /** 1–5: עוצמת שינוי תפיסתי */
   mindShiftIntensity?: number;
+  /** ISO YYYY-MM-DD לסימון עדכון/פרסום בכרטיס */
+  contentFreshnessIso?: string;
+  /** true אם התאריך הוא עדכון (לא פרסום ראשון) */
+  contentFreshnessIsUpdate?: boolean;
 };
 
 const {
@@ -29,7 +33,15 @@ const {
   readingMinutes,
   isPremium = false,
   mindShiftIntensity,
+  contentFreshnessIso = "",
+  contentFreshnessIsUpdate = false,
 } = Astro.props;
+
+const freshnessDate =
+  typeof contentFreshnessIso === "string" && /^\d{4}-\d{2}-\d{2}$/.test(contentFreshnessIso.trim())
+    ? contentFreshnessIso.trim()
+    : "";
+const freshnessLabel = contentFreshnessIsUpdate ? "עודכן" : "פורסם";
 
 /** ממוצע ייחוס לפס מלא (למשל 5 דק׳ = 100%) */
 const READING_BASELINE_MINUTES = 5;
@@ -64,8 +76,8 @@ const showPremiumTeaser = difficultyKey === "advanced" || difficultyKey === "dee
   class:list={[
     "article-card group relative overflow-hidden rounded-lg border border-[#1A1A1A]/10 bg-white p-6 pb-5 pt-14 transition-all hover:border-[#D42B2B]/30 sm:pt-[3.25rem]",
     difficultyKey === "deep"
-      ? "hover:-translate-y-0.5 hover:shadow-[0_28px_72px_rgba(26,26,26,0.2)]"
-      : "hover:shadow-lg",
+      ? "motion-safe:hover:-translate-y-0.5 motion-safe:hover:shadow-[0_28px_72px_rgba(26,26,26,0.2)]"
+      : "motion-safe:hover:shadow-lg",
   ]}
 >
   <div
@@ -105,6 +117,15 @@ const showPremiumTeaser = difficultyKey === "advanced" || difficultyKey === "dee
           ))}
         </span>
       </span>
+    ) : null}
+    {freshnessDate ? (
+      <time
+        class="inline-flex items-center rounded-full border border-[#e5e1dc] bg-[#faf9f7] px-2 py-1 text-[0.65rem] font-medium tabular-nums text-[#5a5652]"
+        datetime={freshnessDate}
+        title={`${freshnessLabel} ${freshnessDate}`}
+      >
+        {freshnessLabel} {freshnessDate}
+      </time>
     ) : null}
   </div>
 
@@ -171,7 +192,7 @@ const showPremiumTeaser = difficultyKey === "advanced" || difficultyKey === "dee
     title={`${readingMinutes} דק׳ קריאה · יחס לממוצע ${READING_BASELINE_MINUTES} דק׳`}
   >
     <div
-      class="h-full rounded-e-sm bg-gradient-to-l from-[#D42B2B] to-[color-mix(in_srgb,#D42B2B_75%,#1a1a1a)] transition-[width] duration-500 ease-out group-hover:from-[#c52626] group-hover:to-[#D42B2B]"
+      class="h-full rounded-e-sm bg-gradient-to-l from-[#D42B2B] to-[color-mix(in_srgb,#D42B2B_75%,#1a1a1a)] motion-safe:transition-[width] motion-safe:duration-500 motion-safe:ease-out group-hover:from-[#c52626] group-hover:to-[#D42B2B]"
       style={`width: ${readingBarPercent}%`}
     />
   </div>

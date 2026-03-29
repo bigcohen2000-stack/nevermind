@@ -50,8 +50,16 @@ const q = Astro.url.searchParams.get("q")?.trim() ?? "";
         if (!resultsContainer) return;
         resultsContainer.innerHTML = "";
         if (!items.length) {
-          resultsContainer.innerHTML =
-            '<p class="text-[clamp(0.9rem,0.85rem+0.2vw,1.05rem)] text-[color-mix(in_srgb,var(--nm-fg)_55%,var(--nm-bg))]">אין תוצאות כרגע.</p>';
+          resultsContainer.innerHTML = `
+            <div class="space-y-4 rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] bg-[color-mix(in_srgb,var(--nm-surface-muted)_55%,white)] p-5 text-right">
+              <p class="text-[clamp(0.95rem,0.9rem+0.2vw,1.05rem)] font-medium text-[var(--nm-fg)]">לא מצאנו בדיוק את זה. אולי ננסה מילה אחרת, או נכנס מכיוון שכבר פתוח.</p>
+              <p class="text-[clamp(0.85rem,0.8rem+0.2vw,1rem)] text-[color-mix(in_srgb,var(--nm-fg)_58%,var(--nm-bg))]">שלושה כיוונים שמובילים לעומק:</p>
+              <div class="flex flex-wrap justify-end gap-2">
+                <a href="/articles/hidden-assumptions-mechanics/" class="inline-flex min-h-[44px] items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 px-4 py-2 text-sm text-[var(--nm-fg)] transition hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nm-accent)]">הנחה סמויה</a>
+                <a href="/articles/why-bad-things-happen/" class="inline-flex min-h-[44px] items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 px-4 py-2 text-sm text-[var(--nm-fg)] transition hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nm-accent)]">למה דברים רעים קורים</a>
+                <a href="/articles/" class="inline-flex min-h-[44px] items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 px-4 py-2 text-sm text-[var(--nm-fg)] transition hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nm-accent)]">כל המאמרים</a>
+              </div>
+            </div>`;
           return;
         }
         items.forEach((item) => {

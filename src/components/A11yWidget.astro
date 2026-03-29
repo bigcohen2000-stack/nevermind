@@ -5,7 +5,7 @@
  */
 ---
 
-<div class="pointer-events-none fixed bottom-6 left-6 z-[70] flex flex-col items-start gap-2">
+<div id="nm-a11y-dock" class="pointer-events-none fixed bottom-6 left-6 z-[70] flex flex-col items-start gap-2">
   <div
     id="nm-a11y-panel"
     class="pointer-events-auto hidden w-[min(18rem,92vw)] rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-[var(--nm-bg-canvas)] p-4 text-right shadow-lg"
@@ -41,7 +41,7 @@
   <button
     type="button"
     id="nm-a11y-toggle"
-    class="pointer-events-auto flex h-12 w-12 items-center justify-center rounded-full border-2 border-[var(--nm-fg)] bg-[var(--nm-bg-canvas)] text-lg font-bold text-[var(--nm-fg)] shadow-md transition hover:bg-[var(--nm-surface-muted)]"
+    class="pointer-events-auto flex h-12 w-12 items-center justify-center rounded-full border-2 border-[var(--nm-fg)] bg-[var(--nm-bg-canvas)] text-lg font-bold text-[var(--nm-fg)] shadow-md transition hover:bg-[var(--nm-surface-muted)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nm-accent)]"
     aria-expanded="false"
     aria-controls="nm-a11y-panel"
     title="נגישות"

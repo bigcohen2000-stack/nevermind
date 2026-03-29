@@ -425,6 +425,7 @@ export default function IntakeForm() {
         setLastTag(null);
         setHumanAnswer("");
         setStatus("ok");
+        window.dispatchEvent(new CustomEvent("nm-analytics", { detail: { name: "intake_form_submit" } }));
         (window as unknown as { __nmAnnounce?: (m: string) => void }).__nmAnnounce?.("הטופס נשלח");
       } else {
         setStatus("idle");

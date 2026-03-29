@@ -60,7 +60,7 @@ const prefillEncoded = encodeURIComponent(leadMessage);
       rel="noreferrer"
       aria-label="מחשבה אחת נקייה - ישר לוואטסאפ"
       title="מחשבה אחת נקייה - ישר לוואטסאפ"
-      class="fixed bottom-[5.5rem] left-6 z-40 flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-[var(--nm-bg-canvas)]/95 shadow-sm backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-500"
+      class="fixed bottom-[4.75rem] left-5 z-40 flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-[var(--nm-bg-canvas)]/95 shadow-sm backdrop-blur-md md:hidden opacity-0 pointer-events-none transition-none"
     >
       <span class="block h-2.5 w-2.5 rounded-full bg-[var(--nm-accent)]" aria-hidden="true" />
     </a>
@@ -78,13 +78,11 @@ const prefillEncoded = encodeURIComponent(leadMessage);
       const base = whatsappButton?.getAttribute("data-wa-base") ?? "";
       const prefillAttr = whatsappButton?.getAttribute("data-wa-prefill") ?? "";
 
+      const waScrollThresholdPx = 400;
       const updateWhatsappVisibility = () => {
         if (!whatsappButton) return;
-        const doc = document.documentElement;
-        const scrollTop = doc.scrollTop || document.body.scrollTop;
-        const scrollHeight = doc.scrollHeight - doc.clientHeight;
-        const progress = scrollHeight > 0 ? scrollTop / scrollHeight : 0;
-        const shouldShow = progress >= 0.5;
+        const y = window.scrollY || document.documentElement.scrollTop || 0;
+        const shouldShow = y > waScrollThresholdPx;
 
         whatsappButton.classList.toggle("opacity-100", shouldShow);
         whatsappButton.classList.toggle("pointer-events-auto", shouldShow);
@@ -109,10 +107,12 @@ const prefillEncoded = encodeURIComponent(leadMessage);
 
       updateWhatsappHref();
       document.addEventListener("scroll", updateWhatsappVisibility, { passive: true });
+      window.addEventListener("resize", updateWhatsappVisibility, { passive: true });
       updateWhatsappVisibility();
 
       window.__nmWhatsappCleanup = () => {
         document.removeEventListener("scroll", updateWhatsappVisibility);
+        window.removeEventListener("resize", updateWhatsappVisibility);
       };
     });
   </script>

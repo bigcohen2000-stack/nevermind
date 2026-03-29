@@ -28,6 +28,11 @@ const articles = (await getCollection("articles", ({ data }) => data.draft !== t
     const wordCount = plain.split(/\s+/).filter(Boolean).length;
     const readingMinutes = Math.max(1, Math.ceil(wordCount / 200));
 
+    const pub = article.data.pubDate;
+    const upd = article.data.updatedDate;
+    const freshnessSource = upd ?? pub;
+    const freshnessIso = freshnessSource.toISOString().slice(0, 10);
+
     return {
       slug: article.slug,
       title: article.data.title,
@@ -39,6 +44,8 @@ const articles = (await getCollection("articles", ({ data }) => data.draft !== t
       readingMinutes,
       isPremium: Boolean(article.data.isPremium),
       mindShiftIntensity: resolveMindShift(article.data.mindShiftIntensity),
+      contentFreshnessIso: freshnessIso,
+      contentFreshnessIsUpdate: Boolean(upd),
     };
   });
 
@@ -88,6 +95,8 @@ const tags = Array.from(tagSet);
           readingMinutes={article.readingMinutes}
           isPremium={article.isPremium}
           mindShiftIntensity={article.mindShiftIntensity}
+          contentFreshnessIso={article.contentFreshnessIso}
+          contentFreshnessIsUpdate={article.contentFreshnessIsUpdate}
         />
       ))}
     </div>

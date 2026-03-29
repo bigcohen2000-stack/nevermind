@@ -86,6 +86,10 @@ const articles = defineCollection({
       )
       .optional(),
     slug: articleFileSlugSchema.optional(),
+    /** מרכז הקריאה ב־/blog/: כניסה מובנית בלי רשימה קשיחה בקוד */
+    hubPosition: z.enum(["start", "core", "latest"]).optional(),
+    /** סדר בתוך אותה קטגוריית hub (נמוך מופיע ראשון) */
+    hubOrder: z.number().optional(),
     videoContent: z
       .object({
         hook: z.string().optional(),

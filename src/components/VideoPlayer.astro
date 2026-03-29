@@ -5,6 +5,8 @@ interface Props {
   videoSummaryPoints?: string[];
   /** ברירת מחדל lazy: פחות עומס על LCP עד לחיצה; eager אם הפוסטר הוא אלמנט ה-LCP המכוון */
   posterLoading?: "lazy" | "eager";
+  /** כשהפוסטר מעל הקיפול ומועמד ל-LCP */
+  posterFetchPriority?: "high" | "low" | "auto";
 }
 
 const {
@@ -12,6 +14,7 @@ const {
   title = "סרטון וידאו",
   videoSummaryPoints = [],
   posterLoading = "lazy",
+  posterFetchPriority,
 } = Astro.props;
 const points = videoSummaryPoints.map((point) => String(point).trim()).filter(Boolean);
 const playLabel = `הפעלת וידאו: ${title}`;
@@ -37,6 +40,7 @@ const posterUrl = `https://i.ytimg.com/vi/${youtubeId}/hqdefault.jpg`;
           width="1280"
           height="720"
           class="nm-video-poster"
+          {...(posterFetchPriority ? { fetchpriority: posterFetchPriority } : {})}
         />
         <span class="nm-video-overlay" aria-hidden="true">
           <span class="nm-video-play">▶</span>

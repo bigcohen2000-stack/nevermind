@@ -1,6 +1,7 @@
 /// <reference types="astro/client" />
 
 interface ImportMetaEnv {
+  readonly PUBLIC_NM_CLUB_WEBHOOK_URL?: string;
   readonly PUBLIC_WEB3FORMS_ACCESS_KEY?: string;
   readonly PUBLIC_CLIENT_LOG_URL?: string;
   readonly PUBLIC_WHATSAPP_NUMBER?: string;

@@ -1,4 +1,5 @@
 User-agent: *
 Disallow: /admin/
+Disallow: /dashboard/
 
 Sitemap: https://www.nevermind.co.il/sitemap-index.xml

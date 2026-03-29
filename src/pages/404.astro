@@ -2,6 +2,7 @@
 import Layout from "../layouts/Layout.astro";
 import SubscribeBanner from "../components/SubscribeBanner.astro";
 import { ArchiveSearchFloatingInput } from "../components/ArchiveSearchFloatingInput";
+import { BLOG_REDIRECTS } from "../data/migration-map";
 
 type ArticleModule = {
   frontmatter?: {
@@ -33,10 +34,19 @@ const recommended = (
 )
   .filter((article): article is { slug: string; title: string; description: string } => article !== null)
   .slice(0, 4);
+
+const popularLegacyBlog = Object.values(BLOG_REDIRECTS)
+  .filter((href) => href.startsWith("/blog/"))
+  .slice(0, 14)
+  .map((href) => {
+    const slug = href.replace(/^\/blog\/|\/$/g, "");
+    return { href, label: slug.replace(/-/g, " ") };
+  });
 ---
 <Layout
   title="הגענו למבוי סתום (וזה בסדר)"
   description="הדף שחיפשת לא נמצא כאן. אולי הוא נמחק, אולי הייתה טעות בקישור, ואולי זו סתם תקלה טכנית."
+  noIndex={true}
   breadcrumbItems={[{ label: "בית", href: "/" }, { label: "דף לא נמצא" }]}
 >
   <section class="space-y-12">
@@ -72,6 +82,27 @@ const recommended = (
       </div>
       <div data-pagefind-results class="mt-4 space-y-3 text-right"></div>
     </div>
+
+    <section class="space-y-4" aria-labelledby="nm-404-legacy-heading">
+      <h2
+        id="nm-404-legacy-heading"
+        class="text-[clamp(1.15rem,1rem+0.5vw,1.35rem)] font-semibold text-[var(--nm-fg)]"
+      >
+        נתיבים חמים מהמיגרציה (בלוג ישן)
+      </h2>
+      <ul class="flex flex-wrap justify-center gap-2 md:justify-start">
+        {popularLegacyBlog.map((item) => (
+          <li>
+            <a
+              href={item.href}
+              class="inline-flex max-w-full items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/70 px-3 py-1.5 text-[clamp(0.8rem,0.78rem+0.12vw,0.9rem)] text-[var(--nm-fg)]/85 transition hover:bg-white"
+            >
+              {item.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
 
     <div class="flex flex-wrap items-center justify-center gap-3">
       <a
