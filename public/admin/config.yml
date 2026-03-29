@@ -1,13 +1,13 @@
-backend:
+﻿backend:
   name: github
   repo: bigcohen2000-stack/nevermind
   branch: main
   base_url: https://nevermind-9dr.pages.dev/api
   auth_endpoint: /auth
   auth_scope: repo
-  site_domain: nevermind-9dr.pages.dev
+  site_domain: www.nevermind.co.il
 
-site_url: https://nevermind-9dr.pages.dev
+site_url: https://www.nevermind.co.il
 logo_url: /favicon.svg
 locale: he
 publish_mode: simple
@@ -24,8 +24,8 @@ editor:
 
 collections:
   - name: articles
-    label: מאמרים
-    label_singular: מאמר
+    label: ׳׳׳׳¨׳™׳
+    label_singular: ׳׳׳׳¨
     folder: src/content/articles
     create: true
     delete: true
@@ -39,64 +39,64 @@ collections:
       - updatedDate
       - title
     view_filters:
-      - label: טיוטות
+      - label: ׳˜׳™׳•׳˜׳•׳×
         field: draft
         pattern: true
-      - label: מוכן לפרסום
+      - label: ׳׳•׳›׳ ׳׳₪׳¨׳¡׳•׳
         field: draft
         pattern: false
     fields:
-      - label: כותרת
+      - label: ׳›׳•׳×׳¨׳×
         name: title
         widget: string
-      - label: תיאור קצר
+      - label: ׳×׳™׳׳•׳¨ ׳§׳¦׳¨
         name: description
         widget: text
-      - label: תאריך פרסום
+      - label: ׳×׳׳¨׳™׳ ׳₪׳¨׳¡׳•׳
         name: pubDate
         widget: datetime
         required: true
         format: "YYYY-MM-DD"
         date_format: "YYYY-MM-DD"
         time_format: false
-      - label: תאריך עדכון
+      - label: ׳×׳׳¨׳™׳ ׳¢׳“׳›׳•׳
         name: updatedDate
         widget: datetime
         required: false
         format: "YYYY-MM-DD"
         date_format: "YYYY-MM-DD"
         time_format: false
-      - label: מחבר
+      - label: ׳׳—׳‘׳¨
         name: author
         widget: string
-        default: "השם לא משנה"
-      - label: תגיות
+        default: "׳”׳©׳ ׳׳ ׳׳©׳ ׳”"
+      - label: ׳×׳’׳™׳•׳×
         name: tags
         widget: select
         multiple: true
         options:
-          - חופש
-          - מכניקת מחשבה
-          - העצמי
-          - בהירות
-          - בחירה
-          - זוגיות
-          - משפחה וחינוך
-          - פילוסופיה וחברה
-          - תודעה ורצון
-          - חשיבה ביקורתית
-          - שאלות גדולות
-          - רגשות
-          - ניסויי מחשבה
-      - label: רמת עומק (MDX)
+          - ׳—׳•׳₪׳©
+          - ׳׳›׳ ׳™׳§׳× ׳׳—׳©׳‘׳”
+          - ׳”׳¢׳¦׳׳™
+          - ׳‘׳”׳™׳¨׳•׳×
+          - ׳‘׳—׳™׳¨׳”
+          - ׳–׳•׳’׳™׳•׳×
+          - ׳׳©׳₪׳—׳” ׳•׳—׳™׳ ׳•׳
+          - ׳₪׳™׳׳•׳¡׳•׳₪׳™׳” ׳•׳—׳‘׳¨׳”
+          - ׳×׳•׳“׳¢׳” ׳•׳¨׳¦׳•׳
+          - ׳—׳©׳™׳‘׳” ׳‘׳™׳§׳•׳¨׳×׳™׳×
+          - ׳©׳׳׳•׳× ׳’׳“׳•׳׳•׳×
+          - ׳¨׳’׳©׳•׳×
+          - ׳ ׳™׳¡׳•׳™׳™ ׳׳—׳©׳‘׳”
+      - label: ׳¨׳׳× ׳¢׳•׳׳§ (MDX)
         name: difficultyLevel
         widget: select
         required: false
         options:
-          - { label: מתחילים, value: beginner }
-          - { label: מתקדמים, value: advanced }
-          - { label: עומק, value: deep }
-      - label: עוצמת שינוי תפיסתי (1–5)
+          - { label: ׳׳×׳—׳™׳׳™׳, value: beginner }
+          - { label: ׳׳×׳§׳“׳׳™׳, value: advanced }
+          - { label: ׳¢׳•׳׳§, value: deep }
+      - label: ׳¢׳•׳¦׳׳× ׳©׳™׳ ׳•׳™ ׳×׳₪׳™׳¡׳×׳™ (1ג€“5)
         name: mindShiftIntensity
         widget: number
         required: false
@@ -104,20 +104,20 @@ collections:
         min: 1
         max: 5
         step: 1
-      - label: תובנת ליבה (originalInsight)
+      - label: ׳×׳•׳‘׳ ׳× ׳׳™׳‘׳” (originalInsight)
         name: originalInsight
         widget: text
         required: false
-      - label: שאלה לסכמת TruthBlock / SEO (questionForSchema)
+      - label: ׳©׳׳׳” ׳׳¡׳›׳׳× TruthBlock / SEO (questionForSchema)
         name: questionForSchema
         widget: string
         required: false
-      - label: תיאור קונספט לתמונה (imageAlt)
+      - label: ׳×׳™׳׳•׳¨ ׳§׳•׳ ׳¡׳₪׳˜ ׳׳×׳׳•׳ ׳” (imageAlt)
         name: imageAlt
         widget: string
         required: false
-        hint: "לא רק מה מופיע בפריים — מה הרעיון שהתמונה נושאת (למשל מראה שבורה כמטאפורה לפירוק האגו). עברית. חיזוק הקשר סמנטי לחיפוש."
-      - label: תמונה ראשית
+        hint: "׳׳ ׳¨׳§ ׳׳” ׳׳•׳₪׳™׳¢ ׳‘׳₪׳¨׳™׳™׳ ג€” ׳׳” ׳”׳¨׳¢׳™׳•׳ ׳©׳”׳×׳׳•׳ ׳” ׳ ׳•׳©׳׳× (׳׳׳©׳ ׳׳¨׳׳” ׳©׳‘׳•׳¨׳” ׳›׳׳˜׳׳₪׳•׳¨׳” ׳׳₪׳™׳¨׳•׳§ ׳”׳׳’׳•). ׳¢׳‘׳¨׳™׳×. ׳—׳™׳–׳•׳§ ׳”׳§׳©׳¨ ׳¡׳׳ ׳˜׳™ ׳׳—׳™׳₪׳•׳©."
+      - label: ׳×׳׳•׳ ׳” ׳¨׳׳©׳™׳×
         name: image
         widget: image
         required: false
@@ -125,48 +125,48 @@ collections:
         media_library:
           config:
             multiple: false
-      - label: כתובת קנונית
+      - label: ׳›׳×׳•׳‘׳× ׳§׳ ׳•׳ ׳™׳×
         name: canonicalUrl
         widget: string
         required: false
-      - label: מילות מפתח
+      - label: ׳׳™׳׳•׳× ׳׳₪׳×׳—
         name: keywords
         widget: string
         required: false
-      - label: קישור לאודיו
+      - label: ׳§׳™׳©׳•׳¨ ׳׳׳•׳“׳™׳•
         name: audioUrl
         widget: string
         required: false
-      - label: מזהה יוטיוב
+      - label: ׳׳–׳”׳” ׳™׳•׳˜׳™׳•׳‘
         name: youtubeId
         widget: string
         required: false
-      - label: קישור ל-Tally
+      - label: ׳§׳™׳©׳•׳¨ ׳-Tally
         name: tallyUrl
         widget: string
         required: false
-      - label: תוכן פרימיום
+      - label: ׳×׳•׳›׳ ׳₪׳¨׳™׳׳™׳•׳
         name: isPremium
         widget: boolean
         default: false
-      - label: טיוטה
+      - label: ׳˜׳™׳•׳˜׳”
         name: draft
         widget: boolean
         default: true
-      - label: שאלות נפוצות
+      - label: ׳©׳׳׳•׳× ׳ ׳₪׳•׳¦׳•׳×
         name: faq
         widget: list
         required: false
         collapsed: true
         summary: "{{fields.question}}"
         fields:
-          - label: שאלה
+          - label: ׳©׳׳׳”
             name: question
             widget: string
-          - label: תשובה
+          - label: ׳×׳©׳•׳‘׳”
             name: answer
             widget: text
-      - label: תוכן המאמר
+      - label: ׳×׳•׳›׳ ׳”׳׳׳׳¨
         name: body
         widget: markdown
         modes:
@@ -176,3 +176,4 @@ collections:
           - image
           - code-block
           - link
+

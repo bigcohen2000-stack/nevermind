@@ -1,6 +1,5 @@
 import fs from "node:fs";
 import path from "node:path";
-import cloudflare from "@astrojs/cloudflare";
 import { defineConfig } from "astro/config";
 import mdx from "@astrojs/mdx";
 import react from "@astrojs/react";
@@ -15,8 +14,8 @@ import { premiumMdxStripPlugin } from "./src/vite-plugins/premium-mdx-strip";
 const articlesDir = path.resolve("src/content/articles");
 
 /** lastmod לפי frontmatter (updatedDate או pubDate) למסלולי /articles/... */
-function articlePathToLastmod(): Map<string, Date> {
-  const map = new Map<string, Date>();
+function articlePathToLastmod(): Map<string, string> {
+  const map = new Map<string, string>();
   if (!fs.existsSync(articlesDir)) return map;
   for (const name of fs.readdirSync(articlesDir)) {
     if (!name.endsWith(".mdx")) continue;
@@ -34,7 +33,7 @@ function articlePathToLastmod(): Map<string, Date> {
     if (updated == null) continue;
     const d = new Date(updated as string | number | Date);
     if (Number.isNaN(d.getTime())) continue;
-    map.set(pathname, d);
+    map.set(pathname, d.toISOString());
   }
   return map;
 }
@@ -43,9 +42,9 @@ const articleLastmodByPath = articlePathToLastmod();
 
 export default defineConfig({
   site: "https://www.nevermind.co.il",
+  base: "/",
   publicDir: "./public",
   output: "static",
-  adapter: cloudflare(),
   build: {
     format: "directory",
   },
@@ -119,8 +118,19 @@ export default defineConfig({
           priority = 0.75;
         }
         const articleMod = articleLastmodByPath.get(pathname);
-        const lastmod = articleMod ?? (item as { lastmod?: Date }).lastmod;
-        return { ...item, priority, changefreq, ...(lastmod ? { lastmod } : {}) };
+        const existingLastmod =
+          typeof item === "object" && item !== null && "lastmod" in item
+            ? (item as { lastmod?: string | Date }).lastmod
+            : undefined;
+        const lastmod =
+          typeof articleMod === "string"
+            ? articleMod
+            : typeof existingLastmod === "string"
+              ? existingLastmod
+              : existingLastmod instanceof Date
+                ? existingLastmod.toISOString()
+                : undefined;
+        return { ...item, priority, changefreq: changefreq as any, ...(lastmod ? { lastmod } : {}) };
       },
     }),
     pagefind({
@@ -131,16 +141,14 @@ export default defineConfig({
     }),
   ],
   vite: {
-    plugins: [tailwindcss(), premiumMdxStripPlugin()],
+    plugins: [tailwindcss() as any, premiumMdxStripPlugin() as any],
     build: {
       minify: "esbuild",
       cssMinify: true,
       sourcemap: false,
       rollupOptions: {
         output: {
-          manualChunks: {
-            vendor: ["react", "react-dom"],
-          },
+          manualChunks: undefined,
         },
       },
     },

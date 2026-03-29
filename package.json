@@ -20,7 +20,8 @@
         "format": "prettier --write .",
         "pagefind": "pagefind --site dist",
         "pre-deploy": "node scripts/pre-deploy-check.js",
-        "deploy": "npm run pre-deploy && npm run build && wrangler pages deploy dist"
+        "deploy": "npm run pre-deploy && npm run build",
+        "deploy:cloudflare": "npm run pre-deploy && npm run build && wrangler pages deploy dist"
     },
     "dependencies": {
         "@astrojs/cloudflare": "^12.6.13",
