@@ -22,7 +22,7 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": [".astro/types.d.ts", "src/**/*", "astro.config.mjs"],
+  "include": [".astro/types.d.ts", "src/**/*", "astro.config.ts", "astro.config.mjs"],
   "exclude": [
     "node_modules",
     ".next/**/*",
