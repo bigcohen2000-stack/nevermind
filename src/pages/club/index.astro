@@ -1,0 +1,68 @@
+---
+import Layout from "../../layouts/Layout.astro";
+
+const pageTitle = "איך זה עובד כאן";
+const pageDescription = "מנגנון כניסה למועדון. מה נשמר בשרת. איך נפתחת גישה. למה מופיעים Flags.";
+---
+
+<Layout title={pageTitle} description={pageDescription}>
+  <section class="mx-auto max-w-3xl space-y-10 px-4 py-12 text-right">
+    <header class="space-y-3 rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)]/80 p-6 shadow-[0_24px_70px_rgba(0,0,0,0.04)]">
+      <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--nm-accent)]">מנגנון מועדון</p>
+      <h1 class="text-[clamp(2rem,1.6rem+1.5vw,3rem)] font-semibold leading-tight text-[var(--nm-fg)]">
+        איך זה עובד כאן
+      </h1>
+      <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
+        זה הסבר עובדתי. המטרה היא פירוק מה נשמר איפה ומה מפעיל גישה.
+      </p>
+    </header>
+
+    <section class="space-y-4 rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/60 p-6">
+      <h2 class="text-xl font-semibold text-[var(--nm-fg)]">מה נשמר בשרת</h2>
+      <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">
+        `CLUB_MEMBERS` שומר פרטי חבר. כולל `memberName`. `phone`. `passwordHash`. `expiresAt`. וסטטוס גישה.
+      </p>
+      <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">
+        `CLUB_ACTIVITY` שומר שורות קצרות של כניסה. כולל `ipHash`. זמן. נתיב באתר. טלפון. ודפדפן.
+      </p>
+    </section>
+
+    <section class="space-y-4 rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/60 p-6">
+      <h2 class="text-xl font-semibold text-[var(--nm-fg)]">איך נפתחת גישה</h2>
+      <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">
+        הכניסה מבוצעת מול Worker דרך webhook. המשתמש נותן `phone` וסיסמה.
+      </p>
+      <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">
+        אם ה Worker מאשר. הדפדפן שומר `nm_club_session` במכשיר. ואז מוצג פס עליון עם סטטוס גישה.
+      </p>
+    </section>
+
+    <section class="space-y-4 rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/60 p-6">
+      <h2 class="text-xl font-semibold text-[var(--nm-fg)]">למה יש Fraud Flags</h2>
+      <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">
+        אם אותו טלפון או אותו `passwordHash` מופיעים ממספר IP שונים בחלון זמן קצר. נוצרת רשומת flag.
+      </p>
+      <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">
+        זה לא חסימה אוטומטית. זה אות שמאפשר בדיקה ידנית.
+      </p>
+    </section>
+
+    <section class="space-y-4 rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/60 p-6">
+      <h2 class="text-xl font-semibold text-[var(--nm-fg)]">מה עושה Admin</h2>
+      <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">
+        דרך ממשק ניהול. מוסיפים חבר חדש. בוחרים `phone` וסיסמה. ושומרים `passwordHash` עם תוקף.
+      </p>
+      <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">
+        Admin יכול גם לאפס סיסמה. זה מחליף את ה hash בלי לגעת בשאר המידע.
+      </p>
+    </section>
+
+    <div class="rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-tint)] p-6">
+      <h2 class="text-xl font-semibold text-[var(--nm-fg)]">בדיקה עצמית קצרה</h2>
+      <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+        איזה שדה אתה רוצה לראות בבירור בזמן אמת כדי לדעת מה באמת מפעיל את הגישה כאן.
+      </p>
+    </div>
+  </section>
+</Layout>
+

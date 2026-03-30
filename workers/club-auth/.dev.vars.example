@@ -1,1 +1,5 @@
 CLUB_IP_PEPPER="replace-with-a-long-random-secret"
+ADMIN_PASSWORD="replace-with-a-strong-admin-password"
+# אופציונלי: אותו ערך סודי כמו ב-Cloudflare Pages (פרוקסי). אפשר גם NM_CLUB_ADMIN_SERVICE_KEY באותו ערך.
+ADMIN_SERVICE_KEY=
+# NM_CLUB_ADMIN_SERVICE_KEY=

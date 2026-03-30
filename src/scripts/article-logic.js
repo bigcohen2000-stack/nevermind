@@ -146,7 +146,7 @@ function setupArticlePage() {
           "הבסיס תמיד פתוח לכולם. ההמשך של המאמר הזה מיועד למי שרוצה להעמיק עוד צעד, עם גישה דרך אזור אישי או מסלול מלא.";
       const fallbackCtaLabel = overrides.ctaLabel || premiumBody.dataset.premiumCtaLabel || "איך מצטרפים?";
       const fallbackCtaHref = overrides.ctaHref || premiumBody.dataset.premiumCtaHref || "/services/";
-      const accessRoute = premiumBody.dataset.premiumAccessRoute || "/dashboard/";
+      const accessRoute = premiumBody.dataset.premiumAccessRoute || "/me/unlock/";
       const helperText =
         premiumBody.dataset.premiumAccessHelper || "גישה לתוכן פרימיום נפתחת כרגע דרך קוד גישה מתחלף.";
       const returnTo = encodeURIComponent(window.location.pathname);

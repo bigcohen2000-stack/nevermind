@@ -2,6 +2,11 @@ interface Env {
   CLUB_MEMBERS: KVNamespace;
   CLUB_ACTIVITY: KVNamespace;
   CLUB_IP_PEPPER: string;
+  ADMIN_PASSWORD: string;
+  /** מפתח שירות לפרוקסי Pages (כותרת X-NM-Admin-Service). אופציונלי. */
+  ADMIN_SERVICE_KEY?: string;
+  /** כינוי ל־ADMIN_SERVICE_KEY (אותו ערך כמו ב־Pages). */
+  NM_CLUB_ADMIN_SERVICE_KEY?: string;
   ALLOWED_ORIGINS?: string;
 }
 
@@ -10,6 +15,22 @@ type LoginRequest = {
   password?: string;
   path?: string;
   fullName?: string;
+};
+
+type AdminLoginRequest = {
+  password?: string;
+};
+
+type AdminResetPasswordRequest = {
+  phone?: string;
+  newPassword?: string;
+};
+
+type AdminAddMemberRequest = {
+  phone?: string;
+  password?: string;
+  fullName?: string;
+  expiresAt?: string;
 };
 
 type StoredMember = {
@@ -32,6 +53,21 @@ type ActivityEntry = {
   userAgent: string;
 };
 
+type FraudFlagEntry = {
+  phone: string;
+  flaggedAt: string;
+  memberIpCount?: number;
+  passwordIpCount?: number;
+  lastPath?: string;
+};
+
+type AdminSessionPayload = {
+  role: "admin";
+  iat: number;
+  exp: number;
+  nonce: string;
+};
+
 const DEFAULT_ALLOWED_ORIGINS = [
   "https://www.nevermind.co.il",
   "https://nevermind.co.il",
@@ -39,6 +75,11 @@ const DEFAULT_ALLOWED_ORIGINS = [
 ];
 const LOGIN_WINDOW_MS = 6 * 60 * 60 * 1000;
 const MAX_ACTIVITY_ENTRIES = 12;
+const ADMIN_SESSION_MS = 8 * 60 * 60 * 1000;
+const RECENT_LOGIN_LIMIT = 24;
+const FRAUD_FLAG_LIMIT = 24;
+const KV_LIST_LIMIT = 1000;
+const CLUB_MEMBER_DEFAULT_EXPIRES_DAYS = 365;
 
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
@@ -61,8 +102,24 @@ export default {
       );
     }
 
+    if (request.method === "POST" && url.pathname === "/admin/login") {
+      return handleAdminLogin(request, env, corsHeaders);
+    }
+
+    if (request.method === "GET" && url.pathname === "/admin/overview") {
+      return handleAdminOverview(request, env, corsHeaders);
+    }
+
+    if (request.method === "POST" && url.pathname === "/admin/reset-password") {
+      return handleAdminResetPassword(request, env, corsHeaders);
+    }
+
+    if (request.method === "POST" && url.pathname === "/admin/add-member") {
+      return handleAdminAddMember(request, env, corsHeaders);
+    }
+
     if (request.method !== "POST" || !isLoginPath(url.pathname)) {
-      return json({ ok: false, error: "הנתיב לא נתמך." }, 404, corsHeaders);
+      return json({ ok: false, error: "הנתיב הזה לא נתמך." }, 404, corsHeaders);
     }
 
     let payload: LoginRequest | null = null;
@@ -99,7 +156,7 @@ export default {
     const passwordHash = String(member.passwordHash ?? "").trim();
     const isValidPassword = await verifyPassword(password, passwordHash);
     if (!isValidPassword) {
-      return json({ ok: false, error: "הטלפון או הסיסמה לא התאימו." }, 401, corsHeaders);
+      return json({ ok: false, error: "הטלפון או הסיסמה לא תואמים." }, 401, corsHeaders);
     }
 
     const nowIso = new Date().toISOString();
@@ -176,6 +233,185 @@ export default {
   },
 };
 
+async function handleAdminLogin(request: Request, env: Env, headers: Headers): Promise<Response> {
+  let payload: AdminLoginRequest | null = null;
+  try {
+    payload = (await request.json()) as AdminLoginRequest;
+  } catch {
+    return json({ ok: false, error: "הבקשה לא נקראה כמו שצריך." }, 400, headers);
+  }
+
+  const password = String(payload?.password ?? "");
+  if (!password) {
+    return json({ ok: false, error: "צריך סיסמת ניהול." }, 400, headers);
+  }
+
+  if (!timingSafeEqual(password, String(env.ADMIN_PASSWORD ?? ""))) {
+    return json({ ok: false, error: "סיסמת הניהול לא תואמת." }, 401, headers);
+  }
+
+  const now = Date.now();
+  const token = await createAdminToken(env, now);
+  return json(
+    {
+      ok: true,
+      role: "admin",
+      label: "Admin",
+      token,
+      loggedInAt: new Date(now).toISOString(),
+      expiresAt: new Date(now + ADMIN_SESSION_MS).toISOString(),
+    },
+    200,
+    headers
+  );
+}
+
+async function handleAdminOverview(request: Request, env: Env, headers: Headers): Promise<Response> {
+  const auth = await requireAdminAuth(request, env, headers);
+  if (auth instanceof Response) return auth;
+
+  const [memberKeys, recentLogins, fraudFlags] = await Promise.all([
+    listKvKeys(env.CLUB_MEMBERS, "member:"),
+    readRecentLogins(env.CLUB_ACTIVITY),
+    readFraudFlags(env.CLUB_ACTIVITY),
+  ]);
+
+  return json(
+    {
+      ok: true,
+      stats: {
+        members: memberKeys.length,
+        recentLogins: recentLogins.length,
+        flaggedMembers: fraudFlags.length,
+        lastFlaggedAt: fraudFlags[0]?.flaggedAt ?? "",
+      },
+      recentLogins,
+      fraudFlags,
+    },
+    200,
+    headers
+  );
+}
+
+async function handleAdminAddMember(request: Request, env: Env, headers: Headers): Promise<Response> {
+  const auth = await requireAdminAuth(request, env, headers);
+  if (auth instanceof Response) return auth;
+
+  let payload: AdminAddMemberRequest | null = null;
+  try {
+    payload = (await request.json()) as AdminAddMemberRequest;
+  } catch {
+    return json({ ok: false, error: "הבקשה לא נקראה כמו שצריך." }, 400, headers);
+  }
+
+  const phone = normalizePhone(payload?.phone ?? "");
+  const password = String(payload?.password ?? "").trim();
+  const fullName = String(payload?.fullName ?? "").trim();
+  const expiresAtRaw = String(payload?.expiresAt ?? "").trim();
+
+  if (!phone || !password) {
+    return json({ ok: false, error: "צריך טלפון וסיסמה." }, 400, headers);
+  }
+
+  let expiresAtIso: string;
+  if (expiresAtRaw) {
+    const ts = Date.parse(expiresAtRaw);
+    if (Number.isNaN(ts)) {
+      return json({ ok: false, error: "expiresAt לא תקין." }, 400, headers);
+    }
+    expiresAtIso = new Date(ts).toISOString();
+  } else {
+    expiresAtIso = new Date(Date.now() + CLUB_MEMBER_DEFAULT_EXPIRES_DAYS * 24 * 60 * 60 * 1000).toISOString();
+  }
+
+  const memberKey = `member:${phone}`;
+  const existing = await env.CLUB_MEMBERS.get<StoredMember>(memberKey, "json");
+  if (existing) {
+    const existingExpiresAt = String(existing.expiresAt ?? "").trim();
+    const isExistingActive =
+      Boolean(existingExpiresAt) &&
+      !isExpired(existingExpiresAt) &&
+      String(existing.status ?? "active") !== "blocked" &&
+      String(existing.status ?? "active") !== "paused";
+    if (isExistingActive) {
+      return json({ ok: false, error: "חבר פעיל כבר קיים לטלפון הזה." }, 409, headers);
+    }
+  }
+
+  const passwordHash = await createPasswordHash(password);
+  const updatedAt = new Date().toISOString();
+  const updatedMember: StoredMember = {
+    memberName: fullName || "חבר",
+    phone,
+    passwordHash,
+    passwordGroup: passwordHash,
+    expiresAt: expiresAtIso,
+    status: "active",
+    lastLoginAt: existing?.lastLoginAt,
+    lastIpHash: existing?.lastIpHash,
+  };
+
+  await env.CLUB_MEMBERS.put(memberKey, JSON.stringify(updatedMember));
+
+  return json(
+    {
+      ok: true,
+      phone,
+      memberName: updatedMember.memberName,
+      expiresAt: updatedMember.expiresAt,
+      updatedAt,
+    },
+    200,
+    headers
+  );
+}
+
+async function handleAdminResetPassword(request: Request, env: Env, headers: Headers): Promise<Response> {
+  const auth = await requireAdminAuth(request, env, headers);
+  if (auth instanceof Response) return auth;
+
+  let payload: AdminResetPasswordRequest | null = null;
+  try {
+    payload = (await request.json()) as AdminResetPasswordRequest;
+  } catch {
+    return json({ ok: false, error: "הבקשה לא נקראה כמו שצריך." }, 400, headers);
+  }
+
+  const phone = normalizePhone(payload?.phone ?? "");
+  const newPassword = String(payload?.newPassword ?? "").trim();
+
+  if (!phone || !newPassword) {
+    return json({ ok: false, error: "צריך טלפון וסיסמה חדשה." }, 400, headers);
+  }
+
+  const memberKey = `member:${phone}`;
+  const member = await env.CLUB_MEMBERS.get<StoredMember>(memberKey, "json");
+  if (!member) {
+    return json({ ok: false, error: "לא מצאנו חבר עם הטלפון הזה." }, 404, headers);
+  }
+
+  const passwordHash = await createPasswordHash(newPassword);
+  const updatedAt = new Date().toISOString();
+  const updatedMember: StoredMember = {
+    ...member,
+    phone,
+    passwordHash,
+    passwordGroup: passwordHash,
+  };
+
+  await env.CLUB_MEMBERS.put(memberKey, JSON.stringify(updatedMember));
+
+  return json(
+    {
+      ok: true,
+      phone,
+      updatedAt,
+    },
+    200,
+    headers
+  );
+}
+
 function isLoginPath(pathname: string): boolean {
   return pathname === "/" || pathname === "/auth/login";
 }
@@ -183,7 +419,7 @@ function isLoginPath(pathname: string): boolean {
 function createCorsHeaders(request: Request, env: Env): Headers {
   const headers = new Headers({
     "Access-Control-Allow-Methods": "POST, OPTIONS, GET",
-    "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization, X-NM-Admin-Service",
     "Access-Control-Max-Age": "86400",
     "Content-Type": "application/json; charset=utf-8",
     Vary: "Origin",
@@ -246,6 +482,20 @@ async function verifyPassword(password: string, passwordHash: string): Promise<b
   return timingSafeEqual(actualHash, expectedHash);
 }
 
+async function createPasswordHash(password: string): Promise<string> {
+  const salt = randomHex(16);
+  const digest = await sha256Hex(`${salt}:${password}`);
+  return `v1$${salt}$${digest}`;
+}
+
+function randomHex(bytes: number): string {
+  const buffer = new Uint8Array(bytes);
+  crypto.getRandomValues(buffer);
+  return Array.from(buffer)
+    .map((value) => value.toString(16).padStart(2, "0"))
+    .join("");
+}
+
 async function sha256Hex(input: string): Promise<string> {
   const buffer = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(input));
   return Array.from(new Uint8Array(buffer))
@@ -280,4 +530,107 @@ function appendActivity(entries: ActivityEntry[], nextEntry: ActivityEntry): Act
 
 function countDistinctIps(entries: ActivityEntry[]): number {
   return new Set(entries.map((entry) => entry.ipHash)).size;
+}
+
+async function createAdminToken(env: Env, nowMs: number): Promise<string> {
+  const payload: AdminSessionPayload = {
+    role: "admin",
+    iat: nowMs,
+    exp: nowMs + ADMIN_SESSION_MS,
+    nonce: randomHex(12),
+  };
+  const encodedPayload = encodeBase64Url(JSON.stringify(payload));
+  const signature = await sha256Hex(`${env.CLUB_IP_PEPPER}:${env.ADMIN_PASSWORD}:${encodedPayload}`);
+  return `${encodedPayload}.${signature}`;
+}
+
+async function requireAdminAuth(request: Request, env: Env, headers: Headers): Promise<AdminSessionPayload | Response> {
+  const serviceSecret = String(env.ADMIN_SERVICE_KEY ?? env.NM_CLUB_ADMIN_SERVICE_KEY ?? "").trim();
+  const serviceHeader = String(request.headers.get("x-nm-admin-service") ?? "").trim();
+  if (serviceSecret && serviceHeader) {
+    if (timingSafeEqual(serviceHeader, serviceSecret)) {
+      const nowMs = Date.now();
+      return { role: "admin", iat: nowMs, exp: nowMs + ADMIN_SESSION_MS, nonce: "service" };
+    }
+  }
+
+  const authHeader = String(request.headers.get("authorization") ?? "").trim();
+  if (!authHeader.startsWith("Bearer ")) {
+    return json({ ok: false, error: "צריך כניסת ניהול." }, 401, headers);
+  }
+  const token = authHeader.slice(7).trim();
+  const payload = await verifyAdminToken(token, env);
+  if (!payload) {
+    return json({ ok: false, error: "הגישה לניהול כבר לא פעילה." }, 401, headers);
+  }
+  return payload;
+}
+
+async function verifyAdminToken(token: string, env: Env): Promise<AdminSessionPayload | null> {
+  const parts = String(token || "").split(".");
+  if (parts.length !== 2) return null;
+  const [encodedPayload, signature] = parts;
+  if (!encodedPayload || !signature) return null;
+  const expectedSignature = await sha256Hex(`${env.CLUB_IP_PEPPER}:${env.ADMIN_PASSWORD}:${encodedPayload}`);
+  if (!timingSafeEqual(signature, expectedSignature)) return null;
+
+  try {
+    const payload = JSON.parse(decodeBase64Url(encodedPayload)) as AdminSessionPayload;
+    if (!payload || payload.role !== "admin") return null;
+    if (!Number.isFinite(payload.exp) || payload.exp < Date.now()) return null;
+    return payload;
+  } catch {
+    return null;
+  }
+}
+
+function encodeBase64Url(input: string): string {
+  return btoa(input).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+}
+
+function decodeBase64Url(input: string): string {
+  const normalized = input.replace(/-/g, "+").replace(/_/g, "/");
+  const padding = normalized.length % 4 === 0 ? "" : "=".repeat(4 - (normalized.length % 4));
+  return atob(`${normalized}${padding}`);
+}
+
+async function listKvKeys(namespace: KVNamespace, prefix: string): Promise<string[]> {
+  let cursor: string | undefined;
+  const keys: string[] = [];
+
+  do {
+    const page = await namespace.list({ prefix, cursor, limit: KV_LIST_LIMIT });
+    keys.push(...page.keys.map((entry) => entry.name));
+    cursor = page.list_complete ? undefined : page.cursor;
+  } while (cursor);
+
+  return keys;
+}
+
+async function readRecentLogins(namespace: KVNamespace): Promise<Array<Record<string, string>>> {
+  const keys = await listKvKeys(namespace, "activity:member:");
+  const entries = await Promise.all(keys.map((key) => namespace.get<ActivityEntry[]>(key, "json")));
+
+  return entries
+    .flatMap((list) => (Array.isArray(list) ? list : []))
+    .filter((entry) => entry && typeof entry.seenAt === "string")
+    .sort((left, right) => Date.parse(right.seenAt) - Date.parse(left.seenAt))
+    .slice(0, RECENT_LOGIN_LIMIT)
+    .map((entry) => ({
+      phone: entry.phone,
+      seenAt: entry.seenAt,
+      path: entry.path,
+      userAgent: entry.userAgent,
+      ipFingerprint: entry.ipHash.slice(0, 8),
+    }));
+}
+
+async function readFraudFlags(namespace: KVNamespace): Promise<FraudFlagEntry[]> {
+  const keys = await listKvKeys(namespace, "flag:");
+  const entries = await Promise.all(keys.map((key) => namespace.get<FraudFlagEntry>(key, "json")));
+
+  return entries
+    .filter((entry): entry is FraudFlagEntry => Boolean(entry && typeof entry.phone === "string" && typeof entry.flaggedAt === "string"))
+    .sort((left, right) => Date.parse(right.flaggedAt) - Date.parse(left.flaggedAt))
+    .slice(0, FRAUD_FLAG_LIMIT);
 }

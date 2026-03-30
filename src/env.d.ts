@@ -1,6 +1,8 @@
 /// <reference types="astro/client" />
 
 interface ImportMetaEnv {
+  /** true = קריאות ניהול ל-/api/club-admin (פרוקסי Pages + Cloudflare Access), בלי JWT בדפדפן */
+  readonly PUBLIC_CLUB_ADMIN_VIA_PROXY?: string;
   readonly PUBLIC_NM_CLUB_WEBHOOK_URL?: string;
   readonly PUBLIC_HCAPTCHA_SITE_KEY?: string;
   readonly PUBLIC_WEB3FORMS_ACCESS_KEY?: string;
@@ -23,6 +25,14 @@ type NmClubSession = {
   liveStatus?: string;
 };
 
+type NmAdminSession = {
+  role: "admin";
+  token: string;
+  expiresAt: string;
+  loggedInAt?: string;
+  label?: string;
+};
+
 interface Window {
   __nmArticleCleanup?: () => void;
   __nmAnnounce?: (message: string) => void;
@@ -32,7 +42,11 @@ interface Window {
   __nmClearButtonLoading?: (target: HTMLElement) => void;
   __nmReadClubSession?: () => NmClubSession | null;
   __nmClearClubSession?: () => void;
+  __nmReadAdminSession?: () => NmAdminSession | null;
+  __nmClearAdminSession?: () => void;
   __nmLayoutCleanup?: () => void;
+  __nmAdminLoginCleanup?: () => void;
+  __nmAdminDashboardCleanup?: () => void;
   __nmMountHcaptcha?: (form: HTMLFormElement) => () => void;
   __nmHcaptchaOk?: (form: HTMLFormElement) => boolean;
   __nmHcaptchaGlobalsRegistered?: boolean;
@@ -46,10 +60,7 @@ interface Window {
   dataLayer?: unknown[];
   gtag?: (...args: unknown[]) => void;
   hcaptcha?: {
-    render: (
-      container: HTMLElement,
-      params: Record<string, unknown>,
-    ) => number;
+    render: (container: HTMLElement, params: Record<string, unknown>) => number;
     remove: (widgetId: number) => void;
   };
 }

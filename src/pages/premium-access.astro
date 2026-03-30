@@ -8,8 +8,8 @@ import Layout from "../layouts/Layout.astro";
     <p class="leading-8 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">
       העמוד הזה נשאר כדי שלא תהיה שבירה בקישורים ישנים.
     </p>
-    <a id="dashboard-fallback-link" href="/dashboard/" class="inline-flex items-center justify-center rounded-full bg-[var(--nm-accent)] px-6 py-3 text-sm font-semibold text-[var(--nm-on-accent)]">
-      מעבר לאזור אישי
+    <a id="dashboard-fallback-link" href="/me/unlock/" class="inline-flex items-center justify-center rounded-full bg-[var(--nm-accent)] px-6 py-3 text-sm font-semibold text-[var(--nm-on-accent)]">
+      מעבר לקוד אישי
     </a>
   </section>
 
@@ -17,7 +17,7 @@ import Layout from "../layouts/Layout.astro";
     (() => {
       const params = new URLSearchParams(window.location.search);
       const returnTo = params.get("returnTo");
-      const target = returnTo ? `/dashboard/?returnTo=${encodeURIComponent(returnTo)}` : "/dashboard/";
+      const target = returnTo ? `/me/unlock/?returnTo=${encodeURIComponent(returnTo)}` : "/me/unlock/";
       const fallback = document.getElementById("dashboard-fallback-link");
       if (fallback instanceof HTMLAnchorElement) {
         fallback.href = target;

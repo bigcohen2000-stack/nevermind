@@ -1,0 +1,24 @@
+---
+import Layout from "../../layouts/Layout.astro";
+
+const pageTitle = "מעבר ללוח ניהול";
+const pageDescription = "כניסת ניהול מתבצעת דרך Cloudflare Access. אין טופס סיסמה כאן.";
+---
+
+<Layout title={pageTitle} description={pageDescription} noIndex={true}>
+  <section class="mx-auto max-w-2xl px-4 py-16 text-right text-[var(--nm-fg)]">
+    <header class="space-y-3 rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 p-6">
+      <p class="text-sm font-semibold uppercase tracking-[0.2em] text-[var(--nm-accent)]">ניהול</p>
+      <h1 class="text-2xl font-semibold">מעבר ללוח ניהול</h1>
+      <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
+        אם הגעת לכאן מסימניה ישנה: הכניסה לניהול מתבצעת ב-Cloudflare Zero Trust. אין כאן טופס סיסמה באתר.
+      </p>
+      <p class="text-sm">
+        <a href="/dashboard/" class="font-semibold text-[var(--nm-accent)] underline underline-offset-4">ללוח הניהול</a>
+      </p>
+    </header>
+  </section>
+  <script is:inline>
+    location.replace("/dashboard/");
+  </script>
+</Layout>

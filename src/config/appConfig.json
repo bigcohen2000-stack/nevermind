@@ -18,7 +18,7 @@
     "premiumAccess":  {
                           "enabled":  true,
                           "sessionHours":  168,
-                          "unlockRoute":  "/dashboard/",
+                          "unlockRoute":  "/me/unlock/",
                           "helperText":  "גישה לתוכן פרימיום נפתחת כרגע דרך קוד גישה מתחלף.",
                           "codes":  [
                                         {
