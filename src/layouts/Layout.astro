@@ -509,6 +509,7 @@ const socialLinks = [
     data-staging={stagingEnabled ? "true" : "false"}
     class={`min-h-screen overflow-x-hidden bg-[var(--nm-bg)] text-[var(--nm-fg)] antialiased selection:bg-[color-mix(in_srgb,var(--nm-accent)_18%,var(--nm-bg))] selection:text-[var(--nm-fg)]`}
   >
+    <div id="nm-route-progress" aria-hidden="true"></div>
     <a
       href={skipToContentHref}
       class="sr-only transition-colors duration-200 focus:not-sr-only focus:fixed focus:top-4 focus:z-[110] focus:rounded-md focus:bg-[var(--nm-bg-canvas)] focus:px-4 focus:py-2 focus:text-[var(--nm-fg)] focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-[var(--color-red)] shadow-xl focus:start-4"
@@ -617,19 +618,42 @@ const socialLinks = [
                 data-random-article-trigger
                 class="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full bg-[var(--nm-accent)] px-3.5 py-2 text-sm font-medium text-[var(--nm-on-accent)] transition-colors duration-200 [transition-timing-function:ease] hover:bg-[var(--nm-accent-hover)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-red)] sm:px-4"
               >
-                הפתע אותי
+                בואו נבדוק
               </button>
               <button
                 id="search-trigger"
                 type="button"
                 data-search-trigger
-                aria-label="חיפוש במרכז הידע | מה מעסיק אותך כרגע?"
+                aria-label="חיפוש במרכז הידע"
                 class="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))] transition-colors duration-200 [transition-timing-function:ease] hover:border-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)] hover:text-[var(--nm-accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-red)]"
               >
                 <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                   <circle cx="11" cy="11" r="8" />
                   <path d="m21 21-4.3-4.3" />
                 </svg>
+              </button>
+              <a
+                href="/premium-access/"
+                data-nm-auth-login
+                class="inline-flex min-h-[44px] items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-white/92 px-3.5 py-2 text-sm font-semibold text-[var(--nm-fg)] no-underline transition hover:border-[color-mix(in_srgb,var(--nm-accent)_28%,transparent)] hover:text-[var(--nm-accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-red)]"
+              >
+                כניסה או הרשמה
+              </a>
+              <a
+                href="/me/"
+                data-nm-auth-me
+                hidden
+                class="hidden inline-flex min-h-[44px] items-center rounded-full border border-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)] bg-[var(--nm-tint)] px-3.5 py-2 text-sm font-semibold text-[var(--nm-fg)] no-underline transition hover:border-[color-mix(in_srgb,var(--nm-accent)_34%,transparent)] hover:text-[var(--nm-accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-red)]"
+              >
+                <span data-nm-auth-summary>LIVE</span>
+              </a>
+              <button
+                type="button"
+                data-nm-auth-logout
+                hidden
+                class="hidden inline-flex min-h-[44px] items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-[var(--nm-surface-muted)] px-3.5 py-2 text-sm font-semibold text-[var(--nm-fg)] transition hover:border-[color-mix(in_srgb,var(--nm-accent)_28%,transparent)] hover:text-[var(--nm-accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-red)]"
+              >
+                יציאה
               </button>
             </div>
           </div>
@@ -740,7 +764,7 @@ const socialLinks = [
                 data-email-domain={emailDomain}
                 class="inline-flex min-h-[44px] items-center rounded-full border border-[color-mix(in_srgb,#1A1A1A_12%,transparent)] bg-transparent px-4 py-2 font-semibold text-[#1A1A1A] transition-colors hover:border-[color-mix(in_srgb,#D42B2B_35%,transparent)] hover:text-[#D42B2B] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D42B2B]"
               >
-                שלח מייל
+                לכתוב במייל
               </button>
             ) : null}
             <a
@@ -926,6 +950,40 @@ const socialLinks = [
         const emailTriggers = Array.from(document.querySelectorAll("[data-email-cta]"));
         const phoneTriggers = Array.from(document.querySelectorAll("[data-phone-cta]"));
         const footerIdentityLine = document.getElementById("nm-footer-identity-line");
+        const resolveLoadingLabel = (trigger, fallback = "\u05de\u05d6\u05e7\u05e7 \u05d0\u05ea \u05d4\u05de\u05e0\u05d2\u05e0\u05d5\u05df...") => {
+          if (!(trigger instanceof HTMLElement)) return fallback;
+          return String(trigger.getAttribute("data-nm-loading-label") || "").trim() || fallback;
+        };
+        const onInteractiveFeedbackClick = (event) => {
+          const target = event.target;
+          if (!(target instanceof Element)) return;
+          const trigger = target.closest("button, [role='button'], summary, a[href]");
+          if (!(trigger instanceof HTMLElement)) return;
+          if ((trigger instanceof HTMLButtonElement || trigger instanceof HTMLInputElement) && trigger.disabled) return;
+          if (trigger.getAttribute("aria-disabled") === "true") return;
+          window.__nmHapticLight?.();
+          if (trigger instanceof HTMLAnchorElement) {
+            const href = trigger.getAttribute("href") || "";
+            if (!href || href.startsWith("#") || trigger.target === "_blank" || trigger.hasAttribute("download")) {
+              return;
+            }
+            let url = null;
+            try {
+              url = new URL(trigger.href, window.location.href);
+            } catch {
+              url = null;
+            }
+            if (url && url.origin === window.location.origin) {
+              window.__nmSetButtonLoading?.(trigger, resolveLoadingLabel(trigger, "\u05d1\u05d5\u05d3\u05e7 \u05d0\u05ea \u05e9\u05d5\u05e8\u05e9 \u05d4\u05e8\u05e6\u05d5\u05df..."));
+              startRouteProgress();
+            }
+            return;
+          }
+          if (trigger instanceof HTMLButtonElement && trigger.type === "submit") {
+            window.__nmSetButtonLoading?.(trigger, resolveLoadingLabel(trigger));
+          }
+        };
+        document.addEventListener("click", onInteractiveFeedbackClick, true);
 
         const onSearchClick = (event) => {
           event.preventDefault();
@@ -934,6 +992,10 @@ const socialLinks = [
 
         const onRandomClick = (event) => {
           event.preventDefault();
+          if (event.currentTarget instanceof HTMLElement) {
+            window.__nmSetButtonLoading?.(event.currentTarget, "\u05d1\u05d5\u05d3\u05e7 \u05d0\u05ea \u05e9\u05d5\u05e8\u05e9 \u05d4\u05e8\u05e6\u05d5\u05df...");
+          }
+          startRouteProgress();
           const paths = Array.isArray(randomArticlePaths) ? randomArticlePaths : [];
           if (!paths.length) return;
 
@@ -975,71 +1037,283 @@ const socialLinks = [
           document.documentElement.setAttribute("data-save-data", "true");
         }
 
-        const NM_CLUB_STORAGE_KEY = "nm_club_session";
-        const nmReadClubPremiumActive = () => {
+        const routeProgress = document.getElementById("nm-route-progress");
+        let routeProgressResetTimer = 0;
+        const clearRouteProgressTimer = () => {
+          window.clearTimeout(routeProgressResetTimer);
+          routeProgressResetTimer = 0;
+        };
+        const runHaptic = (pattern) => {
+          if (!navigator.vibrate || !document.hasFocus()) return;
           try {
-            const raw = window.localStorage.getItem(NM_CLUB_STORAGE_KEY);
-            if (!raw) return false;
-            const o = JSON.parse(raw);
-            if (!o || typeof o !== "object") return false;
-            const memberName = typeof o.memberName === "string" ? o.memberName : "";
-            const expiresAt = typeof o.expiresAt === "string" ? o.expiresAt : "";
-            if (!memberName || !expiresAt) return false;
-            const t = Date.parse(expiresAt);
-            if (Number.isNaN(t) || t < Date.now()) {
-              try {
-                window.localStorage.removeItem(NM_CLUB_STORAGE_KEY);
-              } catch {
-                /* ignore */
-              }
-              return false;
-            }
+            navigator.vibrate(pattern);
+          } catch {
+            /* ignore */
+          }
+        };
+        window.__nmHapticLight = () => runHaptic(8);
+        window.__nmHapticSuccess = () => runHaptic([12, 20, 18]);
+        const setButtonLoading = (target, label = "\u05de\u05d6\u05e7\u05e7 \u05d0\u05ea \u05d4\u05de\u05e0\u05d2\u05e0\u05d5\u05df...") => {
+          if (!(target instanceof HTMLElement)) return;
+          target.classList.add("nm-feedback-shell");
+          target.setAttribute("data-nm-loading", "true");
+          target.setAttribute("data-nm-loading-label", label);
+          if (target instanceof HTMLButtonElement || target instanceof HTMLInputElement) {
+            target.disabled = true;
+          }
+        };
+        const clearButtonLoading = (target) => {
+          if (!(target instanceof HTMLElement)) return;
+          target.removeAttribute("data-nm-loading");
+          target.removeAttribute("data-nm-loading-label");
+          if (target instanceof HTMLButtonElement || target instanceof HTMLInputElement) {
+            target.disabled = false;
+          }
+        };
+        const clearTransientLoading = () => {
+          document.querySelectorAll("[data-nm-loading='true']").forEach((node) => {
+            clearButtonLoading(node);
+          });
+        };
+        window.__nmSetButtonLoading = setButtonLoading;
+        window.__nmClearButtonLoading = clearButtonLoading;
+        const startRouteProgress = () => {
+          if (!(routeProgress instanceof HTMLElement)) return;
+          clearRouteProgressTimer();
+          routeProgress.classList.remove("is-finishing");
+          routeProgress.classList.add("is-active");
+        };
+        const finishRouteProgress = () => {
+          if (!(routeProgress instanceof HTMLElement)) return;
+          clearRouteProgressTimer();
+          routeProgress.classList.remove("is-active");
+          routeProgress.classList.add("is-finishing");
+          routeProgressResetTimer = window.setTimeout(() => {
+            routeProgress.classList.remove("is-finishing");
+            clearTransientLoading();
+          }, 260);
+        };
+        const onBeforePreparation = () => startRouteProgress();
+        const onAfterSwap = () => finishRouteProgress();
+        document.addEventListener("astro:before-preparation", onBeforePreparation);
+        document.addEventListener("astro:after-swap", onAfterSwap);
+        document.addEventListener("astro:page-load", onAfterSwap);
+
+        const NM_CLUB_STORAGE_KEY = "nm_club_session";
+        const NM_FAVORITES_STORAGE_KEY = "nm_favorites";
+        const NM_HISTORY_STORAGE_KEY = "nm_watch_history";
+        const readJsonStorage = (key) => {
+          try {
+            const raw = window.localStorage.getItem(key);
+            return raw ? JSON.parse(raw) : null;
+          } catch {
+            return null;
+          }
+        };
+        const writeJsonStorage = (key, value) => {
+          try {
+            window.localStorage.setItem(key, JSON.stringify(value));
             return true;
           } catch {
             return false;
           }
         };
+        const nmReadClubSession = () => {
+          const data = readJsonStorage(NM_CLUB_STORAGE_KEY);
+          if (!data || typeof data !== "object") return null;
+          const memberName = typeof data.memberName === "string" ? data.memberName.trim() : "";
+          const phone = typeof data.phone === "string" ? data.phone.trim() : "";
+          const expiresAt = typeof data.expiresAt === "string" ? data.expiresAt.trim() : "";
+          const lastLoginAt = typeof data.lastLoginAt === "string" ? data.lastLoginAt.trim() : "";
+          if (!memberName || !expiresAt) return null;
+          const expiresTs = Date.parse(expiresAt);
+          if (Number.isNaN(expiresTs) || expiresTs < Date.now()) {
+            try {
+              window.localStorage.removeItem(NM_CLUB_STORAGE_KEY);
+            } catch {
+            }
+            return null;
+          }
+          return {
+            memberName,
+            phone,
+            expiresAt: new Date(expiresTs).toISOString(),
+            lastLoginAt,
+          };
+        };
+        const nmFormatMemberDate = (value) => {
+          const date = new Date(value || "");
+          if (Number.isNaN(date.getTime())) return "";
+          return date.toLocaleDateString("he-IL", { day: "numeric", month: "short", year: "numeric" });
+        };
+        const nmFormatMemberDateTime = (value) => {
+          const date = new Date(value || "");
+          if (Number.isNaN(date.getTime())) return "";
+          return date.toLocaleString("he-IL", {
+            day: "numeric",
+            month: "short",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+          });
+        };
         const nmSyncPremiumStripText = () => {
           const strip = document.querySelector("[data-nm-premium-strip]");
           const textEl = strip?.querySelector(".nm-premium-strip-text");
           if (!(strip instanceof HTMLElement) || !(textEl instanceof HTMLElement)) return;
-          if (!nmReadClubPremiumActive()) {
+          const session = nmReadClubSession();
+          if (!session) {
             textEl.textContent = "";
             return;
           }
-          try {
-            const raw = window.localStorage.getItem(NM_CLUB_STORAGE_KEY);
-            if (!raw) return;
-            const o = JSON.parse(raw);
-            const name = typeof o.memberName === "string" ? o.memberName.trim() : "";
-            const phone = typeof o.phone === "string" ? o.phone.trim() : "";
-            const expStr = typeof o.expiresAt === "string" ? o.expiresAt : "";
-            const expDate = expStr ? new Date(expStr) : null;
-            const expLabel =
-              expDate && !Number.isNaN(expDate.getTime())
-                ? expDate.toLocaleDateString("he-IL", { day: "numeric", month: "short", year: "numeric" })
-                : "";
-            const parts = [];
-            if (name) parts.push(`היי ${name}`);
-            if (phone) parts.push(phone);
-            parts.push("מנוי בתוקף");
-            if (expLabel) parts.push(`עד ${expLabel}`);
-            textEl.textContent = parts.join(" · ");
-          } catch {
-            textEl.textContent = "מנוי בתוקף";
+          const parts = ["LIVE", session.memberName];
+          if (session.phone) parts.push(session.phone);
+          const expiry = nmFormatMemberDate(session.expiresAt);
+          if (expiry) parts.push(`עד ${expiry}`);
+          const lastLogin = nmFormatMemberDateTime(session.lastLoginAt);
+          if (lastLogin) parts.push(`כניסה אחרונה ${lastLogin}`);
+          textEl.textContent = parts.join(" · ");
+        };
+        const nmSyncHeaderAuth = () => {
+          const session = nmReadClubSession();
+          const loginLink = document.querySelector("[data-nm-auth-login]");
+          const memberLink = document.querySelector("[data-nm-auth-me]");
+          const logoutButton = document.querySelector("[data-nm-auth-logout]");
+          const summaryEl = memberLink?.querySelector("[data-nm-auth-summary]");
+          const active = Boolean(session);
+          if (loginLink instanceof HTMLElement) {
+            loginLink.classList.toggle("hidden", active);
+            loginLink.toggleAttribute("hidden", active);
+          }
+          if (memberLink instanceof HTMLElement) {
+            memberLink.classList.toggle("hidden", !active);
+            memberLink.toggleAttribute("hidden", !active);
+          }
+          if (logoutButton instanceof HTMLElement) {
+            logoutButton.classList.toggle("hidden", !active);
+            logoutButton.toggleAttribute("hidden", !active);
+          }
+          if (summaryEl instanceof HTMLElement) {
+            summaryEl.textContent = session
+              ? ["LIVE", session.memberName, session.phone].filter(Boolean).join(" · ")
+              : "LIVE";
           }
         };
         const nmSyncPremiumUi = () => {
-          const active = nmReadClubPremiumActive();
+          const session = nmReadClubSession();
+          const active = Boolean(session);
           document.body.classList.toggle("is-premium", active);
           nmSyncPremiumStripText();
+          nmSyncHeaderAuth();
         };
+        window.__nmReadClubSession = nmReadClubSession;
+        window.__nmClearClubSession = () => {
+          try {
+            window.localStorage.removeItem(NM_CLUB_STORAGE_KEY);
+          } catch {
+          }
+          nmSyncPremiumUi();
+        };
+        const readFavorites = () => {
+          const value = readJsonStorage(NM_FAVORITES_STORAGE_KEY);
+          return Array.isArray(value) ? value : [];
+        };
+        const writeFavorites = (items) => {
+          writeJsonStorage(NM_FAVORITES_STORAGE_KEY, items.slice(0, 60));
+        };
+        const syncFavoriteButtons = () => {
+          const favorites = readFavorites();
+          const favoriteSlugs = new Set(favorites.map((item) => String(item?.slug || "").trim()).filter(Boolean));
+          document.querySelectorAll("[data-nm-favorite-toggle]").forEach((node) => {
+            if (!(node instanceof HTMLButtonElement)) return;
+            const slug = String(node.getAttribute("data-favorite-slug") || "").trim();
+            const title = String(node.getAttribute("data-favorite-title") || slug).trim();
+            const active = favoriteSlugs.has(slug);
+            node.setAttribute("aria-pressed", active ? "true" : "false");
+            node.setAttribute("aria-label", active ? `הסרה מהמועדפים: ${title}` : `שמירה למועדפים: ${title}`);
+            node.classList.toggle("text-[var(--nm-accent)]", active);
+            node.classList.toggle("border-[color-mix(in_srgb,var(--nm-accent)_30%,transparent)]", active);
+            const icon = node.querySelector("[data-favorite-icon]");
+            if (icon instanceof HTMLElement) icon.textContent = active ? "★" : "☆";
+          });
+        };
+        const onFavoriteToggleClick = (event) => {
+          const target = event.target;
+          if (!(target instanceof Element)) return;
+          const trigger = target.closest("[data-nm-favorite-toggle]");
+          if (!(trigger instanceof HTMLButtonElement)) return;
+          event.preventDefault();
+          const slug = String(trigger.getAttribute("data-favorite-slug") || "").trim();
+          const title = String(trigger.getAttribute("data-favorite-title") || "").trim();
+          const description = String(trigger.getAttribute("data-favorite-description") || "").trim();
+          const href = String(trigger.getAttribute("data-favorite-href") || "").trim() || `/articles/${slug}/`;
+          if (!slug) return;
+          const favorites = readFavorites();
+          const existingIndex = favorites.findIndex((item) => String(item?.slug || "").trim() === slug);
+          if (existingIndex >= 0) {
+            favorites.splice(existingIndex, 1);
+            writeFavorites(favorites);
+            window.__nmAnnounce?.("המאמר הוסר מהמועדפים.");
+          } else {
+            favorites.unshift({ slug, title, description, href, savedAt: new Date().toISOString() });
+            writeFavorites(favorites);
+            window.__nmAnnounce?.("המאמר נשמר במועדפים.");
+            window.__nmHapticSuccess?.();
+          }
+          syncFavoriteButtons();
+          window.dispatchEvent(new CustomEvent("nm-favorites-changed"));
+        };
+        const readHistory = () => {
+          const value = readJsonStorage(NM_HISTORY_STORAGE_KEY);
+          return Array.isArray(value) ? value : [];
+        };
+        const writeHistory = (items) => {
+          writeJsonStorage(NM_HISTORY_STORAGE_KEY, items.slice(0, 30));
+        };
+        const trackWatchHistory = () => {
+          const path = window.location.pathname;
+          const isTrackable = ["/articles/", "/glossary/", "/library", "/about/", "/blog/", "/root-problem-tree/", "/personal-consultation/"].some((prefix) => path.startsWith(prefix));
+          if (!isTrackable) return;
+          const titleBase = document.title.replace(/\s*\|\s*NeverMind\s*$/u, "").trim() || "עמוד";
+          const history = readHistory().filter((item) => String(item?.href || "") !== path);
+          history.unshift({ href: path, title: titleBase, visitedAt: new Date().toISOString() });
+          writeHistory(history);
+          window.dispatchEvent(new CustomEvent("nm-watch-history-changed"));
+        };
+        const onHeaderLogoutClick = (event) => {
+          const target = event.target;
+          if (!(target instanceof Element)) return;
+          const trigger = target.closest("[data-nm-auth-logout]");
+          if (!(trigger instanceof HTMLButtonElement)) return;
+          event.preventDefault();
+          window.__nmClearClubSession?.();
+          window.__nmAnnounce?.("היציאה נשמרה על המכשיר הזה.");
+        };
+        const onNmPageLoadSync = () => {
+          nmSyncPremiumUi();
+          syncFavoriteButtons();
+          trackWatchHistory();
+        };
+        document.addEventListener("click", onFavoriteToggleClick);
+        document.addEventListener("click", onHeaderLogoutClick);
+        document.addEventListener("astro:page-load", onNmPageLoadSync);
         nmSyncPremiumUi();
+        syncFavoriteButtons();
+        trackWatchHistory();
         const onNmClubStorage = (e) => {
-          if (e.key === NM_CLUB_STORAGE_KEY || e.key === null) nmSyncPremiumUi();
+          if (
+            e.key === null ||
+            e.key === NM_CLUB_STORAGE_KEY ||
+            e.key === NM_FAVORITES_STORAGE_KEY ||
+            e.key === NM_HISTORY_STORAGE_KEY
+          ) {
+            nmSyncPremiumUi();
+            syncFavoriteButtons();
+          }
         };
         window.addEventListener("storage", onNmClubStorage);
         window.addEventListener("nm-club-session-changed", nmSyncPremiumUi);
+        window.addEventListener("nm-club-session-changed", syncFavoriteButtons);
 
         const formatAvailabilityDateHebrew = (isoString) => {
           const date = new Date(isoString);
@@ -1165,7 +1439,8 @@ const socialLinks = [
 
         const showCopyFeedback = (trigger) => {
           const original = trigger.textContent || "";
-          trigger.textContent = "✓ הועתק";
+          trigger.textContent = "\u05d4\u05d5\u05e2\u05ea\u05e7";
+          window.__nmHapticSuccess?.();
           window.setTimeout(() => {
             trigger.textContent = original;
           }, 2000);
@@ -1307,6 +1582,15 @@ const socialLinks = [
           emailTriggers.forEach((trigger) => trigger.removeEventListener("click", onEmailClick));
           phoneTriggers.forEach((trigger) => trigger.removeEventListener("click", onPhoneClick));
           document.removeEventListener("click", onCopyClick);
+          document.removeEventListener("click", onInteractiveFeedbackClick, true);
+          document.removeEventListener("click", onFavoriteToggleClick);
+          document.removeEventListener("click", onHeaderLogoutClick);
+          document.removeEventListener("astro:before-preparation", onBeforePreparation);
+          document.removeEventListener("astro:after-swap", onAfterSwap);
+          document.removeEventListener("astro:page-load", onAfterSwap);
+          document.removeEventListener("astro:page-load", onNmPageLoadSync);
+          clearRouteProgressTimer();
+          clearTransientLoading();
           cleanupFormPersistence();
           window.removeEventListener("scroll", persistScroll);
           window.removeEventListener("beforeunload", persistScroll);
@@ -1314,6 +1598,7 @@ const socialLinks = [
           window.removeEventListener("scroll", onHeaderScroll);
           window.removeEventListener("storage", onNmClubStorage);
           window.removeEventListener("nm-club-session-changed", nmSyncPremiumUi);
+          window.removeEventListener("nm-club-session-changed", syncFavoriteButtons);
           if (backBtn instanceof HTMLElement) {
             backBtn.removeEventListener("click", onBackToTopClick);
           }

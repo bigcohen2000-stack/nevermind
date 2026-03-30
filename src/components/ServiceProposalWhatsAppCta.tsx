@@ -60,7 +60,7 @@ export default function ServiceProposalWhatsAppCta({ serviceJson, selectedExtens
         className={`${waProposalButtonClass} w-full shrink-0 self-stretch sm:w-auto sm:self-start`}
       >
         <WhatsAppGlyph className="size-[1.15rem] shrink-0" />
-        שלח הצעה בוואטסאפ
+        בואו נבדוק בוואטסאפ
       </a>
     </div>
   );

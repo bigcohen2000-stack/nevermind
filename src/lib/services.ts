@@ -27,6 +27,7 @@ export type ServiceExtension = {
 };
 
 export type StageService = ServiceStage["services"][number] & {
+  action_type?: "whatsapp" | "payment" | "link" | "invoice" | string;
   action_link?: string;
   action_href?: string;
   payment_link?: string;
@@ -69,8 +70,8 @@ export const getPremiumBonuses = (): PremiumBonusesConfig => {
   if (!raw || typeof raw !== "object") return { exclusive: [], member_prices: [] };
   return raw as PremiumBonusesConfig;
 };
-export type AddOn = ServicesConfig["add_ons"][number];
-export type ThoughtShift = ServicesConfig["trust_elements"]["thought_shifts"][number];
+export type AddOn = { id?: string; title?: string; description?: string; price?: number; [key: string]: unknown };
+export type ThoughtShift = { before?: string; after?: string; title?: string; body?: string; [key: string]: unknown };
 export type AuthoritySection = {
   title?: string;
   subtitle?: string;
@@ -187,11 +188,12 @@ export const servicesEngagementSections: EngagementSectionsMap = (() => {
 
 export const servicesHero = servicesConfig.hero;
 export const servicesStages = servicesConfig.funnel_stages as ServiceStage[];
-export const servicesAddOns = servicesConfig.add_ons;
+export const servicesAddOns = ((servicesConfig as Record<string, unknown>).add_ons as AddOn[] | undefined) ?? [];
 export const servicesAuthoritySection = ((servicesConfig as Record<string, unknown>).authority_section ??
   null) as AuthoritySection | null;
 export const servicesTrust = servicesConfig.trust_elements;
-export const servicesThoughtShifts = servicesConfig.trust_elements.thought_shifts as ThoughtShift[];
+export const servicesThoughtShifts =
+  ((servicesConfig.trust_elements as Record<string, unknown>).thought_shifts as ThoughtShift[] | undefined) ?? [];
 export const servicesPaymentMethods = servicesConfig.payment_methods as PaymentMethod[];
 
 export type TopicLandingCtaButton = {
@@ -408,7 +410,7 @@ export function mergeServiceWithExtension(
   return base;
 }
 
-/** הודעת כפתור שלח הצעה בוואטסאפ (מחיר ב־Ref פנימי בלבד) */
+/** הודעת כפתור בואו נבדוק בוואטסאפ (מחיר ב־Ref פנימי בלבד) */
 export function buildServiceProposalWhatsAppMessage(args: {
   serviceTitle: string;
   extensionLabel: string;
@@ -426,7 +428,7 @@ export function buildServiceProposalWhatsAppMessage(args: {
     chunks.push(buildWhatsAppCrmPreface(serviceName));
     chunks.push("");
   }
-  chunks.push(`היי יקיר, ראיתי את האפשרות של ${serviceName} עם הרחבת ${extensionName}.`);
+  chunks.push(`שלום, ראיתי את האפשרות של ${serviceName} עם הרחבת ${extensionName}.`);
   if (focusRaw.length > 0) {
     const focusSentence = /[.!?]$/.test(focusRaw) ? focusRaw : `${focusRaw}.`;
     chunks.push(`אני רוצה להתמקד ב: ${focusSentence}`);
@@ -465,7 +467,7 @@ export function buildServiceWhatsAppHref(
     return buildWhatsAppHref(applyWhatsappTemplate(raw, merged, selectedExtension?.label));
   }
   const actionText = merged.action_text || `אני רוצה להתקדם עם ${service.title}`;
-  const defaultMessage = `שלום, אני רוצה להתקדם עם ${merged.title}. ראיתי את המסלול באתר במחיר ${formatMoney(merged.price_full)}. אפשר לשלוח לי את הפרטים המלאים?`;
+  const defaultMessage = `שלום, אני רוצה להתקדם עם ${merged.title}. ראיתי את המסלול באתר במחיר ${formatMoney(merged.price_full)}. אפשר לבדוק יחד את הפרטים המלאים?`;
   return buildWhatsAppHref(
     actionText === (service.action_text || "") ? `${actionText}. ${defaultMessage}` : defaultMessage
   );

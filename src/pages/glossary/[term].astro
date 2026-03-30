@@ -1,4 +1,4 @@
----
+﻿---
 import { getCollection } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
 import appConfig from "../../config/appConfig.json";
@@ -49,7 +49,7 @@ for (const tag of concept.tags) {
   fallbackLinks.push({
     href: topicHref,
     title: `נושא: ${tag}`,
-    description: `המשך חקירה דרך כל המאמרים שמשויכים ל-${tag}.`,
+    description: `המשך חקירה דרך כל המאמרים ששייכים ל-${tag}.`,
   });
 }
 for (const link of concept.relatedLinks) {
@@ -61,7 +61,7 @@ if (!fallbackLinks.some((item) => item.href === "/articles/")) {
   fallbackLinks.push({
     href: "/articles/",
     title: "כל המאמרים",
-    description: "ספריית המאמרים המלאה להעמקה נוספת מעבר למושג הבסיסי הזה.",
+    description: "מעבר לספריית המאמרים המלאה כדי להמשיך לחקור.",
   });
 }
 
@@ -78,31 +78,38 @@ const otherConcepts = glossaryConcepts
 const pageTitle = `${concept.title} | הגדרות מחדש`;
 const pageDescription = concept.summary;
 const relatedSearchHref = `/services/?q=${encodeURIComponent(concept.title)}&topic=${encodeURIComponent(concept.title)}`;
+const isFactVsInterpretation = concept.slug === "fact-vs-interpretation";
+const factRows = [
+  { fact: "הוא לא ענה לי יומיים.", interpretation: "הוא מזלזל בי." },
+  { fact: "הפגישה נדחתה לשבוע הבא.", interpretation: "זה אומר שאני לא חשוב." },
+  { fact: "הלב דופק מהר לפני שיחה.", interpretation: "אני לא מסוגל לעמוד בזה." },
+  { fact: "יש לי משימה ולא התחלתי.", interpretation: "אני עצלן ואין לי משמעת." },
+];
 ---
 
 <Layout title={pageTitle} description={pageDescription} breadcrumbCurrentLabel={concept.title}>
   <section class="mx-auto max-w-5xl space-y-10 px-4 pb-20 text-[var(--nm-fg)]">
-    <header class="rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/82 px-6 py-8 text-right shadow-[0_20px_60px_rgba(26,26,26,0.05)] md:px-8">
-      <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--nm-accent)]">מושג יסוד</p>
+    <header class="rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/86 px-6 py-8 text-right shadow-[0_20px_60px_rgba(26,26,26,0.05)] md:px-8">
+      <p class="text-sm font-semibold text-[var(--nm-accent)]">מושג יסוד</p>
       <h1 class="mt-3 text-[clamp(2.1rem,1.6rem+2vw,3.2rem)] font-semibold text-[var(--nm-fg)]">{concept.title}</h1>
-      <p class="mt-4 max-w-3xl text-[clamp(1rem,0.95rem+0.35vw,1.18rem)] leading-8 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">{concept.summary}</p>
+      <p class="mt-4 max-w-3xl text-[clamp(1rem,0.95rem+0.35vw,1.18rem)] leading-[1.75] text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">
+        {concept.summary}
+      </p>
       <div class="mt-5 flex flex-wrap justify-end gap-3">
         <a
           href={relatedSearchHref}
           class="inline-flex min-h-[44px] items-center justify-center rounded-full bg-[var(--nm-accent)] px-5 py-2.5 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]"
         >
-          עוד בנושא: {concept.title}
+          עוד על {concept.title}
         </a>
       </div>
       <div class="mt-5 flex flex-wrap justify-end gap-2 text-xs text-[color-mix(in_srgb,var(--nm-fg)_55%,var(--nm-bg))]">
         {concept.tags.map((tag) => {
           const topicHref = glossaryTagToTopicHref[tag];
           const pillClass =
-            "rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-3 py-1 transition hover:border-[color-mix(in_srgb,var(--nm-accent)_28%,transparent)] hover:text-[var(--nm-accent)]";
+            "inline-flex min-h-[32px] items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-3 py-1 transition hover:border-[color-mix(in_srgb,var(--nm-accent)_28%,transparent)] hover:text-[var(--nm-accent)]";
           return topicHref ? (
-            <a href={topicHref} class={`inline-flex min-h-[32px] items-center ${pillClass}`}>
-              {tag}
-            </a>
+            <a href={topicHref} class={pillClass}>{tag}</a>
           ) : (
             <span class={pillClass}>{tag}</span>
           );
@@ -110,37 +117,77 @@ const relatedSearchHref = `/services/?q=${encodeURIComponent(concept.title)}&top
       </div>
     </header>
 
-    <section class="grid gap-6 md:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
-      <article class="space-y-6 rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/82 p-6 text-right shadow-[0_20px_60px_rgba(26,26,26,0.05)]">
-        <div class="body-text space-y-3">
-          <p class="text-sm font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">הגדרה קצרה</p>
-          <p class="text-[clamp(1rem,0.95rem+0.35vw,1.16rem)] leading-8 text-[var(--nm-fg)]/74">{concept.definition}</p>
-        </div>
-        <div class="body-text space-y-3 border-t border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] pt-5">
-          <p class="text-sm font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">למה זה משנה</p>
-          <p class="text-[clamp(1rem,0.95rem+0.35vw,1.16rem)] leading-8 text-[var(--nm-fg)]/74">{concept.whyItMatters}</p>
-        </div>
+    <section class="grid gap-6 md:grid-cols-[minmax(0,1.08fr)_minmax(0,0.92fr)]">
+      <article class="space-y-6 rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/86 p-6 text-right shadow-[0_20px_60px_rgba(26,26,26,0.05)]">
+        {isFactVsInterpretation ? (
+          <>
+            <div class="space-y-3">
+              <p class="text-sm font-semibold text-[var(--nm-accent)]">🧱 מה זו עובדה?</p>
+              <p class="text-[clamp(1rem,0.95rem+0.35vw,1.16rem)] leading-[1.75] text-[var(--nm-fg)]/80">
+                עובדה היא משהו שאפשר לצלם, להקליט, או למדוד. אין בה מסקנה עליך.
+              </p>
+            </div>
+            <div class="space-y-3 border-t border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] pt-5">
+              <p class="text-sm font-semibold text-[var(--nm-accent)]">🎨 מה זה פירוש?</p>
+              <p class="text-[clamp(1rem,0.95rem+0.35vw,1.16rem)] leading-[1.75] text-[var(--nm-fg)]/80">
+                פירוש הוא מה שהמוח אומר שהעובדה אומרת. כאן נכנסים פחד, עלבון, זהות, וסיפור.
+              </p>
+            </div>
+            <div class="space-y-4 border-t border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] pt-5">
+              <p class="text-sm font-semibold text-[var(--nm-accent)]">דוגמאות</p>
+              <div class="overflow-x-auto">
+                <table class="min-w-full border-separate border-spacing-0 overflow-hidden rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] text-sm">
+                  <thead>
+                    <tr class="bg-[var(--nm-surface-muted)] text-[var(--nm-fg)]">
+                      <th class="border-b border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] px-4 py-3 text-right font-semibold">עובדה</th>
+                      <th class="border-b border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] px-4 py-3 text-right font-semibold">פירוש</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {factRows.map((row) => (
+                      <tr class="align-top odd:bg-white even:bg-[color-mix(in_srgb,var(--nm-bg-canvas)_96%,white)]">
+                        <td class="border-b border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] px-4 py-3 leading-[1.7]">{row.fact}</td>
+                        <td class="border-b border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] px-4 py-3 leading-[1.7]">{row.interpretation}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </>
+        ) : (
+          <>
+            <div class="space-y-3">
+              <p class="text-sm font-semibold text-[var(--nm-accent)]">הגדרה קצרה</p>
+              <p class="text-[clamp(1rem,0.95rem+0.35vw,1.16rem)] leading-[1.75] text-[var(--nm-fg)]/80">{concept.definition}</p>
+            </div>
+            <div class="space-y-3 border-t border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] pt-5">
+              <p class="text-sm font-semibold text-[var(--nm-accent)]">למה זה משנה</p>
+              <p class="text-[clamp(1rem,0.95rem+0.35vw,1.16rem)] leading-[1.75] text-[var(--nm-fg)]/80">{concept.whyItMatters}</p>
+            </div>
+          </>
+        )}
       </article>
 
       <div class="space-y-4">
         {concept.oppositeLink && (
           <aside class="rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-accent)_18%,transparent)] bg-[var(--nm-tint)] p-6 text-right shadow-[0_16px_40px_rgba(212,43,43,0.08)]">
-            <p class="text-sm font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">הצד השני של המטבע</p>
+            <p class="text-sm font-semibold text-[var(--nm-accent)]">הצד השני</p>
             <h2 class="mt-3 text-2xl font-semibold text-[var(--nm-fg)]">{concept.oppositeLink.title}</h2>
-            <p class="mt-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">{concept.oppositeLink.description}</p>
-            <a href={concept.oppositeLink.href} class="mt-5 inline-flex items-center rounded-full border border-[color-mix(in_srgb,var(--nm-accent)_18%,transparent)] bg-white px-4 py-2 text-sm font-semibold text-[var(--nm-accent)] transition hover:bg-[var(--nm-tint)]">
+            <p class="mt-3 text-sm leading-[1.75] text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">{concept.oppositeLink.description}</p>
+            <a href={concept.oppositeLink.href} class="mt-5 inline-flex min-h-[44px] items-center rounded-full border border-[color-mix(in_srgb,var(--nm-accent)_18%,transparent)] bg-white px-4 py-2 text-sm font-semibold text-[var(--nm-accent)] transition hover:bg-[var(--nm-tint)]">
               לעבור לצד השני
             </a>
           </aside>
         )}
 
         <aside class="space-y-4 rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-6 text-right">
-          <p class="text-sm font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">ראה גם</p>
+          <p class="text-sm font-semibold text-[var(--nm-accent)]">להמשך</p>
           <div class="space-y-3">
             {relatedLinks.map((link) => (
               <a href={link.href} class="block rounded-[1.4rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white px-4 py-4 transition hover:bg-[var(--nm-tint)]">
                 <p class="font-semibold text-[var(--nm-fg)]">{link.title}</p>
-                <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_64%,var(--nm-bg))]">{link.description}</p>
+                <p class="mt-2 text-sm leading-[1.75] text-[color-mix(in_srgb,var(--nm-fg)_64%,var(--nm-bg))]">{link.description}</p>
               </a>
             ))}
           </div>
@@ -151,14 +198,14 @@ const relatedSearchHref = `/services/?q=${encodeURIComponent(concept.title)}&top
     {otherConcepts.length > 0 && (
       <section class="space-y-4 text-right">
         <div class="space-y-2">
-          <p class="text-sm font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">מושגים קרובים</p>
-          <h2 class="text-2xl font-semibold text-[var(--nm-fg)]">אם הגעת לכאן, כנראה שתרצה להמשיך גם לכאן</h2>
+          <p class="text-sm font-semibold text-[var(--nm-accent)]">מושגים קרובים</p>
+          <h2 class="text-2xl font-semibold text-[var(--nm-fg)]">אפשר להמשיך מכאן לעוד שכבה אחת</h2>
         </div>
         <div class="grid gap-4 md:grid-cols-3">
           {otherConcepts.map((item) => (
-            <a href={`/glossary/${item.slug}/`} class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/82 p-5 transition hover:translate-y-[-2px] hover:bg-white">
+            <a href={`/glossary/${item.slug}/`} class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/86 p-5 transition hover:translate-y-[-2px] hover:bg-white">
               <h3 class="text-xl font-semibold text-[var(--nm-fg)]">{item.title}</h3>
-              <p class="mt-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_66%,var(--nm-bg))]">{item.summary}</p>
+              <p class="mt-3 text-sm leading-[1.75] text-[color-mix(in_srgb,var(--nm-fg)_66%,var(--nm-bg))]">{item.summary}</p>
             </a>
           ))}
         </div>
@@ -166,12 +213,7 @@ const relatedSearchHref = `/services/?q=${encodeURIComponent(concept.title)}&top
     )}
 
     <div class="flex justify-end border-t border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] pt-10" aria-label="פתיחת שיחה אחרי קריאה">
-      <DirectLink
-        client:load
-        whatsAppNumber={appConfig.contact.whatsAppNumber}
-        fallbackEmail={appConfig.contact.email}
-      />
+      <DirectLink client:load whatsAppNumber={appConfig.contact.whatsAppNumber} fallbackEmail={appConfig.contact.email} />
     </div>
   </section>
 </Layout>
-

@@ -1,0 +1,55 @@
+---
+interface Props {
+  href?: string;
+  type?: "button" | "submit" | "reset";
+  class?: string;
+}
+
+const { href, type = "button", class: className = "" } = Astro.props as Props;
+const classes = `nm-btn ${className}`.trim();
+---
+
+{href ? (
+  <a href={href} class={classes} data-nm-pressable>
+    <slot />
+  </a>
+) : (
+  <button type={type} class={classes} data-nm-pressable>
+    <slot />
+  </button>
+)}
+
+<style>
+  .nm-btn {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background-color: #1a1a1a;
+    color: #fafaf8;
+    padding: 1rem 2rem;
+    font-family: "Heebo", "Assistant Variable", sans-serif;
+    font-weight: 800;
+    font-size: 1.25rem;
+    line-height: 1.6;
+    text-decoration: none;
+    border-radius: 999px;
+    transition:
+      transform 0.1s ease,
+      background-color 0.1s ease,
+      border-color 0.1s ease;
+    border: 2px solid #1a1a1a;
+  }
+
+  .nm-btn:active {
+    transform: scale(0.98);
+    background-color: #d42b2b;
+    border-color: #d42b2b;
+  }
+
+  .nm-btn:focus-visible {
+    outline: 2px solid #d42b2b;
+    outline-offset: 2px;
+  }
+</style>

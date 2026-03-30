@@ -56,6 +56,7 @@
   --line-height-article: 1.8;
   --transition-fast: 0.2s ease;
   --transition-medium: 0.3s ease;
+  --nm-feedback-press-scale: 0.98;
 
   --color-valid: #16a34a;
   --color-mark-highlight: color-mix(in srgb, var(--color-accent) 22%, var(--color-surface-page));
@@ -105,7 +106,7 @@ html[lang="he"] {
 }
 
 body {
-  font-family: "Assistant Variable", system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-family: "Assistant Variable", "Heebo", system-ui, -apple-system, "Segoe UI", sans-serif;
   font-size: 1rem;
   line-height: var(--line-height-ui);
   letter-spacing: 0;
@@ -124,6 +125,151 @@ body {
   outline-offset: 2px;
 }
 
+#nm-route-progress {
+  position: fixed;
+  inset-block-start: 0;
+  inset-inline: 0;
+  z-index: 120;
+  block-size: 2px;
+  pointer-events: none;
+  opacity: 0;
+  transform-origin: right center;
+  transform: scaleX(0);
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--nm-accent) 82%, white) 0%,
+    color-mix(in srgb, var(--nm-accent) 55%, var(--nm-fg)) 100%
+  );
+  transition:
+    opacity 120ms ease,
+    transform 420ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+#nm-route-progress.is-active {
+  opacity: 1;
+  transform: scaleX(0.62);
+}
+
+#nm-route-progress.is-finishing {
+  opacity: 1;
+  transform: scaleX(1);
+}
+
+:where(
+    button,
+    [role="button"],
+    summary,
+    a.inline-flex,
+    a.inline-block,
+    a[href][class*="rounded"],
+    a[href][data-nm-pressable]
+  ) {
+  transition:
+    transform var(--transition-fast),
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    color var(--transition-fast),
+    opacity var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+:where(
+    button,
+    [role="button"],
+    summary,
+    a.inline-flex,
+    a.inline-block,
+    a[href][class*="rounded"],
+    a[href][data-nm-pressable]
+  ):active {
+  transform: scale(var(--nm-feedback-press-scale));
+}
+
+:where(
+    button,
+    [role="button"],
+    summary,
+    a.inline-flex,
+    a.inline-block,
+    a[href][class*="rounded"],
+    a[href][data-nm-pressable]
+  ):focus-visible {
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--nm-accent) 18%, transparent);
+}
+
+:where(button, [role="button"], a.inline-flex, a.inline-block)[data-nm-loading="true"] {
+  position: relative;
+  overflow: hidden;
+  cursor: wait;
+  pointer-events: none;
+  opacity: 0.88;
+  font-size: 0;
+}
+
+:where(button, [role="button"], a.inline-flex, a.inline-block)[data-nm-loading="true"] > * {
+  visibility: hidden;
+}
+
+:where(button, [role="button"], a.inline-flex, a.inline-block)[data-nm-loading="true"]::before {
+  content: "";
+  inline-size: 1rem;
+  block-size: 1rem;
+  border-radius: 999px;
+  border: 2px solid color-mix(in srgb, currentColor 28%, transparent);
+  border-top-color: currentColor;
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: 50%;
+  transform: translate(-50%, -50%);
+  animation: nm-feedback-spin 0.7s linear infinite;
+}
+
+:where(button, [role="button"], a.inline-flex, a.inline-block)[data-nm-loading="true"]::after {
+  content: attr(data-nm-loading-label);
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: 50%;
+  transform: translate(-50%, calc(-50% + 1.35rem));
+  font-size: 0.72rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.nm-feedback-shell {
+  position: relative;
+  overflow: hidden;
+}
+
+.nm-feedback-loading {
+  position: relative;
+  overflow: hidden;
+}
+
+.nm-feedback-loading::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    120deg,
+    transparent 12%,
+    color-mix(in srgb, var(--nm-accent) 10%, transparent) 50%,
+    transparent 88%
+  );
+  transform: translateX(-100%);
+  animation: nm-feedback-sweep 1s ease-in-out infinite;
+}
+
+@keyframes nm-feedback-spin {
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+@keyframes nm-feedback-sweep {
+  to {
+    transform: translateX(100%);
+  }
+}
 /* Skeleton (חיפוש גילוי וכו׳) */
 .nm-skeleton-line {
   height: 0.85rem;

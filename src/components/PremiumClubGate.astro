@@ -1,7 +1,7 @@
 ---
 /**
- * הזדהות קלה לחברי מועדון (מצב בדפדפן). הסיסמה נבדקת בצד השרת ב־Webhook בלבד.
- * תגובה צפויה: JSON { "ok": true, "memberName": "...", "expiresAt": "ISO" } או { "ok": false, "error": "..." }
+ * כניסה קלה לחברי המועדון בדפדפן.
+ * האימות עצמו נעשה רק מול Webhook חיצוני.
  */
 const webhookUrl = (import.meta.env.PUBLIC_NM_CLUB_WEBHOOK_URL ?? "").trim();
 ---
@@ -13,66 +13,66 @@ const webhookUrl = (import.meta.env.PUBLIC_NM_CLUB_WEBHOOK_URL ?? "").trim();
   data-nm-premium-club-gate
 >
   <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">מועדון NeverMind</p>
-  <h2 class="mt-2 text-lg font-semibold text-[var(--nm-fg)]">כבר רשומים למסלול המלא?</h2>
+  <h2 class="mt-2 text-lg font-semibold text-[var(--nm-fg)]">כבר יש לך גישה פעילה</h2>
   <p class="mt-2 text-sm leading-[var(--line-height-ui)] text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
-    אחרי אימות קצר נשמר מצב בדפדפן בלבד. אין כאן חשבון מאובטח כמו בבנק. זה שכבת נוחות לקריאה.
+    אחרי אימות קצר נשמור את המצב על המכשיר הזה, כדי שלא תצטרך להתחבר בכל פעם מחדש.
   </p>
 
   <div id="nm-club-status" class="mt-4 hidden rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] bg-white/90 px-4 py-3 text-sm text-[var(--nm-fg)]"></div>
 
   <form id="nm-club-form" class="mt-5 space-y-4">
     <div id="nm-club-fields" class="space-y-4">
-    <div class="space-y-1.5">
-      <label for="nm-club-fullname" class="block text-sm font-semibold text-[var(--nm-fg)]">שם מלא</label>
-      <input
-        id="nm-club-fullname"
-        name="fullName"
-        type="text"
-        autocomplete="name"
-        required
-        minlength="2"
-        maxlength="80"
-        class="w-full rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-white px-4 py-3 text-[var(--nm-fg)] outline-none transition focus-visible:ring-2 focus-visible:ring-[var(--nm-accent)]"
-        placeholder="כפי שתרצה שיופיע בברכה"
-      />
-    </div>
-    <div class="space-y-1.5">
-      <label for="nm-club-phone" class="block text-sm font-semibold text-[var(--nm-fg)]">טלפון</label>
-      <input
-        id="nm-club-phone"
-        name="phone"
-        type="tel"
-        inputmode="tel"
-        autocomplete="tel"
-        required
-        class="w-full rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-white px-4 py-3 text-[var(--nm-fg)] outline-none transition focus-visible:ring-2 focus-visible:ring-[var(--nm-accent)]"
-        placeholder="למשל 050-0000000"
-      />
-    </div>
-    <div class="space-y-1.5">
-      <label for="nm-club-secret" class="block text-sm font-semibold text-[var(--nm-fg)]">סיסמת כניסה</label>
-      <input
-        id="nm-club-secret"
-        name="password"
-        type="password"
-        autocomplete="current-password"
-        required
-        minlength="4"
-        maxlength="128"
-        class="w-full rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-white px-4 py-3 text-[var(--nm-fg)] outline-none transition focus-visible:ring-2 focus-visible:ring-[var(--nm-accent)]"
-      />
-      <p class="text-xs text-[color-mix(in_srgb,var(--nm-fg)_48%,var(--nm-bg))]">לפחות 4 תווים. האימות המלא נעשה בצד השרת.</p>
-    </div>
-    <p id="nm-club-error" class="hidden text-sm font-medium text-[var(--nm-accent)]" role="alert"></p>
-    <div class="flex flex-wrap items-center gap-2">
-      <button
-        type="submit"
-        id="nm-club-submit"
-        class="inline-flex min-h-[44px] items-center justify-center rounded-full bg-[var(--nm-inverse)] px-6 py-2.5 text-sm font-semibold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-inverse-hover)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nm-accent)]"
-      >
-        כניסה
-      </button>
-    </div>
+      <div class="space-y-1.5">
+        <label for="nm-club-fullname" class="block text-sm font-semibold text-[var(--nm-fg)]">שם מלא</label>
+        <input
+          id="nm-club-fullname"
+          name="fullName"
+          type="text"
+          autocomplete="name"
+          required
+          minlength="2"
+          maxlength="80"
+          class="w-full rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-white px-4 py-3 text-[var(--nm-fg)] outline-none transition focus-visible:ring-2 focus-visible:ring-[var(--nm-accent)]"
+          placeholder="כפי שתרצה שיופיע בברכה"
+        />
+      </div>
+      <div class="space-y-1.5">
+        <label for="nm-club-phone" class="block text-sm font-semibold text-[var(--nm-fg)]">טלפון</label>
+        <input
+          id="nm-club-phone"
+          name="phone"
+          type="tel"
+          inputmode="tel"
+          autocomplete="tel"
+          required
+          class="w-full rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-white px-4 py-3 text-[var(--nm-fg)] outline-none transition focus-visible:ring-2 focus-visible:ring-[var(--nm-accent)]"
+          placeholder="למשל 050-0000000"
+        />
+      </div>
+      <div class="space-y-1.5">
+        <label for="nm-club-secret" class="block text-sm font-semibold text-[var(--nm-fg)]">סיסמת כניסה</label>
+        <input
+          id="nm-club-secret"
+          name="password"
+          type="password"
+          autocomplete="current-password"
+          required
+          minlength="4"
+          maxlength="128"
+          class="w-full rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-white px-4 py-3 text-[var(--nm-fg)] outline-none transition focus-visible:ring-2 focus-visible:ring-[var(--nm-accent)]"
+        />
+        <p class="text-xs text-[color-mix(in_srgb,var(--nm-fg)_48%,var(--nm-bg))]">האימות נעשה מול השרת. כאן נשמר רק מצב הקריאה על המכשיר.</p>
+      </div>
+      <p id="nm-club-error" class="hidden text-sm font-medium text-[var(--nm-accent)]" role="alert"></p>
+      <div class="flex flex-wrap items-center gap-2">
+        <button
+          type="submit"
+          id="nm-club-submit"
+          class="inline-flex min-h-[44px] items-center justify-center rounded-full bg-[var(--nm-inverse)] px-6 py-2.5 text-sm font-semibold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-inverse-hover)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nm-accent)]"
+        >
+          כניסה
+        </button>
+      </div>
     </div>
     <div class="mt-3 flex flex-wrap items-center gap-2">
       <button
@@ -99,13 +99,14 @@ const webhookUrl = (import.meta.env.PUBLIC_NM_CLUB_WEBHOOK_URL ?? "").trim();
     const logoutBtn = document.getElementById("nm-club-logout");
     const hintEl = document.getElementById("nm-club-webhook-hint");
 
-    if (!(form instanceof HTMLFormElement) || !fieldsEl || !statusEl || !errEl || !submitBtn || !logoutBtn || !hintEl) return;
+    if (!(form instanceof HTMLFormElement) || !(fieldsEl instanceof HTMLElement) || !(statusEl instanceof HTMLElement) || !(errEl instanceof HTMLElement) || !(submitBtn instanceof HTMLButtonElement) || !(logoutBtn instanceof HTMLButtonElement) || !(hintEl instanceof HTMLElement)) {
+      return;
+    }
 
     function notifyClubSessionChange() {
       try {
         window.dispatchEvent(new CustomEvent("nm-club-session-changed"));
       } catch {
-        /* ignore */
       }
     }
 
@@ -113,25 +114,28 @@ const webhookUrl = (import.meta.env.PUBLIC_NM_CLUB_WEBHOOK_URL ?? "").trim();
       try {
         const raw = localStorage.getItem(KEY);
         if (!raw) return null;
-        const o = JSON.parse(raw);
-        if (!o || typeof o !== "object") return null;
-        const memberName = typeof o.memberName === "string" ? o.memberName : "";
-        const phone = typeof o.phone === "string" ? o.phone : "";
-        const expiresAt = typeof o.expiresAt === "string" ? o.expiresAt : "";
+        const data = JSON.parse(raw);
+        if (!data || typeof data !== "object") return null;
+        const memberName = typeof data.memberName === "string" ? data.memberName.trim() : "";
+        const phone = typeof data.phone === "string" ? data.phone.trim() : "";
+        const expiresAt = typeof data.expiresAt === "string" ? data.expiresAt.trim() : "";
+        const lastLoginAt = typeof data.lastLoginAt === "string" ? data.lastLoginAt.trim() : "";
+        const liveStatus = typeof data.liveStatus === "string" ? data.liveStatus.trim() : "LIVE";
+        const fraudFlag = data.fraudFlag === true;
         if (!memberName || !expiresAt) return null;
-        const t = Date.parse(expiresAt);
-        if (Number.isNaN(t) || t < Date.now()) {
+        const expiresTs = Date.parse(expiresAt);
+        if (Number.isNaN(expiresTs) || expiresTs < Date.now()) {
           localStorage.removeItem(KEY);
           return null;
         }
-        return { memberName, phone, expiresAt: t };
+        return { memberName, phone, expiresAt, lastLoginAt, liveStatus, fraudFlag };
       } catch {
         return null;
       }
     }
 
-    function showError(msg) {
-      errEl.textContent = msg;
+    function showError(message) {
+      errEl.textContent = message;
       errEl.classList.remove("hidden");
     }
 
@@ -140,34 +144,58 @@ const webhookUrl = (import.meta.env.PUBLIC_NM_CLUB_WEBHOOK_URL ?? "").trim();
       errEl.classList.add("hidden");
     }
 
-    function renderLoggedIn(s) {
-      const d = new Date(s.expiresAt);
-      const dateStr = d.toLocaleDateString("he-IL", { day: "numeric", month: "long", year: "numeric" });
-      const phonePart = s.phone ? ` · ${s.phone}` : "";
-      statusEl.textContent = `היי ${s.memberName}${phonePart} · מנוי בתוקף עד ${dateStr}`;
+    function formatDate(value) {
+      const date = new Date(value || "");
+      if (Number.isNaN(date.getTime())) return "";
+      return date.toLocaleDateString("he-IL", { day: "numeric", month: "long", year: "numeric" });
+    }
+
+    function formatDateTime(value) {
+      const date = new Date(value || "");
+      if (Number.isNaN(date.getTime())) return "";
+      return date.toLocaleString("he-IL", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    }
+
+    function renderLoggedIn(session) {
+      const parts = [session.liveStatus || "LIVE", session.memberName];
+      if (session.phone) parts.push(session.phone);
+      const expiry = formatDate(session.expiresAt);
+      if (expiry) parts.push(`חברות פעילה עד ${expiry}`);
+      const lastLogin = formatDateTime(session.lastLoginAt);
+      if (lastLogin) parts.push(`כניסה אחרונה ${lastLogin}`);
+      statusEl.textContent = parts.join(" · ");
       statusEl.classList.remove("hidden");
       fieldsEl.classList.add("hidden");
       logoutBtn.classList.remove("hidden");
+      submitBtn.classList.add("hidden");
     }
 
     function renderLoggedOut() {
       statusEl.classList.add("hidden");
       statusEl.textContent = "";
       fieldsEl.classList.remove("hidden");
-      submitBtn.classList.remove("hidden");
       logoutBtn.classList.add("hidden");
+      submitBtn.classList.remove("hidden");
     }
 
     if (!webhookUrl) {
-      hintEl.textContent =
-        "כדי להפעיל כניסה: הגדר PUBLIC_NM_CLUB_WEBHOOK_URL בפריסה. ה־Worker בודק סיסמה ושולח לך התראה.";
+      hintEl.textContent = "כדי להפעיל כניסה צריך להגדיר PUBLIC_NM_CLUB_WEBHOOK_URL בפריסה. השרת הוא זה שבודק את הסיסמה.";
       hintEl.classList.remove("hidden");
       submitBtn.disabled = true;
     }
 
     const existing = readSession();
-    if (existing) renderLoggedIn(existing);
-    else renderLoggedOut();
+    if (existing) {
+      renderLoggedIn(existing);
+    } else {
+      renderLoggedOut();
+    }
 
     logoutBtn.addEventListener("click", () => {
       localStorage.removeItem(KEY);
@@ -176,56 +204,78 @@ const webhookUrl = (import.meta.env.PUBLIC_NM_CLUB_WEBHOOK_URL ?? "").trim();
       notifyClubSessionChange();
     });
 
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
       clearError();
       if (!webhookUrl) {
-        showError("אין כתובת Webhook מוגדרת.");
+        showError("אין כתובת אימות מוגדרת.");
         return;
       }
-      const fd = new FormData(form);
-      const phone = String(fd.get("phone") ?? "").trim();
-      const password = String(fd.get("password") ?? "");
+
+      const data = new FormData(form);
+      const fullName = String(data.get("fullName") ?? "").trim();
+      const phone = String(data.get("phone") ?? "").trim();
+      const password = String(data.get("password") ?? "");
+
       submitBtn.disabled = true;
+      window.__nmSetButtonLoading?.(submitBtn, "מזקק את המנגנון...");
+
       try {
-        const res = await fetch(webhookUrl, {
+        const response = await fetch(webhookUrl, {
           method: "POST",
           headers: { "Content-Type": "application/json", Accept: "application/json" },
           body: JSON.stringify({
+            fullName,
             phone,
             password,
             path: typeof location !== "undefined" ? location.pathname : "",
           }),
         });
-        let data = null;
+
+        let payload = null;
         try {
-          data = await res.json();
+          payload = await response.json();
         } catch {
-          data = null;
+          payload = null;
         }
-        if (!res.ok) {
-          showError(data && data.error ? String(data.error) : "הכניסה נדחתה. בודקים את הפרטים.");
+
+        if (!response.ok || !payload || payload.ok !== true) {
+          const serverMessage = payload && payload.error ? String(payload.error) : "השרת לא אישר קבלה. אפשר לנסות שוב או פשוט לשלוח לנו הודעה בוואטסאפ.";
+          showError(serverMessage);
           return;
         }
-        if (!data || data.ok !== true) {
-          showError(data && data.error ? String(data.error) : "הכניסה נדחתה.");
-          return;
-        }
-        const memberName = String(data.memberName ?? fullName ?? "").trim() || "חבר";
-        const expiresAt = String(data.expiresAt ?? "").trim();
+
+        const memberName = String(payload.memberName ?? fullName ?? "").trim() || "חבר";
+        const expiresAt = String(payload.expiresAt ?? "").trim();
+        const phoneStored = typeof payload.phone === "string" && payload.phone.trim() ? payload.phone.trim() : phone;
         if (!expiresAt) {
-          showError("תשובת השרת חסרה תאריך תפוגה.");
+          showError("תשובת השרת חסרה תאריך סיום.");
           return;
         }
-        const phoneStored = typeof data.phone === "string" && data.phone.trim() ? data.phone.trim() : phone;
-        localStorage.setItem(KEY, JSON.stringify({ memberName, expiresAt, phone: phoneStored }));
-        const s = readSession();
-        if (s) renderLoggedIn(s);
+
+        const session = {
+          memberName,
+          phone: phoneStored,
+          expiresAt,
+          lastLoginAt:
+            typeof payload.lastLoginAt === "string" && payload.lastLoginAt.trim()
+              ? payload.lastLoginAt.trim()
+              : new Date().toISOString(),
+          fraudFlag: payload.fraudFlag === true,
+          liveStatus:
+            typeof payload.liveStatus === "string" && payload.liveStatus.trim()
+              ? payload.liveStatus.trim()
+              : "LIVE",
+        };
+        localStorage.setItem(KEY, JSON.stringify(session));
+        renderLoggedIn(session);
         notifyClubSessionChange();
+        window.__nmHapticSuccess?.();
       } catch {
-        showError("בעיית רשת. נסה שוב בעוד רגע.");
+        showError("השרת לא אישר קבלה. אפשר לנסות שוב או פשוט לשלוח לנו הודעה בוואטסאפ.");
       } finally {
         submitBtn.disabled = false;
+        window.__nmClearButtonLoading?.(submitBtn);
       }
     });
   })();

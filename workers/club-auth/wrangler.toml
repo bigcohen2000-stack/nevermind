@@ -1,0 +1,16 @@
+name = "nm-club-auth"
+main = "src/index.ts"
+compatibility_date = "2026-03-30"
+
+[vars]
+ALLOWED_ORIGINS = "https://www.nevermind.co.il,https://nevermind.co.il,http://localhost:4321"
+
+[[kv_namespaces]]
+binding = "CLUB_MEMBERS"
+id = "5170449ba2b94f97b29195f60a04dc9c"
+preview_id = "5170449ba2b94f97b29195f60a04dc9c"
+
+[[kv_namespaces]]
+binding = "CLUB_ACTIVITY"
+id = "df7d6cf6806d42aca851ad4c17acb986"
+preview_id = "df7d6cf6806d42aca851ad4c17acb986"

@@ -10,268 +10,105 @@ import {
 ---
 
 <Layout
-  title="שיטת NEVERMIND"
-  description="מה NeverMind בפועל: פירוק בלבול, בדיקת הנחות מול עובדות, ורצף ברור. שאלות נפוצות על השיטה והמסלול."
+  title="מה זה NeverMind"
+  description="עמוד אחד שמסביר איך NeverMind עובד: איפה נולד בלבול, איך בודקים הנחה, ואיך עוברים מעומס לבהירות."
   faqItems={aboutPageFaqForSchema}
 >
   <div class="mx-auto max-w-6xl space-y-16 px-4 py-14 text-right text-[var(--nm-fg)] md:space-y-20">
     <header class="space-y-5">
-      <p class="text-sm font-semibold uppercase tracking-[0.2em] text-[var(--nm-accent)]">שיטת NEVERMIND</p>
-      <h1 class="text-[clamp(2rem,1.4rem+2.2vw,3.4rem)] font-light leading-tight">מה זה NeverMind, בקצרה</h1>
-      <p class="max-w-3xl text-base leading-8 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
-        עמוד אחד עם ההגדרות והשאלות שחוזרות. אין כאן הבטחות סגורות. יש מה לבדוק מול עצמך.
+      <p class="text-sm font-semibold text-[var(--nm-accent)]">מה זה NeverMind</p>
+      <h1 class="text-[clamp(2.1rem,1.6rem+2vw,3.5rem)] font-semibold leading-[1.15]">לא עוד תשובה מהירה. בדיקה של מה שמפעיל את השאלה.</h1>
+      <p class="max-w-3xl text-base leading-[1.75] text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+        אם משהו מרגיש תקוע, בדרך כלל לא חסר מידע. חסרה הבחנה בין עובדה, פירוש, והרגל תגובה. זה מה שהאתר הזה מנסה לעשות.
       </p>
     </header>
 
-    <section aria-labelledby="method-core" class="space-y-6 rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white p-6 md:p-8">
-      <h2 id="method-core" class="text-[clamp(1.35rem,1.15rem+0.6vw,1.85rem)] font-semibold leading-snug">
-        מה NeverMind עושה בפועל
-      </h2>
-      <div class="space-y-5 text-[clamp(1rem,0.95rem+0.2vw,1.12rem)] leading-8 text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))]">
-        <p>
-          המוקד הוא לא לצבור עוד טריקים. <strong class="font-semibold text-[var(--nm-fg)]">המוקד הוא להוריד רעש</strong>
-          ולראות מה נשאר כשמפסיקים לערבב עובדה, פחד ופירוש.
+    <section class="grid gap-6 rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 p-6 shadow-[0_20px_60px_rgba(26,26,26,0.05)] lg:grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)] lg:p-8">
+      <div class="space-y-4">
+        <p class="text-sm font-semibold text-[var(--nm-accent)]">המנגנון</p>
+        <h2 class="text-[clamp(1.5rem,1.3rem+0.8vw,2rem)] font-semibold">מה האתר הזה עושה בפועל</h2>
+        <p class="text-[clamp(1rem,0.96rem+0.2vw,1.1rem)] leading-[1.75] text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))]">
+          הוא לא מנסה להרגיע כל רגש בנפרד. הוא בודק איך מחשבה אחת מייצרת את השרשרת: הנחה, תגובה, סימפטום.
         </p>
-        <p>
-          הרבה גישות נוגעות ברגש, במחשבה או בהתנהגות כל אחת בנפרד. כאן מחפשים את החוט המשותף: איפה אותה הנחה חוזרת, ואיך
-          לבדוק אותה עד הסוף בלי ליפול באמצע לסיסמה ריקה.
-          <strong class="font-semibold text-[var(--nm-fg)]">
-            אין כאן טענה שזה מתאים לכולם או שזה פותר הכול
-          </strong>
-          . יש רצף שאפשר לעבור בו בבירור, צעד אחר צעד, כשאתה בוחר להמשיך.
+        <p class="text-[clamp(1rem,0.96rem+0.2vw,1.1rem)] leading-[1.75] text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))]">
+          ברגע שהשרשרת נראית, קל יותר להבין מה שייך למציאות, ומה נוסף עליה מתוך פחד, הרגל, או דימוי עצמי.
         </p>
-        <p class="border-r-4 border-[var(--nm-accent)] pr-4 text-[var(--nm-fg)]">
-          חיפוש אחרי שיטה מנצחת אחת מבלבל. השאלה המדויקת יותר: מה כבר הוכח אצלך בעבר, ומה אתה מניח עכשיו בלי לבדוק.
-        </p>
+      </div>
+
+      <div class="grid gap-3">
+        <article class="rounded-[1.4rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-4">
+          <h3 class="text-lg font-semibold">עובדה</h3>
+          <p class="mt-2 text-sm leading-[1.7] text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">מה קרה, בלי תוספת של משמעות.</p>
+        </article>
+        <article class="rounded-[1.4rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-4">
+          <h3 class="text-lg font-semibold">פירוש</h3>
+          <p class="mt-2 text-sm leading-[1.7] text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">מה המוח אומר שזה אומר עליך, על אחרים, או על העתיד.</p>
+        </article>
+        <article class="rounded-[1.4rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-4">
+          <h3 class="text-lg font-semibold">פעולה</h3>
+          <p class="mt-2 text-sm leading-[1.7] text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">מה נשאר לעשות אחרי שהפירוש נבדק.</p>
+        </article>
       </div>
     </section>
 
-    <section aria-labelledby="about-personal" class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-6 text-right">
-      <div class="flex flex-col gap-6 md:flex-row md:items-start md:gap-8">
-        <figure class="mx-auto w-full max-w-sm shrink-0 md:mx-0">
+    <section class="rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-6 lg:p-8">
+      <div class="grid gap-8 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1fr)]">
+        <figure class="mx-auto w-full max-w-sm overflow-hidden rounded-[1.5rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] shadow-[0_18px_48px_rgba(26,26,26,0.07)] lg:mx-0">
           <img
             src="/uploads/nevermind-yakir.webp"
-            alt="יקיר, מייסד NeverMind"
+            alt="הקו שמחזיק את NeverMind"
             width={640}
             height={800}
-            class="aspect-[4/5] w-full rounded-[1.35rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] object-cover shadow-[0_18px_48px_rgba(26,26,26,0.07)]"
+            class="aspect-[4/5] w-full object-cover"
             loading="lazy"
             decoding="async"
           />
         </figure>
-        <div class="min-w-0 flex-1 space-y-4">
-          <h2 id="about-personal" class="text-[clamp(1.35rem,1.15rem+0.6vw,1.75rem)] font-semibold">
-            מי עומד מאחורי המסלול
-          </h2>
-          <p class="text-sm leading-[var(--line-height-ui)] text-[color-mix(in_srgb,var(--nm-fg)_76%,var(--nm-bg))]">
-            השם בצילום: יקיר. התוכן באתר ובשיחות נשען על אותו עיקרון: לדבר על מה שקורה בפנים בלי לעטוף את זה ביופי מיותר.
-            אם הקו הזה נשמע לך מדויק, אפשר להמשיך מהארכיון או משיחה קצרה בתיאום.
+        <div class="space-y-4">
+          <p class="text-sm font-semibold text-[var(--nm-accent)]">מאחורי האתר</p>
+          <h2 class="text-[clamp(1.5rem,1.3rem+0.8vw,2rem)] font-semibold">השם לא משנה</h2>
+          <p class="text-sm leading-[1.75] text-[color-mix(in_srgb,var(--nm-fg)_74%,var(--nm-bg))]">
+            התוכן כאן נשען על אותו קו עבודה שמופיע בשיחות: לראות מה פועל בפנים בלי לקשט אותו.
           </p>
-          <div class="flex flex-wrap gap-3">
-            <a
-              href="/library/"
-              class="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full bg-[var(--nm-inverse)] px-5 py-2.5 text-sm font-semibold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-inverse-hover)]"
-            >
-              לספרייה
-            </a>
-            <a
-              href="/book/"
-              class="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-5 py-2.5 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]"
-            >
-              קביעת שיחה
-            </a>
+          <p class="text-sm leading-[1.75] text-[color-mix(in_srgb,var(--nm-fg)_74%,var(--nm-bg))]">
+            אם משהו כאן פוגש נקודה אמיתית, אפשר להמשיך דרך הספרייה, המילון, או שיחה קצרה.
+          </p>
+          <div class="flex flex-wrap justify-end gap-3 pt-2">
+            <a href="/library/" class="inline-flex min-h-[44px] items-center rounded-full bg-[var(--nm-inverse)] px-5 py-2.5 text-xl font-bold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-inverse-hover)]">בואו נבדוק</a>
+            <a href="/book/" class="inline-flex min-h-[44px] items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-5 py-2.5 text-xl font-bold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]">יש לי שאלה</a>
           </div>
         </div>
       </div>
     </section>
 
-    <section aria-labelledby="process-map" class="space-y-7">
-      <h2 id="process-map" class="text-[clamp(1.5rem,1.25rem+1vw,2rem)] font-light">איך זה עובד</h2>
-      <div class="grid gap-4 md:grid-cols-5">
-        <article class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white p-5">
-          <h3 class="text-lg font-semibold">בלבול</h3>
-          <p class="mt-2 text-sm leading-8 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">מזהים תקיעות בלי לדעת איזו עובדה חסרה.</p>
-        </article>
-        <article class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white p-5">
-          <h3 class="text-lg font-semibold">בהירות</h3>
-          <p class="mt-2 text-sm leading-8 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">מפרידים בין מה שידוע לבין מה שמנוחש.</p>
-        </article>
-        <article class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white p-5">
-          <h3 class="text-lg font-semibold">הבנה</h3>
-          <p class="mt-2 text-sm leading-8 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">רואים איזה סיפור בנית על המצב ומה הוא מחזיק במקום.</p>
-        </article>
-        <article class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white p-5">
-          <h3 class="text-lg font-semibold">פעולה</h3>
-          <p class="mt-2 text-sm leading-8 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">בוחרים צעד אחד שמתאים למה שכבר ברור.</p>
-        </article>
-        <article class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white p-5">
-          <h3 class="text-lg font-semibold">קשר אישי</h3>
-          <p class="mt-2 text-sm leading-8 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">כשהשפה בפנים משתנה, לפעמים גם מה שקורה מול אנשים קרובים נראה אחרת.</p>
-        </article>
-      </div>
+    <section class="space-y-4">
+      <h2 class="text-[clamp(1.45rem,1.25rem+0.7vw,1.9rem)] font-semibold">וידאו קצר על המנגנון</h2>
+      <VideoPlayer youtubeId="lPSE9xQaNHw" title="איך NeverMind עובד" />
     </section>
 
-    <section aria-labelledby="daily-principle" class="space-y-4">
-      <h2 id="daily-principle" class="text-[clamp(1.4rem,1.2rem+0.8vw,1.9rem)] font-light">משהו קטן להיום</h2>
-      <article class="rounded-[1.8rem] border-2 border-[var(--nm-accent)] bg-white p-6">
-        <p class="text-[clamp(1.15rem,1.05rem+0.3vw,1.35rem)] leading-9">אל תחפש להרגיש טוב יותר. תחפש לראות מה נכון.</p>
-      </article>
-    </section>
-
-    <section
-      aria-labelledby="from-articles-definitions"
-      class="space-y-6 rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-6 md:p-8"
-    >
+    <section id="nm-about-faq" class="space-y-4">
       <div class="space-y-2">
-        <h2 id="from-articles-definitions" class="text-[clamp(1.35rem,1.15rem+0.6vw,1.85rem)] font-semibold leading-snug">
-          מהמאמרים: השם לא משנה
-        </h2>
-        <p class="max-w-3xl text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
-          קטעים מקוצרים ממאמר על נאחזות בהגדרות. המאמר המלא מרחיב את המכניקה ואת שאלות ההיפוך.
+        <h2 class="text-[clamp(1.45rem,1.25rem+0.7vw,1.9rem)] font-semibold">שאלות שחוזרות על עצמן</h2>
+        <p class="max-w-3xl text-sm leading-[1.75] text-[color-mix(in_srgb,var(--nm-fg)_65%,var(--nm-bg))]">
+          אם חסר משהו, אפשר לעבור ל<a href="/contact/" class="font-semibold text-[var(--nm-accent)] underline-offset-2 hover:underline">יצירת קשר</a>.
         </p>
       </div>
-      <div class="space-y-4 border-r-4 border-[var(--nm-accent)] pr-4">
-        <blockquote class="text-base leading-8 text-[color-mix(in_srgb,var(--nm-fg)_88%,var(--nm-bg))]">
-          <p>הגדרה היא לא הבנה. היא רק השם שנתת למשהו כדי להפסיק להסתכל עליו.</p>
-        </blockquote>
-        <blockquote class="text-base leading-8 text-[color-mix(in_srgb,var(--nm-fg)_88%,var(--nm-bg))]">
-          <p>כשהשם לא משנה בתור עוגן של כבוד, נעלם חלק מהצורך להגן על הזהות.</p>
-        </blockquote>
-      </div>
-      <p>
-        <a
-          href="/articles/why-cling-to-definitions/"
-          class="inline-flex min-h-[44px] items-center justify-center rounded-full bg-[var(--nm-inverse)] px-5 py-2.5 text-sm font-semibold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-inverse-hover)]"
-        >
-          למאמר המלא
-        </a>
-      </p>
-      <div class="max-w-3xl">
-        <p class="mb-3 text-sm font-semibold text-[var(--nm-fg)]">וידאו בנושא</p>
-        <VideoPlayer
-          youtubeId="esh2jppdZr4"
-          title="השם לא משנה: הגדרות, תיוג והיפוך שאלות"
-        />
-      </div>
-    </section>
 
-    <section aria-labelledby="reversal-question" class="space-y-5">
-      <h2 id="reversal-question" class="text-[clamp(1.4rem,1.2rem+0.8vw,1.9rem)] font-light">שאלה שהופכת הכל</h2>
-      <p id="reversal-question-text" class="max-w-3xl text-[clamp(1.5rem,1.2rem+1vw,2.2rem)] font-light leading-tight">
-        מה אם הבעיה היא בכלל הפתרון?
-      </p>
-      <button
-        id="next-reversal-question"
-        type="button"
-        class="inline-flex min-h-[46px] items-center justify-center rounded-full bg-[var(--nm-accent)] px-7 py-2.5 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]"
-      >
-        שאלה נוספת
-      </button>
-    </section>
-
-    <section id="nm-about-faq" aria-labelledby="faq-method-heading" class="scroll-mt-28 space-y-6">
-      <div class="space-y-2">
-        <h2 id="faq-method-heading" class="text-[clamp(1.5rem,1.25rem+1vw,2rem)] font-semibold">
-          שאלות ותשובות על השיטה
-        </h2>
-        <p class="max-w-3xl text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_65%,var(--nm-bg))]">
-          ריכוז שאלות שחוזרות. חסר משהו?
-          <a href="/contact/" class="font-semibold text-[var(--nm-accent)] underline-offset-2 hover:underline">יצירת קשר</a>
-          .
-        </p>
-      </div>
       <div class="space-y-3">
-        {
-          aboutMethodFaq.map((item) => (
-            <details class="group rounded-[1.25rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white p-4 open:bg-[var(--nm-bg-canvas)] md:p-5">
-              <summary class="cursor-pointer list-none text-right text-base font-semibold text-[var(--nm-fg)] marker:content-none [&::-webkit-details-marker]:hidden">
-                <span class="inline-flex w-full items-start justify-between gap-3">
-                  <span class="min-w-0 flex-1 leading-snug">{item.question}</span>
-                  <span
-                    class="mt-0.5 shrink-0 text-[var(--nm-accent)] transition group-open:rotate-180"
-                    aria-hidden="true"
-                  >
-                    ▼
-                  </span>
-                </span>
-              </summary>
-              <p class="mt-4 border-t border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] pt-4 text-sm leading-[var(--line-height-ui)] text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))]">
-                {item.answer}
-              </p>
-            </details>
-          ))
-        }
-      </div>
-    </section>
-
-    <section aria-labelledby="faq-extra-heading" class="space-y-4">
-      <h2 id="faq-extra-heading" class="text-[clamp(1.35rem,1.15rem+0.6vw,1.75rem)] font-semibold">עוד נקודות שעולות הרבה</h2>
-      <div class="space-y-3">
-        {
-          aboutExtraMethodFaq.map((item) => (
-            <details class="group rounded-[1.25rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white p-4 open:bg-[var(--nm-bg-canvas)] md:p-5">
-              <summary class="cursor-pointer list-none text-right text-base font-semibold text-[var(--nm-fg)] marker:content-none [&::-webkit-details-marker]:hidden">
-                <span class="inline-flex w-full items-start justify-between gap-3">
-                  <span class="min-w-0 flex-1 leading-snug">{item.question}</span>
-                  <span class="mt-0.5 shrink-0 text-[var(--nm-accent)] transition group-open:rotate-180" aria-hidden="true">
-                    ▼
-                  </span>
-                </span>
-              </summary>
-              <p class="mt-4 border-t border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] pt-4 text-sm leading-[var(--line-height-ui)] text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))]">
-                {item.answer}
-              </p>
-            </details>
-          ))
-        }
-      </div>
-    </section>
-
-    <section id="nm-about-faq-practical" aria-labelledby="faq-practical-heading" class="scroll-mt-28 space-y-4">
-      <h2 id="faq-practical-heading" class="text-[clamp(1.35rem,1.15rem+0.6vw,1.75rem)] font-semibold">
-        שאלות מעשיות (מסלול ופרטיות)
-      </h2>
-      <div class="space-y-3">
-        {
-          aboutPracticalFaq.map((item) => (
-            <details class="group rounded-[1.25rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-4 open:bg-white md:p-5">
-              <summary class="cursor-pointer list-none text-right text-base font-semibold text-[var(--nm-fg)] marker:content-none [&::-webkit-details-marker]:hidden">
-                <span class="inline-flex w-full items-start justify-between gap-3">
-                  <span class="min-w-0 flex-1 leading-snug">{item.question}</span>
-                  <span class="mt-0.5 shrink-0 text-[var(--nm-accent)] transition group-open:rotate-180" aria-hidden="true">
-                    ▼
-                  </span>
-                </span>
-              </summary>
-              <p class="mt-4 border-t border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] pt-4 text-sm leading-[var(--line-height-ui)] text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))]">
-                {item.answer}
-              </p>
-            </details>
-          ))
-        }
+        {[...aboutMethodFaq, ...aboutExtraMethodFaq, ...aboutPracticalFaq].map((item) => (
+          <details class="group rounded-[1.25rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white p-4 open:bg-[var(--nm-bg-canvas)] md:p-5">
+            <summary class="cursor-pointer list-none text-base font-semibold text-[var(--nm-fg)] marker:content-none [&::-webkit-details-marker]:hidden">
+              <span class="inline-flex w-full items-start justify-between gap-3">
+                <span class="min-w-0 flex-1 leading-snug">{item.question}</span>
+                <span class="mt-0.5 shrink-0 text-[var(--nm-accent)] transition group-open:rotate-180" aria-hidden="true">⌃</span>
+              </span>
+            </summary>
+            <p class="mt-4 border-t border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] pt-4 text-sm leading-[1.75] text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))]">
+              {item.answer}
+            </p>
+          </details>
+        ))}
       </div>
     </section>
   </div>
-
-  <script is:inline>
-    (() => {
-      const questions = [
-        "מה אם הבעיה היא בכלל הפתרון?",
-        "מה אם אתה לא צריך להחליט עכשיו?",
-        "מה יקרה אם תפסיק לנסות לתקן?",
-        "מה הדבר הכי פשוט שאתה יכול לעשות ברגע זה?",
-        "מה אם אתה כבר יודע את התשובה ומפחד להודות בה?",
-        "מה אתה מרוויח מזה שזה נשאר תקוע?",
-        "מה משתנה אם אתה מפסיק להילחם במה שכבר קרה?",
-      ];
-      let idx = 0;
-      const textEl = document.getElementById("reversal-question-text");
-      const btn = document.getElementById("next-reversal-question");
-      if (!textEl || !btn) return;
-      btn.addEventListener("click", () => {
-        idx = (idx + 1) % questions.length;
-        textEl.textContent = questions[idx];
-      });
-    })();
-  </script>
 </Layout>

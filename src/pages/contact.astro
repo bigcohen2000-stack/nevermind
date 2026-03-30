@@ -6,121 +6,70 @@ import { FloatingInput } from "../components/ui/FloatingInput";
 import appConfig from "../config/appConfig.json";
 import { buildWhatsAppHref } from "../lib/services";
 import { WEB3FORMS_ACCESS_KEY } from "../lib/web3forms-access";
-const waGeneral = buildWhatsAppHref(
-  "׳³ג€׳³ג„¢׳³ג„¢, ׳³ג‚×׳³ֲ ׳³ג„¢׳³ֳ—׳³ג„¢ ׳³ֲ׳³ֲ¢׳³ֲ׳³ג€¢׳³ג€ ׳³ג„¢׳³ֲ¦׳³ג„¢׳³ֲ¨׳³ֳ— ׳³ג€׳³ֲ§׳³ֲ©׳³ֲ¨ ׳³ג€˜׳³ֲ׳³ֳ—׳³ֲ¨. ׳³ֲ׳³ג‚×׳³ֲ©׳³ֲ¨ ׳³ֲ׳³ג€”׳³ג€“׳³ג€¢׳³ֲ¨ ׳³ֲ׳³ֲ׳³ג„¢׳³ג„¢ ׳³ג€÷׳³ֲ׳³ֲ?"
-);
+
+const waGeneral = buildWhatsAppHref("שלום, יש לי שאלה דרך עמוד יצירת הקשר של NeverMind.");
 const tel = appConfig.contact.phoneTel?.trim() || "";
 ---
 
-<Layout
-  title="׳³ג„¢׳³ֲ¦׳³ג„¢׳³ֲ¨׳³ֳ— ׳³ֲ§׳³ֲ©׳³ֲ¨"
-  description="׳³ֲ׳³ג„¢׳³ג„¢׳³ֲ, ׳³ֻ׳³ֲ׳³ג‚×׳³ג€¢׳³ֲ, ׳³ג€¢׳³ג€¢׳³ֲ׳³ֻ׳³ֲ¡׳³ֲ׳³ג‚× ׳³ֲ׳³ג€¢ ׳³ֻ׳³ג€¢׳³ג‚×׳³ֲ¡ ׳³ֲ§׳³ֲ¦׳³ֲ¨. ׳³ֲ׳³ֲ¡׳³ֲ׳³ג€¢׳³ֲ ׳³ֲ ׳³ג‚×׳³ֲ¨׳³ג€ ׳³ֲ׳³ג‚×׳³ֲ ׳³ג„¢ ׳³ֲ©׳³ג„¢׳³ג€”׳³ג€: ׳³ֲ¦׳³ג€¢׳³ֲ¨ ׳³ֲ§׳³ֲ©׳³ֲ¨ (׳³ֲ׳³ג€¢׳³ֲ ׳³ֲ׳³ג„¢׳³ג„¢׳³ֲ) ׳³ֲ¢׳³ֲ ׳³ג€÷׳³ֳ—׳³ג„¢׳³ג€˜׳³ג€ ׳³ֲ׳³ג€¢ ׳³ֲ¡׳³ג„¢׳³ֲ׳³ג€¢׳³ֲ."
->
+<Layout title="יצירת קשר" description="אם משהו באתר פתח שאלה, אפשר לכתוב כאן. אפשר גם לעבור ישר לוואטסאפ או למייל.">
   <section class="mx-auto max-w-3xl space-y-12 px-4 py-14 text-right text-[var(--nm-fg)]">
     <header class="space-y-4">
-      <p class="text-sm font-semibold uppercase tracking-[0.2em] text-[var(--nm-accent)]">׳³ֲ¨׳³ג€˜׳²ֲ¾׳³ֲ¢׳³ֲ¨׳³ג€¢׳³ֲ¦׳³ג„¢</p>
-      <h1 class="text-[clamp(2rem,1.5rem+2vw,3rem)] font-semibold leading-tight">׳³ג„¢׳³ֲ¦׳³ג„¢׳³ֲ¨׳³ֳ— ׳³ֲ§׳³ֲ©׳³ֲ¨</h1>
-      <p class="text-[clamp(1rem,0.95rem+0.25vw,1.15rem)] leading-[var(--line-height-ui)] text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
-        ׳³ג€׳³ג€÷׳³ג‚×׳³ֳ—׳³ג€¢׳³ֲ¨ ׳³ג€׳³ֲ¦׳³ֲ£ ׳³ג€˜׳³ג€¢׳³ג€¢׳³ֲ׳³ֻ׳³ֲ¡׳³ֲ׳³ג‚× ׳³ֲ׳³ג€¢׳³ג‚×׳³ג„¢׳³ֲ¢ ׳³ֲ׳³ג€”׳³ֲ¨׳³ג„¢ ׳³ג€™׳³ֲ׳³ג„¢׳³ֲ׳³ג€ ׳³ג€˜׳³ֲ¢׳³ֲ׳³ג€¢׳³ג€׳³ג„¢׳³ֲ ׳³ֲ¨׳³ג€˜׳³ג„¢׳³ֲ. ׳³ג€÷׳³ֲ׳³ֲ ׳³ג„¢׳³ֲ© ׳³ג€™׳³ֲ ׳³ֲ¢׳³ֲ¨׳³ג€¢׳³ֲ¦׳³ג„¢׳³ֲ ׳³ג„¢׳³ֲ©׳³ג„¢׳³ֲ¨׳³ג„¢׳³ֲ ׳³ג€˜׳³ֲ׳³ג„¢ ׳³ֳ—׳³ֲ׳³ג€¢׳³ֳ— ׳³ג€˜׳³ג€™׳³ֲ׳³ג„¢׳³ֲ׳³ג€.
+      <p class="text-sm font-semibold text-[var(--nm-accent)]">יצירת קשר</p>
+      <h1 class="text-[clamp(2rem,1.5rem+2vw,3rem)] font-semibold leading-[1.15]">אם יש שאלה, אפשר לכתוב אותה פשוט.</h1>
+      <p class="text-[clamp(1rem,0.95rem+0.25vw,1.15rem)] leading-[1.75] text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+        לא צריך ניסוח מושלם. מספיק לתאר מה קורה, מה לא ברור, או מה אתה מנסה לבדוק.
       </p>
     </header>
 
-    <aside
-      class="rounded-2xl border border-[color-mix(in_srgb,var(--nm-accent)_24%,transparent)] bg-[var(--nm-tint)] p-5 text-right"
-      aria-label="׳³ֲ׳³ֲ¡׳³ֲ׳³ג€¢׳³ֲ ׳³ֲ׳³ג€¢׳³ֲ׳³ֲ׳³ֲ¥ ׳³ֲ׳³ג‚×׳³ֲ ׳³ג„¢ ׳³ֲ©׳³ג„¢׳³ג€”׳³ג€"
-    >
-      <p class="text-sm font-semibold text-[var(--nm-fg)]">׳³ֲ¨׳³ג€¢׳³ֲ¦׳³ג€ ׳³ֲ§׳³ג€¢׳³ג€׳³ֲ ׳³ֲ׳³ג€׳³ג€˜׳³ג„¢׳³ֲ¢ ׳³ג€˜׳³ֲ§׳³ֲ¦׳³ג€˜ ׳³ֲ©׳³ֲ׳³ֲ ׳³ג€˜׳³ֲ׳³ג„¢ ׳³ֲ¢׳³ֲ¨׳³ג€¢׳³ֲ¥ ׳³ג‚×׳³ֳ—׳³ג€¢׳³ג€”?</p>
-      <p class="mt-2 text-sm leading-[var(--line-height-ui)] text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
-        ׳³ֲ¢׳³ֲ׳³ג€¢׳³ג€ ׳³ֲ ׳³ג‚×׳³ֲ¨׳³ג€ ׳³ֲ׳³ג€÷׳³ֳ—׳³ג„¢׳³ג€˜׳³ג€ ׳³ֲ׳³ג€¢ ׳³ֲ¡׳³ג„¢׳³ֲ׳³ג€¢׳³ֲ, ׳³ֲ¢׳³ֲ ׳³ג€׳³ֲ¢׳³ֲ¨׳³ג€¢׳³ֳ— ׳³ג€˜׳³ג€׳³ֲ¨׳³ֲ ׳³ֲ׳³ג‚×׳³ג„¢ ׳³ֲ׳³ג€ ׳³ֲ©׳³ג€˜׳³ג€”׳³ֲ¨׳³ֳ—.
+    <aside class="rounded-2xl border border-[color-mix(in_srgb,var(--nm-accent)_24%,transparent)] bg-[var(--nm-tint)] p-5 text-right">
+      <p class="text-sm font-semibold text-[var(--nm-fg)]">רוצה ערוץ מהיר יותר?</p>
+      <p class="mt-2 text-sm leading-[1.75] text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
+        אפשר לעבור ישר לוואטסאפ, לטלפון, או למייל. הטופס כאן מתאים למי שרוצה לנסח רגע בשקט.
       </p>
-      <a
-        href="/intake/"
-        data-astro-prefetch
-        class="mt-4 inline-flex min-h-[44px] w-full items-center justify-center rounded-full bg-[var(--nm-inverse)] px-5 py-3 text-sm font-semibold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-inverse-hover)] sm:w-auto"
-      >
-        ׳³ֲ¦׳³ג€¢׳³ֲ¨ ׳³ֲ§׳³ֲ©׳³ֲ¨ (׳³ֲ׳³ג€¢׳³ֲ ׳³ֲ׳³ג„¢׳³ג„¢׳³ֲ)
+      <a href="/intake/" class="mt-4 inline-flex min-h-[48px] items-center rounded-full bg-[var(--nm-inverse)] px-6 py-3 text-xl font-bold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-inverse-hover)]">
+        בואו נבדוק יחד
       </a>
     </aside>
 
-    <nav aria-label="׳³ֲ¢׳³ֲ¨׳³ג€¢׳³ֲ¦׳³ג„¢ ׳³ֲ§׳³ֲ©׳³ֲ¨ ׳³ֲ׳³ג€׳³ג„¢׳³ֲ¨׳³ג„¢׳³ֲ" class="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:justify-end">
-      <a
-        href={waGeneral}
-        target="_blank"
-        rel="noreferrer"
-        class="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full bg-[var(--nm-accent)] px-5 py-3 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]"
-        title="׳³ֲ׳³ג€¢׳³ֲ¢׳³ג€׳³ֲ£ ׳³ֲ׳³ֳ—׳³ג€™׳³ג€¢׳³ג€˜׳³ג€ ׳³ֲ׳³ג€׳³ג„¢׳³ֲ¨׳³ג€"
-      >
-        ׳³ג€¢׳³ג€¢׳³ֲ׳³ֻ׳³ֲ¡׳³ֲ׳³ג‚× (׳³ֲ׳³ג€¢׳³ֲ¢׳³ג€׳³ֲ£)
+    <nav aria-label="ערוצי קשר מהירים" class="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:justify-end">
+      <a href={waGeneral} target="_blank" rel="noreferrer" class="inline-flex min-h-[44px] items-center justify-center rounded-full bg-[var(--nm-accent)] px-5 py-3 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]">
+        וואטסאפ
       </a>
       {tel ? (
-        <a
-          href={`tel:${tel.replace(/\s/g, "")}`}
-          class="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-5 py-3 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]"
-          title="׳³ֲ©׳³ג„¢׳³ג€”׳³ג€ ׳’ג‚¬ג€ ׳³ֲ׳³ֲ ׳³ֳ—׳³ֲ׳³ג„¢׳³ג€ ׳³ג€“׳³ֲ׳³ג„¢׳³ֲ ׳³ג€¢׳³ֳ— ׳³ֲ׳³ג„¢׳³ג„¢׳³ג€׳³ג„¢׳³ֳ—"
-        >
-          ׳³ֻ׳³ֲ׳³ג‚×׳³ג€¢׳³ֲ: {appConfig.contact.phoneDisplay}
+        <a href={`tel:${tel.replace(/\s/g, "")}`} class="inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-5 py-3 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]">
+          טלפון: {appConfig.contact.phoneDisplay}
         </a>
       ) : null}
-      <a
-        href={`mailto:${appConfig.contact.email}`}
-        class="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-5 py-3 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]"
-      >
-        ׳³ֲ׳³ג„¢׳³ג„¢׳³ֲ
+      <a href={`mailto:${appConfig.contact.email}`} class="inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-5 py-3 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]">
+        מייל
       </a>
     </nav>
 
     <section aria-labelledby="contact-form-heading" class="space-y-4">
-      <h2 id="contact-form-heading" class="text-xl font-semibold">
-        ׳³ֻ׳³ג€¢׳³ג‚×׳³ֲ¡ ׳³ֲ§׳³ֲ¦׳³ֲ¨
-      </h2>
-      <p class="text-sm leading-[var(--line-height-ui)] text-[color-mix(in_srgb,var(--nm-fg)_65%,var(--nm-bg))]">
-        ׳³ֲ©׳³ג€׳³ג€¢׳³ֳ— ׳³ג€”׳³ג€¢׳³ג€˜׳³ג€ ׳³ֲ׳³ֲ¡׳³ג€¢׳³ֲ׳³ֲ ׳³ג„¢׳³ֲ ׳³ג€˜׳³ֻ׳³ג€¢׳³ג‚×׳³ֲ¡. ׳³ג€™׳³ג€¢׳³ג€׳³ֲ ׳³ֻ׳³ֲ§׳³ֲ¡׳³ֻ ׳³ֲ׳³ג„¢׳³ֲ ׳³ג„¢׳³ֲ׳³ֲ׳³ג„¢ ׳³ג€˜׳³ֲ׳³ג€¢׳³ג€˜׳³ג„¢׳³ג„¢׳³ֲ ׳³ֲ׳³ג€¢׳³ֲ ׳³ֲ¢ ׳³ג€“׳³ג€¢׳³ֲ ׳³ֲ׳³ג€¢׳³ֻ׳³ג€¢׳³ֲ׳³ֻ׳³ג„¢ ׳³ג€˜-iOS.
+      <h2 id="contact-form-heading" class="text-xl font-semibold">לשלוח שאלה קצרה</h2>
+      <p class="text-sm leading-[1.75] text-[color-mix(in_srgb,var(--nm-fg)_65%,var(--nm-bg))]">
+        השמירה המקומית פועלת אוטומטית. גם אם תצא מהעמוד, מה שכתבת נשאר על המכשיר שלך.
       </p>
 
-      <form
-        id="contact-form"
-        data-nm-antispam
-        class="space-y-4 rounded-3xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/80 p-6"
-        action="https://api.web3forms.com/submit"
-        method="POST"
-      >
+      <form id="contact-form" data-nm-antispam class="space-y-4 rounded-3xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/85 p-6" action="https://api.web3forms.com/submit" method="POST">
         <input type="hidden" name="access_key" value={WEB3FORMS_ACCESS_KEY} />
-        <input type="hidden" name="subject" value="׳³ג‚×׳³ֲ ׳³ג„¢׳³ג„¢׳³ג€ ׳³ֲ׳³ֲ¢׳³ֲ׳³ג€¢׳³ג€ ׳³ג„¢׳³ֲ¦׳³ג„¢׳³ֲ¨׳³ֳ— ׳³ֲ§׳³ֲ©׳³ֲ¨ | NeverMind" />
+        <input type="hidden" name="subject" value="פנייה מעמוד יצירת קשר | NeverMind" />
         <input type="hidden" name="page" value="contact" />
         <input type="text" name="botcheck" class="hidden" tabindex="-1" autocomplete="off" aria-hidden="true" />
         <FormAntispamFields />
 
-        <FloatingInput client:load id="contact-name" name="name" label="׳³ֲ©׳³ֲ" required dir="rtl" autoComplete="name" />
-        <FloatingInput client:load id="contact-email" name="email" label="׳³ֲ׳³ג„¢׳³ֲ׳³ג„¢׳³ג„¢׳³ֲ" type="email" required dir="rtl" autoComplete="email" />
-        <FloatingInput
-          client:load
-          id="contact-message"
-          name="message"
-          label="׳³ג€׳³ג€¢׳³ג€׳³ֲ¢׳³ג€"
-          multiline
-          rows={5}
-          required
-          dir="rtl"
-          autoComplete="off"
-        />
+        <FloatingInput client:load id="contact-name" name="name" label="שם" required dir="rtl" autoComplete="name" />
+        <FloatingInput client:load id="contact-email" name="email" label="אימייל" type="email" required dir="rtl" autoComplete="email" />
+        <FloatingInput client:load id="contact-message" name="message" label="מה אתה רוצה לבדוק" multiline rows={5} required dir="rtl" autoComplete="off" />
 
         <Web3FormsHcaptcha idSuffix="contact" />
 
-                <button
-          type="submit"
-          class="w-full rounded-full bg-[var(--nm-inverse)] px-5 py-4 text-sm font-bold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-accent)]"
-        >
+        <button type="submit" class="w-full rounded-full bg-[var(--nm-inverse)] px-6 py-4 text-xl font-bold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-accent)]">
           יש לי שאלה
         </button>
-                <p data-contact-status aria-live="polite" class="text-center text-sm text-[color-mix(in_srgb,var(--nm-fg)_58%,var(--nm-bg))] opacity-0 transition-opacity">
-          קיבלתי את ההודעה.
-        </p>
+        <p data-contact-status aria-live="polite" class="text-center text-sm text-[color-mix(in_srgb,var(--nm-fg)_58%,var(--nm-bg))] opacity-0 transition-opacity"></p>
       </form>
     </section>
-
-    <p class="text-xs leading-[var(--line-height-ui)] text-[color-mix(in_srgb,var(--nm-fg)_52%,var(--nm-bg))]">
-      <a href="/accessibility/" class="underline underline-offset-2 hover:text-[var(--nm-accent)]">׳³ג€׳³ֲ¦׳³ג€׳³ֲ¨׳³ֳ— ׳³ֲ ׳³ג€™׳³ג„¢׳³ֲ©׳³ג€¢׳³ֳ—</a>
-    </p>
   </section>
 
   <script is:inline>
@@ -129,6 +78,7 @@ const tel = appConfig.contact.phoneTel?.trim() || "";
 
       const contactForm = document.querySelector("#contact-form");
       const status = document.querySelector("[data-contact-status]");
+      const submitButton = contactForm?.querySelector('[type="submit"]');
       if (!(contactForm instanceof HTMLFormElement)) return;
 
       if (typeof window.__nmStampFormAntispam === "function") {
@@ -140,8 +90,29 @@ const tel = appConfig.contact.phoneTel?.trim() || "";
         unmountHcaptcha = window.__nmMountHcaptcha(contactForm);
       }
 
+      const showStatus = (message) => {
+        if (!(status instanceof HTMLElement)) return;
+        status.textContent = message;
+        status.classList.add("opacity-100");
+      };
+
+      const clearLoading = () => {
+        if (submitButton instanceof HTMLElement) {
+          window.__nmClearButtonLoading?.(submitButton);
+        }
+      };
+
+      const getHcaptchaToken = () => {
+        const tokenInput = contactForm.querySelector('input[name="h-captcha-response"]');
+        return tokenInput instanceof HTMLInputElement ? tokenInput.value.trim() : "";
+      };
+
       const onSubmit = async (event) => {
         event.preventDefault();
+        if (submitButton instanceof HTMLElement) {
+          window.__nmSetButtonLoading?.(submitButton, "מזקק את המנגנון...");
+        }
+
         const fd = new FormData(contactForm);
         const msg = String(fd.get("message") || "").trim();
         const read = window.__nmReadAntispamFromForm;
@@ -149,38 +120,41 @@ const tel = appConfig.contact.phoneTel?.trim() || "";
         if (typeof read === "function" && typeof validate === "function") {
           const as = read(contactForm);
           const check = validate({ ...as, messageTexts: [msg] });
-          if (!check.ok && status instanceof HTMLElement) {
-            status.textContent = check.userMessage;
-            status.classList.add("opacity-100");
+          if (!check.ok) {
+            showStatus(check.userMessage);
+            clearLoading();
             return;
           }
         }
-        if (typeof window.__nmHcaptchaOk === "function" && !window.__nmHcaptchaOk(contactForm)) {
-          if (status instanceof HTMLElement) {
-            status.textContent = "ן¿½ן¿½ ן¿½ן¿½ן¿½ן¿½ן¿½ן¿½ ן¿½ן¿½ ן¿½ן¿½ן¿½ן¿½ן¿½ן¿½ ן¿½ן¿½ן¿½ן¿½.";
-            status.classList.add("opacity-100");
-          }
+
+        const token = getHcaptchaToken();
+        if (!token) {
+          showStatus("נא להשלים את האימות לפני השליחה.");
+          clearLoading();
           return;
         }
+        fd.set("h-captcha-response", token);
+
         try {
           const res = await fetch("https://api.web3forms.com/submit", { method: "POST", body: fd });
+          const text = await res.text();
           if (res.ok) {
             contactForm.reset();
-            if (status instanceof HTMLElement) {
-              status.textContent = "ן¿½ן¿½ן¿½ן¿½ן¿½ן¿½ ן¿½ן¿½ ן¿½ן¿½ן¿½ן¿½ן¿½ן¿½.";
-              status.classList.add("opacity-100");
-            }
-            window.dispatchEvent(new CustomEvent("nm-analytics", { detail: { name: "contact_form_submit" } }));
-            window.__nmAnnounce?.("ן¿½ן¿½ן¿½ן¿½ן¿½ן¿½ ן¿½ן¿½ן¿½ן¿½ן¿½ן¿½");
-          } else if (status instanceof HTMLElement) {
-            status.textContent = "ן¿½ן¿½ ן¿½ן¿½ ן¿½ן¿½ן¿½ ן¿½ן¿½ן¿½ן¿½. ן¿½ן¿½ן¿½ן¿½ ן¿½ן¿½ן¿½ן¿½ן¿½ ן¿½ן¿½ן¿½.";
-            status.classList.add("opacity-100");
+            showStatus("השאלה נקלטה.");
+            window.__nmHapticSuccess?.();
+            window.__nmAnnounce?.("השאלה נקלטה");
+          } else {
+            const lower = text.toLowerCase();
+            showStatus(
+              lower.includes("hcaptcha") || lower.includes("mandatory")
+                ? "השרת לא אישר קבלה. אפשר לנסות שוב או פשוט לשלוח לנו הודעה בוואטסאפ."
+                : "השרת לא אישר קבלה. אפשר לנסות שוב או פשוט לשלוח לנו הודעה בוואטסאפ."
+            );
           }
         } catch {
-          if (status instanceof HTMLElement) {
-            status.textContent = "ן¿½ן¿½ ן¿½ן¿½ ן¿½ן¿½ן¿½ ן¿½ן¿½ן¿½ן¿½. ן¿½ן¿½ן¿½ן¿½ ן¿½ן¿½ן¿½ן¿½ן¿½ ן¿½ן¿½ן¿½.";
-            status.classList.add("opacity-100");
-          }
+          showStatus("השרת לא אישר קבלה. אפשר לנסות שוב או פשוט לשלוח לנו הודעה בוואטסאפ.");
+        } finally {
+          clearLoading();
         }
       };
 
@@ -188,6 +162,7 @@ const tel = appConfig.contact.phoneTel?.trim() || "";
 
       window.__nmContactCleanup = () => {
         unmountHcaptcha();
+        clearLoading();
         contactForm.removeEventListener("submit", onSubmit);
       };
     });

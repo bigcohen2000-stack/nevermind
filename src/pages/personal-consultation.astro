@@ -1,4 +1,4 @@
----
+﻿---
 import Layout from "../layouts/Layout.astro";
 import ServiceCard from "../components/ServiceCard.astro";
 import ThoughtShiftProof from "../components/ThoughtShiftProof.astro";
@@ -11,50 +11,49 @@ const consultationService = findServiceById("phone-perspective");
 const subscriptionService = findServiceById("retainer-subscription");
 const authorityService = findServiceById("podcast-mic");
 
-// TODO: Ensure fallback schema matches DB structure.
 const fallbackConsultation = ({
   id: "phone-perspective",
-  title: "שיחת מיקוד 20 דקות",
-  subtitle: "להפריד עובדה מפירוש - עכשיו",
-  description: "שיחה קצרה ומדויקת למצב שבו אתה צריך בהירות עכשיו, לא בעוד חודש.",
+  title: "שיחת מיקוד של 20 דקות",
+  subtitle: "כדי להפריד בין עובדה לפירוש בזמן אמת",
+  description: "שיחה קצרה למצב שבו יש החלטה, קונפליקט, או תקיעות שצריך לפרק עכשיו.",
   price_full: 450,
   action_type: "whatsapp",
-  action_text: "כן, אני רוצה להתחיל",
+  action_text: "אני רוצה להתחיל",
   visible: true,
   badges: [],
-  features: [],
+  features: ["שיחה קצרה ומדויקת", "פירוק של הנחה אחת מרכזית", "כיוון פעולה אחד ברור"],
   stageName: "בהירות מיידית",
-  targetAudience: "מי שצריך תשובה עכשיו",
+  targetAudience: "למי שצריך תשובה עכשיו",
 } as unknown as FlatService);
 
 const fallbackSubscription = ({
   id: "retainer-subscription",
-  title: "מסלול ליווי מתמשך - מרפסת",
-  subtitle: "המסלול הקבוע שלך להתפתחות אמיתית",
-  description: "שני מפגשים בחודש וליווי וואטסאפ יומי למי שצריך עומק מתמשך ולא רק תשובה רגעית.",
+  title: "מסלול המשך חודשי",
+  subtitle: "למי שלא מחפש עוד תוכן, אלא רצף עבודה",
+  description: "שני מפגשים בחודש וליווי מתמשך למי שרוצה לראות מנגנונים חוזרים ולא רק לפתור רגע אחד.",
   price_full: 1800,
   action_type: "whatsapp",
-  action_text: "אני רוצה להתחיל מנוי מרפסת",
+  action_text: "אני רוצה מסלול המשך",
   visible: true,
-  badges: ["הכי פופולרי"],
-  features: [],
+  badges: ["מסלול עומק"],
+  features: ["שני מפגשים בכל חודש", "מקום לשאלות בין מפגשים", "רצף שמאפשר לראות תבנית"],
   stageName: "ליווי והמשכיות",
-  targetAudience: "מי שרוצה גב קבוע",
+  targetAudience: "למי שרוצה גב קבוע",
 } as unknown as FlatService);
 
 const fallbackAuthority = ({
   id: "podcast-mic",
-  title: "סשן מצולם + ייעוץ אסטרטגי",
-  subtitle: "תוכן ברמה גבוהה לרשתות שלך",
-  description: "יום צילום מלא באולפן עם ייעוץ מדויק למי שרוצה להפוך תובנות לנכס תוכן וסמכות.",
+  title: "סשן אולפן ותוכן",
+  subtitle: "כשהמטרה היא להפוך הבנה למסמך, פרק, או מסר מדויק",
+  description: "יום אולפן קצר למי שרוצה לבנות תוכן חד מתוך הבנה ולא מתוך רעש.",
   price_full: 2950,
   action_type: "invoice",
-  action_text: "שריין סשן מצולם",
+  action_text: "אני רוצה לבדוק התאמה",
   visible: true,
-  badges: ["השקעה אסטרטגית"],
-  features: [],
-  stageName: "השפעה וסמכות",
-  targetAudience: "מי שרוצה להפוך תובנות לנכס",
+  badges: ["עבודה אסטרטגית"],
+  features: ["מיקוד מסר", "צילום או הקלטה", "תרגום של רעיון למבנה"],
+  stageName: "השפעה ותוכן",
+  targetAudience: "למי שבונה קול ברור החוצה",
 } as unknown as FlatService);
 
 const featuredServices: FlatService[] = [
@@ -63,165 +62,71 @@ const featuredServices: FlatService[] = [
   authorityService ?? fallbackAuthority,
 ];
 
-const pageTitle = "אני לא פה כדי לתת לך עצות. אני פה כדי שתחזור לראות.";
-const pageDescription = "שיחת מיקוד אישית למי שנתקע בצומת בחיים וצריך בהירות נקייה, בלי סיבוכים ובלי מריחות.";
-const pricingHref = "#pricing";
-const proofItems = [
-  "לא טיפול. לא תהליך ארוך. שיחה אחת שמחזירה סדר למה שמרגיש מפוזר.",
-  "מתאים לרגעים של קונפליקט, משבר אמונה, פיצול פנימי, זוגיות או החלטה שאתה דוחה יותר מדי זמן.",
-  "המטרה היא לא להרשים אותך. המטרה היא שתצא עם דבר אחד ברור שאפשר לפעול עליו מיד.",
-];
-
-const pillars = [
+const mechanismCards = [
   {
-    icon: "◎",
-    title: "עומק חד-פעמי",
-    text: "אני לא מושך אותך לתהליך ארוך. אני נכנס איתך ישר לליבה של מה שקורה כדי לחתוך רעש, בלבול ודחייה.",
+    title: "עובדה",
+    body: "מה קרה בפועל, בלי שיפוט ובלי סיפור שמתווסף אחר כך.",
   },
   {
-    icon: "◇",
-    title: "עצמאות מחשבתית",
-    text: "אני לא בונה תלות. אני מלמד אותך לזהות בעצמך איפה אתה מתבלבל ואיך לחזור לקרקע יציבה.",
+    title: "פירוש",
+    body: "המשפט שהמוח מוסיף, ואז מתחיל לנהל פחד, תקיעות, או הימנעות.",
   },
   {
-    icon: "↗",
-    title: "שיטה פרקטית",
-    text: "אני לא מוכר שפה גבוהה. אני מפרק איתך את המציאות כמו שהיא ומתרגם אותה לצעד ברור שאפשר לבצע בעולם האמיתי.",
-  },
-];
-
-const processSteps = [
-  {
-    title: "מיפוי מטרות",
-    text: "אני לא מתחיל בפתרון. אני מתחיל איתך בלראות מה אתה באמת רוצה ומה רק נשמע דחוף בגלל לחץ.",
-  },
-  {
-    title: "ניתוח לוגי",
-    text: "אני מפריד איתך בין עובדה, פירוש, פחד והרגל. כאן הסיפור מאבד שליטה והמצב מתחיל להתבהר.",
-  },
-  {
-    title: "תוכנית פעולה",
-    text: "אני מוציא אותך עם כיוון ברור אחד. לא חמישה תרחישים. לא עוד עומס. פעולה אחת נכונה שמחזירה תנועה.",
+    title: "פעולה",
+    body: "אחרי שהפירוש נבדק, בוחרים צעד אחד שאפשר באמת לבצע.",
   },
 ];
 
 const benefits = [
-  {
-    title: "בהירות בקבלת החלטות",
-    text: "פחות רעש, פחות התלבטות מיותרת, ויותר יכולת לראות מה באמת נכון לבחור.",
-  },
-  {
-    title: "צמיחה כלכלית ואישית",
-    text: "כשמחשבה מפסיקה להיתקע סביב עצמה, מתחילים לזוז טוב יותר גם בעבודה, גם בכסף וגם ביחסים.",
-  },
-  {
-    title: "שקט נפשי בר-קיימא",
-    text: "לא שקט מזויף של הדחקה. שקט שמגיע כשיש מבנה פנימי מסודר יותר ואחיזה יציבה יותר במציאות.",
-  },
+  "בהירות מול החלטה שקפאה יותר מדי זמן.",
+  "פירוק של קונפליקט זוגי או אישי בלי להסתבך בעוד שכבות.",
+  "הבנה של מה באמת מפעיל אותך לפני שמגיבים שוב מאותו מקום.",
 ];
 ---
 
-<Layout title={pageTitle} description={pageDescription}>
-  <section class="mx-auto max-w-6xl space-y-20 px-4 pb-20 text-[var(--nm-fg)]">
-    <header class="grid gap-10 rounded-[2.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface)] px-6 py-10 shadow-[0_24px_80px_rgba(26,26,26,0.06)] md:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] md:px-10 md:py-14">
-      <div class="space-y-6 text-right">
-        <p class="text-sm font-semibold uppercase tracking-[0.24em] text-[var(--nm-accent)]">ייעוץ אישי | השם לא משנה</p>
-        <h1 class="text-[clamp(2.5rem,2rem+2vw,4.7rem)] font-semibold leading-[1.02] text-[var(--nm-fg)]">
-          אני לא פה כדי לייעץ לך. אני פה כדי שתראה.
+<Layout title="ייעוץ אישי" description="שיחה אישית שמפרקת את המנגנון שמחזיק תקיעות, פחד, או קונפליקט, ובונה צעד פעולה ברור.">
+  <section class="mx-auto max-w-6xl space-y-16 px-4 pb-20 text-right text-[var(--nm-fg)]">
+    <header class="grid gap-8 rounded-[2.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/88 px-6 py-10 shadow-[0_24px_80px_rgba(26,26,26,0.06)] lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:px-10">
+      <div class="space-y-5">
+        <p class="text-sm font-semibold text-[var(--nm-accent)]">ייעוץ אישי</p>
+        <h1 class="text-[clamp(2.4rem,2rem+1.8vw,4rem)] font-semibold leading-[1.1] text-[var(--nm-fg)]">
+          לא עוד עצה. בדיקה של המנגנון שמחזיק את הבעיה.
         </h1>
-        <p class="max-w-3xl text-[clamp(1rem,0.96rem+0.35vw,1.18rem)] leading-8 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
-          אם נתקעת בצומת, בתוך קשר, או מול החלטה שמעייפת אותך - אתה לא חייב עוד תוכן. אתה צריך לוגיקה. בשיחה אחת אני עוזר לך להפריד בין מה שקרה באמת, לבין הסיפור שאתה מספר לעצמך ושואב לך את האנרגיה.
-        </p>
-        <p class="max-w-3xl text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_60%,var(--nm-bg))]">
-          השם לא משנה | הבנה אחת פותרת הכל
+        <p class="max-w-3xl text-[clamp(1rem,0.96rem+0.25vw,1.15rem)] leading-[1.75] text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+          כשיש רעש, לא חסר מידע. חסרה הבחנה. בשיחה אחת אנחנו מפרידים בין עובדה, פירוש, ופעולה.
         </p>
         <div class="flex flex-wrap justify-end gap-3 pt-2">
-          <a href={pricingHref} class="inline-flex items-center justify-center rounded-full bg-[var(--nm-accent)] px-6 py-3 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]">
-            כן, אני רוצה להתחיל
+          <a href="#pricing" class="inline-flex min-h-[44px] items-center rounded-full bg-[var(--nm-accent)] px-5 py-3 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]">
+            לראות מסלולים
           </a>
-          <a href="/intake/" class="inline-flex items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white px-6 py-3 text-sm font-semibold text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))] transition hover:bg-[var(--nm-surface-muted)]">
-            לשאלון התאמה וסינון
+          <a href="/intake/" class="inline-flex min-h-[44px] items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-white px-5 py-3 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]">
+            אני צריך הכוונה
           </a>
         </div>
       </div>
 
-      <aside class="rounded-[1.9rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-6 text-right">
-        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">מהי השיחה הזו בעצם</p>
-        <ul class="mt-5 space-y-4">
-          {proofItems.map((item) => (
-            <li class="rounded-[1.3rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white px-4 py-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">{item}</li>
+      <aside class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-6">
+        <p class="text-sm font-semibold text-[var(--nm-accent)]">איך זה עובד</p>
+        <div class="mt-4 grid gap-3">
+          {mechanismCards.map((item) => (
+            <article class="rounded-[1.3rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white px-4 py-4">
+              <h2 class="text-lg font-semibold text-[var(--nm-fg)]">{item.title}</h2>
+              <p class="mt-2 text-sm leading-[1.7] text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">{item.body}</p>
+            </article>
           ))}
-        </ul>
+        </div>
       </aside>
     </header>
 
-    <section class="space-y-6 text-right">
-      <div class="space-y-3">
-        <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--nm-accent)]">עמודי התווך</p>
-        <h2 class="text-[clamp(1.9rem,1.5rem+1vw,2.8rem)] font-semibold text-[var(--nm-fg)]">זה לא עוד ייעוץ. זו דרך חשיבה.</h2>
-      </div>
-      <div class="grid gap-5 md:grid-cols-3">
-        {pillars.map((pillar) => (
-          <article class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface)] p-5 shadow-[0_18px_50px_rgba(26,26,26,0.04)] transition duration-300 hover:shadow-[0_24px_70px_rgba(26,26,26,0.08)]">
-            <div class="flex items-center justify-end gap-3">
-              <h3 class="text-xl font-semibold text-[var(--nm-fg)]">{pillar.title}</h3>
-              <span class="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)] bg-[var(--nm-tint)] text-lg font-semibold text-[var(--nm-accent)]">
-                {pillar.icon}
-              </span>
-            </div>
-            <p class="mt-4 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">{pillar.text}</p>
-          </article>
-        ))}
-      </div>
+    <section class="grid gap-5 md:grid-cols-3">
+      {benefits.map((item) => (
+        <article class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-5 shadow-[0_18px_50px_rgba(26,26,26,0.04)]">
+          <p class="text-base leading-[1.75] text-[var(--nm-fg)]">{item}</p>
+        </article>
+      ))}
     </section>
 
-    <section class="space-y-6 text-right">
-      <div class="space-y-3">
-        <p class="text-sm font-semibold text-[var(--nm-accent)]">תהליך הייעוץ</p>
-        <h2 class="text-[clamp(1.9rem,1.5rem+1vw,2.8rem)] font-semibold text-[var(--nm-fg)]">איך זה עובד בפועל?</h2>
-      </div>
-      <div class="space-y-4">
-        {processSteps.map((step, index) => (
-          <article class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-5 shadow-[0_18px_50px_rgba(26,26,26,0.04)] transition duration-300 hover:shadow-[0_24px_70px_rgba(26,26,26,0.08)]">
-            <div class="flex items-center justify-end gap-3">
-              <h3 class="text-xl font-semibold text-[var(--nm-fg)]">{step.title}</h3>
-              <span class="inline-flex h-8 min-w-8 items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)] px-2 text-xs font-semibold text-[var(--nm-accent)]">
-                0{index + 1}
-              </span>
-            </div>
-            <p class="mt-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">{step.text}</p>
-          </article>
-        ))}
-      </div>
-    </section>
-
-    <section class="grid gap-6 rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-6 py-8 md:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] md:px-10">
-      <div class="space-y-3 text-right">
-        <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--nm-accent)]">למי זה נכון</p>
-        <h2 class="text-2xl font-semibold text-[var(--nm-fg)]">לא לכל אחד. כן למי שכבר מבין שהבעיה היא לא מחסור במידע.</h2>
-      </div>
-      <div class="space-y-4 text-right text-sm leading-8 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">
-        <p>זה נכון למי שמרגיש שהוא מסתובב סביב אותו צומת יותר מדי זמן. למי ששומע את עצמו מסביר, מצדיק, דוחה, ומתעייף מהקול שלו עצמו.</p>
-        <p>זה נכון גם למי שלא מחפש יד מחזיקה, אלא מישהו שיכול לחתוך דרך הערפל ולהראות את המבנה. לא מה נעים לשמוע. מה נכון לראות.</p>
-      </div>
-    </section>
-
-    <section class="space-y-6 rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface)] px-6 py-8 shadow-[0_18px_60px_rgba(26,26,26,0.04)] md:px-10">
-      <div class="space-y-3 text-right">
-        <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--nm-accent)]">הערך הסופי</p>
-        <h2 class="text-[clamp(1.9rem,1.5rem+1vw,2.8rem)] font-semibold text-[var(--nm-fg)]">מערכת הפעלה חדשה לחשיבה</h2>
-      </div>
-      <div class="grid gap-5 md:grid-cols-3">
-        {benefits.map((benefit) => (
-          <article class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-5 text-right">
-            <h3 class="text-xl font-semibold text-[var(--nm-fg)]">{benefit.title}</h3>
-            <p class="mt-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">{benefit.text}</p>
-          </article>
-        ))}
-      </div>
-    </section>
-
-    <ThoughtShiftProof items={servicesThoughtShifts} heading="מה משתנה אחרי שיחה מדויקת" eyebrow="לפני ואחרי לוגי" />
+    <ThoughtShiftProof items={servicesThoughtShifts} heading="מה משתנה אחרי שיחה מדויקת" eyebrow="לפני ואחרי" />
 
     <CostOfNoCalculator />
 
@@ -229,45 +134,33 @@ const benefits = [
 
     <WhyThisIsNotForYou
       title="למי זה לא מתאים כרגע"
-      intro="אם אתה כבר מרגיש שהמבנה הנוכחי שלך נשען על בלבול, עדיף לבדוק התאמה בכנות לפני שנכנסים למסלול."
+      intro="העבודה כאן לא מלטפת את הסיפור. היא בודקת אותו. לכן צריך רצון לראות, לא רק רצון להירגע."
       items={[
-        "למי שמחפש אישור שהוא כבר צודק, ולא מוכן לפגוש אפשרות שהפירוש שלו עצמו מחזיק את התקיעות.",
-        "למי שרוצה שמישהו ייקח ממנו את הבחירה במקום ללמוד לראות נכון יותר מה באמת קורה.",
-        "למי שמחפש טיפול, הרגעה או עטיפה רגשית, כשמה שנדרש כאן הוא פירוק לוגי ובהירות.",
+        "למי שמחפש אישור שהוא כבר צודק.",
+        "למי שרוצה שמישהו אחר יחליט במקומו.",
+        "למי שמעדיף להישאר ברמת הסימפטום ולא לגעת בהנחה שמפעילה אותו.",
       ]}
-      closing="אם זה עדיין לא הזמן שלך להיכנס לשיחה כזו, זה לגיטימי. עדיף להגיע כשיש נכונות אמיתית לראות את מה שקורה, לא רק רצון להרגיש טוב יותר לכמה שעות."
+      closing="אם זה לא הזמן שלך להיכנס לשיחה כזאת, זה לגיטימי. עדיף לחכות לרגע שבו יש נכונות אמיתית לראות."
     />
 
-    <section id="pricing" class="space-y-6 text-right">
+    <section id="pricing" class="space-y-6">
       <div class="space-y-3">
-        <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--nm-accent)]">מסלולי עבודה</p>
-        <h2 class="text-[clamp(2rem,1.6rem+1vw,3rem)] font-semibold text-[var(--nm-fg)]">תבחר את עומק ההתקדמות שמתאים לך עכשיו</h2>
-        <p class="max-w-3xl text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">אם אתה צריך בהירות עכשיו, תתחיל קצר. אם אתה מחפש מסלול מתמשך או מהלך עם השפעה חיצונית, תבחר את השלב שמחזיק את זה נכון.</p>
+        <p class="text-sm font-semibold text-[var(--nm-accent)]">מסלולי עבודה</p>
+        <h2 class="text-[clamp(2rem,1.6rem+1vw,3rem)] font-semibold text-[var(--nm-fg)]">המחירון מסודר לפי עומק, לא לפי רעש.</h2>
+        <p class="max-w-3xl text-sm leading-[1.75] text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">
+          מתחילים במה שמתאים למצב הנוכחי. אם צריך עומק, ממשיכים. אם צריך בהירות מיידית, לא מעמיסים מסלול ארוך.
+        </p>
       </div>
-      <div class="grid gap-6 lg:grid-cols-3">
+
+      <div class="grid items-stretch gap-6 lg:grid-cols-2 xl:grid-cols-3">
         {featuredServices.map((featuredService) => (
           <ServiceCard service={featuredService} />
         ))}
       </div>
-      <div class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-5 py-4 text-right text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_66%,var(--nm-bg))]">
-        התשלום מבוצע במערכת Grow המאובטחת בתקן המחמיר ביותר.
-      </div>
+
+      <p class="rounded-[1.4rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-5 py-4 text-sm leading-[1.75] text-[color-mix(in_srgb,var(--nm-fg)_66%,var(--nm-bg))]">
+        התשלום מתבצע דרך מערכת Grow. אם צריך לשאול לפני, אפשר לפתוח שאלה קצרה בוואטסאפ מתוך כל כרטיס.
+      </p>
     </section>
   </section>
 </Layout>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

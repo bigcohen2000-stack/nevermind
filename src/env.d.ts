@@ -14,9 +14,25 @@ interface ImportMeta {
   readonly env: ImportMetaEnv;
 }
 
+type NmClubSession = {
+  memberName: string;
+  phone: string;
+  expiresAt: string;
+  lastLoginAt?: string;
+  fraudFlag?: boolean;
+  liveStatus?: string;
+};
+
 interface Window {
   __nmArticleCleanup?: () => void;
   __nmAnnounce?: (message: string) => void;
+  __nmHapticLight?: () => void;
+  __nmHapticSuccess?: () => void;
+  __nmSetButtonLoading?: (target: HTMLElement, label?: string) => void;
+  __nmClearButtonLoading?: (target: HTMLElement) => void;
+  __nmReadClubSession?: () => NmClubSession | null;
+  __nmClearClubSession?: () => void;
+  __nmLayoutCleanup?: () => void;
   __nmMountHcaptcha?: (form: HTMLFormElement) => () => void;
   __nmHcaptchaOk?: (form: HTMLFormElement) => boolean;
   __nmHcaptchaGlobalsRegistered?: boolean;

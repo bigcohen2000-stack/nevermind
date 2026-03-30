@@ -38,13 +38,13 @@ const defaultHref = `https://wa.me/${phone}?text=${encodeURIComponent(baseMessag
   <div
     data-trigger-overlay
     hidden
-    class="fixed inset-0 z-[70] bg-[var(--nm-inverse)]/12 opacity-0 transition-opacity duration-300"
+    class="fixed inset-0 z-[70] bg-[var(--nm-inverse)]/12 opacity-0 transition-opacity duration-[220ms] ease-[cubic-bezier(0.4,0,0.2,1)]"
   ></div>
 
   <aside
     data-trigger-panel
     hidden
-    class="fixed bottom-24 left-4 z-[71] w-[min(92vw,26rem)] rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)]/98 p-5 text-right text-[var(--nm-fg)] shadow-[0_34px_80px_rgba(26,26,26,0.18)] opacity-0 translate-y-3 transition duration-300 md:bottom-28 md:left-6"
+    class="fixed bottom-24 left-4 z-[71] w-[min(92vw,26rem)] rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)]/98 p-5 text-right text-[var(--nm-fg)] shadow-[0_34px_80px_rgba(26,26,26,0.18)] opacity-0 translate-y-3 scale-[0.98] will-change-[opacity,transform] transition-[opacity,transform] duration-[220ms] ease-[cubic-bezier(0.4,0,0.2,1)] md:bottom-28 md:left-6"
     role="dialog"
     aria-modal="true"
     aria-labelledby="trigger-buster-title"
@@ -188,6 +188,26 @@ const defaultHref = `https://wa.me/${phone}?text=${encodeURIComponent(baseMessag
       story: "",
       gain: "",
     };
+    let lockTimer = 0;
+
+    const clearLockTimer = () => {
+      if (lockTimer) {
+        window.clearTimeout(lockTimer);
+        lockTimer = 0;
+      }
+    };
+
+    const triggerLockHaptic = () => {
+      clearLockTimer();
+      lockTimer = window.setTimeout(() => {
+        try {
+          if (document.hasFocus() && navigator.vibrate) {
+            navigator.vibrate(10);
+          }
+        } catch {
+        }
+      }, 220);
+    };
 
     const setDotState = (step) => {
       dots.forEach((dot, index) => {
@@ -209,12 +229,14 @@ const defaultHref = `https://wa.me/${phone}?text=${encodeURIComponent(baseMessag
     };
 
     const openPanel = () => {
+      window.__nmHapticLight?.();
       overlay.hidden = false;
       panel.hidden = false;
       requestAnimationFrame(() => {
         overlay.classList.remove("opacity-0");
-        panel.classList.remove("opacity-0", "translate-y-3");
+        panel.classList.remove("opacity-0", "translate-y-3", "scale-[0.98]");
       });
+      triggerLockHaptic();
       openButton.setAttribute("aria-expanded", "true");
       showStep(1);
       const firstField = inputs.fact;
@@ -222,8 +244,9 @@ const defaultHref = `https://wa.me/${phone}?text=${encodeURIComponent(baseMessag
     };
 
     const closePanel = () => {
+      clearLockTimer();
       overlay.classList.add("opacity-0");
-      panel.classList.add("opacity-0", "translate-y-3");
+      panel.classList.add("opacity-0", "translate-y-3", "scale-[0.98]");
       openButton.setAttribute("aria-expanded", "false");
       window.setTimeout(() => {
         overlay.hidden = true;

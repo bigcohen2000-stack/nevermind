@@ -72,6 +72,8 @@ const articles = defineCollection({
     /** alt לתמונה: תמונה גלויה + הקשר קונספטואלי (חיזוק סמנטי ל-SEO, לא רק תיאור פיקסלים) */
     imageAlt: z.string().optional(),
     inversionNote: z.string().optional(),
+    inversionQuestion: z.string().optional(),
+    finalQuestion: z.string().optional(),
     reflectionQuestions: z.array(z.string()).length(3).optional(),
     relatedConcepts: z.array(z.string()).optional(),
     /** ל־TruthBlock microdata: Question + acceptedAnswer */

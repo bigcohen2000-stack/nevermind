@@ -3,6 +3,8 @@ import { runPagefindSearch } from "../lib/pagefind-client.js";
 const MIN_LEN = 2;
 const DEBOUNCE_MS = 320;
 const LIMIT = 6;
+const EMPTY_MESSAGE = "לא מצאנו את מה שחיפשת, אולי ננסה לשאול את ההפך?";
+const LOADING_MESSAGE = "בודק את שורש הרצון...";
 
 function escapeHtml(text) {
   return String(text ?? "")
@@ -26,7 +28,6 @@ async function runDiscoverySetup() {
 
   const configEl = document.getElementById("services-discovery-config");
   const input = document.getElementById("discovery-search");
-  const resultsEl = document.getElementById("discovery-results");
   const gapEl = document.getElementById("discovery-gap");
   const gapText = document.getElementById("discovery-gap-text");
   const gapWa = document.getElementById("discovery-gap-wa");
@@ -37,7 +38,6 @@ async function runDiscoverySetup() {
   if (
     !(configEl instanceof HTMLElement) ||
     !(input instanceof HTMLInputElement) ||
-    !(resultsEl instanceof HTMLElement) ||
     !(gapEl instanceof HTMLElement) ||
     !(gapText instanceof HTMLElement) ||
     !(gapWa instanceof HTMLAnchorElement) ||
@@ -48,11 +48,10 @@ async function runDiscoverySetup() {
     return;
   }
 
-  const contentGapMessage = configEl.dataset.contentGapMessage || "";
   const waNumber = configEl.dataset.waNumber || "";
   const waHrefForTopic = (topic) => {
     const resolvedTopic = String(topic || "").trim() || "הנושא שחיפשתי";
-    const body = `היי, חיפשתי באתר על ${resolvedTopic} ולא מצאתי, אשמח לדבר על זה.`;
+    const body = `היי, חיפשתי באתר על ${resolvedTopic} ולא מצאתי. אפשר לבדוק את זה יחד?`;
     return `https://wa.me/${waNumber}?text=${encodeURIComponent(body)}`;
   };
 
@@ -68,7 +67,44 @@ async function runDiscoverySetup() {
     statusEl.innerHTML = "";
   };
 
-  const runQuery = async (raw) => {
+  const showLoading = () => {
+    idleEl.classList.add("hidden");
+    gapEl.classList.add("hidden");
+    statusEl.classList.remove("hidden");
+    statusEl.setAttribute("aria-busy", "true");
+    statusEl.innerHTML = `
+      <div class="nm-feedback-loading space-y-3 rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] bg-[color-mix(in_srgb,var(--nm-bg-canvas)_94%,transparent)] px-4 py-4 text-right">
+        <p class="text-sm font-semibold text-[var(--nm-fg)]">${LOADING_MESSAGE}</p>
+        <span class="nm-skeleton-line nm-skeleton-line--88 block rounded-lg" aria-hidden="true"></span>
+        <span class="nm-skeleton-line nm-skeleton-line--60 block rounded-lg" aria-hidden="true"></span>
+      </div>`;
+    listEl.innerHTML = "";
+  };
+
+  const showGap = (query) => {
+    statusEl.classList.add("hidden");
+    statusEl.removeAttribute("aria-busy");
+    statusEl.innerHTML = "";
+    gapEl.classList.remove("hidden");
+    gapText.textContent = EMPTY_MESSAGE;
+    gapWa.href = waHrefForTopic(query);
+    listEl.innerHTML = "";
+  };
+
+  const showResults = (rows) => {
+    statusEl.classList.add("hidden");
+    statusEl.removeAttribute("aria-busy");
+    statusEl.innerHTML = "";
+    gapEl.classList.add("hidden");
+    listEl.innerHTML = rows
+      .map(
+        (row) =>
+          `<a href="${escapeHtml(row.url)}" data-nm-loading-label="בודק את שורש הרצון..." class="block rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[color-mix(in_srgb,var(--nm-bg-canvas)_88%,transparent)] px-4 py-4 text-right transition hover:border-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)] hover:bg-[var(--nm-surface-muted)]"><p class="font-semibold text-[var(--nm-fg)]">${escapeHtml(row.title)}</p><div class="mt-1 text-sm leading-6 text-[color-mix(in_srgb,var(--nm-fg)_62%,var(--nm-bg))]">${row.excerpt}</div></a>`
+      )
+      .join("");
+  };
+
+  const runQuery = async (raw, { announce = false } = {}) => {
     const query = String(raw || "").trim();
     if (query.length < MIN_LEN) {
       showIdle();
@@ -76,13 +112,10 @@ async function runDiscoverySetup() {
     }
 
     const myId = ++requestId;
-    idleEl.classList.add("hidden");
-    gapEl.classList.add("hidden");
-    statusEl.classList.remove("hidden");
-    statusEl.setAttribute("aria-busy", "true");
-    statusEl.innerHTML =
-      '<span class="nm-skeleton-line nm-skeleton-line--88 mb-2 block max-w-md rounded-lg" aria-hidden="true"></span><span class="nm-skeleton-line nm-skeleton-line--60 block max-w-sm rounded-lg" aria-hidden="true"></span>';
-    listEl.innerHTML = "";
+    if (announce) {
+      window.__nmHapticLight?.();
+    }
+    showLoading();
 
     let rows = [];
     try {
@@ -95,31 +128,18 @@ async function runDiscoverySetup() {
       return;
     }
 
-    statusEl.classList.add("hidden");
-    statusEl.removeAttribute("aria-busy");
-    statusEl.innerHTML = "";
-
     if (!rows.length) {
-      gapEl.classList.remove("hidden");
-      gapText.textContent = contentGapMessage;
-      gapWa.href = waHrefForTopic(query);
-      listEl.innerHTML = "";
+      showGap(query);
       return;
     }
 
-    gapEl.classList.add("hidden");
-    listEl.innerHTML = rows
-      .map(
-        (row) =>
-          `<a href="${escapeHtml(row.url)}" class="block rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[color-mix(in_srgb,var(--nm-bg-canvas)_88%,transparent)] px-4 py-4 text-right transition hover:border-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)] hover:bg-[var(--nm-surface-muted)]"><p class="font-semibold text-[var(--nm-fg)]">${escapeHtml(row.title)}</p><div class="mt-1 text-sm leading-6 text-[color-mix(in_srgb,var(--nm-fg)_62%,var(--nm-bg))]">${row.excerpt}</div></a>`
-      )
-      .join("");
+    showResults(rows);
   };
 
   const scheduleRun = () => {
     window.clearTimeout(debounceTimer);
     debounceTimer = window.setTimeout(() => {
-      void runQuery(input.value);
+      void runQuery(input.value, { announce: input.value.trim().length >= MIN_LEN });
     }, DEBOUNCE_MS);
   };
 
@@ -128,7 +148,9 @@ async function runDiscoverySetup() {
   };
 
   input.addEventListener("input", onInput);
-  input.addEventListener("search", onInput);
+  input.addEventListener("search", () => {
+    void runQuery(input.value, { announce: true });
+  });
 
   const tagButtons = Array.from(document.querySelectorAll("[data-discovery-tag]"));
   const onTagClick = (event) => {
@@ -140,7 +162,7 @@ async function runDiscoverySetup() {
     const tag = button.dataset.discoveryTag || "";
     syncDiscoveryInputValue(input, tag);
     window.clearTimeout(debounceTimer);
-    void runQuery(tag);
+    void runQuery(tag, { announce: true });
   };
 
   tagButtons.forEach((button) => button.addEventListener("click", onTagClick));
@@ -158,7 +180,6 @@ async function runDiscoverySetup() {
   window.__nmServicesDiscoveryCleanup = () => {
     window.clearTimeout(debounceTimer);
     input.removeEventListener("input", onInput);
-    input.removeEventListener("search", onInput);
     tagButtons.forEach((button) => button.removeEventListener("click", onTagClick));
     window.__nmServicesDiscoveryCleanup = undefined;
   };

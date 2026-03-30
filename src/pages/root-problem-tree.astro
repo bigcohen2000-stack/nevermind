@@ -1,249 +1,378 @@
----
+﻿---
 import Layout from "../layouts/Layout.astro";
-import { problemRootNodes } from "../data/problemTree";
+import TruthBlock from "../components/TruthBlock.astro";
 
-const pageTitle = "עץ שורש הבעיה";
-const pageDescription = "מפת שורשים אינטראקטיבית של NeverMind: לוחצים על הבעיה החיצונית, ורואים אילו שורשים תודעתיים מחזיקים אותה במקום.";
-const defaultNode = problemRootNodes[0];
+const pageTitle = "המבנה של הטעות";
+const pageDescription = "בעיה היא לא אירוע שקרה במציאות. היא תוצאה של מחשבה שלא נבדקה. כאן נפרק את המבנה שלה.";
+const storageKey = "nm-root-problem-draft";
+
+const dominoes = [
+  {
+    step: "הנחה",
+    title: "משפט שלא נבדק",
+    body: "המוח בוחר משפט אחד, ומחזיק בו כאילו הוא עובדה.",
+  },
+  {
+    step: "תגובה",
+    title: "ניסיון לשלוט בתוצאה",
+    body: "המשפט יוצר לחץ. הלחץ דוחף להתנגדות, דחייה, או הימנעות.",
+  },
+  {
+    step: "סימפטום",
+    title: "תקיעות שנראית כמו בעיה",
+    body: "הפעולה לא קורית. אחר כך נדמה שהתקיעות היא הבעיה עצמה.",
+  },
+];
+
+const mechanics = [
+  {
+    label: "המנגנון",
+    text: "אני מרגיש תקוע.",
+  },
+  {
+    label: "העובדה",
+    text: "יש פעולה שצריך לעשות והיא לא קורית.",
+  },
+  {
+    label: "הפירוש",
+    text: "אם אכשל, זה אומר עלי משהו נורא.",
+  },
+];
+
+const breakdown = [
+  {
+    title: "הנחה נסתרת",
+    body: 'המחשבה אומרת שהמציאות צריכה להיות אחרת ממה שהיא.',
+  },
+  {
+    title: "התנגדות",
+    body: "המוח נלחם בעובדה הקיימת, במקום לבדוק מה באמת קורה.",
+  },
+  {
+    title: "הגדלה",
+    body: "פעולה פשוטה נצבעת כאיום על הערך העצמי.",
+  },
+];
 ---
 
 <Layout title={pageTitle} description={pageDescription}>
-  <section class="mx-auto max-w-7xl space-y-10 px-4 pb-20 text-right text-[var(--nm-fg)]">
-    <header class="max-w-4xl space-y-4">
-      <p class="text-sm font-semibold uppercase tracking-[0.24em] text-[var(--nm-accent)]">עץ שורש הבעיה</p>
-      <h1 class="text-[clamp(2.2rem,1.7rem+2vw,3.6rem)] font-semibold leading-[1.05]">עץ שורש הבעיה</h1>
-      <p class="text-[clamp(1rem,0.95rem+0.35vw,1.15rem)] leading-8 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
-        בוחרים את הבעיה החיצונית, ורואים איך היא מסתעפת לשורשים תודעתיים עמוקים יותר. זה לא תרשים אבחוני. זו דרך מהירה להבין איפה לעצור את הרעש ולהתחיל לראות מנגנון.
+  <section class="problem-shell" dir="rtl">
+    <header class="hero-card">
+      <p class="hero-label">מפת פירוק</p>
+      <h1 class="hero-title">המבנה של הטעות.</h1>
+      <p class="hero-subtitle">
+        בעיה היא לא אירוע שקרה במציאות. היא תוצאה של מחשבה שלא נבדקה. כאן נפרק את המבנה שלה.
       </p>
     </header>
 
-    <div class="grid gap-8 xl:grid-cols-[320px_minmax(0,1fr)]">
-      <aside class="space-y-4 xl:sticky xl:top-28">
-        <section class="rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/88 p-5 shadow-[0_20px_60px_rgba(26,26,26,0.06)]">
-          <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">בחר בעיה</p>
-          <div class="mt-4 grid gap-3">
-            {problemRootNodes.map((node, index) => (
-              <button
-                type="button"
-                data-problem-trigger
-                data-problem-id={node.id}
-                data-selected={index === 0 ? "true" : "false"}
-                class="rounded-[1.35rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-4 text-right transition duration-300 hover:border-[color-mix(in_srgb,var(--nm-accent)_26%,transparent)] hover:bg-white data-[selected=true]:border-[color-mix(in_srgb,var(--nm-accent)_30%,transparent)] data-[selected=true]:bg-[var(--nm-tint)]"
-              >
-                <span class="block text-base font-semibold text-[var(--nm-fg)]">{node.title}</span>
-                <span class="mt-2 block text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_60%,var(--nm-bg))]">{node.summary}</span>
-              </button>
-            ))}
-          </div>
-        </section>
-      </aside>
-
-      <div class="space-y-6">
-        <section class="overflow-hidden rounded-[2.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/92 p-4 shadow-[0_26px_80px_rgba(26,26,26,0.06)] md:p-8">
-          <div class="mb-6 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-            <div class="space-y-2">
-              <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">מפת שורשים אינטראקטיבית</p>
-              <h2 data-problem-title class="text-[clamp(1.6rem,1.3rem+0.9vw,2.2rem)] font-semibold text-[var(--nm-fg)]">{defaultNode.title}</h2>
-            </div>
-            <p data-problem-summary class="max-w-2xl text-sm leading-7 text-[var(--nm-fg)]/62">{defaultNode.summary}</p>
-          </div>
-
-          <div class="overflow-hidden rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] bg-[var(--nm-bg-canvas)]">
-            <svg viewBox="0 0 1100 760" width="1100" height="760" class="h-auto w-full" role="img" aria-labelledby="problem-tree-title problem-tree-desc">
-              <title id="problem-tree-title">עץ שורש הבעיה</title>
-              <desc id="problem-tree-desc">בעיה חיצונית בראש, ושלושה שורשים תודעתיים שמחזיקים אותה מתחת.</desc>
-
-              <defs>
-                <linearGradient id="problemCard" x1="0" x2="1">
-                  <stop offset="0%" stop-color="var(--nm-bg-canvas)" />
-                  <stop offset="100%" stop-color="color-mix(in srgb, var(--nm-accent) 5%, var(--nm-bg-canvas))" />
-                </linearGradient>
-              </defs>
-
-              <!-- מרכזי תחתונים: 190 / 550 / 910 (מלבנים 340px, רווח 20, שוליים 20) -->
-              <line x1="550" y1="190" x2="190" y2="420" stroke="color-mix(in srgb, var(--nm-fg) 14%, transparent)" stroke-width="3" />
-              <line x1="550" y1="190" x2="550" y2="420" stroke="color-mix(in srgb, var(--nm-fg) 14%, transparent)" stroke-width="3" />
-              <line x1="550" y1="190" x2="910" y2="420" stroke="color-mix(in srgb, var(--nm-fg) 14%, transparent)" stroke-width="3" />
-
-              <g>
-                <rect x="320" y="70" rx="34" ry="34" width="460" height="140" fill="url(#problemCard)" stroke="color-mix(in srgb, var(--nm-accent) 22%, transparent)" stroke-width="3" />
-                <text x="550" y="130" text-anchor="middle" font-size="20" font-weight="600" fill="var(--nm-accent)">הבעיה הגלויה</text>
-                <text data-svg-problem-label x="550" y="172" text-anchor="middle" font-size="38" font-weight="700" fill="var(--nm-fg)">{defaultNode.shortLabel}</text>
-              </g>
-
-              <g data-svg-root-card="0">
-                <rect x="20" y="420" rx="30" ry="30" width="340" height="230" fill="var(--nm-bg-canvas)" stroke="color-mix(in srgb, var(--nm-fg) 10%, transparent)" stroke-width="2" />
-                <text data-svg-root-title="0" x="190" y="458" text-anchor="middle" font-size="24" font-weight="700" fill="var(--nm-fg)">{defaultNode.roots[0].title}</text>
-                <text data-svg-root-description="0" x="190" y="538" text-anchor="middle" font-size="16" fill="color-mix(in srgb, var(--nm-fg) 66%, var(--nm-bg-canvas))"><tspan x="190" dy="0">{defaultNode.roots[0].description}</tspan></text>
-              </g>
-
-              <g data-svg-root-card="1">
-                <rect x="380" y="420" rx="30" ry="30" width="340" height="230" fill="var(--nm-bg-canvas)" stroke="color-mix(in srgb, var(--nm-fg) 10%, transparent)" stroke-width="2" />
-                <text data-svg-root-title="1" x="550" y="458" text-anchor="middle" font-size="24" font-weight="700" fill="var(--nm-fg)">{defaultNode.roots[1].title}</text>
-                <text data-svg-root-description="1" x="550" y="538" text-anchor="middle" font-size="16" fill="color-mix(in srgb, var(--nm-fg) 66%, var(--nm-bg-canvas))"><tspan x="550" dy="0">{defaultNode.roots[1].description}</tspan></text>
-              </g>
-
-              <g data-svg-root-card="2">
-                <rect x="740" y="420" rx="30" ry="30" width="340" height="230" fill="var(--nm-bg-canvas)" stroke="color-mix(in srgb, var(--nm-fg) 10%, transparent)" stroke-width="2" />
-                <text data-svg-root-title="2" x="910" y="458" text-anchor="middle" font-size="24" font-weight="700" fill="var(--nm-fg)">{defaultNode.roots[2].title}</text>
-                <text data-svg-root-description="2" x="910" y="538" text-anchor="middle" font-size="16" fill="color-mix(in srgb, var(--nm-fg) 66%, var(--nm-bg-canvas))"><tspan x="910" dy="0">{defaultNode.roots[2].description}</tspan></text>
-              </g>
-            </svg>
-          </div>
-        </section>
-
-        <section class="grid gap-4 md:grid-cols-3" data-root-cards>
-          {defaultNode.roots.map((root, index) => (
-            <article class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)]/90 p-5 shadow-[0_18px_50px_color-mix(in_srgb,var(--nm-fg)_5%,transparent)]" data-root-card={index}>
-              <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">שורש {index + 1}</p>
-              <h3 class="mt-3 text-xl font-semibold text-[var(--nm-fg)]" data-root-title={index}>{root.title}</h3>
-              <p class="mt-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]" data-root-description={index}>{root.description}</p>
-              {root.relatedHref && root.relatedLabel && (
-                <a href={root.relatedHref} class="mt-4 inline-flex text-sm font-semibold text-[var(--nm-accent)] transition hover:opacity-75" data-root-link={index}>
-                  {root.relatedLabel}
-                </a>
-              )}
-            </article>
-          ))}
-        </section>
+    <section class="section-block" aria-labelledby="root-sequence-title">
+      <div class="section-head">
+        <p class="section-kicker">רצף המנגנון</p>
+        <h2 id="root-sequence-title" class="section-title">הבעיה נבנית כמו שורת דומינו.</h2>
+        <p class="section-copy">הנחה יוצרת תגובה. התגובה יוצרת סימפטום. אחר כך נדמה שהסימפטום הוא השורש.</p>
       </div>
-    </div>
 
-    <script is:inline define:vars={{ problemRootNodes }}>
-      document.addEventListener("astro:page-load", () => {
-        const escapeForSvg = (s) => String(s ?? "")
-          .replace(/&/g, "&amp;")
-          .replace(/</g, "&lt;")
-          .replace(/>/g, "&gt;")
-          .replace(/"/g, "&quot;")
-          .replace(/'/g, "&#039;");
+      <div class="domino-grid">
+        {dominoes.map((item) => (
+          <article class="domino-card">
+            <p class="domino-step">{item.step}</p>
+            <h3 class="domino-title">{item.title}</h3>
+            <p class="domino-body">{item.body}</p>
+          </article>
+        ))}
+      </div>
+    </section>
 
-        const wrapForSvg = (text, maxCharsPerLine) => {
-          const raw = String(text ?? "").trim();
-          if (!raw) return [""];
-          const words = raw.split(/\s+/).filter(Boolean);
-          const lines = [];
-          let line = "";
+    <section class="section-block" aria-labelledby="stage-one-title">
+      <div class="section-head">
+        <p class="section-kicker">שלב 1</p>
+        <h2 id="stage-one-title" class="section-title">הזיהוי</h2>
+        <p class="section-copy">במקום לתאר רגש, נבדוק איזה מנגנון פועל עכשיו.</p>
+      </div>
 
-          for (const word of words) {
-            const next = line ? `${line} ${word}` : word;
-            if (next.length <= maxCharsPerLine) {
-              line = next;
-              continue;
-            }
-            if (line) lines.push(line);
-            line = word;
+      <div class="fact-grid">
+        {mechanics.map((item) => (
+          <article class="fact-card">
+            <p class="fact-label">{item.label}</p>
+            <p class="fact-text">{item.text}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section class="section-block" aria-labelledby="stage-two-title">
+      <div class="section-head">
+        <p class="section-kicker">שלב 2</p>
+        <h2 id="stage-two-title" class="section-title">הפירוק</h2>
+        <p class="section-copy">מחשבה אחת יכולה להפוך עובדה פשוטה למשבר גדול.</p>
+      </div>
+
+      <div class="breakdown-grid">
+        {breakdown.map((item) => (
+          <article class="fact-card">
+            <h3 class="fact-title">{item.title}</h3>
+            <p class="fact-text">{item.body}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section class="section-block" aria-labelledby="stage-three-title">
+      <div class="section-head">
+        <p class="section-kicker">שלב 3</p>
+        <h2 id="stage-three-title" class="section-title">השורש</h2>
+        <p class="section-copy">
+          השורש הוא תמיד מילה אחת או משפט אחד שהמוח לוקח כעובדה מבלי לבדוק אותה.
+        </p>
+      </div>
+
+      <article class="root-card">
+        <p class="root-label">דוגמה</p>
+        <p class="root-statement">אני חייב להיות מוצלח כדי להיות קיים.</p>
+        <p class="root-copy">כל עוד המשפט הזה נראה אמיתי, כל כישלון ירגיש כמו איום על הקיום.</p>
+      </article>
+    </section>
+
+    <section class="section-block" aria-labelledby="inversion-title">
+      <div class="section-head">
+        <p class="section-kicker">היפוך</p>
+        <h2 id="inversion-title" class="section-title">פחד מול מציאות</h2>
+        <p class="section-copy">הפחד נשמע כמו עובדה. ההיפוך בודק אם באמת יש כאן עובדה.</p>
+      </div>
+
+      <TruthBlock label="בדיקת מציאות" questionForSchema="מה קורה כשבודקים את הפחד מול העובדה?">
+        <p>הפחד אומר: אם אכשל, זה מוכיח שאני לא שווה.</p>
+        <p>המציאות אומרת: יש פעולה, יש תוצאה, ויש מחשבה שמפרשת את התוצאה.</p>
+        <p>כשהפירוש נבדק, הכישלון מפסיק להיראות כמו זהות.</p>
+      </TruthBlock>
+    </section>
+
+    <section class="section-block" aria-labelledby="draft-title">
+      <div class="section-head">
+        <p class="section-kicker">בדיקה אישית</p>
+        <h2 id="draft-title" class="section-title">כתבו כאן את בעיית השורש שלכם</h2>
+        <p class="section-copy">נשמור את הניסוח הזה על המכשיר שלכם, כדי שלא ילך לאיבוד.</p>
+      </div>
+
+      <div class="draft-card">
+        <label class="draft-label" for="root-problem-input">מה המשפט שהמוח מחזיק כעובדה</label>
+        <textarea
+          id="root-problem-input"
+          class="draft-input"
+          rows="6"
+          placeholder="למשל: אם לא אצליח, זה אומר שאני לא שווה"
+          data-root-problem-input
+        ></textarea>
+        <p class="draft-status" data-root-problem-status aria-live="polite">עדיין לא נכתב כאן דבר.</p>
+      </div>
+    </section>
+
+    <section class="section-block" aria-labelledby="closing-title">
+      <div class="section-head">
+        <p class="section-kicker">סיכום</p>
+        <h2 id="closing-title" class="section-title">כשהשורש נבדק, הסימפטום מאבד כוח.</h2>
+        <p class="section-copy">
+          הבעיה לא נפתרת כשמשנים את המציאות. היא נחלשת כשההנחה הנסתרת מתפרקת.
+        </p>
+      </div>
+    </section>
+
+    <script is:inline define:vars={{ storageKey }}>
+      const initRootProblemDraft = () => {
+        const input = document.querySelector("[data-root-problem-input]");
+        const status = document.querySelector("[data-root-problem-status]");
+        if (!(input instanceof HTMLTextAreaElement) || !(status instanceof HTMLElement)) {
+          return;
+        }
+
+        const updateStatus = (value) => {
+          const text = String(value || "").trim();
+          status.textContent = text ? "נשמר אוטומטית על המכשיר הזה." : "עדיין לא נכתב כאן דבר.";
+        };
+
+        try {
+          const saved = window.localStorage.getItem(storageKey) || "";
+          if (saved) {
+            input.value = saved;
           }
+          updateStatus(saved);
+        } catch {
+          updateStatus(input.value);
+        }
 
-          if (line) lines.push(line);
-          return lines.length ? lines : [""];
+        const onInput = () => {
+          const next = input.value;
+          try {
+            window.localStorage.setItem(storageKey, next);
+          } catch {
+            // Keep the field usable even if storage is blocked.
+          }
+          updateStatus(next);
         };
 
-        const renderWrappedSvgText = (textEl, value, opts) => {
-          if (!textEl) return;
-          const el = textEl instanceof SVGTextElement ? textEl : null;
-          if (!el) return;
+        input.addEventListener("input", onInput);
+      };
 
-          const {
-            maxCharsPerLine,
-            maxLines,
-            lineDyEm,
-          } = opts;
+      if (!window.__nmRootProblemDraftBound) {
+        window.__nmRootProblemDraftBound = true;
+        document.addEventListener("astro:page-load", initRootProblemDraft);
+      }
 
-          const x = el.getAttribute("x") || "";
-          const lines = wrapForSvg(value, maxCharsPerLine).slice(0, maxLines);
-
-          el.innerHTML = lines
-            .map((ln, i) => {
-              const dy = i === 0 ? 0 : `${lineDyEm}em`;
-              return `<tspan x="${escapeForSvg(x)}" dy="${dy}">${escapeForSvg(ln)}</tspan>`;
-            })
-            .join("");
-        };
-
-        const triggers = Array.from(document.querySelectorAll("[data-problem-trigger]"));
-        const titleNode = document.querySelector("[data-problem-title]");
-        const summaryNode = document.querySelector("[data-problem-summary]");
-        const svgProblemLabel = document.querySelector("[data-svg-problem-label]");
-        const svgRootCards = Array.from(document.querySelectorAll("[data-svg-root-card]"));
-        const rootCards = Array.from(document.querySelectorAll("[data-root-card]"));
-
-        const renderNode = (nodeId) => {
-          const current = problemRootNodes.find((item) => item.id === nodeId) || problemRootNodes[0];
-          if (!current) return;
-
-          if (titleNode) titleNode.textContent = current.title;
-          if (summaryNode) summaryNode.textContent = current.summary;
-          if (svgProblemLabel) svgProblemLabel.textContent = current.shortLabel;
-
-          triggers.forEach((trigger) => {
-            const isActive = trigger.getAttribute("data-problem-id") === current.id;
-            trigger.setAttribute("data-selected", isActive ? "true" : "false");
-          });
-
-          current.roots.forEach((root, index) => {
-            const rootTitle = document.querySelector(`[data-root-title="${index}"]`);
-            const rootDescription = document.querySelector(`[data-root-description="${index}"]`);
-            const rootLink = document.querySelector(`[data-root-link="${index}"]`);
-            const svgRootTitle = document.querySelector(`[data-svg-root-title="${index}"]`);
-            const svgRootDescription = document.querySelector(`[data-svg-root-description="${index}"]`);
-            const svgRootCard = svgRootCards[index];
-            const card = rootCards[index];
-
-            if (rootTitle) rootTitle.textContent = root.title;
-            if (rootDescription) rootDescription.textContent = root.description;
-            renderWrappedSvgText(
-              svgRootTitle,
-              root.title,
-              { maxCharsPerLine: 14, maxLines: 2, lineDyEm: 1.12 }
-            );
-            renderWrappedSvgText(
-              svgRootDescription,
-              root.description,
-              { maxCharsPerLine: 22, maxLines: 4, lineDyEm: 1.18 }
-            );
-            if (rootLink instanceof HTMLAnchorElement) {
-              if (root.relatedHref && root.relatedLabel) {
-                rootLink.href = root.relatedHref;
-                rootLink.textContent = root.relatedLabel;
-                rootLink.style.display = "inline-flex";
-              } else {
-                rootLink.removeAttribute("href");
-                rootLink.textContent = "";
-                rootLink.style.display = "none";
-              }
-            }
-
-            if (svgRootCard instanceof SVGGElement) {
-              const rect = svgRootCard.querySelector("rect");
-              if (rect) {
-                rect.setAttribute(
-                  "stroke",
-                  index === 1 ? "color-mix(in srgb, var(--nm-accent) 22%, transparent)" : "color-mix(in srgb, var(--nm-fg) 10%, transparent)",
-                );
-              }
-            }
-
-            if (card instanceof HTMLElement) {
-              card.style.background =
-                index === 1
-                  ? "color-mix(in srgb, var(--nm-accent) 6%, var(--nm-bg-canvas))"
-                  : "color-mix(in srgb, var(--nm-bg-canvas) 86%, transparent)";
-              card.style.borderColor =
-                index === 1 ? "color-mix(in srgb, var(--nm-accent) 16%, transparent)" : "color-mix(in srgb, var(--nm-fg) 10%, transparent)";
-            }
-          });
-        };
-
-        triggers.forEach((trigger) => {
-          trigger.addEventListener("click", () => {
-            const nodeId = trigger.getAttribute("data-problem-id") || problemRootNodes[0]?.id;
-            renderNode(nodeId);
-          });
-        });
-
-        renderNode(problemRootNodes[0]?.id);
-      });
+      initRootProblemDraft();
     </script>
   </section>
 </Layout>
+
+<style>
+  .problem-shell {
+    inline-size: min(100%, 74rem);
+    margin-inline: auto;
+    padding-inline: 1.25rem;
+    padding-block: 2rem 5rem;
+    display: grid;
+    gap: 1.5rem;
+    color: var(--nm-fg);
+  }
+
+  .hero-card,
+  .section-block,
+  .domino-card,
+  .fact-card,
+  .root-card,
+  .draft-card {
+    border: 1px solid color-mix(in srgb, var(--nm-fg) 10%, transparent);
+    background: color-mix(in srgb, white 92%, var(--nm-bg-canvas));
+    box-shadow: 0 24px 70px rgba(26, 26, 26, 0.06);
+  }
+
+  .hero-card,
+  .section-block,
+  .draft-card,
+  .root-card,
+  .domino-card,
+  .fact-card {
+    border-radius: 2rem;
+  }
+
+  .hero-card,
+  .section-block,
+  .draft-card,
+  .root-card {
+    padding-inline: clamp(1.1rem, 2vw, 2rem);
+    padding-block: clamp(1.2rem, 2vw, 2rem);
+  }
+
+  .hero-label,
+  .section-kicker,
+  .domino-step,
+  .fact-label,
+  .root-label {
+    margin: 0;
+    color: var(--nm-accent);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0;
+  }
+
+  .hero-title,
+  .section-title,
+  .domino-title,
+  .fact-title,
+  .root-statement {
+    margin: 0;
+    line-height: 1.25;
+  }
+
+  .hero-title {
+    font-size: clamp(2.2rem, 1.9rem + 1.5vw, 3.7rem);
+  }
+
+  .hero-subtitle,
+  .section-copy,
+  .domino-body,
+  .fact-text,
+  .root-copy,
+  .draft-status {
+    margin: 0;
+    line-height: 1.6;
+    color: color-mix(in srgb, var(--nm-fg) 72%, var(--nm-bg));
+  }
+
+  .section-head {
+    display: grid;
+    gap: 0.55rem;
+    margin-block-end: 1rem;
+  }
+
+  .domino-grid,
+  .fact-grid,
+  .breakdown-grid {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .domino-grid,
+  .fact-grid,
+  .breakdown-grid {
+    grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  }
+
+  .domino-card,
+  .fact-card {
+    padding-inline: 1rem;
+    padding-block: 1rem;
+    display: grid;
+    gap: 0.65rem;
+  }
+
+  .fact-label,
+  .domino-step {
+    font-size: 0.82rem;
+  }
+
+  .root-card {
+    display: grid;
+    gap: 0.75rem;
+    background: color-mix(in srgb, var(--nm-accent) 6%, white);
+  }
+
+  .root-statement {
+    font-size: clamp(1.3rem, 1.1rem + 0.6vw, 1.8rem);
+    font-weight: 700;
+  }
+
+  .draft-card {
+    display: grid;
+    gap: 0.9rem;
+  }
+
+  .draft-label {
+    font-weight: 600;
+    line-height: 1.5;
+  }
+
+  .draft-input {
+    inline-size: 100%;
+    min-block-size: 12rem;
+    border-radius: 1.4rem;
+    border: 1px solid color-mix(in srgb, var(--nm-fg) 14%, transparent);
+    background: white;
+    color: var(--nm-fg);
+    padding-inline: 1rem;
+    padding-block: 0.95rem;
+    resize: vertical;
+    line-height: 1.6;
+  }
+
+  .draft-input:focus-visible {
+    outline: 2px solid var(--nm-accent);
+    outline-offset: 2px;
+  }
+
+  @media (max-width: 640px) {
+    .problem-shell {
+      padding-inline: 0.9rem;
+      padding-block: 1.25rem 4rem;
+    }
+  }
+</style>

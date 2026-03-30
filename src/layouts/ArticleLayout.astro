@@ -1,0 +1,60 @@
+---
+interface Props {
+  frontmatter: {
+    title?: string;
+    inversionQuestion?: string;
+    finalQuestion?: string;
+  };
+}
+
+const { frontmatter } = Astro.props as Props;
+const inversionQuestion = String(frontmatter?.inversionQuestion || "").trim();
+const finalQuestion = String(frontmatter?.finalQuestion || "").trim();
+---
+
+<article class="nm-article">
+  <h1>{frontmatter?.title}</h1>
+
+  <div class="content">
+    <slot />
+  </div>
+
+  {inversionQuestion ? (
+    <section class="inversion-method">
+      <h2>שאלו את ההפך</h2>
+      <p>{inversionQuestion}</p>
+    </section>
+  ) : null}
+
+  {finalQuestion ? (
+    <footer class="reflection">
+      <p class="question">{finalQuestion}</p>
+    </footer>
+  ) : null}
+</article>
+
+<style>
+  .nm-article {
+    max-width: 700px;
+    margin: 0 auto;
+    line-height: 1.6;
+    direction: rtl;
+    font-family: "Assistant Variable", "Heebo", system-ui, sans-serif;
+  }
+
+  .inversion-method {
+    background: #f3f1ed;
+    padding: 1.5rem;
+    border-inline-start: 4px solid #d42b2b;
+    margin: 2rem 0;
+  }
+
+  .reflection {
+    border-top: 1px solid #1a1a1a;
+    padding-top: 1rem;
+  }
+
+  .question {
+    font-weight: 700;
+  }
+</style>

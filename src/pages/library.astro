@@ -1,4 +1,4 @@
----
+﻿---
 import { getCollection } from "astro:content";
 import Layout from "../layouts/Layout.astro";
 import ArticleCard from "../components/ArticleCard.astro";
@@ -20,9 +20,7 @@ const articles = (await getCollection("articles", ({ data }) => data.draft !== t
     const plain = body.replace(/<[^>]*>/g, " ");
     const wordCount = plain.split(/\s+/).filter(Boolean).length;
     const readingMinutes = Math.max(1, Math.ceil(wordCount / 200));
-    const pub = article.data.pubDate;
-    const upd = article.data.updatedDate;
-    const freshnessSource = upd ?? pub;
+    const freshnessSource = article.data.updatedDate ?? article.data.pubDate;
     const freshnessIso = freshnessSource.toISOString().slice(0, 10);
 
     return {
@@ -30,213 +28,261 @@ const articles = (await getCollection("articles", ({ data }) => data.draft !== t
       title: article.data.title,
       description: article.data.description,
       tags: Array.isArray(article.data.tags) ? article.data.tags : [],
-      date: article.data.pubDate,
       transitionId: article.slug.replace(/[^\w-]+/g, "-"),
       difficultyKey,
       readingMinutes,
       isPremium: Boolean(article.data.isPremium),
       contentFreshnessIso: freshnessIso,
-      contentFreshnessIsUpdate: Boolean(upd),
+      contentFreshnessIsUpdate: Boolean(article.data.updatedDate),
     };
   });
 
 const tagSet = new Set<string>();
 articles.forEach((article) => article.tags.forEach((tag) => tagSet.add(tag)));
-const tags = Array.from(tagSet);
-
-const chipBase =
-  "rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/70 px-4 py-2 text-[clamp(0.85rem,0.82rem+0.2vw,1rem)] text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))] transition-colors duration-300 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color-mix(in_srgb,var(--nm-fg)_22%,transparent)] min-h-11";
+const tags = Array.from(tagSet).sort((left, right) => left.localeCompare(right, "he"));
 ---
 
-<Layout
-  title="ספרייה מובנית"
-  description="מאמרים עם סינון לפי נושא. אותו תוכן כמו הארכיון, עם מבנה שמתאים לצמיחה אורגנית."
->
-  <section id="library-filter-root" class="space-y-10" data-library-root>
-    <header class="space-y-4 text-right">
-      <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--nm-accent)]">ספרייה</p>
-      <h1 class="text-[clamp(2.2rem,1.7rem+2vw,3.2rem)] font-semibold text-[var(--nm-fg)]">ספרייה מובנית</h1>
-      <p class="text-[clamp(1.05rem,1rem+0.35vw,1.4rem)] text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">
-        בוחרים נושא או רואים את הכל. אם אתה מרגיש בנוח יותר ברשימה המלאה, יש גם עמוד מאמרים קלאסי.
+<Layout title="ספרייה מובנית" description="מאמרים מסודרים לפי נושא, עומק, וסוג גישה. בוחרים מסנן אחד, ורואים מה באמת מתאים עכשיו.">
+  <section id="library-filter-root" class="mx-auto max-w-6xl space-y-8 px-4 pb-20 text-right" data-library-root>
+    <header class="space-y-4">
+      <p class="text-sm font-semibold text-[var(--nm-accent)]">ספרייה</p>
+      <h1 class="text-[clamp(2.2rem,1.8rem+1.8vw,3.4rem)] font-semibold text-[var(--nm-fg)]">ספרייה מובנית</h1>
+      <p class="max-w-3xl text-[clamp(1rem,0.96rem+0.25vw,1.15rem)] leading-[1.7] text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+        כאן לא צריך לנחש מאיפה להתחיל. בוחרים תגית, עומק, או סוג גישה. המערכת מסננת מיד.
       </p>
-      <p>
-        <a
-          href="/articles/"
-          class="inline-flex min-h-[44px] items-center font-semibold text-[var(--nm-accent)] underline-offset-2 hover:underline"
-        >
-          מעבר לעמוד מאמרים
-        </a>
-      </p>
+      <a
+        href="/articles/"
+        class="inline-flex min-h-[44px] items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-white/90 px-4 py-2 text-sm font-semibold text-[var(--nm-fg)] transition hover:border-[color-mix(in_srgb,var(--nm-accent)_24%,transparent)] hover:bg-white"
+      >
+        לעמוד המאמרים המלא
+      </a>
     </header>
 
-    <div class="space-y-6">
+    <section class="space-y-5 rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/82 p-5 shadow-[0_20px_60px_rgba(26,26,26,0.05)] md:p-6">
       <div class="space-y-3">
-        <p class="text-right text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_60%,var(--nm-bg))]">סינון לפי תגית</p>
-        <div class="flex flex-wrap gap-3" role="group" aria-label="סינון לפי תגית">
-          <button
-            type="button"
-            data-lib-tag="all"
-            aria-pressed="true"
-            class:list={[chipBase, "bg-white"]}
-          >
-            הכל
-          </button>
-          {
-            tags.map((tag) => (
-              <button type="button" data-lib-tag={tag} aria-pressed="false" class={chipBase}>
-                {tag}
-              </button>
-            ))
-          }
+        <p class="text-sm font-semibold text-[var(--nm-fg)]">סינון לפי תגית</p>
+        <div class="flex flex-wrap justify-end gap-2" role="group" aria-label="סינון לפי תגית">
+          <button type="button" data-lib-tag="all" aria-pressed="true" class="nm-filter-chip is-active">הכל</button>
+          {tags.map((tag) => (
+            <button type="button" data-lib-tag={tag} aria-pressed="false" class="nm-filter-chip">{tag}</button>
+          ))}
         </div>
       </div>
 
       <div class="space-y-3">
-        <p class="text-right text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_60%,var(--nm-bg))]">רמת עומק</p>
-        <div class="flex flex-wrap gap-3" role="group" aria-label="סינון לפי רמת עומק">
-          <button type="button" data-lib-diff="all" aria-pressed="true" class:list={[chipBase, "bg-white"]}>
-            הכל
-          </button>
-          <button type="button" data-lib-diff="beginner" aria-pressed="false" class={chipBase}>
-            מתחילים
-          </button>
-          <button type="button" data-lib-diff="advanced" aria-pressed="false" class={chipBase}>
-            מתקדמים
-          </button>
-          <button type="button" data-lib-diff="deep" aria-pressed="false" class={chipBase}>
-            חקירה עמוקה
-          </button>
+        <p class="text-sm font-semibold text-[var(--nm-fg)]">סינון לפי עומק</p>
+        <div class="flex flex-wrap justify-end gap-2" role="group" aria-label="סינון לפי עומק">
+          <button type="button" data-lib-diff="all" aria-pressed="true" class="nm-filter-chip is-active">הכל</button>
+          <button type="button" data-lib-diff="beginner" aria-pressed="false" class="nm-filter-chip">מתחילים</button>
+          <button type="button" data-lib-diff="advanced" aria-pressed="false" class="nm-filter-chip">מתקדמים</button>
+          <button type="button" data-lib-diff="deep" aria-pressed="false" class="nm-filter-chip">עמוק</button>
         </div>
       </div>
 
       <div class="space-y-3">
-        <p class="text-right text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_60%,var(--nm-bg))]">גישה</p>
-        <div class="flex flex-wrap gap-3" role="group" aria-label="סינון לפי סוג גישה">
-          <button type="button" data-lib-prem="all" aria-pressed="true" class:list={[chipBase, "bg-white"]}>
-            הכל
-          </button>
-          <button type="button" data-lib-prem="free" aria-pressed="false" class={chipBase}>
-            חינמי
-          </button>
-          <button type="button" data-lib-prem="premium" aria-pressed="false" class={chipBase}>
-            מועדון
-          </button>
+        <p class="text-sm font-semibold text-[var(--nm-fg)]">סינון לפי גישה</p>
+        <div class="flex flex-wrap justify-end gap-2" role="group" aria-label="סינון לפי גישה">
+          <button type="button" data-lib-prem="all" aria-pressed="true" class="nm-filter-chip is-active">הכל</button>
+          <button type="button" data-lib-prem="free" aria-pressed="false" class="nm-filter-chip">פתוח</button>
+          <button type="button" data-lib-prem="premium" aria-pressed="false" class="nm-filter-chip">מועדון</button>
         </div>
       </div>
-    </div>
+
+      <p data-library-feedback class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_60%,var(--nm-bg))]" aria-live="polite">
+        מוצגים כל המאמרים. אפשר לצמצם לפי מה שמעסיק אותך עכשיו.
+      </p>
+    </section>
 
     <p
       id="library-empty"
-      class="hidden rounded-2xl border border-dashed border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-[color-mix(in_srgb,var(--nm-bg-canvas)_96%,transparent)] px-5 py-8 text-center text-sm leading-relaxed text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]"
+      class="hidden rounded-[1.6rem] border border-dashed border-[color-mix(in_srgb,var(--nm-fg)_14%,transparent)] bg-[color-mix(in_srgb,var(--nm-bg-canvas)_96%,transparent)] px-5 py-8 text-center text-sm leading-8 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]"
       role="status"
     >
-      אין מאמרים שמתאימים לשילוב הסינון הזה. נסה להרחיב תגית או לבחור ״הכל״ באחד השדות.
+      לא מצאנו מאמרים לשילוב הזה. אולי ננסה לשאול את ההפך, או נרחיב מסנן אחד.
     </p>
 
-    <div id="library-grid" class="grid grid-cols-1 gap-6 md:grid-cols-2">
-      {
-        articles.map((article) => (
-          <ArticleCard
-            slug={article.slug}
-            title={article.title}
-            description={article.description}
-            tagsCsv={article.tags.join(",")}
-            transitionId={article.transitionId}
-            difficultyKey={article.difficultyKey}
-            readingMinutes={article.readingMinutes}
-            isPremium={article.isPremium}
-            contentFreshnessIso={article.contentFreshnessIso}
-            contentFreshnessIsUpdate={article.contentFreshnessIsUpdate}
-          />
-        ))
-      }
+    <div id="library-grid" data-library-grid class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+      {articles.map((article) => (
+        <ArticleCard
+          slug={article.slug}
+          title={article.title}
+          description={article.description}
+          tagsCsv={article.tags.join(",")}
+          transitionId={article.transitionId}
+          difficultyKey={article.difficultyKey}
+          readingMinutes={article.readingMinutes}
+          isPremium={article.isPremium}
+          contentFreshnessIso={article.contentFreshnessIso}
+          contentFreshnessIsUpdate={article.contentFreshnessIsUpdate}
+        />
+      ))}
     </div>
   </section>
 
+  <style>
+    .nm-filter-chip {
+      min-height: 44px;
+      border-radius: 999px;
+      border: 1px solid color-mix(in srgb, var(--nm-fg) 12%, transparent);
+      background: color-mix(in srgb, white 88%, var(--nm-bg-canvas));
+      padding-inline: 1rem;
+      padding-block: 0.55rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      line-height: 1.6;
+      color: color-mix(in srgb, var(--nm-fg) 72%, var(--nm-bg));
+      transition:
+        transform 180ms ease,
+        background-color 180ms ease,
+        border-color 180ms ease,
+        color 180ms ease,
+        box-shadow 180ms ease;
+    }
+
+    .nm-filter-chip:hover,
+    .nm-filter-chip:focus-visible {
+      border-color: color-mix(in srgb, var(--nm-accent) 28%, transparent);
+      background: white;
+      color: var(--nm-fg);
+    }
+
+    .nm-filter-chip:active {
+      transform: scale(0.98);
+    }
+
+    .nm-filter-chip.is-active {
+      border-color: color-mix(in srgb, var(--nm-accent) 34%, transparent);
+      background: color-mix(in srgb, var(--nm-accent) 9%, white);
+      color: var(--nm-accent);
+      box-shadow: 0 12px 24px color-mix(in srgb, var(--nm-accent) 10%, transparent);
+    }
+
+    [data-library-grid].is-filtering > * {
+      transition: opacity 180ms ease, transform 180ms ease;
+    }
+
+    [data-library-grid].is-filtering [data-article-card] {
+      opacity: 0.42;
+      transform: translateY(3px);
+    }
+
+    [data-library-grid] [data-article-card].is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+
   <script is:inline>
     (function () {
-      if (window.__nmLibraryFiltersInit) return;
-      window.__nmLibraryFiltersInit = true;
-
       const state = { tag: "all", diff: "all", prem: "all" };
 
-      function setActive(root, group, activeVal) {
-        root.querySelectorAll("[data-lib-" + group + "]").forEach(function (btn) {
-          if (!(btn instanceof HTMLButtonElement)) return;
-          var v = btn.getAttribute("data-lib-" + group) || "";
-          var on = v === activeVal;
-          btn.setAttribute("aria-pressed", String(on));
-          btn.classList.toggle("bg-white", on);
+      const setActive = (root, group, activeVal) => {
+        root.querySelectorAll(`[data-lib-${group}]`).forEach((node) => {
+          if (!(node instanceof HTMLButtonElement)) return;
+          const current = node.getAttribute(`data-lib-${group}`) || "";
+          const isActive = current === activeVal;
+          node.setAttribute("aria-pressed", String(isActive));
+          node.classList.toggle("is-active", isActive);
         });
-      }
+      };
 
-      function apply(root) {
-        var cards = root.querySelectorAll("[data-article-card]");
-        var emptyEl = document.getElementById("library-empty");
-        var visible = 0;
-        for (var i = 0; i < cards.length; i++) {
-          var card = cards[i];
-          var cardTags = card.dataset.tags ? card.dataset.tags.split(",").map(function (t) { return t.trim(); }) : [];
-          var diff = card.dataset.difficulty || "";
-          var prem = card.dataset.premium === "true";
-          var ok = true;
-          if (state.tag !== "all" && cardTags.indexOf(state.tag) === -1) ok = false;
-          if (ok && state.diff !== "all" && diff !== state.diff) ok = false;
-          if (ok && state.prem === "free" && prem) ok = false;
-          if (ok && state.prem === "premium" && !prem) ok = false;
-          card.classList.toggle("hidden", !ok);
-          if (ok) visible += 1;
-        }
-        if (emptyEl) emptyEl.classList.toggle("hidden", visible > 0);
-      }
+      const buildFeedback = (visible) => {
+        const parts = [];
+        parts.push(state.tag === "all" ? "כל התגיות" : `תגית: ${state.tag}`);
+        parts.push(state.diff === "all" ? "כל רמות העומק" : `עומק: ${state.diff}`);
+        parts.push(
+          state.prem === "all" ? "כל סוגי הגישה" : state.prem === "free" ? "גישה פתוחה" : "גישה למועדון"
+        );
+        return visible > 0 ? `נמצאו ${visible} תוצאות. ${parts.join(" · ")}.` : "לא מצאנו את מה שחיפשת. אולי ננסה לשאול את ההפך?";
+      };
 
-      function resetState(root) {
-        state.tag = "all";
-        state.diff = "all";
-        state.prem = "all";
-        setActive(root, "tag", "all");
-        setActive(root, "diff", "all");
-        setActive(root, "prem", "all");
-        apply(root);
-      }
+      const apply = (root) => {
+        const grid = root.querySelector("[data-library-grid]");
+        const cards = Array.from(root.querySelectorAll("[data-article-card]"));
+        const emptyEl = root.querySelector("#library-empty");
+        const feedbackEl = root.querySelector("[data-library-feedback]");
+        if (!(grid instanceof HTMLElement)) return;
 
-      document.addEventListener("astro:page-load", function () {
-        var root = document.getElementById("library-filter-root");
-        if (!root) return;
-        resetState(root);
-      });
+        grid.classList.add("is-filtering");
+        let visible = 0;
 
-      document.addEventListener(
-        "click",
-        function (e) {
-          var root = document.getElementById("library-filter-root");
-          if (!root || !e.target || !root.contains(e.target)) return;
-          var t = e.target;
-          if (!(t instanceof Element)) return;
+        window.setTimeout(() => {
+          cards.forEach((card) => {
+            if (!(card instanceof HTMLElement)) return;
+            const cardTags = (card.dataset.tags || "")
+              .split(",")
+              .map((tag) => tag.trim())
+              .filter(Boolean);
+            const matchesTag = state.tag === "all" || cardTags.includes(state.tag);
+            const matchesDiff = state.diff === "all" || card.dataset.difficulty === state.diff;
+            const isPremium = card.dataset.premium === "true";
+            const matchesPrem =
+              state.prem === "all" ||
+              (state.prem === "free" && !isPremium) ||
+              (state.prem === "premium" && isPremium);
+            const show = matchesTag && matchesDiff && matchesPrem;
+            card.classList.toggle("hidden", !show);
+            card.classList.toggle("is-visible", show);
+            if (show) visible += 1;
+          });
 
-          var tagBtn = t.closest("[data-lib-tag]");
+          grid.classList.remove("is-filtering");
+          if (emptyEl instanceof HTMLElement) {
+            emptyEl.classList.toggle("hidden", visible > 0);
+          }
+          if (feedbackEl instanceof HTMLElement) {
+            feedbackEl.textContent = buildFeedback(visible);
+          }
+        }, 90);
+      };
+
+      const init = () => {
+        const root = document.getElementById("library-filter-root");
+        if (!(root instanceof HTMLElement)) return;
+
+        const onClick = (event) => {
+          const target = event.target instanceof Element ? event.target : null;
+          if (!target) return;
+
+          const tagBtn = target.closest("[data-lib-tag]");
           if (tagBtn instanceof HTMLButtonElement) {
             state.tag = tagBtn.getAttribute("data-lib-tag") || "all";
             setActive(root, "tag", state.tag);
+            window.__nmHapticLight?.();
             apply(root);
             return;
           }
-          var diffBtn = t.closest("[data-lib-diff]");
+
+          const diffBtn = target.closest("[data-lib-diff]");
           if (diffBtn instanceof HTMLButtonElement) {
             state.diff = diffBtn.getAttribute("data-lib-diff") || "all";
             setActive(root, "diff", state.diff);
+            window.__nmHapticLight?.();
             apply(root);
             return;
           }
-          var premBtn = t.closest("[data-lib-prem]");
+
+          const premBtn = target.closest("[data-lib-prem]");
           if (premBtn instanceof HTMLButtonElement) {
             state.prem = premBtn.getAttribute("data-lib-prem") || "all";
             setActive(root, "prem", state.prem);
+            window.__nmHapticLight?.();
             apply(root);
           }
-        },
-        true
-      );
+        };
+
+        if (root.dataset.libraryBound === "true") {
+          apply(root);
+          return;
+        }
+
+        root.dataset.libraryBound = "true";
+        root.addEventListener("click", onClick);
+        apply(root);
+      };
+
+      init();
+      document.addEventListener("astro:page-load", init);
     })();
   </script>
 </Layout>

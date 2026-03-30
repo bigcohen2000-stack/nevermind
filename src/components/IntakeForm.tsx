@@ -446,8 +446,9 @@ export default function IntakeForm() {
           /* ignore */
         }
         setStatus("ok");
+        window.__nmHapticSuccess?.();
         window.dispatchEvent(new CustomEvent("nm-analytics", { detail: { name: "intake_form_submit" } }));
-        (window as unknown as { __nmAnnounce?: (m: string) => void }).__nmAnnounce?.("הטופס נשלח");
+        (window as unknown as { __nmAnnounce?: (m: string) => void }).__nmAnnounce?.("השאלה נקלטה");
       } else {
         setStatus("idle");
         const hint =
@@ -458,7 +459,7 @@ export default function IntakeForm() {
       }
     } catch {
       setStatus("idle");
-      setClientError("רשת או חסימה. נסה שוב או שלח בוואטסאפ.");
+      setClientError("רשת או חסימה. אפשר לנסות שוב או לכתוב בוואטסאפ.");
     }
   };
 
@@ -742,15 +743,17 @@ export default function IntakeForm() {
         <button
           type="submit"
           disabled={status === "sending"}
-          className="min-h-[48px] w-full flex-1 rounded-full bg-[var(--nm-inverse)] px-6 py-4 text-sm font-bold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-accent)] disabled:opacity-60 sm:min-w-[12rem]"
+          data-nm-loading={status === "sending" ? "true" : undefined}
+          data-nm-loading-label="מזקק את המנגנון..."
+          className="relative min-h-[48px] w-full flex-1 rounded-full bg-[var(--nm-inverse)] px-6 py-4 text-xl font-bold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-accent)] disabled:opacity-60 sm:min-w-[12rem]"
         >
-          {status === "sending" ? "שולחים…" : "שליחה לאימייל"}
+          {status === "sending" ? "מזקק את המנגנון..." : "שליחה למייל"}
         </button>
         <button
           type="button"
           onClick={handleWhatsAppClick}
           disabled={status === "sending"}
-          className="min-h-[48px] w-full flex-1 rounded-full border-2 border-[color-mix(in_srgb,var(--nm-fg)_18%,transparent)] bg-[var(--nm-bg-canvas)] px-6 py-4 text-sm font-bold text-[var(--nm-fg)] transition hover:border-[color-mix(in_srgb,var(--nm-accent)_40%,transparent)] hover:bg-[var(--nm-tint)] disabled:opacity-60 sm:min-w-[12rem]"
+          className="min-h-[48px] w-full flex-1 rounded-full border-2 border-[color-mix(in_srgb,var(--nm-fg)_18%,transparent)] bg-[var(--nm-bg-canvas)] px-6 py-4 text-xl font-bold text-[var(--nm-fg)] transition hover:border-[color-mix(in_srgb,var(--nm-accent)_40%,transparent)] hover:bg-[var(--nm-tint)] disabled:opacity-60 sm:min-w-[12rem]"
         >
           שליחה לוואטסאפ (אותו תוכן)
         </button>
