@@ -1,4 +1,4 @@
-﻿---
+---
 import { getCollection, type CollectionEntry } from "astro:content";
 import ClarityAnalogy from "../../components/ClarityAnalogy.astro";
 import ConceptCallout from "../../components/ConceptCallout.astro";
@@ -8,6 +8,7 @@ import InquirySection from "../../components/InquirySection.astro";
 import MechanismCard from "../../components/MechanismCard.astro";
 import PremiumBreak from "../../components/PremiumBreak.astro";
 import PremiumClubGate from "../../components/PremiumClubGate.astro";
+import ClubKeywordWall from "../../components/ClubKeywordWall.astro";
 import SocialParadoxes from "../../components/SocialParadoxes.astro";
 import SubscribeBanner from "../../components/SubscribeBanner.astro";
 import TruthBlock from "../../components/TruthBlock.astro";
@@ -93,6 +94,8 @@ const mdxComponents = {
         </section>
       ) : null
     }
+
+    {frontmatter.isPremium ? null : <ClubKeywordWall />}
   </section>
 </Layout>
 

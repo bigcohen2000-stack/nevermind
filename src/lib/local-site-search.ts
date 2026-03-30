@@ -40,7 +40,7 @@ const STATIC_HITS: SiteSearchHit[] = [
   {
     url: "/about/#nm-about-faq",
     title: "שאלות ותשובות על שיטת NeverMind",
-    excerpt: "מה זו השיטה, איך שונה, זמן, אגו, זוגיות, מסלול ופרטיות.",
+    excerpt: "מה המנגנון כאן, איך שונה, זמן, אגו, זוגיות, מסלול ופרטיות.",
   },
 ];
 

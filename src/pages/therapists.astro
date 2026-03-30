@@ -15,7 +15,7 @@ const fallbackConsultation = ({
   action_text: "לתיאום שיחת מיקוד",
   visible: true,
   badges: ["דיוק מקצועי"],
-  features: ["בהירות לוגית לפני פעולה", "מיפוי צומת טיפולי בזמן אמת", "כיוון פרקטי למפגש הבא"],
+  features: ["בהירות לוגית לפני פעולה", "מיפוי צומת קלינית בזמן אמת", "כיוון פרקטי למפגש הבא"],
   stageName: "דיוק קליני",
   targetAudience: "מטפלים ומאמנים שרוצים בהירות בזמן עומס",
 } as unknown as FlatService);
@@ -32,7 +32,7 @@ const featuredService: FlatService = consultation ?? fallbackConsultation;
     <header class="space-y-5 rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg)] px-6 py-8 text-right">
       <h1 class="text-[clamp(2rem,1.5rem+1.8vw,3rem)] font-semibold leading-tight">למי המטפל פונה כשאין לו עם מי לדבר?</h1>
       <p class="max-w-4xl text-[clamp(1rem,0.95rem+0.25vw,1.1rem)] leading-8 text-[color-mix(in_srgb,var(--nm-fg)_74%,var(--nm-bg))]">
-        כמאמן או מטפל, אתה רגיל להיות העוגן. אבל גם העוגן צריך לפעמים קרקע יציבה. בתוך הקליניקה, קל מאוד ללכת לאיבוד בתוך הדרמה של המטופל. אני לא פה כדי ללמד אותך עוד שיטה. אני פה כדי להחזיר לך את הבהירות הלוגית.
+        כמאמן או מטפל, אתה רגיל להיות העוגן. אבל גם העוגן צריך לפעמים קרקע יציבה. בתוך הקליניקה, קל מאוד ללכת לאיבוד בתוך הדרמה של המטופל. אני לא פה כדי לטעון לך עוד מודל סגור. אני פה כדי להחזיר לך את הבהירות הלוגית.
       </p>
     </header>
 
@@ -41,7 +41,7 @@ const featuredService: FlatService = consultation ?? fallbackConsultation;
       <div class="grid gap-4 md:grid-cols-3">
         <article class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-5">
           <h3 class="text-xl font-semibold">Drama vs Logic</h3>
-          <p class="mt-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">אני עוזר לך לזהות איפה אתה נסחף לסיפור של המטופל במקום להחזיק מבנה לוגי נקי.</p>
+          <p class="mt-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">אני ממפה איתך איפה אתה נסחף לסיפור של המטופל במקום להחזיק מבנה לוגי נקי.</p>
         </article>
         <article class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-5">
           <h3 class="text-xl font-semibold">Consciousness Supervision</h3>
@@ -64,7 +64,7 @@ const featuredService: FlatService = consultation ?? fallbackConsultation;
     <BookBanner
       eyebrow="הכלי שחסר לך בקליניקה"
       title="אהבה ב-20 עמודים"
-      body="ספר שפורק את הלוגיקה של יחסים. מטפלים רבים משתמשים בו כבסיס להבנת הדינמיקה בחדר הטיפולים."
+      body="ספר שפורק את הלוגיקה של יחסים. אנשי מקצוע רבים משתמשים בו כבסיס להבנת הדינמיקה בחדר העבודה הקליני."
       digitalHref="/studio/?topic=book-digital"
       physicalHref="/studio/?topic=book-physical"
       questionHref="/studio/?topic=book-question"

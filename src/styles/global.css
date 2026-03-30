@@ -106,7 +106,7 @@ html[lang="he"] {
 }
 
 body {
-  font-family: "Assistant Variable", "Heebo", system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-family: "Heebo", "Assistant Variable", system-ui, -apple-system, "Segoe UI", sans-serif;
   font-size: 1rem;
   line-height: var(--line-height-ui);
   letter-spacing: 0;
@@ -976,6 +976,47 @@ article .nm-subscription-callout a.nm-subscription-callout__cta,
   );
   -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.92) 0%, rgba(0, 0, 0, 0.28) 58%, rgba(0, 0, 0, 0) 100%);
   mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.92) 0%, rgba(0, 0, 0, 0.28) 58%, rgba(0, 0, 0, 0) 100%);
+}
+
+/* אינטראקציה: מעבר עדין + scale (NeverMind cabinet) */
+@media (hover: hover) and (pointer: fine) {
+  header a[href]:hover,
+  footer a[href]:hover,
+  .nm-nav-link:hover,
+  .nm-header-services-link:hover,
+  .nm-breadcrumb-strip a[href]:hover,
+  header button:not(:disabled):hover,
+  footer button:not(:disabled):hover,
+  main button:not(:disabled):hover,
+  main summary:hover,
+  [data-search-trigger]:hover,
+  [data-random-article-trigger]:hover {
+    transform: scale(1.02);
+  }
+
+  main a[href]:hover {
+    transform: scale(1.02);
+  }
+
+  header a[href],
+  footer a[href],
+  .nm-nav-link,
+  .nm-header-services-link,
+  .nm-breadcrumb-strip a[href],
+  header button:not(:disabled),
+  footer button:not(:disabled),
+  main button:not(:disabled),
+  main summary,
+  [data-search-trigger],
+  [data-random-article-trigger],
+  main a[href] {
+    transition:
+      transform 0.2s ease,
+      color 0.2s ease,
+      background-color 0.2s ease,
+      border-color 0.2s ease,
+      opacity 0.2s ease;
+  }
 }
 
 @media print {

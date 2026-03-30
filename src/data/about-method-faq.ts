@@ -1,9 +1,9 @@
-﻿export type FaqPair = { question: string; answer: string };
+export type FaqPair = { question: string; answer: string };
 
 export const aboutMethodFaq: FaqPair[] = [
   {
     question: "מה בעצם קורה כאן?",
-    answer: "NeverMind בודק איך מחשבה הופכת עובדה פשוטה לסבל מיותר. לא מוסיפים עוד שיטה. מפרקים את המנגנון שכבר עובד בפנים.",
+    answer: "NeverMind בודק איך מחשבה הופכת עובדה פשוטה לסבל מיותר. לא מוסיפים עוד ארגז כלים סגור. מפרקים את המנגנון הפנימי. הוא כבר עובד שם.",
   },
   {
     question: "למה קוראים לזה NeverMind?",
@@ -25,8 +25,8 @@ export const aboutMethodFaq: FaqPair[] = [
 
 export const aboutExtraMethodFaq: FaqPair[] = [
   {
-    question: "זה טיפול?",
-    answer: "לא במבנה הקלאסי. זו עבודה של הבחנה, פירוק, ובדיקה של הנחות.",
+    question: "זו פגישה במבנה קליני קלאסי?",
+    answer: "לא במבנה הקלאסי. זו חקירה של הבחנה, פירוק, ובדיקה של הנחות.",
   },
   {
     question: "זה מבטיח פתרון?",

@@ -28,6 +28,14 @@
       }
     ]
   },
+  "clubKeywordWall": {
+    "enabled": true,
+    "matchPhrases": ["הבנה עמוקה", "תרגיל מתקדם", "רמה 3"],
+    "title": "המשך מיועד למסלול המלא",
+    "body": "במאמר הופיעו ניסוחים שמקשרים לעומק המלא. בלי גישה למועדון זה נשאר רמז בלבד.",
+    "ctaLabel": "איך מצטרפים?",
+    "ctaHref": "/premium-access/"
+  },
   "premiumVault": {
     "enabled": true,
     "cutoffMarker": "[[premium-break]]",

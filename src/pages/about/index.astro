@@ -7,48 +7,69 @@ import {
   aboutPageFaqForSchema,
   aboutPracticalFaq,
 } from "../../data/about-method-faq";
+import {
+  masterPhilosophyClosingQuestion,
+  masterPhilosophyMetaDescription,
+  masterPhilosophyParagraphs,
+  masterPhilosophySectionLabel,
+} from "../../data/master-philosophy";
 ---
 
 <Layout
   title="מה זה NeverMind"
-  description="עמוד אחד שמסביר איך NeverMind עובד: איפה נולד בלבול, איך בודקים הנחה, ואיך עוברים מעומס לבהירות."
+  description={masterPhilosophyMetaDescription}
   faqItems={aboutPageFaqForSchema}
 >
   <div class="mx-auto max-w-6xl space-y-16 px-4 py-14 text-right text-[var(--nm-fg)] md:space-y-20">
     <header class="space-y-5">
       <p class="text-sm font-semibold text-[var(--nm-accent)]">מה זה NeverMind</p>
       <h1 class="text-[clamp(2.1rem,1.6rem+2vw,3.5rem)] font-semibold leading-[1.15]">לא עוד תשובה מהירה. בדיקה של מה שמפעיל את השאלה.</h1>
-      <p class="max-w-3xl text-base leading-[1.75] text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
-        אם משהו מרגיש תקוע, בדרך כלל לא חסר מידע. חסרה הבחנה בין עובדה, פירוש, והרגל תגובה. זה מה שהאתר הזה מנסה לעשות.
-      </p>
     </header>
+
+    <section
+      class="space-y-4 rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-6 lg:p-8"
+      aria-labelledby="master-philosophy-heading"
+    >
+      <h2 id="master-philosophy-heading" class="text-sm font-semibold text-[var(--nm-accent)]">
+        {masterPhilosophySectionLabel}
+      </h2>
+      <div class="max-w-3xl space-y-4 text-base leading-[1.6] text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))]">
+        {masterPhilosophyParagraphs.map((para) => (
+          <p>{para}</p>
+        ))}
+        <p class="font-medium text-[var(--nm-fg)]">{masterPhilosophyClosingQuestion}</p>
+      </div>
+    </section>
 
     <section class="grid gap-6 rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 p-6 shadow-[0_20px_60px_rgba(26,26,26,0.05)] lg:grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)] lg:p-8">
       <div class="space-y-4">
         <p class="text-sm font-semibold text-[var(--nm-accent)]">המנגנון</p>
         <h2 class="text-[clamp(1.5rem,1.3rem+0.8vw,2rem)] font-semibold">מה האתר הזה עושה בפועל</h2>
-        <p class="text-[clamp(1rem,0.96rem+0.2vw,1.1rem)] leading-[1.75] text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))]">
+        <p class="text-[clamp(1rem,0.96rem+0.2vw,1.1rem)] leading-[1.6] text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))]">
           הוא לא מנסה להרגיע כל רגש בנפרד. הוא בודק איך מחשבה אחת מייצרת את השרשרת: הנחה, תגובה, סימפטום.
         </p>
-        <p class="text-[clamp(1rem,0.96rem+0.2vw,1.1rem)] leading-[1.75] text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))]">
-          ברגע שהשרשרת נראית, קל יותר להבין מה שייך למציאות, ומה נוסף עליה מתוך פחד, הרגל, או דימוי עצמי.
+        <p class="text-[clamp(1rem,0.96rem+0.2vw,1.1rem)] leading-[1.6] text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))]">
+          כשהשרשרת נראית, קל יותר להבין מה שייך למציאות. קל יותר לראות מה נוסף מתוך פחד, הרגל, או דימוי עצמי.
         </p>
       </div>
 
       <div class="grid gap-3">
         <article class="rounded-[1.4rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-4">
           <h3 class="text-lg font-semibold">עובדה</h3>
-          <p class="mt-2 text-sm leading-[1.7] text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">מה קרה, בלי תוספת של משמעות.</p>
+          <p class="mt-2 text-sm leading-[1.6] text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">מה קרה, בלי תוספת של משמעות.</p>
         </article>
         <article class="rounded-[1.4rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-4">
           <h3 class="text-lg font-semibold">פירוש</h3>
-          <p class="mt-2 text-sm leading-[1.7] text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">מה המוח אומר שזה אומר עליך, על אחרים, או על העתיד.</p>
+          <p class="mt-2 text-sm leading-[1.6] text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">מה המוח אומר שזה אומר עליך, על אחרים, או על העתיד.</p>
         </article>
         <article class="rounded-[1.4rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-4">
           <h3 class="text-lg font-semibold">פעולה</h3>
-          <p class="mt-2 text-sm leading-[1.7] text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">מה נשאר לעשות אחרי שהפירוש נבדק.</p>
+          <p class="mt-2 text-sm leading-[1.6] text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">מה נשאר לעשות אחרי שהפירוש נבדק.</p>
         </article>
       </div>
+      <p class="col-span-full text-[clamp(1rem,0.96rem+0.2vw,1.1rem)] leading-[1.6] text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))] lg:col-span-2">
+        איזה מהשלושה הכי קשה לך למלא בלי להוסיף מעבר לעובדה?
+      </p>
     </section>
 
     <section class="rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-6 lg:p-8">
@@ -67,15 +88,18 @@ import {
         <div class="space-y-4">
           <p class="text-sm font-semibold text-[var(--nm-accent)]">מאחורי האתר</p>
           <h2 class="text-[clamp(1.5rem,1.3rem+0.8vw,2rem)] font-semibold">השם לא משנה</h2>
-          <p class="text-sm leading-[1.75] text-[color-mix(in_srgb,var(--nm-fg)_74%,var(--nm-bg))]">
+          <p class="text-sm leading-[1.6] text-[color-mix(in_srgb,var(--nm-fg)_74%,var(--nm-bg))]">
             התוכן כאן נשען על אותו קו עבודה שמופיע בשיחות: לראות מה פועל בפנים בלי לקשט אותו.
           </p>
-          <p class="text-sm leading-[1.75] text-[color-mix(in_srgb,var(--nm-fg)_74%,var(--nm-bg))]">
+          <p class="text-sm leading-[1.6] text-[color-mix(in_srgb,var(--nm-fg)_74%,var(--nm-bg))]">
             אם משהו כאן פוגש נקודה אמיתית, אפשר להמשיך דרך הספרייה, המילון, או שיחה קצרה.
           </p>
+          <p class="text-sm leading-[1.6] text-[color-mix(in_srgb,var(--nm-fg)_74%,var(--nm-bg))]">
+            מה תבחר לקחת מהדף הזה לפני שתסגור אותו?
+          </p>
           <div class="flex flex-wrap justify-end gap-3 pt-2">
-            <a href="/library/" class="inline-flex min-h-[44px] items-center rounded-full bg-[var(--nm-inverse)] px-5 py-2.5 text-xl font-bold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-inverse-hover)]">בואו נבדוק</a>
-            <a href="/book/" class="inline-flex min-h-[44px] items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-5 py-2.5 text-xl font-bold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]">יש לי שאלה</a>
+            <a href="/library/" class="inline-flex min-h-[44px] scale-100 items-center rounded-full bg-[var(--nm-inverse)] px-5 py-2.5 text-xl font-bold text-[var(--nm-inverse-fg)] transition-all hover:scale-[1.02] hover:bg-[var(--nm-inverse-hover)]">בוא נבדוק</a>
+            <a href="/book/" class="inline-flex min-h-[44px] scale-100 items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-5 py-2.5 text-xl font-bold text-[var(--nm-fg)] transition-all hover:scale-[1.02] hover:bg-[var(--nm-surface-muted)]">יש לי שאלה</a>
           </div>
         </div>
       </div>
@@ -84,13 +108,16 @@ import {
     <section class="space-y-4">
       <h2 class="text-[clamp(1.45rem,1.25rem+0.7vw,1.9rem)] font-semibold">וידאו קצר על המנגנון</h2>
       <VideoPlayer youtubeId="lPSE9xQaNHw" title="איך NeverMind עובד" />
+      <p class="max-w-3xl text-sm leading-[1.6] text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+        איזה שלב במנגנון הכי ברור לך אחרי הצפייה?
+      </p>
     </section>
 
     <section id="nm-about-faq" class="space-y-4">
       <div class="space-y-2">
         <h2 class="text-[clamp(1.45rem,1.25rem+0.7vw,1.9rem)] font-semibold">שאלות שחוזרות על עצמן</h2>
-        <p class="max-w-3xl text-sm leading-[1.75] text-[color-mix(in_srgb,var(--nm-fg)_65%,var(--nm-bg))]">
-          אם חסר משהו, אפשר לעבור ל<a href="/contact/" class="font-semibold text-[var(--nm-accent)] underline-offset-2 hover:underline">יצירת קשר</a>.
+        <p class="max-w-3xl text-sm leading-[1.6] text-[color-mix(in_srgb,var(--nm-fg)_65%,var(--nm-bg))]">
+          אם חסר משהו, אפשר לעבור ל<a href="/contact/" class="font-semibold text-[var(--nm-accent)] underline-offset-2 transition-colors hover:underline">יצירת קשר</a>.
         </p>
       </div>
 
@@ -103,12 +130,15 @@ import {
                 <span class="mt-0.5 shrink-0 text-[var(--nm-accent)] transition group-open:rotate-180" aria-hidden="true">⌃</span>
               </span>
             </summary>
-            <p class="mt-4 border-t border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] pt-4 text-sm leading-[1.75] text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))]">
+            <p class="mt-4 border-t border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] pt-4 text-sm leading-[1.6] text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))]">
               {item.answer}
             </p>
           </details>
         ))}
       </div>
+      <p class="max-w-3xl text-sm leading-[1.6] text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+        איזו שאלה עדיין דוחפת אותך אחרי שקראת את התשובות?
+      </p>
     </section>
   </div>
 </Layout>

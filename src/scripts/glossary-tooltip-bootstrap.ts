@@ -1,5 +1,5 @@
 /**
- * ????? ????? ???? ?-hover ??????? .nm-glossary-tip (??? ?????? ???????).
+ * טולטיפ לפי data-glossary-preview על .nm-glossary-tip (קישור או span אחרי עיטוף אוטומטי).
  */
 let glossaryTooltipBound = false;
 
@@ -7,6 +7,8 @@ function initGlossaryTooltips() {
   if (glossaryTooltipBound) return;
   glossaryTooltipBound = true;
   let tip: HTMLDivElement | null = null;
+
+  const tipSelector = "[data-glossary-preview].nm-glossary-tip";
 
   const ensureTip = () => {
     if (tip) return tip;
@@ -25,7 +27,7 @@ function initGlossaryTooltips() {
     tip.hidden = true;
   };
 
-  const position = (anchor: HTMLAnchorElement, el: HTMLDivElement) => {
+  const position = (anchor: HTMLElement, el: HTMLDivElement) => {
     const rect = anchor.getBoundingClientRect();
     const margin = 8;
     let top = rect.bottom + margin + window.scrollY;
@@ -43,11 +45,7 @@ function initGlossaryTooltips() {
     el.style.left = `${left}px`;
   };
 
-  const onEnter = (e: Event) => {
-    const target = e.target;
-    if (!(target instanceof Element)) return;
-    const anchor = target.closest("a.nm-glossary-tip");
-    if (!(anchor instanceof HTMLAnchorElement)) return;
+  const showForAnchor = (anchor: HTMLElement) => {
     const preview = anchor.getAttribute("data-glossary-preview");
     if (!preview) return;
     const el = ensureTip();
@@ -57,18 +55,28 @@ function initGlossaryTooltips() {
     requestAnimationFrame(() => el.classList.remove("opacity-0"));
   };
 
+  const onEnter = (e: Event) => {
+    const target = e.target;
+    if (!(target instanceof Element)) return;
+    const anchor = target.closest(tipSelector);
+    if (!(anchor instanceof HTMLElement)) return;
+    showForAnchor(anchor);
+  };
+
   const onLeave = (e: Event) => {
     const target = e.target;
     if (!(target instanceof Element)) return;
-    const anchor = target.closest("a.nm-glossary-tip");
+    const anchor = target.closest(tipSelector);
     if (!anchor) return;
-    const rel = e instanceof MouseEvent ? e.relatedTarget : null;
+    const rel = e instanceof MouseEvent ? e.relatedTarget : (e as FocusEvent).relatedTarget;
     if (rel instanceof Node && anchor.contains(rel)) return;
     hide();
   };
 
   document.addEventListener("pointerover", onEnter, true);
   document.addEventListener("pointerout", onLeave, true);
+  document.addEventListener("focusin", onEnter, true);
+  document.addEventListener("focusout", onLeave, true);
   document.addEventListener("scroll", hide, { passive: true, capture: true });
 }
 

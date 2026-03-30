@@ -57,3 +57,21 @@
 ## קישורים חיצוניים
 
 - לבדוק ידנית קישורים לטפסים, אנליטיקס, וואטסאפ, וכל URL שמוזן בקונפיג.
+
+## אימות משתני סביבה (אוטומטי)
+
+כשמשתני Pages זמינים באותה סשן (למשל CI עם secrets):
+
+```bash
+NM_VERIFY_PROD_ENV=1 npm run verify:prod-env
+```
+
+הסקריפט בודק אורך `PREMIUM_SESSION_SECRET`, נוכחות `PUBLIC_WEB3FORMS_ACCESS_KEY`, פורמט `PUBLIC_NM_CLUB_WEBHOOK_URL`, והתאמות בסיסיות לפרוקסי מועדון.
+
+## Zero Trust (Access)
+
+צעדים מפורטים: `docs/ZERO_TRUST_SETUP.md`.
+
+## אחרי Deploy
+
+רשימת בדיקות ידניות: `docs/POST_DEPLOY_SMOKE.md`.

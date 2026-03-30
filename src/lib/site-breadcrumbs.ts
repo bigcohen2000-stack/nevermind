@@ -10,6 +10,19 @@ export type SiteBreadcrumbCrumb = {
   href: string | null;
 };
 
+/** מקסימום פריטים בפירור (לרוב: בית + עד 3 רמות). */
+const MAX_BREADCRUMB_ITEMS = 4;
+
+/** מקטין שרשרת ארוכה: אם יותר מ־MAX, נשארים בית + שלושת הסיומות האחרונות. */
+export function capBreadcrumbTrail(crumbs: SiteBreadcrumbCrumb[]): SiteBreadcrumbCrumb[] {
+  if (crumbs.length <= MAX_BREADCRUMB_ITEMS) return crumbs;
+  const home = crumbs[0];
+  if (home?.label === BREADCRUMB_HOME_LABEL && home.href === "/") {
+    return [home, ...crumbs.slice(-(MAX_BREADCRUMB_ITEMS - 1))];
+  }
+  return crumbs.slice(-MAX_BREADCRUMB_ITEMS);
+}
+
 /** תווית לסגמנט URL בודד (לא לכותרת מאמר/מושג) */
 const SEGMENT_LABELS: Record<string, string> = {
   blog: "מרכז הקריאה",
@@ -23,7 +36,7 @@ const SEGMENT_LABELS: Record<string, string> = {
   intake: "צור קשר (אונליין)",
   archive: "ארכיון",
   studio: "סטודיו",
-  about: "שיטת NEVERMIND",
+  about: "אודות NeverMind",
   "personal-consultation": "שיחה אישית",
   "premium-access": "גישת פרימיום",
   premium: "פרימיום",
@@ -79,7 +92,7 @@ export function buildSiteBreadcrumbTrail(
     return [
       { label: BREADCRUMB_HOME_LABEL, href: "/" },
       { label: "מרכז הקריאה", href: "/blog/" },
-      { label: titleOpt || "מסע בתוך הנפש", href: null },
+      { label: titleOpt || "עומק בתוך הנפש", href: null },
     ];
   }
   /* אין אינדקס ביניים: בית → כותרת */
@@ -112,7 +125,7 @@ export function buildSiteBreadcrumbTrail(
     const label = isLast && titleOpt ? titleOpt : labelForSegment(seg);
     out.push({ label, href: isLast ? null : pathWithSlash });
   }
-  return out;
+  return capBreadcrumbTrail(out);
 }
 
 export function parseBreadcrumbOverride(
@@ -133,7 +146,7 @@ export function parseBreadcrumbOverride(
     const h = typeof raw.href === "string" ? raw.href.trim() : "";
     out.push({ label, href: h.length > 0 ? h : "/" });
   }
-  return out.length > 0 ? out : null;
+  return out.length > 0 ? capBreadcrumbTrail(out) : null;
 }
 
 export function breadcrumbTrailToJsonLd(

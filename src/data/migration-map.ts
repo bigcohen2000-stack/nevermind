@@ -132,9 +132,9 @@ export const BLOG_REDIRECTS = {
 
 /** SEO CONSTANTS (From Yoast settings) */
 export const SEO = {
-  siteName: "ייעוץ אישי ועסקי בשיטת NeverMind - כלים מעשיים לשיפור החיים",
+  siteName: "NeverMind — כלים מעשיים לשיפור החיים",
   defaultTitleTemplate: "%%title%%",
-  defaultDescription: "ייעוץ זוגי ואישי בשיטת NeverMind %%sep%% %%title%%",
+  defaultDescription: "NeverMind — חקירה זוגית ואישית %%sep%% %%title%%",
   defaultImage: "https://www.nevermind.co.il/og.jpg",
   googleVerify: "M2ujWgqETy_44tp8wSVOKsZ0PyQVfpu-zy4MCN5-Tm0",
 } as const;

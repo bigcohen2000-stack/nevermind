@@ -151,7 +151,7 @@ export type EngagementSectionsMap = {
 const defaultEngagementSections: EngagementSectionsMap = {
   studio: {
     title: "אולפן פודקאסט",
-    body: "מגיעים לאולפן פודקאסט אמיתי ונוכחים לשיחה מרתקת על כל תחומי החיים. אפשר לדבר בלי להיות מצולמים - אנונימיות מלאה אם תרצה. אפשר גם לבקש עיוות קול: לטובתך ולטובת כולם - כי אם תרצה לשתף חבר שעובר את אותו הדבר, הסרטונים יעזרו לו בדיוק כמו שעזרו לך.",
+    body: "מגיעים לאולפן פודקאסט אמיתי ונוכחים לשיחה מרתקת על כל תחומי החיים. אפשר לדבר בלי להיות מצולמים - אנונימיות מלאה אם תרצה. אפשר גם לבקש עיוות קול. אם תרצה לשתף חבר שעובר את אותו הדבר, אותו חומר ויזואלי זמין גם בשבילו.",
     ctaHref: "/services/#balcony-experience",
     ctaLabel: "לפרטים על האולפן",
   },
@@ -169,7 +169,7 @@ const defaultEngagementSections: EngagementSectionsMap = {
   },
   philosophy: {
     title: "איך זה עובד כאן",
-    body: "זה לא עוד המלצה. זו הבנה עמוקה של מה שכבר קיים, ופתיחה לאפשרויות חדשות - אם תרצה.",
+    body: "זה לא המלצה חמה. זו בדיקה של מה שכבר קיים, ופתיחה לאפשרויות חדשות אם תרצה.",
     ctaHref: "/services/",
     ctaLabel: "למרחב הגילוי",
   },
@@ -225,7 +225,7 @@ const defaultTopicLanding: ServicesTopicLandingConfig = {
   override_on_extension: true,
   topic_header: {
     label: "הנחה למנוי שנתי · לזמן מוגבל",
-    title: "ללמוד את השיטה NEVERMIND",
+    title: "ללמוד את מנגנון NeverMind",
     subtitle:
       "אם הגעת לכאן בגלל {topic}, יש סיכוי טוב שהתשובה כבר מחכה בארכיון. המנוי פותח לך גישה לכל החקירות, לכל התכנים, לכל השאלות, בלי הגבלה.",
     cta_buttons: [

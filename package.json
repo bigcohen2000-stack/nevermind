@@ -20,6 +20,8 @@
     "format": "prettier --write .",
     "pagefind": "pagefind --site dist",
     "pre-deploy": "node scripts/pre-deploy-check.js",
+    "verify:prod-env": "node scripts/verify-production-env.mjs",
+    "copy:audit": "node scripts/copy-audit-forbidden.mjs",
     "deploy": "npm run pre-deploy && npm run build",
     "deploy:cloudflare": "npm run pre-deploy && npm run build && wrangler pages deploy dist"
   },
@@ -30,6 +32,7 @@
     "@astrojs/rss": "^4.0.17",
     "@astrojs/sitemap": "^3.7.1",
     "@fontsource-variable/assistant": "^5.2.9",
+    "@fontsource/heebo": "^5.2.8",
     "@hcaptcha/react-hcaptcha": "^2.0.2",
     "astro": "^5.18.1",
     "astro-pagefind": "^1.8.5",

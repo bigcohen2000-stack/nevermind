@@ -82,6 +82,42 @@ function fieldTrim(id) {
   return fieldValue(id).trim();
 }
 
+function yq(s) {
+  return String(s ?? "").replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+}
+
+/** טיוטת MDX להורדה מקומית — בלי מודל חיצוני */
+function buildMdxStub(data) {
+  const today = new Date().toISOString().slice(0, 10);
+  const slug = data.slug.trim() || "draft-article";
+  const tagParts = data.tags
+    .split(/[,،]/)
+    .map((tag) => tag.trim())
+    .filter(Boolean);
+  const tagsYaml = tagParts.map((t) => `"${yq(t)}"`).join(", ");
+  const body = data.body.trim() || "<!-- גוף המאמר -->\n";
+
+  return `---
+title: "${yq(data.topic || "כותרת זמנית")}"
+description: "${yq(data.summary || "תקציר לחיפוש")}"
+pubDate: ${today}
+author: "השם לא משנה"
+questionForSchema: "${yq(data.questionForSchema)}"
+originalInsight: "${yq(data.aha)}"
+difficultyLevel: ${data.difficultyLevel || "beginner"}
+mindShiftIntensity: ${Number(data.mindShiftIntensity) || 3}
+imageAlt: "${yq(data.imageAlt)}"
+slug: "${yq(slug)}"
+tags: [${tagsYaml}]
+image: "/uploads/${slug}.jpg"
+isPremium: ${Boolean(data.isPremium)}
+draft: true
+---
+
+${body}
+`;
+}
+
 function isWizardFieldTarget(target) {
   if (!(target instanceof HTMLElement)) {
     return false;
@@ -453,9 +489,40 @@ Follow the brand identity: zero fluff, focus on thought-shifts, NeverMind voice 
       else if (button.id === "wiz-generate") onGenerate();
       else if (button.id === "wiz-copy") void onCopy();
       else if (button.id === "wiz-save") void onSave();
+      else if (button.id === "wiz-download-mdx") onDownloadMdx();
     },
     { signal }
   );
+
+  function onDownloadMdx() {
+    const saveStatus = document.getElementById("wiz-save-status");
+    const data = collectData();
+    persistDraft();
+    const blockers = runBlockingChecks(data);
+    if (blockers.length > 0) {
+      if (saveStatus instanceof HTMLElement) {
+        saveStatus.textContent = "לא ניתן להוריד לפני תיקון החסימות (שלב 2).";
+      }
+      return;
+    }
+
+    const raw = buildMdxStub(data);
+    const slug = data.slug.trim() || "draft-article";
+    const blob = new Blob([raw], { type: "text/markdown;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${slug}.mdx`;
+    a.rel = "noopener";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.setTimeout(() => URL.revokeObjectURL(url), 1500);
+
+    if (saveStatus instanceof HTMLElement) {
+      saveStatus.textContent = "קובץ MDX הורד. להעביר ל־src/content/articles/ אחרי בדיקה.";
+    }
+  }
 
   async function onSave() {
     const saveStatus = document.getElementById("wiz-save-status");

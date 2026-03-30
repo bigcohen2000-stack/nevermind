@@ -1,11 +1,13 @@
 ---
 import "@fontsource-variable/assistant/wght.css";
+import "@fontsource/heebo/index.css";
 import "../styles/global.css";
 import { getCollection } from "astro:content";
 import { ClientRouter } from "astro:transitions";
 import A11yWidget from "../components/A11yWidget.astro";
 import Analytics from "../components/Analytics.astro";
 import CookieBanner from "../components/CookieBanner.astro";
+import PwaInstallPrompt from "../components/PwaInstallPrompt.astro";
 import SearchModal from "../components/SearchModal";
 import WhatsAppButton from "../components/WhatsAppButton.astro";
 import WhisperBanner from "../components/WhisperBanner.astro";
@@ -72,7 +74,17 @@ const waArticleTitle = typeof title === "string" ? title : "";
 const waSlug = typeof waArticleSlug === "string" ? waArticleSlug.trim() : "";
 
 const siteTitle = appConfig.site.name;
-const siteDescription = "מרכז חקירה שקט לבהירות, דיוק רגשי והבנה בגובה העיניים.";
+const trimMetaDescription = (value: string) => {
+  const normalized = String(value || "").trim().replace(/\s+/g, " ");
+  if (normalized.length <= 155) return normalized;
+  return `${normalized.slice(0, 152).trimEnd()}...`;
+};
+/** מטא ברירת מחדל: מילות מפתח SEO + בלי משפטי «ש…» */
+const siteDescription = trimMetaDescription(
+  "מרכז חקירה: שקט נפשי, חשיבה צלולה, אמת אובייקטיבית, הבנה מושלמת של עובדה מול סיפור. איך להפסיק לסבול מתוך בלבול. NeverMind."
+);
+const seoKeywords =
+  "שקט נפשי, הבנה מושלמת, אמת אובייקטיבית, חשיבה צלולה, איך להפסיק לסבול, NeverMind";
 const siteUrl = appConfig.site.url;
 const siteUrlSlash = siteUrl.endsWith("/") ? siteUrl : `${siteUrl}/`;
 const logoPath =
@@ -94,11 +106,6 @@ const emailDomain = emailDomainRaw.trim();
 const normalizeTitle = (value: unknown) => String(value ?? "").trim();
 const rawPageTitle = normalizeTitle(title);
 const pageTitle = rawPageTitle ? `${rawPageTitle} | ${siteTitle}` : siteTitle;
-const trimMetaDescription = (value: string) => {
-  const normalized = String(value || "").trim().replace(/\s+/g, " ");
-  if (normalized.length <= 155) return normalized;
-  return `${normalized.slice(0, 152).trimEnd()}...`;
-};
 const pageDescription = trimMetaDescription(description ?? frontmatter?.description ?? siteDescription);
 const pageUrl = Astro.url ? new URL(Astro.url.pathname, siteUrl).toString() : siteUrl;
 const canonicalURL = Astro.site ? new URL(Astro.url.pathname, Astro.site).toString() : pageUrl;
@@ -454,6 +461,7 @@ const socialLinks = [
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{pageTitle}</title>
     <meta name="description" content={pageDescription} />
+    <meta name="keywords" content={seoKeywords} />
     <meta
       name="robots"
       content={robotsContent}
@@ -501,6 +509,7 @@ const socialLinks = [
       import "../scripts/form-antispam-bootstrap.ts";
       import "../scripts/site-search-bootstrap.ts";
       import "../scripts/glossary-tooltip-bootstrap.ts";
+      import "../scripts/nm-auto-term-tooltips.ts";
     </script>
 
   </head>
@@ -859,6 +868,7 @@ const socialLinks = [
     <SearchModal client:idle />
     <A11yWidget />
     <CookieBanner />
+    <PwaInstallPrompt />
     <Analytics />
 
     <script is:inline defer define:vars={{ randomArticlePaths }}>
@@ -1611,6 +1621,7 @@ const socialLinks = [
             fields.forEach((field) => {
               field.addEventListener("input", persistDraft);
               field.addEventListener("change", persistDraft);
+              field.addEventListener("blur", persistDraft);
             });
             form.addEventListener("submit", clearDraft);
 
@@ -1618,6 +1629,7 @@ const socialLinks = [
               fields.forEach((field) => {
                 field.removeEventListener("input", persistDraft);
                 field.removeEventListener("change", persistDraft);
+                field.removeEventListener("blur", persistDraft);
               });
               form.removeEventListener("submit", clearDraft);
             });
