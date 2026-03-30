@@ -11,11 +11,11 @@ const { items } = Astro.props;
 {
   items.length > 0 ? (
     <nav
-      class="nm-breadcrumb-strip mb-5 min-w-0 border-b border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] pb-4 md:pb-5"
+      class="nm-breadcrumb-strip mb-5 w-full min-w-0 border-b border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] pb-4 md:pb-5"
       aria-label="מיקום באתר"
     >
       <ol
-        class="mx-auto flex min-w-0 max-w-7xl list-none flex-nowrap items-center justify-end gap-x-0 gap-y-2 overflow-x-auto overflow-y-hidden overscroll-x-contain px-1 py-2 [-webkit-overflow-scrolling:touch] [scrollbar-width:thin] md:flex-wrap md:overflow-visible md:px-1 md:py-3 md:leading-relaxed"
+        class="flex w-full min-w-0 list-none flex-nowrap items-center justify-start gap-x-0 gap-y-2 overflow-x-auto overflow-y-hidden overscroll-x-contain py-2 [-webkit-overflow-scrolling:touch] [scrollbar-width:thin] md:flex-wrap md:overflow-visible md:py-3 md:leading-relaxed"
         dir="rtl"
       >
         {items.map((item, i) => (

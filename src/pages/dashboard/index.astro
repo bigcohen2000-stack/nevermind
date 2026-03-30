@@ -21,6 +21,10 @@ const articles = await getCollection("articles");
 
 const siteUrlRaw = String((appConfig as { site?: { url?: string } }).site?.url ?? "").replace(/\/$/, "");
 const siteUrlSlash = siteUrlRaw ? `${siteUrlRaw}/` : "https://www.nevermind.co.il/";
+const publicSiteUrl = siteUrlRaw || "https://www.nevermind.co.il";
+const lookerDashboardUrl = String(
+  import.meta.env.PUBLIC_ADMIN_LOOKER_DASHBOARD_URL ?? "https://lookerstudio.google.com/reporting/51ee9864-bc0b-4a85-8b24-da7ce5fd43eb"
+).trim();
 
 const countQaComponents = (body: string) => {
   const patterns = [/<SkepticBox\b/g, /<FAQ\b/g, /<Reflection\b/g];
@@ -166,6 +170,85 @@ try {
     </header>
 
     <ClubAdminPanel />
+
+    <section class="grid gap-4 lg:grid-cols-2">
+      <article class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 p-5 shadow-[0_20px_60px_rgba(26,26,26,0.05)]">
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">Pulse + תפעול</p>
+        <h2 class="mt-2 text-xl font-semibold text-[var(--nm-fg)]">כלי בקרה מהירים</h2>
+        <p id="nm-uptime-status" class="mt-3 inline-flex items-center gap-2 rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-3 py-1 text-sm">
+          <span class="size-2 rounded-full bg-gray-400" data-uptime-dot></span>
+          <span data-uptime-text>בודק זמינות...</span>
+        </p>
+        <p class="mt-3 text-xs text-[color-mix(in_srgb,var(--nm-fg)_58%,var(--nm-bg))]">
+          מדד משתמשים חיים מוצג דרך Looker. עדכון מגיע לפי ריענון GA4.
+        </p>
+        <div class="mt-4 flex flex-wrap gap-2">
+          <button id="nm-purge-cache-btn" type="button" class="inline-flex min-h-[44px] items-center justify-center rounded-full bg-[var(--nm-accent)] px-4 py-2 text-sm font-semibold text-[var(--nm-on-accent)] transition-all hover:scale-[1.02] hover:bg-[var(--nm-accent-hover)]">
+            ניקוי מטמון
+          </button>
+          <span id="nm-purge-cache-state" class="inline-flex min-h-[44px] items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-4 py-2 text-sm text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">ממתין</span>
+        </div>
+      </article>
+
+      <article class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 p-5 shadow-[0_20px_60px_rgba(26,26,26,0.05)]">
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">Mobile First</p>
+        <h2 class="mt-2 text-xl font-semibold text-[var(--nm-fg)]">תצוגת מובייל חיה</h2>
+        <div class="mt-4 flex justify-center">
+          <div class="w-[min(100%,24rem)] rounded-[2.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_14%,transparent)] bg-[#111] p-2 shadow-[0_12px_40px_rgba(0,0,0,0.25)]">
+            <div class="mb-2 h-5 w-24 rounded-full bg-[#1f1f1f] mx-auto"></div>
+            <iframe
+              src={publicSiteUrl}
+              title="Mobile preview"
+              loading="lazy"
+              class="h-[640px] w-full rounded-[1.6rem] border-0 bg-white"
+            />
+          </div>
+        </div>
+        <p class="mt-3 text-xs text-[color-mix(in_srgb,var(--nm-fg)_58%,var(--nm-bg))]">
+          אם המסגרת לא נטענת, בדוק CSP ו־frame-ancestors עבור הדומיין.
+        </p>
+      </article>
+    </section>
+
+    <section class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 p-5 shadow-[0_20px_60px_rgba(26,26,26,0.05)]">
+      <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">Analytics</p>
+      <h2 class="mt-2 text-xl font-semibold text-[var(--nm-fg)]">Looker Dashboard</h2>
+      <iframe src={lookerDashboardUrl} title="Looker dashboard" loading="lazy" class="mt-4 h-[420px] w-full rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white" />
+    </section>
+
+    <div id="nm-psi-config" class="hidden" data-site-url={publicSiteUrl}></div>
+
+    <section class="grid gap-4 lg:grid-cols-2" aria-label="ביצועים ועומק שימוש">
+      <article class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 p-5 shadow-[0_20px_60px_rgba(26,26,26,0.05)]">
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">Core Web Vitals</p>
+        <h2 class="mt-2 text-xl font-semibold text-[var(--nm-fg)]">PageSpeed — מובייל</h2>
+        <p class="mt-2 text-xs leading-6 text-[color-mix(in_srgb,var(--nm-fg)_58%,var(--nm-bg))]">
+          דגימה אחת לפי קריאה ל-Google PSI. לא מדידה רציפה. המפתח נשמר בשרת בלבד.
+        </p>
+        <div class="mt-4 flex flex-wrap items-center gap-2">
+          <button
+            id="nm-psi-btn"
+            type="button"
+            class="inline-flex min-h-[44px] items-center justify-center rounded-full bg-[var(--nm-accent)] px-4 py-2 text-sm font-semibold text-[var(--nm-on-accent)] transition-all hover:scale-[1.02] hover:bg-[var(--nm-accent-hover)]"
+          >
+            הרץ בדיקה
+          </button>
+          <span id="nm-psi-status" class="text-sm text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]" role="status" aria-live="polite"></span>
+        </div>
+        <div id="nm-psi-result" class="mt-3 hidden space-y-2 rounded-xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-4 text-sm text-[var(--nm-fg)]" aria-live="polite"></div>
+      </article>
+
+      <article class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 p-5 shadow-[0_20px_60px_rgba(26,26,26,0.05)]">
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">עומק שימוש</p>
+        <h2 class="mt-2 text-xl font-semibold text-[var(--nm-fg)]">Deep File</h2>
+        <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
+          לוג גישות לתוכן פרימיום, מחולל קודים ומונה אמת — ב־Worker עם KV או D1. אין עדיין מסך נתונים חי כאן.
+        </p>
+        <p class="mt-3 text-xs text-[color-mix(in_srgb,var(--nm-fg)_56%,var(--nm-bg))]">
+          מפת מסלול: קובץ <code class="rounded bg-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] px-1.5 py-0.5">docs/DEEP_FILE_ROADMAP.md</code> בפרויקט.
+        </p>
+      </article>
+    </section>
 
     <div class="overflow-x-auto rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/92 shadow-[0_24px_70px_rgba(26,26,26,0.06)]">
       <table class="min-w-full text-right">
@@ -423,6 +506,131 @@ ${closeLd}
       const tableBody = document.getElementById("insight-gaps-body");
       const emptyState = document.getElementById("insight-gaps-empty");
       const tableWrap = document.getElementById("insight-gaps-table-wrap");
+      const purgeBtn = document.getElementById("nm-purge-cache-btn");
+      const purgeState = document.getElementById("nm-purge-cache-state");
+      const uptimeStatus = document.getElementById("nm-uptime-status");
+
+      const setUptime = (ok) => {
+        if (!(uptimeStatus instanceof HTMLElement)) return;
+        const dot = uptimeStatus.querySelector("[data-uptime-dot]");
+        const text = uptimeStatus.querySelector("[data-uptime-text]");
+        if (dot instanceof HTMLElement) {
+          dot.classList.toggle("bg-emerald-500", ok);
+          dot.classList.toggle("bg-red-500", !ok);
+          dot.classList.remove("bg-gray-400");
+        }
+        if (text instanceof HTMLElement) {
+          text.textContent = ok ? "האתר מגיב" : "האתר לא מגיב";
+        }
+      };
+
+      const checkUptime = async () => {
+        try {
+          const res = await fetch("/", { method: "HEAD", cache: "no-store" });
+          setUptime(res.ok);
+        } catch {
+          setUptime(false);
+        }
+      };
+
+      if (purgeBtn instanceof HTMLButtonElement && purgeState instanceof HTMLElement) {
+        purgeBtn.addEventListener("click", async () => {
+          purgeBtn.disabled = true;
+          purgeState.textContent = "מנקה...";
+          try {
+            const response = await fetch("/api/admin/purge-cache", { method: "POST", headers: { accept: "application/json" } });
+            const payload = await response.json().catch(() => null);
+            if (!response.ok || !payload?.ok) throw new Error("purge failed");
+            purgeState.textContent = "נקי";
+          } catch {
+            purgeState.textContent = "שגיאה";
+          } finally {
+            purgeBtn.disabled = false;
+          }
+        });
+      }
+
+      const psiBtn = document.getElementById("nm-psi-btn");
+      const psiStatus = document.getElementById("nm-psi-status");
+      const psiResult = document.getElementById("nm-psi-result");
+      const psiCfg = document.getElementById("nm-psi-config");
+      const psiSiteUrl = psiCfg?.getAttribute("data-site-url")?.trim() || "https://www.nevermind.co.il";
+
+      const fillPsiResult = (el, payload) => {
+        if (!(el instanceof HTMLElement)) return;
+        el.replaceChildren();
+        const perf = payload?.performanceScore;
+        const warn = typeof perf === "number" && perf < 95;
+        const scoreP = document.createElement("p");
+        scoreP.className = warn
+          ? "text-lg font-semibold text-red-700"
+          : "text-lg font-semibold text-[var(--nm-fg)]";
+        scoreP.textContent =
+          typeof perf === "number" ? `ציון ביצועים (מובייל): ${perf}` : "ציון ביצועים: לא זמין";
+        el.appendChild(scoreP);
+        const addLine = (label, val) => {
+          const p = document.createElement("p");
+          p.className = "text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))]";
+          p.textContent = `${label}: ${val}`;
+          el.appendChild(p);
+        };
+        const ms = (n) => (typeof n === "number" && Number.isFinite(n) ? `${n} ms` : "—");
+        const num = (n, d) => {
+          if (typeof n !== "number" || !Number.isFinite(n)) return "—";
+          if (d != null) return String(Math.round(n * 10 ** d) / 10 ** d);
+          return String(n);
+        };
+        addLine("LCP", ms(payload?.lcpMs));
+        addLine("CLS", num(payload?.cls, 3));
+        addLine("TBT", ms(payload?.tbtMs));
+        if (payload?.inpMs != null) addLine("INP", ms(payload.inpMs));
+        const t = document.createElement("p");
+        t.className = "text-xs text-[color-mix(in_srgb,var(--nm-fg)_56%,var(--nm-bg))]";
+        t.textContent = `URL: ${String(payload?.url || psiSiteUrl)}`;
+        el.appendChild(t);
+      };
+
+      if (psiBtn instanceof HTMLButtonElement && psiStatus instanceof HTMLElement && psiResult instanceof HTMLElement) {
+        psiBtn.addEventListener("click", async () => {
+          psiBtn.disabled = true;
+          psiStatus.textContent = "בודק...";
+          psiResult.classList.add("hidden");
+          try {
+            const q = new URLSearchParams({ url: psiSiteUrl, strategy: "mobile" });
+            const response = await fetch(`/api/admin/psi?${q.toString()}`, {
+              headers: { accept: "application/json" },
+              cache: "no-store",
+            });
+            const payload = await response.json().catch(() => null);
+            if (!response.ok || !payload?.ok) {
+              const err = payload && typeof payload.error === "string" ? payload.error : "שגיאה";
+              psiStatus.textContent = err.length > 120 ? `${err.slice(0, 120)}…` : err;
+              return;
+            }
+            fillPsiResult(psiResult, payload);
+            psiResult.classList.remove("hidden");
+            const fetched = payload?.fetchedAt ? new Date(String(payload.fetchedAt)) : null;
+            const stamp =
+              fetched && !Number.isNaN(fetched.getTime())
+                ? new Intl.DateTimeFormat("he-IL", {
+                    year: "numeric",
+                    month: "2-digit",
+                    day: "2-digit",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  }).format(fetched)
+                : "";
+            psiStatus.textContent = stamp ? `עודכן ${stamp}` : "הושלם";
+          } catch {
+            psiStatus.textContent = "שגיאת רשת או תגובה לא תקינה.";
+          } finally {
+            psiBtn.disabled = false;
+          }
+        });
+      }
+
+      void checkUptime();
+      window.setInterval(checkUptime, 60000);
 
       try {
         const response = await fetch("/api/log-search-gap", { headers: { accept: "application/json" } });

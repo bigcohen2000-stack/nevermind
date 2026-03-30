@@ -50,6 +50,17 @@ if (clubProxy === "true") {
   if (!key) warns.push("PUBLIC_CLUB_ADMIN_VIA_PROXY=true אבל חסר NM_CLUB_ADMIN_SERVICE_KEY ב-Pages.");
 }
 
+const psiKey = s("PSI_API_KEY") || s("GOOGLE_PAGESPEED_API_KEY");
+if (!psiKey) {
+  warns.push("חסר PSI_API_KEY (או GOOGLE_PAGESPEED_API_KEY) — בדיקת PageSpeed בדשבורד לא תעבוד עד שיוגדר.");
+}
+
+const cfZone = s("CF_ZONE_ID");
+const cfTok = s("CF_API_TOKEN");
+if (!cfZone || !cfTok) {
+  warns.push("חסר CF_ZONE_ID או CF_API_TOKEN — כפתור ניקוי מטמון בדשבורד ייכשל עד שיוגדרו.");
+}
+
 if (warns.length) {
   console.warn("\n[verify-production-env] אזהרות:");
   warns.forEach((w) => console.warn(`  • ${w}`));

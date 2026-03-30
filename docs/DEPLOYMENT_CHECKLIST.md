@@ -28,7 +28,7 @@
 
 **מה נשאר ציבורי לגולשים:** מאמרים, ספרייה, `/me/`, `/me/unlock/`, מועדון לפי סיסמה — כל מה שהאתר מציג בדרך כלל.
 
-**מה מיועד רק לך (ניהול):** `/dashboard/` ו־`/api/club-admin/*`. אין להסתמך רק על הקוד בצד הלקוח. חובה **Cloudflare Zero Trust (Access)** על שני הנתיבים האלה, עם מדיניות **רק למייל שלך** (או לקבוצה אחת). בלי זה כל מי שמגיע לכתובת עלול לראות את ממשק הניהול או להפעיל את הפרוקסי.
+**מה מיועד רק לך (ניהול):** `/dashboard/`, `/api/club-admin/*` ו־`/api/admin/*` (למשל ניקוי מטמון ו־PageSpeed). אין להסתמך רק על הקוד בצד הלקוח. חובה **Cloudflare Zero Trust (Access)** על כל הנתיבים האלה, עם מדיניות **רק למייל שלך** (או לקבוצה אחת). בלי זה כל מי שמגיע לכתובת עלול לראות את ממשק הניהול או להפעיל את הפרוקסי.
 
 ### משתני סביבה — איפה מה
 
@@ -44,7 +44,7 @@
 
 ### Zero Trust
 
-- יישום (Application) אחד או שני כללים: `https://www.nevermind.co.il/dashboard/*` ו־`https://www.nevermind.co.il/api/club-admin/*` (התאם לדומיין שלך).
+- יישום (Application) אחד או כמה כללים: `https://www.nevermind.co.il/dashboard/*`, `https://www.nevermind.co.il/api/club-admin/*`, `https://www.nevermind.co.il/api/admin/*` (התאם לדומיין שלך).
 - Include: **רק** המייל שלך (או IdP קבוצתי צר).
 - לפיתוח מקומי בלי Access: ב־Pages Functions בלבד `CLUB_ADMIN_PROXY_SKIP_AUTH=1` (לא לפרודקשן).
 

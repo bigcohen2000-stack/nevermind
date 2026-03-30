@@ -1,9 +1,11 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import { FloatingInput } from "../../components/ui/FloatingInput";
+import appConfig from "../../config/appConfig.json";
 
 const pageTitle = "אשף מאמרים";
 const pageDescription = "אשף שלושה שלבים ליצירת פרומפט מדויק לכתיבת מאמר.";
+const githubNewArticleBase = `https://github.com/${appConfig.github.owner}/${appConfig.github.repo}/new/${appConfig.github.branch}/${appConfig.github.articlesPath}`;
 ---
 
 <Layout title={pageTitle} description={pageDescription} noIndex={true}>
@@ -34,7 +36,7 @@ const pageDescription = "אשף שלושה שלבים ליצירת פרומפט 
           className="[&_.nm-floating-control]:bg-transparent"
         />
         <label class="block space-y-2">
-          <span class="text-sm font-semibold">מי קורא אותנו?</span>
+          <span class="text-sm font-semibold">למי מיועד המאמר?</span>
           <select id="wiz-audience" class="w-full rounded-[1rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-transparent px-4 py-3 outline-none focus:border-[color-mix(in_srgb,var(--nm-accent)_35%,transparent)]">
             <option value="Beginners">מתחילים</option>
             <option value="Advanced">קוראים מנוסים</option>
@@ -200,6 +202,9 @@ const pageDescription = "אשף שלושה שלבים ליצירת פרומפט 
         <button id="wiz-generate" type="button" class="inline-flex min-h-[44px] items-center justify-center rounded-full bg-[var(--nm-inverse)] px-6 py-3 text-sm font-semibold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-inverse-hover)]">
           לזקק למאמר
         </button>
+        <button id="wiz-copy-package" type="button" class="inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-transparent px-6 py-3 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]">
+          יצירה מהירה
+        </button>
         <FloatingInput
           client:load
           id="wiz-output"
@@ -221,6 +226,43 @@ const pageDescription = "אשף שלושה שלבים ליצירת פרומפט 
         <button id="wiz-download-mdx" type="button" class="inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-transparent px-6 py-3 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]">
           הורד טיוטת MDX
         </button>
+        <a id="wiz-open-github" href={githubNewArticleBase} target="_blank" rel="noreferrer" class="inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-transparent px-6 py-3 text-sm font-semibold text-[var(--nm-fg)] no-underline transition hover:bg-[var(--nm-surface-muted)]">
+          פתח יצירה ב-GitHub
+        </a>
+        <FloatingInput
+          client:load
+          id="wiz-external-mdx"
+          label="הדבק כאן פלט MDX ממודל חיצוני"
+          multiline
+          rows={10}
+          hideValidation={true}
+          className="[&_.nm-floating-control]:bg-[var(--nm-surface-muted)] [&_.nm-floating-control]:leading-7"
+        />
+        <div class="flex flex-wrap gap-3">
+          <button id="wiz-validate-external" type="button" class="inline-flex min-h-[44px] items-center justify-center rounded-full bg-[var(--nm-accent)] px-6 py-3 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]">
+            בדוק ונקה
+          </button>
+          <button id="wiz-invert-claim" type="button" class="inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-transparent px-6 py-3 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]">
+            הפוך טענה
+          </button>
+        </div>
+        <div
+          id="wiz-external-result"
+          class="hidden rounded-[1rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3 text-xs leading-6 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]"
+        />
+        <div id="wiz-inversion-wrap" class="hidden space-y-2 rounded-[1rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3">
+          <p class="text-xs font-semibold text-[var(--nm-accent)]">בדיקת היפוך לפני הורדה</p>
+          <p id="wiz-claim-source" class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_74%,var(--nm-bg))]"></p>
+          <FloatingInput
+            client:load
+            id="wiz-claim-inversion"
+            label="כתוב את ההיפוך של המשפט הזה"
+            multiline
+            rows={3}
+            hideValidation={true}
+            className="[&_.nm-floating-control]:bg-transparent"
+          />
+        </div>
         <p id="wiz-save-status" class="text-xs font-semibold text-[color-mix(in_srgb,var(--nm-fg)_62%,var(--nm-bg))]"></p>
       </section>
 

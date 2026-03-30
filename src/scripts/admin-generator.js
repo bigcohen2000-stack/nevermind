@@ -6,6 +6,21 @@ const SLUG_EN_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const YOUTUBE_ID_RE = /^[a-zA-Z0-9_-]{11}$/;
 const WORD_WARN = 900;
 const WORD_DEEP = 1400;
+const REQUIRED_FRONTMATTER_KEYS = [
+  "title",
+  "description",
+  "pubDate",
+  "author",
+  "questionForSchema",
+  "originalInsight",
+  "difficultyLevel",
+  "mindShiftIntensity",
+  "imageAlt",
+  "slug",
+  "tags",
+  "image",
+  "isPremium",
+];
 
 function countWords(raw) {
   return String(raw || "")
@@ -86,6 +101,97 @@ function yq(s) {
   return String(s ?? "").replace(/\\/g, "\\\\").replace(/"/g, '\\"');
 }
 
+function pickClaimForInversion(text) {
+  const cleaned = String(text || "")
+    .replace(/^---[\s\S]*?---/m, "")
+    .replace(/[#*_`>-]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  const candidates = cleaned
+    .split(/[.!?]\s+/)
+    .map((line) => line.trim())
+    .filter((line) => line.length >= 20);
+  return candidates[0] || "";
+}
+
+function parseFrontmatter(raw) {
+  const match = String(raw || "").match(/^---\n([\s\S]*?)\n---\n?/);
+  if (!match) return { frontmatter: "", body: String(raw || "") };
+  return {
+    frontmatter: match[1],
+    body: String(raw || "").slice(match[0].length),
+  };
+}
+
+function readSimpleYamlValue(frontmatter, key) {
+  const lineMatch = frontmatter.match(new RegExp(`^${key}:\\s*(.+)$`, "m"));
+  if (!lineMatch) return "";
+  const raw = lineMatch[1].trim();
+  if ((raw.startsWith('"') && raw.endsWith('"')) || (raw.startsWith("'") && raw.endsWith("'"))) {
+    return raw.slice(1, -1).trim();
+  }
+  return raw;
+}
+
+function parseYamlTags(frontmatter) {
+  const raw = readSimpleYamlValue(frontmatter, "tags");
+  if (!raw) return [];
+  if (raw.startsWith("[") && raw.endsWith("]")) {
+    return raw
+      .slice(1, -1)
+      .split(",")
+      .map((item) => item.trim().replace(/^["']|["']$/g, ""))
+      .filter(Boolean);
+  }
+  return [];
+}
+
+function validateExternalMdx(raw) {
+  const errors = [];
+  const warnings = [];
+  const parsed = parseFrontmatter(raw);
+
+  if (!parsed.frontmatter.trim()) {
+    errors.push("חסר frontmatter בתחילת הקובץ.");
+    return { errors, warnings, slug: "", body: "" };
+  }
+
+  for (const key of REQUIRED_FRONTMATTER_KEYS) {
+    const value = key === "tags" ? parseYamlTags(parsed.frontmatter) : readSimpleYamlValue(parsed.frontmatter, key);
+    const missing = Array.isArray(value) ? value.length === 0 : !String(value || "").trim();
+    if (missing) errors.push(`חסר שדה חובה: ${key}`);
+  }
+
+  const slug = readSimpleYamlValue(parsed.frontmatter, "slug").trim();
+  if (slug && !SLUG_EN_RE.test(slug)) {
+    errors.push("slug לא תקין. נדרש אנגלית קטנה + מקפים.");
+  }
+
+  const tags = parseYamlTags(parsed.frontmatter);
+  for (const tag of tags) {
+    if (!ARTICLE_TAG_WHITELIST_SET.has(tag)) {
+      errors.push(`תגית לא ברשימה: "${tag}"`);
+    }
+  }
+
+  if (/\bשלב\b/.test(parsed.body)) {
+    warnings.push('נמצאה המילה "שלב" בגוף המאמר. להחליף במספור או בנקודות.');
+  }
+
+  const bodyLines = parsed.body.split("\n").map((line) => line.trim()).filter(Boolean);
+  const questionLine = [...bodyLines].reverse().find((line) => line.includes("?"));
+  if (!questionLine) {
+    errors.push("חסרה שאלה פתוחה בסוף.");
+  } else {
+    const realityQuestionRe = /(אצלך|בחיים שלך|ביום שלך|במציאות שלך|אתה|שלך)/;
+    if (!realityQuestionRe.test(questionLine)) {
+      errors.push("השאלה בסוף חייבת להתייחס למציאות של הקורא.");
+    }
+  }
+
+  return { errors, warnings, slug, body: parsed.body };
+}
+
 /** טיוטת MDX להורדה מקומית — בלי מודל חיצוני */
 function buildMdxStub(data) {
   const today = new Date().toISOString().slice(0, 10);
@@ -124,7 +230,7 @@ function isWizardFieldTarget(target) {
   }
 
   const element = target.closest(
-    "#wiz-topic, #wiz-aha, #wiz-question-schema, #wiz-image-alt, #wiz-bottom-line, #wiz-inversion, #wiz-slug, #wiz-summary, #wiz-points, #wiz-tags, #wiz-youtube, #wiz-body, #wiz-output"
+    "#wiz-topic, #wiz-aha, #wiz-question-schema, #wiz-image-alt, #wiz-bottom-line, #wiz-inversion, #wiz-slug, #wiz-summary, #wiz-points, #wiz-tags, #wiz-youtube, #wiz-body, #wiz-output, #wiz-external-mdx, #wiz-claim-inversion"
   );
   return Boolean(element);
 }
@@ -156,6 +262,8 @@ function setupArticleWizard() {
   const steps = Array.from(root.querySelectorAll(".wizard-step"));
   let current = 1;
   let draftRestored = false;
+  let externalValidated = false;
+  let selectedClaim = "";
 
   const progress = document.getElementById("wizard-progress");
   const stepLabel = document.getElementById("wizard-step-label");
@@ -234,7 +342,7 @@ function setupArticleWizard() {
       preflightEl.textContent =
         warnings.length > 0
           ? ["אזהרות:", ...warnings.map((item) => `• ${item}`)].join("\n")
-          : "אין אזהרות. אם אין חסימות באדום, אפשר לשלב 3.";
+          : "אין אזהרות. אם אין חסימות באדום, אפשר להתקדם.";
     }
   };
 
@@ -245,7 +353,7 @@ function setupArticleWizard() {
       progress.style.width = `${(current / 3) * 100}%`;
     }
     if (stepLabel instanceof HTMLElement) {
-      stepLabel.textContent = `שלב ${current} מתוך 3`;
+      stepLabel.textContent = `צעד ${current} מתוך 3`;
     }
 
     const backBtn = document.getElementById("wiz-back");
@@ -331,10 +439,77 @@ Follow the brand identity: zero fluff, focus on thought-shifts, NeverMind voice 
   2) ## שאלת היפוך
   3) ### ניסוי קצר
   4) ## סיכום פרקטי
+- Never use the Hebrew word "שלב" inside the article body.
+- End with exactly one open question about the reader's own reality (not about the article).
 - Inside at least 2 headings above, weave 2-3 natural SEO phrases derived from the topic (use Hebrew patterns like: איך {topic}, איך להפסיק {topic}, פתרון ... בזוגיות when relevant).
 - Two-layer writing: each paragraph has two sentences. First sentence simple and concrete. Second sentence deeper and more precise.
 - Keep paragraphs short. No generic filler.
 ]`;
+  };
+
+  const buildQuickPackage = () => {
+    const prompt = buildPrompt();
+    return `${prompt}
+
+[Delivery rule for external model]
+קח את הפרומפט הזה ותייצר פלט MDX מלא. אל תסיר שדות חובה. אל תכניס ניסוח רובוטי. החזר רק קובץ אחד להדבקה.`;
+  };
+
+  const onCopyPackage = async () => {
+    const saveStatus = document.getElementById("wiz-save-status");
+    try {
+      await navigator.clipboard.writeText(buildQuickPackage());
+      if (saveStatus instanceof HTMLElement) {
+        saveStatus.textContent = "חבילת יצירה מהירה הועתקה. אפשר להדביק במודל חיצוני.";
+      }
+    } catch {
+      if (saveStatus instanceof HTMLElement) {
+        saveStatus.textContent = "לא ניתן להעתיק כרגע. אפשר להעתיק ידנית מהשדה.";
+      }
+    }
+  };
+
+  const onValidateExternal = () => {
+    const external = fieldValue("wiz-external-mdx");
+    const result = document.getElementById("wiz-external-result");
+    const saveStatus = document.getElementById("wiz-save-status");
+    if (!(result instanceof HTMLElement)) return;
+
+    const check = validateExternalMdx(external);
+    externalValidated = check.errors.length === 0;
+    if (check.errors.length > 0) {
+      result.classList.remove("hidden");
+      result.textContent = ["חסימות:", ...check.errors.map((item) => `• ${item}`)].join("\n");
+      if (saveStatus instanceof HTMLElement) saveStatus.textContent = "יש חסימות לפני הורדה.";
+      return;
+    }
+
+    const warnings = check.warnings.length > 0 ? ["אזהרות:", ...check.warnings.map((item) => `• ${item}`)] : ["אין אזהרות."];
+    result.classList.remove("hidden");
+    result.textContent = warnings.join("\n");
+    if (saveStatus instanceof HTMLElement) saveStatus.textContent = "הקובץ עבר בדיקה בסיסית.";
+
+    const openGithub = document.getElementById("wiz-open-github");
+    if (openGithub instanceof HTMLAnchorElement && check.slug) {
+      const fileName = `${check.slug}.mdx`;
+      const current = new URL(openGithub.href);
+      current.searchParams.set("filename", fileName);
+      openGithub.href = current.toString();
+    }
+  };
+
+  const onInvertClaim = () => {
+    const wrap = document.getElementById("wiz-inversion-wrap");
+    const source = document.getElementById("wiz-claim-source");
+    if (!(wrap instanceof HTMLElement) || !(source instanceof HTMLElement)) return;
+    const external = fieldValue("wiz-external-mdx");
+    selectedClaim = pickClaimForInversion(external);
+    if (!selectedClaim) {
+      wrap.classList.add("hidden");
+      return;
+    }
+    source.textContent = `טענה לבדיקה: ${selectedClaim}`;
+    wrap.classList.remove("hidden");
   };
 
   const goBack = () => {
@@ -478,7 +653,9 @@ Follow the brand identity: zero fluff, focus on thought-shifts, NeverMind voice 
         return;
       }
 
-      const button = target.closest("#wiz-next, #wiz-back, #wiz-generate, #wiz-copy, #wiz-save");
+      const button = target.closest(
+        "#wiz-next, #wiz-back, #wiz-generate, #wiz-copy, #wiz-save, #wiz-download-mdx, #wiz-copy-package, #wiz-validate-external, #wiz-invert-claim"
+      );
       if (!button || !root.contains(button)) {
         return;
       }
@@ -489,6 +666,9 @@ Follow the brand identity: zero fluff, focus on thought-shifts, NeverMind voice 
       else if (button.id === "wiz-generate") onGenerate();
       else if (button.id === "wiz-copy") void onCopy();
       else if (button.id === "wiz-save") void onSave();
+      else if (button.id === "wiz-copy-package") void onCopyPackage();
+      else if (button.id === "wiz-validate-external") onValidateExternal();
+      else if (button.id === "wiz-invert-claim") onInvertClaim();
       else if (button.id === "wiz-download-mdx") onDownloadMdx();
     },
     { signal }
@@ -498,16 +678,36 @@ Follow the brand identity: zero fluff, focus on thought-shifts, NeverMind voice 
     const saveStatus = document.getElementById("wiz-save-status");
     const data = collectData();
     persistDraft();
-    const blockers = runBlockingChecks(data);
-    if (blockers.length > 0) {
-      if (saveStatus instanceof HTMLElement) {
-        saveStatus.textContent = "לא ניתן להוריד לפני תיקון החסימות (שלב 2).";
+    const external = fieldValue("wiz-external-mdx").trim();
+    const inversion = fieldTrim("wiz-claim-inversion");
+    if (!external) {
+      const blockers = runBlockingChecks(data);
+      if (blockers.length > 0) {
+        if (saveStatus instanceof HTMLElement) {
+          saveStatus.textContent = "לא ניתן להוריד לפני תיקון החסימות.";
+        }
+        return;
       }
-      return;
     }
 
-    const raw = buildMdxStub(data);
-    const slug = data.slug.trim() || "draft-article";
+    if (external) {
+      if (!externalValidated) {
+        if (saveStatus instanceof HTMLElement) saveStatus.textContent = "יש להריץ בדיקה על פלט חיצוני לפני הורדה.";
+        return;
+      }
+      if (!selectedClaim) {
+        if (saveStatus instanceof HTMLElement) saveStatus.textContent = 'לחץ "הפוך טענה" לפני הורדה.';
+        return;
+      }
+      if (!inversion) {
+        if (saveStatus instanceof HTMLElement) saveStatus.textContent = "נדרש למלא היפוך לטענה לפני הורדה.";
+        return;
+      }
+    }
+
+    const raw = external || buildMdxStub(data);
+    const externalCheck = external ? validateExternalMdx(external) : null;
+    const slug = externalCheck?.slug || data.slug.trim() || "draft-article";
     const blob = new Blob([raw], { type: "text/markdown;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -520,7 +720,7 @@ Follow the brand identity: zero fluff, focus on thought-shifts, NeverMind voice 
     window.setTimeout(() => URL.revokeObjectURL(url), 1500);
 
     if (saveStatus instanceof HTMLElement) {
-      saveStatus.textContent = "קובץ MDX הורד. להעביר ל־src/content/articles/ אחרי בדיקה.";
+      saveStatus.textContent = "קובץ MDX הורד. להעביר ל־src/content/articles/ ולהדביק ב-GitHub.";
     }
   }
 

@@ -144,6 +144,21 @@ const webhookUrl = (import.meta.env.PUBLIC_NM_CLUB_WEBHOOK_URL ?? "").trim();
       errEl.classList.add("hidden");
     }
 
+    function mapServerError(payload) {
+      const code = payload && typeof payload.errorCode === "string" ? payload.errorCode.trim() : "";
+      if (code === "wrong_password") {
+        return "הסיסמה לא תואמת לרשומה קיימת. אם זו כניסה ראשונה, אפשר להירשם בעמוד ההצטרפות.";
+      }
+      if (code === "unknown_member") {
+        return "לא נמצאה גישה פעילה לפרטים שהוזנו. אפשר להצטרף ולקבל גישה מלאה.";
+      }
+      if (code === "expired_membership") {
+        return "הגישה הסתיימה. אפשר לחדש הרשמה ולקבל תאריך חדש.";
+      }
+      if (payload && payload.error) return String(payload.error);
+      return "השרת לא אישר קבלה. אפשר לנסות שוב או לשלוח הודעה בוואטסאפ.";
+    }
+
     function formatDate(value) {
       const date = new Date(value || "");
       if (Number.isNaN(date.getTime())) return "";
@@ -218,7 +233,7 @@ const webhookUrl = (import.meta.env.PUBLIC_NM_CLUB_WEBHOOK_URL ?? "").trim();
       const password = String(data.get("password") ?? "");
 
       submitBtn.disabled = true;
-      window.__nmSetButtonLoading?.(submitBtn, "מזקק את המנגנון...");
+      window.__nmSetButtonLoading?.(submitBtn, "המידע עובר עיבוד. המתן לרגע.");
 
       try {
         const response = await fetch(webhookUrl, {
@@ -240,8 +255,7 @@ const webhookUrl = (import.meta.env.PUBLIC_NM_CLUB_WEBHOOK_URL ?? "").trim();
         }
 
         if (!response.ok || !payload || payload.ok !== true) {
-          const serverMessage = payload && payload.error ? String(payload.error) : "השרת לא אישר קבלה. אפשר לנסות שוב או פשוט לשלוח לנו הודעה בוואטסאפ.";
-          showError(serverMessage);
+          showError(mapServerError(payload));
           return;
         }
 
