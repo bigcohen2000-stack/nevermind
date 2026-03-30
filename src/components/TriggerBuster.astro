@@ -10,11 +10,12 @@ interface Props {
 
 const {
   phone = appConfig.contact.whatsAppNumber,
-  buttonLabel = "׳¢׳׳” ׳׳™ ׳˜׳¨׳™׳’׳¨ ׳¢׳›׳©׳™׳•",
-  ctaLabel = "׳׳¢׳‘׳•׳¨ ׳׳©׳™׳—׳× ׳׳™׳§׳•׳“ ׳©׳ 20 ׳“׳§׳•׳×",
+  buttonLabel = "עלה לי טריגר עכשיו",
+  ctaLabel = "לעבור לשיחת מיקוד של 20 דקות",
 } = Astro.props;
 
-const baseMessage = "׳”׳™׳™, ׳׳ ׳™ ׳‘׳×׳•׳ ׳˜׳¨׳™׳’׳¨ ׳•׳¨׳•׳¦׳” ׳׳₪׳¨׳§ ׳׳× ׳–׳” ׳“׳¨׳ ׳©׳™׳—׳× ׳׳™׳§׳•׳“ ׳©׳ 20 ׳“׳§׳•׳×.";
+const baseMessage =
+  "היי, אני בתוך טריגר ורוצה לפרק את זה דרך שיחת מיקוד של 20 דקות.";
 const defaultHref = `https://wa.me/${phone}?text=${encodeURIComponent(baseMessage)}`;
 ---
 
@@ -54,14 +55,14 @@ const defaultHref = `https://wa.me/${phone}?text=${encodeURIComponent(baseMessag
         type="button"
         data-trigger-close
         class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white text-lg text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))] transition hover:border-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)] hover:text-[var(--nm-accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color-mix(in_srgb,var(--nm-accent)_25%,transparent)]"
-        aria-label="׳¡׳’׳•׳¨"
+        aria-label="סגור"
       >
-        ֳ—
+        ×
       </button>
       <div class="space-y-2">
         <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">עוצרים לולאה</p>
-        <h2 id="trigger-buster-title" class="text-[1.35rem] font-semibold leading-8">׳‘׳•׳ ׳ ׳₪׳¨׳™׳“ ׳¨׳’׳¢ ׳‘׳™׳ ׳׳” ׳©׳§׳¨׳” ׳׳‘׳™׳ ׳׳” ׳©׳”׳׳—׳©׳‘׳” ׳‘׳ ׳×׳” ׳¢׳׳™׳•.</h2>
-        <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_66%,var(--nm-bg))]">׳©׳׳•׳©׳” ׳¦׳¢׳“׳™׳ ׳§׳¦׳¨׳™׳. ׳‘׳׳™ ׳׳ ׳×׳— ׳—׳™׳™׳ ׳©׳׳׳™׳. ׳¨׳§ ׳׳¢׳¦׳•׳¨ ׳׳× ׳”׳׳•׳₪ ׳•׳׳”׳—׳–׳™׳¨ ׳‘׳”׳™׳¨׳•׳×.</p>
+        <h2 id="trigger-buster-title" class="text-[1.35rem] font-semibold leading-8">בוא נפריד רגע בין מה שקרה לבין מה שהמחשבה נתנה עליו.</h2>
+        <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_66%,var(--nm-bg))]">שלושה צעדים קצרים. בלי לנתח חיים שלמים. רק לעצור את הלופ ולהחזיר בהירות.</p>
       </div>
     </div>
 
@@ -74,14 +75,14 @@ const defaultHref = `https://wa.me/${phone}?text=${encodeURIComponent(baseMessag
     <div class="mt-6 space-y-5">
       <section data-trigger-step="1" class="space-y-4">
         <div class="space-y-2">
-          <p class="text-sm font-semibold text-[var(--nm-accent)]">׳©׳׳‘ 1 ׳׳×׳•׳ 3</p>
-          <h3 class="text-xl font-semibold leading-8">׳׳” ׳”׳¢׳•׳‘׳“׳” ׳ ׳˜׳•?</h3>
-          <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_64%,var(--nm-bg))]">׳‘׳׳™ ׳”׳¡׳™׳₪׳•׳¨ ׳©׳¡׳™׳₪׳¨׳× ׳׳¢׳¦׳׳. ׳¨׳§ ׳׳” ׳§׳¨׳” ׳‘׳₪׳•׳¢׳.</p>
+          <p class="text-sm font-semibold text-[var(--nm-accent)]">שלב 1 מתוך 3</p>
+          <h3 class="text-xl font-semibold leading-8">מה העובדה נטו?</h3>
+          <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_64%,var(--nm-bg))]">בלי הסיפור שסיפרת לעצמך. רק מה קרה בפועל.</p>
         </div>
         <FloatingInput
           client:load
           id="nm-trigger-fact"
-          label="׳“׳•׳’׳׳”: ׳”׳•׳ ׳׳ ׳¢׳ ׳” ׳׳™ ׳׳׳– ׳”׳‘׳•׳§׳¨"
+          label="דוגמה: הוא לא ענה לי מאז הבוקר"
           multiline
           rows={4}
           dataTriggerInput="fact"
@@ -89,21 +90,21 @@ const defaultHref = `https://wa.me/${phone}?text=${encodeURIComponent(baseMessag
           className="[&_.nm-floating-control]:bg-white"
         />
         <div class="flex justify-between gap-3">
-          <button type="button" data-trigger-next="2" class="inline-flex items-center justify-center rounded-full bg-[var(--nm-inverse)] px-5 py-3 text-sm font-semibold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-inverse-hover)]">׳׳”׳׳©׳™׳</button>
-          <button type="button" data-trigger-close-inline class="text-sm font-semibold text-[var(--nm-fg)]/56 transition hover:text-[var(--nm-fg)]">׳׳¢׳¦׳•׳¨ ׳›׳׳</button>
+          <button type="button" data-trigger-next="2" class="inline-flex items-center justify-center rounded-full bg-[var(--nm-inverse)] px-5 py-3 text-sm font-semibold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-inverse-hover)]">להמשיך</button>
+          <button type="button" data-trigger-close-inline class="text-sm font-semibold text-[var(--nm-fg)]/56 transition hover:text-[var(--nm-fg)]">לעצור כאן</button>
         </div>
       </section>
 
       <section data-trigger-step="2" class="hidden space-y-4">
         <div class="space-y-2">
-          <p class="text-sm font-semibold text-[var(--nm-accent)]">׳©׳׳‘ 2 ׳׳×׳•׳ 3</p>
-          <h3 class="text-xl font-semibold leading-8">׳׳” ׳”׳₪׳™׳¨׳•׳© ׳©׳”׳׳‘׳©׳× ׳¢׳ ׳”׳¢׳•׳‘׳“׳” ׳”׳–׳•?</h3>
-          <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_64%,var(--nm-bg))]">׳׳” ׳›׳‘׳¨ ׳”׳—׳׳˜׳× ׳©׳–׳” ׳׳•׳׳¨ ׳¢׳׳™׳, ׳¢׳׳™׳• ׳׳• ׳¢׳ ׳”׳¢׳×׳™׳“?</p>
+          <p class="text-sm font-semibold text-[var(--nm-accent)]">שלב 2 מתוך 3</p>
+          <h3 class="text-xl font-semibold leading-8">מה הפירוש שהילבשת על העובדה הזו?</h3>
+          <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_64%,var(--nm-bg))]">מה כבר החלטת שזה אומר עליך, עליו או על העתיד?</p>
         </div>
         <FloatingInput
           client:load
           id="nm-trigger-story"
-          label="׳“׳•׳’׳׳”: ׳”׳•׳ ׳׳–׳׳–׳ ׳‘׳™, ׳׳– ׳›׳ ׳¨׳׳” ׳©׳׳ ׳™ ׳׳ ׳‘׳׳׳× ׳—׳©׳•׳‘"
+          label="דוגמה: הוא מזלזל בי, אז כנראה שאני לא באמת חשוב"
           multiline
           rows={4}
           dataTriggerInput="story"
@@ -111,21 +112,21 @@ const defaultHref = `https://wa.me/${phone}?text=${encodeURIComponent(baseMessag
           className="[&_.nm-floating-control]:bg-white"
         />
         <div class="flex justify-between gap-3">
-          <button type="button" data-trigger-next="3" class="inline-flex items-center justify-center rounded-full bg-[var(--nm-inverse)] px-5 py-3 text-sm font-semibold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-inverse-hover)]">׳׳”׳׳©׳™׳</button>
-          <button type="button" data-trigger-back="1" class="text-sm font-semibold text-[var(--nm-fg)]/56 transition hover:text-[var(--nm-fg)]">׳—׳–׳¨׳”</button>
+          <button type="button" data-trigger-next="3" class="inline-flex items-center justify-center rounded-full bg-[var(--nm-inverse)] px-5 py-3 text-sm font-semibold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-inverse-hover)]">להמשיך</button>
+          <button type="button" data-trigger-back="1" class="text-sm font-semibold text-[var(--nm-fg)]/56 transition hover:text-[var(--nm-fg)]">חזרה</button>
         </div>
       </section>
 
       <section data-trigger-step="3" class="hidden space-y-4">
         <div class="space-y-2">
-          <p class="text-sm font-semibold text-[var(--nm-accent)]">׳©׳׳‘ 3 ׳׳×׳•׳ 3</p>
-          <h3 class="text-xl font-semibold leading-8">׳׳” ׳”׳¨׳•׳•׳— ׳”׳¡׳׳•׳™ ׳©׳׳ ׳׳׳”׳™׳©׳׳¨ ׳›׳•׳¢׳¡ ׳׳• ׳₪׳’׳•׳¢ ׳¢׳›׳©׳™׳•?</h3>
-          <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_64%,var(--nm-bg))]">׳׳₪׳¢׳׳™׳ ׳”׳›׳׳‘ ׳׳—׳–׳™׳§ ׳×׳—׳•׳©׳× ׳¦׳“׳§, ׳©׳׳™׳˜׳” ׳׳• ׳”׳™׳׳ ׳¢׳•׳× ׳׳”׳¦׳¢׳“ ׳”׳‘׳.</p>
+          <p class="text-sm font-semibold text-[var(--nm-accent)]">שלב 3 מתוך 3</p>
+          <h3 class="text-xl font-semibold leading-8">מה הרווח הסמוי שלך מלהישאר כועס או פגוע עכשיו?</h3>
+          <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_64%,var(--nm-bg))]">לפעמים הכאב מחזיק תחושת צדק, שליטה או הימנעות מהצעד הבא.</p>
         </div>
         <FloatingInput
           client:load
           id="nm-trigger-gain"
-          label="׳“׳•׳’׳׳”: ׳›׳ ׳¢׳•׳“ ׳׳ ׳™ ׳₪׳’׳•׳¢, ׳׳ ׳™ ׳׳ ׳¦׳¨׳™׳ ׳׳“׳‘׳¨ ׳™׳©׳™׳¨׳•׳× ׳׳• ׳׳‘׳“׳•׳§ ׳׳” ׳‘׳׳׳× ׳§׳¨׳”"
+          label="דוגמה: כל עוד אני פגוע, אני לא צריך לדבר ישירות או לבדוק מה באמת קרה"
           multiline
           rows={4}
           dataTriggerInput="gain"
@@ -133,16 +134,16 @@ const defaultHref = `https://wa.me/${phone}?text=${encodeURIComponent(baseMessag
           className="[&_.nm-floating-control]:bg-white"
         />
         <div class="flex justify-between gap-3">
-          <button type="button" data-trigger-finish class="inline-flex items-center justify-center rounded-full bg-[var(--nm-accent)] px-5 py-3 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]">׳׳¡׳™׳™׳</button>
-          <button type="button" data-trigger-back="2" class="text-sm font-semibold text-[var(--nm-fg)]/56 transition hover:text-[var(--nm-fg)]">׳—׳–׳¨׳”</button>
+          <button type="button" data-trigger-finish class="inline-flex items-center justify-center rounded-full bg-[var(--nm-accent)] px-5 py-3 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]">לסיום</button>
+          <button type="button" data-trigger-back="2" class="text-sm font-semibold text-[var(--nm-fg)]/56 transition hover:text-[var(--nm-fg)]">חזרה</button>
         </div>
       </section>
 
       <section data-trigger-result class="hidden rounded-[1.5rem] border border-[color-mix(in_srgb,var(--nm-accent)_14%,transparent)] bg-white px-4 py-5">
-        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">׳”׳©׳׳‘ ׳”׳‘׳</p>
-        <h3 class="mt-3 text-xl font-semibold leading-8">׳¢׳“׳™׳™׳ ׳×׳§׳•׳¢ ׳‘׳׳•׳₪? ׳‘׳•׳ ׳ ׳₪׳¨׳§ ׳׳× ׳–׳”.</h3>
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">השלב הבא</p>
+        <h3 class="mt-3 text-xl font-semibold leading-8">עדיין תקוע בלופ? בוא נפרק את זה.</h3>
         <p class="mt-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
-          ׳׳ ׳’׳ ׳׳—׳¨׳™ ׳”׳”׳₪׳¨׳“׳” ׳”׳–׳• ׳™׳© ׳¨׳¢׳©, ׳›׳ ׳¨׳׳” ׳©׳›׳‘׳¨ ׳׳ ׳¦׳¨׳™׳ ׳¢׳•׳“ ׳׳—׳©׳‘׳”. ׳¦׳¨׳™׳ ׳₪׳™׳¨׳•׳§ ׳׳“׳•׳™׳§ ׳©׳ ׳”׳׳ ׳’׳ ׳•׳ ׳¢׳¦׳׳•.
+          אם גם אחרי ההפרדה הזו יש רעש, כנראה שכבר לא צריך עוד מחשבה. צריך פירוק מדויק של המנגנון עצמו.
         </p>
         <a
           data-trigger-whatsapp
@@ -256,11 +257,13 @@ const defaultHref = `https://wa.me/${phone}?text=${encodeURIComponent(baseMessag
 
     const buildWhatsappHref = () => {
       const phone = root.dataset.phone || "972555634035";
-      const baseMessage = root.dataset.baseMessage || "׳”׳™׳™, ׳׳ ׳™ ׳‘׳×׳•׳ ׳˜׳¨׳™׳’׳¨ ׳•׳¨׳•׳¦׳” ׳׳₪׳¨׳§ ׳׳× ׳–׳” ׳“׳¨׳ ׳©׳™׳—׳× ׳׳™׳§׳•׳“ ׳©׳ 20 ׳“׳§׳•׳×.";
+      const baseMessage =
+        root.dataset.baseMessage ||
+        "היי, אני בתוך טריגר ורוצה לפרק את זה דרך שיחת מיקוד של 20 דקות.";
       const lines = [baseMessage];
-      if (state.fact.trim()) lines.push(`׳¢׳•׳‘׳“׳” ׳ ׳˜׳•: ${state.fact.trim()}`);
-      if (state.story.trim()) lines.push(`׳”׳₪׳™׳¨׳•׳© ׳©׳”׳׳‘׳©׳×׳™: ${state.story.trim()}`);
-      if (state.gain.trim()) lines.push(`׳”׳¨׳•׳•׳— ׳”׳¡׳׳•׳™ ׳©׳׳ ׳™ ׳׳–׳”׳”: ${state.gain.trim()}`);
+      if (state.fact.trim()) lines.push(`עובדה נטו: ${state.fact.trim()}`);
+      if (state.story.trim()) lines.push(`הפירוש שהילבשתי: ${state.story.trim()}`);
+      if (state.gain.trim()) lines.push(`הרווח הסמוי שאני מזהה: ${state.gain.trim()}`);
       return `https://wa.me/${phone}?text=${encodeURIComponent(lines.join("\n"))}`;
     };
 

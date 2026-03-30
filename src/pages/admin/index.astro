@@ -12,8 +12,8 @@ import homeCanvas from "../../config/homeCanvas.json";
 import clarityPathsFile from "../../config/clarityPaths.json";
 import { flattenVisibleServices } from "../../lib/services";
 
-const pageTitle = "׳׳¨׳›׳– ׳”׳©׳׳™׳˜׳” ׳©׳ NeverMind";
-const pageDescription = "׳׳¨׳›׳– ׳×׳₪׳¢׳•׳׳™ ׳₪׳¨׳˜׳™ ׳׳ ׳™׳”׳•׳ ׳׳׳׳¨׳™׳, ׳©׳™׳¨׳•׳×׳™׳, ׳§׳•׳ ׳₪׳™׳’׳•׳¨׳¦׳™׳” ׳•׳›׳׳™ ׳”׳™׳¦׳™׳¨׳” ׳©׳ NeverMind.";
+const pageTitle = "מרכז השליטה של NeverMind";
+const pageDescription = "מרכז תפעולי פרוטו לניהול מאמרים, שירותים, קונפיגורציה וכל יצירה של NeverMind.";
 const githubArticleBase = `https://github.com/${appConfig.github.owner}/${appConfig.github.repo}/blob/${appConfig.github.branch}/${appConfig.github.articlesPath}/`;
 const formatDate = new Intl.DateTimeFormat("he-IL", {
   year: "numeric",
@@ -23,19 +23,19 @@ const formatDate = new Intl.DateTimeFormat("he-IL", {
 
 const workflowConfig = {
   writing: {
-    label: "׳‘׳›׳×׳™׳‘׳”",
+    label: "בכתיבה",
     tone: "bg-[var(--nm-tint)] text-[var(--nm-fg)] border-[color-mix(in_srgb,var(--nm-accent)_20%,transparent)]",
   },
   review: {
-    label: "׳׳‘׳“׳™׳§׳”",
+    label: "לבדיקה",
     tone: "bg-[var(--nm-surface-muted)] text-[var(--nm-fg)] border-[color-mix(in_srgb,var(--nm-fg)_14%,transparent)]",
   },
   ready: {
-    label: "׳׳•׳›׳ ׳׳₪׳¨׳¡׳•׳",
+    label: "מוכן לפרסום",
     tone: "bg-[var(--nm-tint-strong)] text-[var(--nm-fg)] border-[color-mix(in_srgb,var(--nm-accent)_26%,transparent)]",
   },
   published: {
-    label: "׳₪׳•׳¨׳¡׳",
+    label: "פורסם",
     tone: "bg-[var(--nm-inverse)] text-[var(--nm-inverse-fg)] border-[color-mix(in_srgb,var(--nm-fg)_22%,transparent)]",
   },
 } as const;
@@ -44,15 +44,15 @@ type WorkflowKey = keyof typeof workflowConfig;
 
 const difficultyConfig = {
   beginner: {
-    label: "׳׳×׳—׳™׳׳™׳",
+    label: "מתחילים",
     tone: "bg-[var(--nm-tint)] text-[var(--nm-fg)] border-[color-mix(in_srgb,var(--nm-accent)_18%,transparent)]",
   },
   advanced: {
-    label: "׳׳×׳§׳“׳׳™׳",
+    label: "מתקדמים",
     tone: "bg-[var(--nm-tint-strong)] text-[var(--nm-fg)] border-[color-mix(in_srgb,var(--nm-accent)_26%,transparent)]",
   },
   deep: {
-    label: "׳—׳§׳™׳¨׳” ׳¢׳׳•׳§׳”",
+    label: "חקירה עמוקה",
     tone: "bg-[var(--nm-inverse)] text-[var(--nm-inverse-fg)] border-[color-mix(in_srgb,var(--nm-fg)_22%,transparent)]",
   },
 } as const;
@@ -93,11 +93,11 @@ const articles = (await getCollection("articles"))
       workflowTone: workflowMeta.tone,
       difficulty: difficultyMeta.label,
       difficultyTone: difficultyMeta.tone,
-      status: article.data.draft ? "׳˜׳™׳•׳˜׳”" : "׳‘׳׳•׳•׳™׳¨",
+      status: article.data.draft ? "טיוטה" : "באוויר",
       statusTone: article.data.draft
         ? "bg-[var(--nm-tint)] text-[var(--nm-accent)] border-[color-mix(in_srgb,var(--nm-accent)_14%,transparent)]"
         : "bg-[var(--nm-tint)] text-[var(--nm-fg)] border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)]",
-      premium: article.data.isPremium ? "׳›׳" : "׳׳",
+      premium: article.data.isPremium ? "כן" : "לא",
       premiumTone: article.data.isPremium
         ? "bg-[var(--nm-inverse)] text-[var(--nm-inverse-fg)] border-[color-mix(in_srgb,var(--nm-fg)_22%,transparent)]"
         : "bg-[var(--nm-bg-canvas)] text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))] border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)]",
@@ -117,70 +117,70 @@ const quickActions = [
     cta: "לפתוח את ניהול המועדון",
   },
   {
-    title: "׳׳׳׳¨ ׳—׳“׳©",
-    description: "׳׳—׳•׳׳ prompt, sandbox ׳ײ¾MDX, autofix ׳•׳™׳™׳¦׳•׳ ׳׳§׳•׳‘׳¥ ׳׳₪׳ ׳™ commit.",
+    title: "מאמר חדש",
+    description: "מחולל prompt, sandbox ל־MDX, autofix וייצוא לקובץ לפני commit.",
     href: "/admin/generator/",
-    cta: "׳׳₪׳×׳•׳— ׳׳× ׳”׳׳—׳•׳׳",
+    cta: "לפתוח את המחולל",
   },
   {
     title: "Content Health",
-    description: "׳¦׳™׳•׳ ׳‘׳¨׳™׳׳•׳× ׳׳›׳ ׳׳׳׳¨ ׳׳₪׳™ Insight, ׳¢׳“׳›׳ ׳™׳•׳× SEO ׳•׳™׳—׳¡ ׳¨׳›׳™׳‘׳™ QA.",
+    description: "ציון בריאות לכל מאמר לפי Insight, עדכוני SEO ויחס רכיבי QA.",
     href: "/dashboard/",
-    cta: "׳׳₪׳×׳•׳— ׳׳× ׳”׳“׳©׳‘׳•׳¨׳“",
+    cta: "לפתוח את הדשבורד",
   },
   {
-    title: "׳¢׳׳•׳“ ׳”׳©׳™׳¨׳•׳×׳™׳",
-    description: "׳׳¡׳׳•׳׳™׳ ׳׳₪׳™ ׳©׳׳‘׳™׳, ׳›׳₪׳×׳•׳¨׳™ ׳•׳•׳׳˜׳¡׳׳₪ ׳׳• ׳—׳©׳‘׳•׳ ׳™׳×, ׳•׳×׳׳—׳•׳¨ ׳‘׳¨׳•׳¨.",
+    title: "עמוד השירותים",
+    description: "מסלולים לפי שלבים, כפתורי וואטסאפ או חשבונית, ותמחור ברור.",
     href: "/services/",
-    cta: "׳׳‘׳“׳•׳§ ׳׳× ׳”׳¢׳׳•׳“",
+    cta: "לבדוק את העמוד",
   },
   {
-    title: "׳˜׳•׳₪׳¡ intake",
-    description: "׳”׳›׳¨׳•׳× ׳׳₪׳ ׳™ ׳©׳™׳—׳”: ׳›׳×׳™׳‘׳”, ׳¡׳™׳׳•׳ ׳׳• ׳©׳ ׳™׳”׳, ׳¢׳ ׳”׳¢׳¨׳•׳× ׳‘׳“׳¨׳ ׳׳₪׳™ ׳‘׳—׳™׳¨׳”.",
+    title: "טופס intake",
+    description: "הכרות לפני שיחה: כתיבה, סימון או שניים, עם הערות בדרך לפני בחירה.",
     href: "/intake/",
-    cta: "׳׳₪׳×׳•׳— ׳׳× ׳”׳˜׳•׳₪׳¡",
+    cta: "לפתוח את הטופס",
   },
   {
-    title: "׳׳—׳•׳׳ ׳₪׳¨׳“׳•׳§׳¡׳™׳",
-    description: "׳›׳׳™ ׳׳”׳™׳¨ ׳׳™׳¦׳™׳¨׳× 20 ׳₪׳¨׳“׳•׳§׳¡׳™׳ ׳—׳“׳™׳ ׳׳¡׳˜׳•׳¨׳™׳–, ׳”׳•׳§׳™׳ ׳•׳›׳•׳×׳¨׳•׳× ׳׳©׳ ׳”.",
+    title: "מחולל פרדוקסים",
+    description: "כלי מהיר ליצירת 20 פרדוקסים חדים לסטוריז, הוקים וכותרות משנות.",
     href: "/admin/paradoxes/",
-    cta: "׳׳™׳™׳¦׳¨ ׳₪׳¨׳“׳•׳§׳¡׳™׳",
+    cta: "לייצר פרדוקסים",
   },
   {
-    title: "׳¢׳¥ ׳©׳•׳¨׳© ׳”׳‘׳¢׳™׳”",
-    description: "׳׳™׳ ׳₪׳•׳’׳¨׳₪׳™׳§׳” ׳׳™׳ ׳˜׳¨׳׳§׳˜׳™׳‘׳™׳× ׳©׳׳₪׳¨׳§׳× ׳‘׳¢׳™׳” ׳’׳׳•׳™׳” ׳׳©׳•׳¨׳©׳™׳ ׳×׳•׳“׳¢׳×׳™׳™׳ ׳¢׳׳•׳§׳™׳ ׳™׳•׳×׳¨.",
+    title: "עץ שורש הבעיה",
+    description: "אינפוגרפיקה אינטראקטיבית שמפרקת בעיה גלויה לשורשים תודעתיים עמוקים יותר.",
     href: "/root-problem-tree/",
-    cta: "׳׳₪׳×׳•׳— ׳׳× ׳”׳׳₪׳”",
+    cta: "לפתוח את המפה",
   },
   {
-    title: "׳”׳¡׳₪׳¨׳™׳™׳” ׳”׳׳¡׳•׳¨׳”",
-    description: "׳¨׳™׳›׳•׳– ׳”׳׳׳׳¨׳™׳ ׳©׳©׳•׳‘׳¨׳™׳ ׳₪׳¨׳•׳× ׳§׳“׳•׳©׳•׳× ׳•׳™׳•׳¦׳¨׳™׳ curiosity gap ׳—׳–׳§ ׳™׳•׳×׳¨.",
+    title: "הספרייה האסורה",
+    description: "ריכוז המאמרים ששוברים פרות קדושות ויוצרים curiosity gap חזק יותר.",
     href: "/forbidden-library/",
-    cta: "׳׳”׳™׳›׳ ׳¡ ׳׳¡׳₪׳¨׳™׳™׳”",
+    cta: "להיכנס לספרייה",
   },
 ];
 
 const visibleServices = flattenVisibleServices();
 const stats = {
   totalArticles: articles.length,
-  drafts: articles.filter((article) => article.status === "׳˜׳™׳•׳˜׳”").length,
-  live: articles.filter((article) => article.status === "׳‘׳׳•׳•׳™׳¨").length,
+  drafts: articles.filter((article) => article.status === "טיוטה").length,
+  live: articles.filter((article) => article.status === "באוויר").length,
   writing: articles.filter((article) => article.workflowKey === "writing").length,
   review: articles.filter((article) => article.workflowKey === "review").length,
   ready: articles.filter((article) => article.workflowKey === "ready").length,
   published: articles.filter((article) => article.workflowKey === "published").length,
   activeServices: visibleServices.length,
   featuredServices: visibleServices.filter((service) => Array.isArray(service.badges) && service.badges.length > 0).length,
-  homeCanvasTrend: homeCanvas.showTrendGraph ? "׳׳•׳₪׳¢׳" : "׳›׳‘׳•׳™",
+  homeCanvasTrend: homeCanvas.showTrendGraph ? "מופעל" : "כבוי",
   clarityJourneys: Array.isArray(clarityPathsFile.paths) ? clarityPathsFile.paths.length : 0,
 };
 
 const topPriority =
   stats.ready > 0
-    ? `${stats.ready} ׳׳׳׳¨׳™׳ ׳׳•׳›׳ ׳™׳ ׳׳₪׳¨׳¡׳•׳.`
+    ? `${stats.ready} מאמרים מוכנים לפרסום.`
     : stats.review > 0
-      ? `${stats.review} ׳׳׳׳¨׳™׳ ׳׳—׳›׳™׳ ׳׳‘׳“׳™׳§׳”.`
-      : "׳׳™׳ ׳¦׳•׳•׳׳¨ ׳‘׳§׳‘׳•׳§ ׳›׳¨׳’׳¢. ׳׳₪׳©׳¨ ׳׳¢׳‘׳•׳¨ ׳׳™׳¦׳™׳¨׳” ׳׳• ׳׳©׳™׳₪׳•׳¨ ׳”׳©׳™׳¨׳•׳×׳™׳.";
+      ? `${stats.review} מאמרים מחכים לבדיקה.`
+      : "אין צוואר בקבוק כרגע. אפשר לעבור ליצירה או לשיפור השירותים.";
 ---
 
 <Layout title={pageTitle} description={pageDescription} noIndex={true}>
@@ -188,16 +188,16 @@ const topPriority =
     <header class="grid gap-6 rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/82 p-6 shadow-[0_30px_90px_rgba(26,26,26,0.08)] backdrop-blur-md lg:grid-cols-[minmax(0,1fr)_20rem]">
       <div class="space-y-5 text-right">
         <p class="text-sm font-semibold uppercase tracking-[0.26em] text-[var(--nm-accent)]">Creator Dashboard</p>
-        <h1 class="text-[clamp(2.4rem,1.8rem+2vw,4rem)] font-semibold leading-[1.05]">׳׳¨׳›׳– ׳”׳©׳׳™׳˜׳” ׳©׳ ׳”׳×׳•׳›׳ ׳•׳”׳׳¢׳¨׳›׳×</h1>
+        <h1 class="text-[clamp(2.4rem,1.8rem+2vw,4rem)] font-semibold leading-[1.05]">מרכז השליטה של התוכן והמערכת</h1>
         <p class="max-w-3xl text-[clamp(1rem,0.94rem+0.3vw,1.15rem)] leading-8 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">
-          ׳–׳” ׳”׳§׳•׳§׳₪׳™׳˜ ׳”׳×׳₪׳¢׳•׳׳™ ׳©׳׳. ׳׳›׳׳ ׳¨׳•׳׳™׳ ׳׳” ׳ ׳›׳×׳‘, ׳׳” ׳×׳§׳•׳¢, ׳׳” ׳׳•׳›׳ ׳׳₪׳¨׳¡׳•׳, ׳•׳׳™׳׳• ׳׳ ׳’׳ ׳•׳ ׳™׳ ׳‘׳׳×׳¨ ׳₪׳¢׳™׳׳™׳ ׳›׳¨׳’׳¢. ׳׳ CMS ׳›׳׳׳™, ׳׳׳ ׳¡׳‘׳™׳‘׳× ׳¢׳‘׳•׳“׳” ׳©׳׳•׳×׳׳׳× ׳ײ¾NeverMind.
+          זה הקוקפיט התפעולי שלך. מכאן רואים מה נכתב, מה תקוע, מה מוכן לפרסום, ואילו מנגנונים באתר פעילים כרגע. לא CMS כללי, אלא סביבת עבודה שמתאימה ל־NeverMind.
         </p>
       </div>
       <div class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-accent)_18%,transparent)] bg-[var(--nm-tint)] p-5 text-right">
-        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">׳×׳¢׳“׳•׳£ ׳׳”׳™׳•׳</p>
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">תעדוף להיום</p>
         <p class="mt-3 text-lg font-semibold text-[var(--nm-fg)]">{topPriority}</p>
         <p class="mt-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_64%,var(--nm-bg))]">
-          ׳׳ ׳׳×׳” ׳¨׳§ ׳׳×׳—׳™׳ ׳¡׳‘׳‘ ׳¢׳‘׳•׳“׳” ׳—׳“׳©, ׳”׳׳¡׳׳•׳ ׳”׳ ׳›׳•׳ ׳”׳•׳: ׳׳—׳•׳׳ ׳׳׳׳¨׳™׳, ׳‘׳“׳™׳§׳× QA, ׳•׳׳– ׳§׳₪׳™׳¦׳” ׳׳˜׳‘׳׳× ׳”׳×׳•׳›׳ ׳›׳“׳™ ׳׳§׳“׳ ׳׳× ׳”׳¡׳˜׳˜׳•׳¡.
+          אם אתה רק מתחיל סבב עבודה חדש, המסלול הנכון הוא: מחולל מאמרים, בדיקת QA, ואז קפיצה לטבלת התוכן כדי לקדם את הסטטוס.
         </p>
       </div>
     </header>
@@ -213,14 +213,14 @@ const topPriority =
     </section>
 
     <section class="grid gap-4 md:grid-cols-4 xl:grid-cols-8">
-      <article class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-5 text-right"><p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">׳׳׳׳¨׳™׳</p><p class="mt-3 text-3xl font-semibold text-[var(--nm-fg)]">{stats.totalArticles}</p></article>
-      <article class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-5 text-right"><p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">׳˜׳™׳•׳˜׳•׳×</p><p class="mt-3 text-3xl font-semibold text-[var(--nm-fg)]">{stats.drafts}</p></article>
-      <article class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-5 text-right"><p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">׳‘׳׳•׳•׳™׳¨</p><p class="mt-3 text-3xl font-semibold text-[var(--nm-fg)]">{stats.live}</p></article>
-      <article class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-5 text-right"><p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">׳‘׳›׳×׳™׳‘׳”</p><p class="mt-3 text-3xl font-semibold text-[var(--nm-fg)]">{stats.writing}</p></article>
-      <article class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-5 text-right"><p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">׳׳‘׳“׳™׳§׳”</p><p class="mt-3 text-3xl font-semibold text-[var(--nm-fg)]">{stats.review}</p></article>
-      <article class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-5 text-right"><p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">׳׳•׳›׳ ׳׳₪׳¨׳¡׳•׳</p><p class="mt-3 text-3xl font-semibold text-[var(--nm-fg)]">{stats.ready}</p></article>
-      <article class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-5 text-right"><p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">׳₪׳•׳¨׳¡׳</p><p class="mt-3 text-3xl font-semibold text-[var(--nm-fg)]">{stats.published}</p></article>
-      <article class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-5 text-right"><p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">׳©׳™׳¨׳•׳×׳™׳ ׳₪׳¢׳™׳׳™׳</p><p class="mt-3 text-3xl font-semibold text-[var(--nm-fg)]">{stats.activeServices}</p></article>
+      <article class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-5 text-right"><p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">מאמרים</p><p class="mt-3 text-3xl font-semibold text-[var(--nm-fg)]">{stats.totalArticles}</p></article>
+      <article class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-5 text-right"><p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">טיוטות</p><p class="mt-3 text-3xl font-semibold text-[var(--nm-fg)]">{stats.drafts}</p></article>
+      <article class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-5 text-right"><p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">באוויר</p><p class="mt-3 text-3xl font-semibold text-[var(--nm-fg)]">{stats.live}</p></article>
+      <article class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-5 text-right"><p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">בכתיבה</p><p class="mt-3 text-3xl font-semibold text-[var(--nm-fg)]">{stats.writing}</p></article>
+      <article class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-5 text-right"><p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">לבדיקה</p><p class="mt-3 text-3xl font-semibold text-[var(--nm-fg)]">{stats.review}</p></article>
+      <article class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-5 text-right"><p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">מוכן לפרסום</p><p class="mt-3 text-3xl font-semibold text-[var(--nm-fg)]">{stats.ready}</p></article>
+      <article class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-5 text-right"><p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">פורסם</p><p class="mt-3 text-3xl font-semibold text-[var(--nm-fg)]">{stats.published}</p></article>
+      <article class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-5 text-right"><p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">שירותים פעילים</p><p class="mt-3 text-3xl font-semibold text-[var(--nm-fg)]">{stats.activeServices}</p></article>
     </section>
 
     <section id="content-queue">
@@ -240,31 +240,31 @@ const topPriority =
     <section class="grid gap-4 md:grid-cols-2">
       <article class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/82 p-5 shadow-[0_24px_70px_rgba(26,26,26,0.06)] text-right">
         <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--nm-accent)]">System State</p>
-        <h2 class="mt-3 text-2xl font-semibold text-[var(--nm-fg)]">׳׳•׳“׳•׳׳™׳ ׳’׳׳•׳‘׳׳™׳™׳</h2>
+        <h2 class="mt-3 text-2xl font-semibold text-[var(--nm-fg)]">מודולים גלובליים</h2>
         <ul class="mt-5 space-y-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
-          <li class="rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3">Whisper Banner: <strong>{siteSettings.whisperBanner.enabled ? "׳׳•׳₪׳¢׳" : "׳›׳‘׳•׳™"}</strong></li>
-          <li class="rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3">Premium Vault: <strong>{siteSettings.premiumVault.enabled ? "׳׳•׳₪׳¢׳" : "׳›׳‘׳•׳™"}</strong></li>
+          <li class="rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3">Whisper Banner: <strong>{siteSettings.whisperBanner.enabled ? "מופעל" : "כבוי"}</strong></li>
+          <li class="rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3">Premium Vault: <strong>{siteSettings.premiumVault.enabled ? "מופעל" : "כבוי"}</strong></li>
           <li class="rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3">Logic Canvas / TrendGraph: <strong>{stats.homeCanvasTrend}</strong></li>
-          <li class="rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3">Clarity Journeys: <strong>{stats.clarityJourneys} ׳׳¡׳׳•׳׳™׳</strong></li>
+          <li class="rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3">Clarity Journeys: <strong>{stats.clarityJourneys} מסלולים</strong></li>
         </ul>
       </article>
 
       <article class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/82 p-5 shadow-[0_24px_70px_rgba(26,26,26,0.06)] text-right">
-        <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--nm-accent)]">׳–׳¨׳™׳׳× ׳¢׳‘׳•׳“׳” ׳׳¢׳•׳“׳›׳ ׳×</p>
-        <h2 class="mt-3 text-2xl font-semibold text-[var(--nm-fg)]">׳׳” ׳¢׳•׳©׳™׳ ׳׳›׳׳</h2>
+        <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--nm-accent)]">זרימת עבודה מעודכנת</p>
+        <h2 class="mt-3 text-2xl font-semibold text-[var(--nm-fg)]">מה עושים מכאן</h2>
         <ol class="mt-5 space-y-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
           <li class="rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3">
-            ׳™׳•׳¦׳¨׳™׳ ׳˜׳™׳•׳˜׳” ׳—׳“׳©׳” ׳•׳׳™׳™׳¦׳¨׳™׳ ׳×׳•׳›׳ ׳׳”׳׳—׳•׳׳.
-            <a href="/admin/generator/" class="ms-2 font-semibold text-[var(--nm-accent)] underline-offset-4 hover:underline">׳₪׳×׳— ׳׳—׳•׳׳</a>
+            יוצרים טיוטה חדשה ומייצרים תוכן מהמחולל.
+            <a href="/admin/generator/" class="ms-2 font-semibold text-[var(--nm-accent)] underline-offset-4 hover:underline">פתח מחולל</a>
           </li>
           <li class="rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3">
-            ׳׳§׳“׳׳™׳ ׳׳׳׳¨׳™׳ ׳“׳¨׳ ׳”׳×׳•׳¨ ׳׳₪׳™ ׳¡׳˜׳˜׳•׳¡: ׳‘׳›׳×׳™׳‘׳”, ׳׳‘׳“׳™׳§׳”, ׳׳•׳›׳ ׳׳₪׳¨׳¡׳•׳, ׳₪׳•׳¨׳¡׳.
-            <a href="#content-queue" class="ms-2 font-semibold text-[var(--nm-accent)] underline-offset-4 hover:underline">׳׳×׳•׳¨ ׳”׳׳׳׳¨׳™׳</a>
+            מקדמים מאמרים דרך התור לפי סטטוס: בכתיבה, לבדיקה, מוכן לפרסום, פורסם.
+            <a href="#content-queue" class="ms-2 font-semibold text-[var(--nm-accent)] underline-offset-4 hover:underline">לתור המאמרים</a>
           </li>
           <li class="rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3">
-            ׳׳₪׳ ׳™ push ׳‘׳•׳“׳§׳™׳ ׳©׳™׳¨׳•׳×׳™׳, ׳”׳’׳“׳¨׳•׳× ׳›׳׳׳™׳•׳×, ׳§׳ ׳‘׳¡ ׳•׳׳¡׳׳•׳׳™׳.
-            <a href="#services-config" class="ms-2 font-semibold text-[var(--nm-accent)] underline-offset-4 hover:underline">׳©׳™׳¨׳•׳×׳™׳ ׳•׳§׳•׳ ׳₪׳™׳’</a>
-            <a href="#canvas-paths" class="ms-2 font-semibold text-[var(--nm-accent)] underline-offset-4 hover:underline">׳§׳ ׳‘׳¡ ׳•׳׳¡׳׳•׳׳™׳</a>
+            לפני push בודקים שירותים, הגדרות כלליות, קנבס ומסלולים.
+            <a href="#services-config" class="ms-2 font-semibold text-[var(--nm-accent)] underline-offset-4 hover:underline">שירותים וקונפיג</a>
+            <a href="#canvas-paths" class="ms-2 font-semibold text-[var(--nm-accent)] underline-offset-4 hover:underline">קנבס ומסלולים</a>
           </li>
         </ol>
       </article>

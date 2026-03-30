@@ -1,7 +1,20 @@
 import { runPagefindSearch } from "../lib/pagefind-client.js";
 
-const EMPTY_MESSAGE = "לא מצאנו את מה שחיפשת, אולי ננסה לשאול את ההפך?";
 const LOADING_MESSAGE = "מזקק את המנגנון...";
+
+function getSearchQueryLabel() {
+  const params = new URLSearchParams(window.location.search);
+  const fromUrl = params.get("q")?.trim() ?? "";
+  if (fromUrl) return fromUrl;
+  const input = document.querySelector("[data-pagefind-input]");
+  const fromInput = input instanceof HTMLInputElement ? input.value.trim() : "";
+  if (fromInput) return fromInput;
+  return "משהו מסוים";
+}
+
+function buildWhatsAppMessage(queryLabel) {
+  return `היי, חיפשתי באתר על ${queryLabel} ולא מצאתי. אני רוצה לקבוע פגישה מצולמת ולפרק את זה יחד.`;
+}
 
 function renderLoadingState(resultsContainer) {
   resultsContainer.setAttribute("aria-busy", "true");
@@ -18,14 +31,68 @@ function renderLoadingState(resultsContainer) {
 
 function renderEmptyState(resultsContainer) {
   resultsContainer.removeAttribute("aria-busy");
+  const waDigits = String(resultsContainer.dataset.waDigits ?? "").replace(/\D/g, "");
+  const queryLabel = getSearchQueryLabel();
+  const waHref = waDigits
+    ? `https://wa.me/${waDigits}?text=${encodeURIComponent(buildWhatsAppMessage(queryLabel))}`
+    : "";
+  const waLinkBlock = waHref
+    ? `<a
+        href="${waHref}"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="inline-flex min-h-[44px] items-center justify-center rounded-xl border border-[color-mix(in_srgb,#1A1A1A_22%,transparent)] bg-transparent px-5 py-3 text-center text-[clamp(0.9rem,0.85rem+0.2vw,1rem)] font-semibold text-[#1A1A1A] transition hover:bg-[color-mix(in_srgb,#1A1A1A_6%,transparent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D42B2B]"
+        aria-label="פתיחת וואטסאפ עם הודעה מוכנה על החיפוש שלא הניב תוצאות"
+      >שליחה בוואטסאפ עם טקסט מוכן</a>`
+    : "";
+
   resultsContainer.innerHTML = `
-    <div class="space-y-4 rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] bg-[color-mix(in_srgb,var(--nm-surface-muted)_55%,white)] p-5 text-right">
-      <p class="text-[clamp(0.95rem,0.9rem+0.2vw,1.05rem)] font-medium text-[var(--nm-fg)]">${EMPTY_MESSAGE}</p>
-      <p class="text-[clamp(0.85rem,0.8rem+0.2vw,1rem)] text-[color-mix(in_srgb,var(--nm-fg)_58%,var(--nm-bg))]">אפשר לפתוח כיוון אחר או להיכנס ישר למאמרים שכבר מחכים לך.</p>
-      <div class="flex flex-wrap justify-end gap-2">
-        <a href="/articles/hidden-assumptions-mechanics/" class="inline-flex min-h-[44px] items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 px-4 py-2 text-sm text-[var(--nm-fg)] transition hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nm-accent)]">הנחה סמויה</a>
-        <a href="/articles/why-bad-things-happen/" class="inline-flex min-h-[44px] items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 px-4 py-2 text-sm text-[var(--nm-fg)] transition hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nm-accent)]">למה דברים רעים קורים</a>
-        <a href="/articles/" class="inline-flex min-h-[44px] items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 px-4 py-2 text-sm text-[var(--nm-fg)] transition hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nm-accent)]">כל המאמרים</a>
+    <div class="nm-search-empty space-y-6 rounded-2xl border border-[color-mix(in_srgb,#1A1A1A_12%,transparent)] bg-[#FAFAF8] p-6 text-right text-[#1A1A1A] [font-family:'Assistant_Variable','Heebo',system-ui,sans-serif] leading-[1.6]">
+      <div class="space-y-3 text-[clamp(0.95rem,0.9rem+0.2vw,1.05rem)]">
+        <p>החיפוש עדיין לא פגש את המחשבה הנכונה כאן.</p>
+        <p>אולי ננסה לשאול את ההפך?</p>
+        <p>אפשר להמשיך למאמרים שכבר מחכים לך.</p>
+        <p>אפשר גם שנשב לפרק את זה יחד באולפן.</p>
+        <p>אנחנו מצלמים שיחות עומק כאלו כדי להעלות תכנים חדשים שמעניינים אותך.</p>
+      </div>
+      <nav aria-label="קישורים מהירים" class="space-y-2">
+        <ul class="m-0 list-none space-y-2 p-0">
+          <li>
+            <a
+              href="/tags/hidden-assumption"
+              class="flex w-full items-center gap-2 rounded-xl py-2 ps-1 pe-1 text-[clamp(0.9rem,0.85rem+0.2vw,1rem)] font-medium text-[#1A1A1A] underline-offset-4 transition hover:bg-[color-mix(in_srgb,#1A1A1A_5%,transparent)] hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D42B2B]"
+            >
+              <span>הנחה סמויה</span>
+              <span class="ms-auto shrink-0 text-[#D42B2B]" aria-hidden="true">←</span>
+            </a>
+          </li>
+          <li>
+            <a
+              href="/articles/why-bad-things-happen/"
+              class="flex w-full items-center gap-2 rounded-xl py-2 ps-1 pe-1 text-[clamp(0.9rem,0.85rem+0.2vw,1rem)] font-medium text-[#1A1A1A] underline-offset-4 transition hover:bg-[color-mix(in_srgb,#1A1A1A_5%,transparent)] hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D42B2B]"
+            >
+              <span class="shrink-0 text-[#D42B2B]" aria-hidden="true">←</span>
+              <span>למה דברים רעים קורים</span>
+            </a>
+          </li>
+          <li>
+            <a
+              href="/library/"
+              class="flex w-full items-center gap-2 rounded-xl py-2 ps-1 pe-1 text-[clamp(0.9rem,0.85rem+0.2vw,1rem)] font-medium text-[#1A1A1A] underline-offset-4 transition hover:bg-[color-mix(in_srgb,#1A1A1A_5%,transparent)] hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D42B2B]"
+            >
+              <span>כל המאמרים</span>
+              <span class="ms-auto shrink-0 text-[#D42B2B]" aria-hidden="true">←</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+      <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:justify-end">
+        <a
+          href="/services#balcony-experience"
+          class="inline-flex min-h-[44px] items-center justify-center rounded-xl bg-[#D42B2B] px-6 py-3 text-center text-[clamp(0.95rem,0.9rem+0.2vw,1.05rem)] font-bold text-white transition hover:bg-[color-mix(in_srgb,#D42B2B_92%,#1A1A1A)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1A1A1A]"
+          aria-label="מעבר לפרטי האולפן לפריקת נושא בפודקאסט"
+        >אני רוצה לפרק את זה באולפן</a>
+        ${waLinkBlock}
       </div>
     </div>`;
 }
