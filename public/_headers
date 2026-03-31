@@ -24,3 +24,13 @@
 
 /admin/*
   Cache-Control: no-store
+
+/me/unlock/*
+  X-Robots-Tag: noindex, nofollow
+  Cache-Control: private, no-store
+
+/me/settings/*
+  Cache-Control: private, no-store
+
+/me/learning/*
+  Cache-Control: private, no-store

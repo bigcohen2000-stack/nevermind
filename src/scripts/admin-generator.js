@@ -6,6 +6,70 @@ const SLUG_EN_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const YOUTUBE_ID_RE = /^[a-zA-Z0-9_-]{11}$/;
 const WORD_WARN = 900;
 const WORD_DEEP = 1400;
+const LONG_SENTENCE_WORDS = 20;
+
+/** מחלץ מזהה סרטון מכל קישור יוטיוב נפוץ או מזהה 11 תווים */
+export function extractYoutubeId(raw) {
+  const s = String(raw || "").trim();
+  if (!s) return "";
+  if (/^[a-zA-Z0-9_-]{11}$/.test(s)) return s;
+  try {
+    const u = s.startsWith("http://") || s.startsWith("https://") ? new URL(s) : new URL(`https://${s}`);
+    if (u.hostname === "youtu.be") {
+      const id = u.pathname.replace(/^\//, "").slice(0, 11);
+      return /^[a-zA-Z0-9_-]{11}$/.test(id) ? id : "";
+    }
+    if (u.hostname.includes("youtube.com") || u.hostname.includes("youtube-nocookie.com")) {
+      const v = u.searchParams.get("v");
+      if (v && /^[a-zA-Z0-9_-]{11}$/.test(v.slice(0, 11))) return v.slice(0, 11);
+      const embed = u.pathname.match(/\/embed\/([a-zA-Z0-9_-]{11})/);
+      if (embed) return embed[1];
+      const shorts = u.pathname.match(/\/shorts\/([a-zA-Z0-9_-]{11})/);
+      if (shorts) return shorts[1];
+    }
+  } catch {
+    return "";
+  }
+  return "";
+}
+
+function sanitizeTagsFromCsv(raw) {
+  const parts = String(raw || "")
+    .split(/[,،]/)
+    .map((t) => t.trim())
+    .filter(Boolean);
+  const out = [];
+  const seen = new Set();
+  for (const t of parts) {
+    if (ARTICLE_TAG_WHITELIST_SET.has(t) && !seen.has(t)) {
+      seen.add(t);
+      out.push(t);
+    }
+  }
+  return out.join(", ");
+}
+
+function normalizeMdxWhitespace(text) {
+  return String(text || "")
+    .replace(/\u2013|\u2014/g, "-")
+    .replace(/[\u201c\u201d]/g, '"')
+    .replace(/[\u2018\u2019]/g, "'")
+    .replace(/[ \t]{2,}/g, " ")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
+function countLongSentences(body) {
+  const t = String(body || "").trim();
+  if (!t) return 0;
+  const sentences = t.split(/[.!?\n]+/).map((x) => x.trim()).filter(Boolean);
+  let n = 0;
+  for (const sent of sentences) {
+    const wc = sent.split(/\s+/).filter(Boolean).length;
+    if (wc > LONG_SENTENCE_WORDS) n += 1;
+  }
+  return n;
+}
 const REQUIRED_FRONTMATTER_KEYS = [
   "title",
   "description",
@@ -31,31 +95,31 @@ function countWords(raw) {
 
 function runBlockingChecks(data) {
   const errors = [];
+  const tagsClean = sanitizeTagsFromCsv(data.tags);
   const slug = data.slug.trim();
+  const boot = typeof window !== "undefined" && window.__NM_WIZARD_BOOT ? window.__NM_WIZARD_BOOT : {};
+  const taken = Array.isArray(boot.existingSlugs) ? boot.existingSlugs : [];
+
   if (!slug) {
     errors.push("חסרה כתובת באנגלית קטנה (slug).");
   } else if (!SLUG_EN_RE.test(slug)) {
     errors.push("הכתובת באנגלית קטנה, מקפים בלבד, בלי רווחים.");
+  } else if (taken.includes(slug)) {
+    errors.push("הכתובת באנגלית כבר קיימת במערכת. בחר שם אחר.");
   }
 
-  const tagParts = data.tags
+  const tagParts = tagsClean
     .split(/[,،]/)
     .map((tag) => tag.trim())
     .filter(Boolean);
 
   if (!tagParts.length) {
-    errors.push("חסרות תגיות. רק מהרשימה בקובץ התגיות.");
+    errors.push("חסרות תגיות מהרשימה המאושרת. בחר לפחות תגית אחת.");
   }
 
-  for (const tag of tagParts) {
-    if (!ARTICLE_TAG_WHITELIST_SET.has(tag)) {
-      errors.push(`תגית לא ברשימה: "${tag}".`);
-    }
-  }
-
-  if (!data.questionForSchema.trim()) errors.push("חסרה שאלה למנועי חיפוש.");
-  if (!data.aha.trim()) errors.push("חסרה תובנת ליבה.");
-  if (!data.imageAlt.trim()) errors.push("חסר תיאור תמונה.");
+  if (!data.questionForSchema.trim()) errors.push("חסרה שאלה למנועי חיפוש (שלב 1).");
+  if (!data.aha.trim()) errors.push("חסרה תובנת ליבה (שלב 1).");
+  if (!data.imageAlt.trim()) errors.push("חסר תיאור תמונה (שלב 1).");
 
   return errors;
 }
@@ -75,6 +139,22 @@ function runPreflight(data) {
   const wordCount = countWords(data.body);
   if (wordCount > 0 && wordCount < 120) {
     warnings.push(`מעט מילים בטיוטה (${wordCount}). אם זה מכוון, בסדר.`);
+  }
+  const bodyLines = data.body.split("\n");
+  const hashes = bodyLines.filter((line) => /^#{1,6}\s/.test(line.trim()));
+  let lastLevel = 0;
+  let skip = false;
+  for (const h of hashes) {
+    const m = h.match(/^(#{1,6})\s/);
+    const lvl = m ? m[1].length : 0;
+    if (lvl > 0 && lastLevel > 0 && lvl > lastLevel + 1) {
+      skip = true;
+      break;
+    }
+    if (lvl > 0) lastLevel = lvl;
+  }
+  if (skip) {
+    warnings.push("בטיוטה יש דילוג ברמת כותרות (למשל מ־## ל־####). עדיף רצף H2→H3.");
   }
   if (wordCount >= WORD_DEEP) {
     warnings.push(`הטיוטה ארוכה (${wordCount} מילים). מתאים בדרך כלל לרמת עומק גבוהה.`);
@@ -216,7 +296,7 @@ imageAlt: "${yq(data.imageAlt)}"
 slug: "${yq(slug)}"
 tags: [${tagsYaml}]
 image: "/uploads/${slug}.jpg"
-isPremium: ${Boolean(data.isPremium)}
+isPremium: ${Boolean(data.isPremium)}${data.youtubeId ? `\nyoutubeId: "${yq(data.youtubeId)}"` : ""}
 draft: true
 ---
 
@@ -264,6 +344,7 @@ function setupArticleWizard() {
   let draftRestored = false;
   let externalValidated = false;
   let selectedClaim = "";
+  let focusMode = false;
 
   const progress = document.getElementById("wizard-progress");
   const stepLabel = document.getElementById("wizard-step-label");
@@ -278,6 +359,10 @@ function setupArticleWizard() {
     const mindShift = document.getElementById("wiz-mind-shift");
     const tone = document.getElementById("wiz-tone");
     const length = document.getElementById("wiz-length");
+    const tagsRaw = fieldTrim("wiz-tags");
+    const tags = sanitizeTagsFromCsv(tagsRaw);
+    const ytRaw = fieldTrim("wiz-youtube");
+    const youtubeParsed = extractYoutubeId(ytRaw) || (YOUTUBE_ID_RE.test(ytRaw.trim()) ? ytRaw.trim() : "");
 
     return {
       topic: fieldTrim("wiz-topic"),
@@ -295,10 +380,105 @@ function setupArticleWizard() {
       tone: tone instanceof HTMLSelectElement ? tone.value : "",
       points: fieldValue("wiz-points"),
       length: length instanceof HTMLSelectElement ? length.value : "",
-      tags: fieldTrim("wiz-tags"),
-      youtubeId: fieldTrim("wiz-youtube"),
+      tags,
+      youtubeId: youtubeParsed,
       body: fieldValue("wiz-body"),
     };
+  };
+
+  const syncTagsHiddenInput = (csv) => {
+    const el = document.getElementById("wiz-tags");
+    if (el instanceof HTMLInputElement) el.value = csv;
+  };
+
+  const step1HasBlockers = (data) => {
+    if (!data.slug.trim() || !data.questionForSchema.trim() || !data.aha.trim() || !data.imageAlt.trim()) return true;
+    return false;
+  };
+
+  const updateTabDots = () => {
+    const data = collectData();
+    const dot = root.querySelector("[data-wiz-tab-dot=\"1\"]");
+    if (dot instanceof HTMLElement) {
+      dot.classList.toggle("hidden", !step1HasBlockers(data));
+    }
+  };
+
+  let paintTagChips = () => {};
+
+  const initTagChips = () => {
+    const container = document.getElementById("wiz-tag-chips");
+    if (!container) {
+      return;
+    }
+    const whitelist = window.__NM_WIZARD_BOOT?.tagWhitelist || ARTICLE_TAG_WHITELIST;
+
+    paintTagChips = () => {
+      const selected = new Set(
+        sanitizeTagsFromCsv(fieldTrim("wiz-tags"))
+          .split(/[,،]/)
+          .map((t) => t.trim())
+          .filter(Boolean),
+      );
+      container.innerHTML = "";
+      for (const tag of whitelist) {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.dataset.tag = tag;
+        btn.textContent = tag;
+        btn.className = `nm-wiz-chip${selected.has(tag) ? " nm-wiz-chip--on" : ""}`;
+        container.appendChild(btn);
+      }
+    };
+
+    container.addEventListener(
+      "click",
+      (e) => {
+        const btn = e.target.closest("button[data-tag]");
+        if (!(btn instanceof HTMLButtonElement) || !container.contains(btn)) {
+          return;
+        }
+        const tag = btn.dataset.tag || "";
+        const selected = new Set(
+          sanitizeTagsFromCsv(fieldTrim("wiz-tags"))
+            .split(/[,،]/)
+            .map((t) => t.trim())
+            .filter(Boolean),
+        );
+        if (selected.has(tag)) {
+          selected.delete(tag);
+        } else {
+          selected.add(tag);
+        }
+        syncTagsHiddenInput([...selected].join(", "));
+        paintTagChips();
+        onWizardFieldActivity();
+      },
+      { signal },
+    );
+
+    paintTagChips();
+  };
+
+  const fillLatestInternalList = () => {
+    const ul = document.getElementById("wiz-latest-internal-list");
+    const boot = typeof window !== "undefined" && window.__NM_WIZARD_BOOT ? window.__NM_WIZARD_BOOT : {};
+    const items = Array.isArray(boot.latestArticlesForWizard) ? boot.latestArticlesForWizard : [];
+    if (!ul) {
+      return;
+    }
+    ul.innerHTML = "";
+    for (const item of items) {
+      const li = document.createElement("li");
+      const a = document.createElement("a");
+      a.href = item.href || "#";
+      a.textContent = item.title || item.href || "";
+      a.className = "text-[var(--nm-accent)] underline underline-offset-2";
+      a.target = "_blank";
+      a.rel = "noopener noreferrer";
+      li.appendChild(a);
+      ul.appendChild(li);
+    }
   };
 
   const updateWordCountAndPreflight = () => {
@@ -308,6 +488,20 @@ function setupArticleWizard() {
     if (wordCountEl instanceof HTMLElement) {
       wordCountEl.textContent = `מילים בטיוטה: ${wordCount}`;
     }
+
+    const sentenceWarn = document.getElementById("wiz-sentence-warn");
+    if (sentenceWarn instanceof HTMLElement) {
+      const n = countLongSentences(data.body);
+      if (n > 0) {
+        sentenceWarn.classList.remove("hidden");
+        sentenceWarn.textContent = `נמצאו ${n} משפטים ארוכים (מעל ${LONG_SENTENCE_WORDS} מילים). שקול לפצל.`;
+      } else {
+        sentenceWarn.classList.add("hidden");
+        sentenceWarn.textContent = "";
+      }
+    }
+
+    updateTabDots();
 
     if (current !== 2) {
       return;
@@ -356,6 +550,13 @@ function setupArticleWizard() {
       stepLabel.textContent = `צעד ${current} מתוך 3`;
     }
 
+    root.querySelectorAll("[data-wiz-tab]").forEach((el) => {
+      const n = Number(el.getAttribute("data-wiz-tab"));
+      const isActive = n === current;
+      el.classList.toggle("nm-wizard-tab-active", isActive);
+      el.setAttribute("aria-current", isActive ? "step" : "false");
+    });
+
     const backBtn = document.getElementById("wiz-back");
     const nextBtn = document.getElementById("wiz-next");
     if (backBtn instanceof HTMLButtonElement) {
@@ -366,7 +567,14 @@ function setupArticleWizard() {
     }
     if (current === 2) {
       updateWordCountAndPreflight();
+    } else {
+      updateTabDots();
     }
+  };
+
+  const goToStep = (step) => {
+    current = Math.min(3, Math.max(1, step));
+    render();
   };
 
   const canonicalTagsCsv = ARTICLE_TAG_WHITELIST.join(", ");
@@ -517,6 +725,27 @@ Follow the brand identity: zero fluff, focus on thought-shifts, NeverMind voice 
     render();
   };
 
+  const toggleFocusMode = () => {
+    focusMode = !focusMode;
+    root.classList.toggle("nm-wizard--focus", focusMode);
+    const btn = document.getElementById("wiz-focus-toggle");
+    if (btn instanceof HTMLButtonElement) {
+      btn.textContent = focusMode ? "יציאה ממצב מיקוד" : "מצב מיקוד";
+    }
+  };
+
+  const onMobilePreview = () => {
+    const dialog = document.getElementById("wiz-mobile-dialog");
+    const body = document.getElementById("wiz-mobile-preview-body");
+    const out = document.getElementById("wiz-output");
+    if (!(dialog instanceof HTMLDialogElement) || !(body instanceof HTMLElement)) {
+      return;
+    }
+    const text = out instanceof HTMLTextAreaElement ? out.value.trim() : "";
+    body.textContent = text || "(ריק — לחץ קודם על לזקק למאמר)";
+    dialog.showModal();
+  };
+
   const goNext = () => {
     if (current === 2) {
       updateWordCountAndPreflight();
@@ -537,25 +766,35 @@ Follow the brand identity: zero fluff, focus on thought-shifts, NeverMind voice 
     output.value = buildPrompt();
   };
 
-  const onCopy = async () => {
-    const output = document.getElementById("wiz-output");
-    const copyBtn = document.getElementById("wiz-copy");
-    if (!(output instanceof HTMLTextAreaElement) || !output.value.trim()) {
+  const onCopyAllMdx = async () => {
+    const copyBtn = document.getElementById("wiz-copy-all-mdx");
+    const saveStatus = document.getElementById("wiz-save-status");
+    const data = collectData();
+    const blockers = runBlockingChecks(data);
+    if (blockers.length > 0) {
+      if (saveStatus instanceof HTMLElement) {
+        saveStatus.textContent = ["לא ניתן להעתיק לפני תיקון:", ...blockers.map((item) => `• ${item}`)].join("\n");
+      }
       return;
     }
-    if (!(copyBtn instanceof HTMLButtonElement)) {
-      return;
-    }
-
+    const raw = buildMdxStub(data);
+    const text = normalizeMdxWhitespace(raw);
     try {
-      await navigator.clipboard.writeText(output.value);
-      const originalText = copyBtn.textContent || "העתק ללוח";
-      copyBtn.textContent = "הועתק";
-      window.setTimeout(() => {
-        copyBtn.textContent = originalText;
-      }, 2000);
+      await navigator.clipboard.writeText(text);
+      if (copyBtn instanceof HTMLButtonElement) {
+        const originalText = copyBtn.textContent || "העתק את כל קוד ה-MDX";
+        copyBtn.textContent = "הועתק";
+        window.setTimeout(() => {
+          copyBtn.textContent = originalText;
+        }, 2000);
+      }
+      if (saveStatus instanceof HTMLElement) {
+        saveStatus.textContent = "קוד MDX מלא הועתק ללוח.";
+      }
     } catch {
-      /* ignore */
+      if (saveStatus instanceof HTMLElement) {
+        saveStatus.textContent = "לא ניתן להעתיק כרגע.";
+      }
     }
   };
 
@@ -630,9 +869,50 @@ Follow the brand identity: zero fluff, focus on thought-shifts, NeverMind voice 
 
     draftRestored = true;
     restoreDraft();
+    paintTagChips();
     render();
     updateWordCountAndPreflight();
   };
+
+  initTagChips();
+  fillLatestInternalList();
+
+  const ytEl = document.getElementById("wiz-youtube");
+  if (ytEl instanceof HTMLInputElement) {
+    const syncYt = () => {
+      const id = extractYoutubeId(ytEl.value);
+      if (id) {
+        ytEl.value = id;
+      }
+    };
+    ytEl.addEventListener("blur", syncYt, { signal });
+  }
+
+  document.addEventListener(
+    "paste",
+    (e) => {
+      const t = e.target;
+      if (!(t instanceof HTMLTextAreaElement) && !(t instanceof HTMLInputElement)) {
+        return;
+      }
+      if (!root.contains(t)) {
+        return;
+      }
+      if (t.id === "wiz-output" || t.id === "wiz-tags" || !t.id.startsWith("wiz-")) {
+        return;
+      }
+      e.preventDefault();
+      const text = e.clipboardData?.getData("text/plain") ?? "";
+      const start = t.selectionStart ?? 0;
+      const end = t.selectionEnd ?? 0;
+      const v = t.value;
+      t.value = `${v.slice(0, start)}${text}${v.slice(end)}`;
+      const pos = start + text.length;
+      t.selectionStart = t.selectionEnd = pos;
+      t.dispatchEvent(new Event("input", { bubbles: true }));
+    },
+    { signal },
+  );
 
   mutationObserver = new MutationObserver(() => {
     tryRestoreOnce();
@@ -653,8 +933,27 @@ Follow the brand identity: zero fluff, focus on thought-shifts, NeverMind voice 
         return;
       }
 
+      const closeMobile = target.closest("[data-wiz-close-mobile]");
+      if (closeMobile) {
+        const dialog = document.getElementById("wiz-mobile-dialog");
+        if (dialog instanceof HTMLDialogElement) {
+          dialog.close();
+        }
+        return;
+      }
+
+      const tabBtn = target.closest("[data-wiz-tab]");
+      if (tabBtn && root.contains(tabBtn)) {
+        const n = Number(tabBtn.getAttribute("data-wiz-tab"));
+        if (n >= 1 && n <= 3) {
+          event.preventDefault();
+          goToStep(n);
+        }
+        return;
+      }
+
       const button = target.closest(
-        "#wiz-next, #wiz-back, #wiz-generate, #wiz-copy, #wiz-save, #wiz-download-mdx, #wiz-copy-package, #wiz-validate-external, #wiz-invert-claim"
+        "#wiz-next, #wiz-back, #wiz-generate, #wiz-copy-all-mdx, #wiz-save, #wiz-download-mdx, #wiz-copy-package, #wiz-validate-external, #wiz-invert-claim, #wiz-focus-toggle, #wiz-mobile-preview",
       );
       if (!button || !root.contains(button)) {
         return;
@@ -664,12 +963,14 @@ Follow the brand identity: zero fluff, focus on thought-shifts, NeverMind voice 
       if (button.id === "wiz-back") goBack();
       else if (button.id === "wiz-next") goNext();
       else if (button.id === "wiz-generate") onGenerate();
-      else if (button.id === "wiz-copy") void onCopy();
+      else if (button.id === "wiz-copy-all-mdx") void onCopyAllMdx();
       else if (button.id === "wiz-save") void onSave();
       else if (button.id === "wiz-copy-package") void onCopyPackage();
       else if (button.id === "wiz-validate-external") onValidateExternal();
       else if (button.id === "wiz-invert-claim") onInvertClaim();
       else if (button.id === "wiz-download-mdx") onDownloadMdx();
+      else if (button.id === "wiz-focus-toggle") toggleFocusMode();
+      else if (button.id === "wiz-mobile-preview") onMobilePreview();
     },
     { signal }
   );
@@ -705,7 +1006,8 @@ Follow the brand identity: zero fluff, focus on thought-shifts, NeverMind voice 
       }
     }
 
-    const raw = external || buildMdxStub(data);
+    const stubRaw = buildMdxStub(data);
+    const raw = external || normalizeMdxWhitespace(stubRaw);
     const externalCheck = external ? validateExternalMdx(external) : null;
     const slug = externalCheck?.slug || data.slug.trim() || "draft-article";
     const blob = new Blob([raw], { type: "text/markdown;charset=utf-8" });

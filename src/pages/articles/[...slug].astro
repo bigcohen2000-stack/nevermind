@@ -35,7 +35,9 @@ const { entry } = Astro.props as Props;
 const frontmatter = entry.data;
 const { Content } = await entry.render();
 const faqItems = Array.isArray(frontmatter.faq) ? frontmatter.faq : [];
-const seoArticleBody = entry.body.replace(/<[^>]*>/g, " ").replace(/\\s+/g, " ").trim();
+const seoArticleBody = entry.body.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+const wordCountArticle = seoArticleBody.split(/\s+/).filter(Boolean).length;
+const readingMinutesArticle = Math.max(1, Math.ceil(wordCountArticle / 200));
 const publishedLabel = frontmatter.pubDate
   ? new Date(frontmatter.pubDate).toLocaleDateString("he-IL", {
       day: "numeric",
@@ -62,6 +64,7 @@ const youtubeIdArticle =
 const videoSummaryPointsArticle = Array.isArray(frontmatter.videoSummaryPoints)
   ? frontmatter.videoSummaryPoints
   : [];
+const hasQuestionForSchema = Boolean(String(frontmatter.questionForSchema ?? "").trim());
 ---
 
 <Layout
@@ -69,7 +72,7 @@ const videoSummaryPointsArticle = Array.isArray(frontmatter.videoSummaryPoints)
   description={frontmatter.description}
   frontmatter={frontmatter}
   faqItems={faqItems}
-  hasInquirySection={faqItems.length > 0}
+  hasInquirySection={faqItems.length > 0 || hasQuestionForSchema}
   seoArticleBody={seoArticleBody}
   articlePaywalled={frontmatter.isPremium}
 >
@@ -79,6 +82,9 @@ const videoSummaryPointsArticle = Array.isArray(frontmatter.videoSummaryPoints)
       <h1 class="mt-3 text-[clamp(2rem,1.6rem+1.4vw,3.1rem)] font-semibold leading-tight">{frontmatter.title}</h1>
       <p class="mt-4 max-w-3xl text-[clamp(1rem,0.96rem+0.22vw,1.08rem)] leading-[1.8] text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">
         {frontmatter.description}
+      </p>
+      <p class="mt-3 text-sm font-medium text-[color-mix(in_srgb,var(--nm-fg)_58%,var(--nm-bg))]">
+        בערך {readingMinutesArticle} דקות קריאה (משוער לפי אורך הטקסט)
       </p>
       {
         publishedLabel ? (

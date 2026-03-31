@@ -759,7 +759,7 @@ export default function IntakeForm() {
         </button>
       </div>
       <p className="text-center text-xs leading-relaxed text-[color-mix(in_srgb,var(--nm-fg)_55%,var(--nm-bg))]">
-        שני הערוצים עוברים את אותו רגע בהירות ואת אותן בדיקות שקטות לפני פתיחה. בוואטסאפ נפתח חלון עם כל התוכן כטקסט אחד.
+        איך אתם רוצים שנתקדם? בוואטסאפ: הכי מהיר, מדברים איתנו ישר לטלפון. כאן באתר: ממלאים פרטים עכשיו ושולחים לנו.
       </p>
 
       {status === "ok" ? (

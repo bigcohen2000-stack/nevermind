@@ -68,6 +68,19 @@ type DeepPageBeacon = {
   ipHash: string;
 };
 
+type MemberProgressStored = {
+  articlesRead: string[];
+  secondsRead: number;
+  updatedAt: string;
+  lastIpPrefix?: string;
+};
+
+type ProgressTokenPayload = {
+  typ: "progress";
+  phone: string;
+  exp: number;
+};
+
 type AdminSessionPayload = {
   role: "admin";
   iat: number;
@@ -89,6 +102,153 @@ const KV_LIST_LIMIT = 1000;
 const CLUB_MEMBER_DEFAULT_EXPIRES_DAYS = 365;
 const DEEP_PAGE_VIEWS_KEY = "deep:page_views";
 const MAX_DEEP_PAGE_VIEWS = 200;
+const PROGRESS_TOKEN_MAX_MS = 30 * 24 * 60 * 60 * 1000;
+
+async function checkRateLimit(
+  env: Env,
+  ipHash: string,
+  routeTag: string,
+  maxPerWindow: number,
+  windowSec: number,
+  corsHeaders: Headers
+): Promise<Response | null> {
+  const key = `rl:${ipHash}:${routeTag}`;
+  const raw = await env.CLUB_ACTIVITY.get(key);
+  const count = raw ? Number.parseInt(raw, 10) || 0 : 0;
+  if (count >= maxPerWindow) {
+    return json({ ok: false, error: "יותר מדי בקשות. נסה שוב בעוד רגע.", errorCode: "rate_limited" }, 429, corsHeaders);
+  }
+  await env.CLUB_ACTIVITY.put(key, String(count + 1), { expirationTtl: windowSec });
+  return null;
+}
+
+async function createProgressToken(env: Env, phone: string, membershipExpiresAt: string): Promise<string> {
+  const memberExpiryMs = Date.parse(membershipExpiresAt);
+  const cap = Date.now() + PROGRESS_TOKEN_MAX_MS;
+  const exp = Number.isFinite(memberExpiryMs) ? Math.min(memberExpiryMs, cap) : cap;
+  const payload: ProgressTokenPayload = { typ: "progress", phone, exp };
+  const encoded = encodeBase64Url(JSON.stringify(payload));
+  const signature = await sha256Hex(`${env.CLUB_IP_PEPPER}:progress:${phone}:${encoded}`);
+  return `${encoded}.${signature}`;
+}
+
+async function verifyProgressToken(token: string, env: Env): Promise<ProgressTokenPayload | null> {
+  const parts = String(token || "").split(".");
+  if (parts.length !== 2) return null;
+  const [encoded, signature] = parts;
+  if (!encoded || !signature) return null;
+  let payload: ProgressTokenPayload;
+  try {
+    payload = JSON.parse(decodeBase64Url(encoded)) as ProgressTokenPayload;
+  } catch {
+    return null;
+  }
+  if (!payload || payload.typ !== "progress" || !payload.phone) return null;
+  const expected = await sha256Hex(`${env.CLUB_IP_PEPPER}:progress:${payload.phone}:${encoded}`);
+  if (!timingSafeEqual(signature, expected)) return null;
+  if (!Number.isFinite(payload.exp) || payload.exp < Date.now()) return null;
+  return payload;
+}
+
+async function readMemberProgress(env: Env, phone: string): Promise<MemberProgressStored> {
+  const key = `progress:${phone}`;
+  const raw = await env.CLUB_MEMBERS.get<MemberProgressStored>(key, "json");
+  if (!raw || !Array.isArray(raw.articlesRead)) {
+    return { articlesRead: [], secondsRead: 0, updatedAt: new Date(0).toISOString() };
+  }
+  return {
+    articlesRead: raw.articlesRead.filter((s) => typeof s === "string"),
+    secondsRead: Number.isFinite(raw.secondsRead) ? raw.secondsRead : 0,
+    updatedAt: typeof raw.updatedAt === "string" ? raw.updatedAt : new Date(0).toISOString(),
+    lastIpPrefix: raw.lastIpPrefix,
+  };
+}
+
+async function handleMemberProgressGet(
+  request: Request,
+  env: Env,
+  ipHash: string,
+  corsHeaders: Headers
+): Promise<Response> {
+  const authHeader = String(request.headers.get("authorization") ?? "").trim();
+  if (!authHeader.startsWith("Bearer ")) {
+    return json({ ok: false, error: "צריך טוקן התקדמות." }, 401, corsHeaders);
+  }
+  const token = authHeader.slice(7).trim();
+  const payload = await verifyProgressToken(token, env);
+  if (!payload) {
+    return json({ ok: false, error: "הטוקן לא תקף או שפג." }, 401, corsHeaders);
+  }
+  const progress = await readMemberProgress(env, payload.phone);
+  return json(
+    {
+      ok: true,
+      phone: payload.phone,
+      progress,
+      lastIpPrefix: progress.lastIpPrefix ?? ipHash.slice(0, 8),
+    },
+    200,
+    corsHeaders
+  );
+}
+
+async function handleMemberProgressPost(
+  request: Request,
+  env: Env,
+  ipHash: string,
+  corsHeaders: Headers
+): Promise<Response> {
+  const authHeader = String(request.headers.get("authorization") ?? "").trim();
+  if (!authHeader.startsWith("Bearer ")) {
+    return json({ ok: false, error: "צריך טוקן התקדמות." }, 401, corsHeaders);
+  }
+  const token = authHeader.slice(7).trim();
+  const tokenPayload = await verifyProgressToken(token, env);
+  if (!tokenPayload) {
+    return json({ ok: false, error: "הטוקן לא תקף או שפג." }, 401, corsHeaders);
+  }
+
+  let body: {
+    articlesRead?: string[];
+    setArticlesRead?: string[];
+    secondsReadDelta?: number;
+    replaceSecondsRead?: number;
+  } | null = null;
+  try {
+    body = (await request.json()) as typeof body;
+  } catch {
+    return json({ ok: false, error: "הבקשה לא נקראה כמו שצריך." }, 400, corsHeaders);
+  }
+
+  const prev = await readMemberProgress(env, tokenPayload.phone);
+  let articlesRead = [...prev.articlesRead];
+  if (Array.isArray(body?.setArticlesRead)) {
+    articlesRead = body.setArticlesRead.map((s) => String(s).trim()).filter(Boolean);
+  } else if (Array.isArray(body?.articlesRead)) {
+    const add = body.articlesRead.map((s) => String(s).trim()).filter(Boolean);
+    const set = new Set([...articlesRead, ...add]);
+    articlesRead = [...set];
+  }
+
+  let secondsRead = prev.secondsRead;
+  if (typeof body?.replaceSecondsRead === "number" && Number.isFinite(body.replaceSecondsRead) && body.replaceSecondsRead >= 0) {
+    secondsRead = Math.floor(body.replaceSecondsRead);
+  } else if (typeof body?.secondsReadDelta === "number" && Number.isFinite(body.secondsReadDelta)) {
+    secondsRead = Math.max(0, Math.floor(prev.secondsRead + body.secondsReadDelta));
+  }
+
+  const updatedAt = new Date().toISOString();
+  const next: MemberProgressStored = {
+    articlesRead,
+    secondsRead,
+    updatedAt,
+    lastIpPrefix: ipHash.slice(0, 12),
+  };
+
+  await env.CLUB_MEMBERS.put(`progress:${tokenPayload.phone}`, JSON.stringify(next));
+
+  return json({ ok: true, progress: next }, 200, corsHeaders);
+}
 
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
@@ -131,6 +291,22 @@ export default {
       return handleAdminAddMember(request, env, corsHeaders);
     }
 
+    if (request.method === "GET" && url.pathname === "/member/progress") {
+      const ip = readClientIp(request);
+      const ipHash = await sha256Hex(`${env.CLUB_IP_PEPPER}:${ip}`);
+      const limited = await checkRateLimit(env, ipHash, "progress_get", 120, 60, corsHeaders);
+      if (limited) return limited;
+      return handleMemberProgressGet(request, env, ipHash, corsHeaders);
+    }
+
+    if (request.method === "POST" && url.pathname === "/member/progress") {
+      const ip = readClientIp(request);
+      const ipHash = await sha256Hex(`${env.CLUB_IP_PEPPER}:${ip}`);
+      const limited = await checkRateLimit(env, ipHash, "progress_post", 90, 60, corsHeaders);
+      if (limited) return limited;
+      return handleMemberProgressPost(request, env, ipHash, corsHeaders);
+    }
+
     if (request.method !== "POST" || !isLoginPath(url.pathname)) {
       return json({ ok: false, error: "הנתיב הזה לא נתמך." }, 404, corsHeaders);
     }
@@ -150,6 +326,11 @@ export default {
     if (!phone || !password) {
       return json({ ok: false, error: "צריך טלפון וסיסמת כניסה." }, 400, corsHeaders);
     }
+
+    const ipEarly = readClientIp(request);
+    const ipHashEarly = await sha256Hex(`${env.CLUB_IP_PEPPER}:${ipEarly}`);
+    const loginLimited = await checkRateLimit(env, ipHashEarly, "login", 45, 60, corsHeaders);
+    if (loginLimited) return loginLimited;
 
     const memberKey = `member:${phone}`;
     const member = await env.CLUB_MEMBERS.get<StoredMember>(memberKey, "json");
@@ -230,6 +411,8 @@ export default {
       ])
     );
 
+    const progressToken = await createProgressToken(env, phone, expiresAt);
+
     return json(
       {
         ok: true,
@@ -239,6 +422,7 @@ export default {
         lastLoginAt: nowIso,
         fraudFlag,
         liveStatus: "LIVE",
+        progressToken,
       },
       200,
       corsHeaders
@@ -247,6 +431,11 @@ export default {
 };
 
 async function handleAdminLogin(request: Request, env: Env, headers: Headers): Promise<Response> {
+  const ip = readClientIp(request);
+  const ipHash = await sha256Hex(`${env.CLUB_IP_PEPPER}:${ip}`);
+  const limited = await checkRateLimit(env, ipHash, "admin_login", 15, 60, headers);
+  if (limited) return limited;
+
   let payload: AdminLoginRequest | null = null;
   try {
     payload = (await request.json()) as AdminLoginRequest;
@@ -322,6 +511,11 @@ async function handleAdminAddMember(request: Request, env: Env, headers: Headers
   const auth = await requireAdminAuth(request, env, headers);
   if (auth instanceof Response) return auth;
 
+  const ip = readClientIp(request);
+  const ipHash = await sha256Hex(`${env.CLUB_IP_PEPPER}:${ip}`);
+  const limited = await checkRateLimit(env, ipHash, "admin_add", 20, 60, headers);
+  if (limited) return limited;
+
   let payload: AdminAddMemberRequest | null = null;
   try {
     payload = (await request.json()) as AdminAddMemberRequest;
@@ -394,6 +588,11 @@ async function handleAdminAddMember(request: Request, env: Env, headers: Headers
 async function handleAdminResetPassword(request: Request, env: Env, headers: Headers): Promise<Response> {
   const auth = await requireAdminAuth(request, env, headers);
   if (auth instanceof Response) return auth;
+
+  const ip = readClientIp(request);
+  const ipHash = await sha256Hex(`${env.CLUB_IP_PEPPER}:${ip}`);
+  const limited = await checkRateLimit(env, ipHash, "admin_reset", 20, 60, headers);
+  if (limited) return limited;
 
   let payload: AdminResetPasswordRequest | null = null;
   try {

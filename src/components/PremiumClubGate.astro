@@ -122,13 +122,14 @@ const webhookUrl = (import.meta.env.PUBLIC_NM_CLUB_WEBHOOK_URL ?? "").trim();
         const lastLoginAt = typeof data.lastLoginAt === "string" ? data.lastLoginAt.trim() : "";
         const liveStatus = typeof data.liveStatus === "string" ? data.liveStatus.trim() : "LIVE";
         const fraudFlag = data.fraudFlag === true;
+        const progressToken = typeof data.progressToken === "string" ? data.progressToken.trim() : "";
         if (!memberName || !expiresAt) return null;
         const expiresTs = Date.parse(expiresAt);
         if (Number.isNaN(expiresTs) || expiresTs < Date.now()) {
           localStorage.removeItem(KEY);
           return null;
         }
-        return { memberName, phone, expiresAt, lastLoginAt, liveStatus, fraudFlag };
+        return { memberName, phone, expiresAt, lastLoginAt, liveStatus, fraudFlag, progressToken };
       } catch {
         return null;
       }
@@ -154,6 +155,9 @@ const webhookUrl = (import.meta.env.PUBLIC_NM_CLUB_WEBHOOK_URL ?? "").trim();
       }
       if (code === "expired_membership") {
         return "הגישה הסתיימה. אפשר לחדש הרשמה ולקבל תאריך חדש.";
+      }
+      if (code === "rate_limited") {
+        return "יותר מדי ניסיונות. נסה שוב בעוד רגע.";
       }
       if (payload && payload.error) return String(payload.error);
       return "השרת לא אישר קבלה. אפשר לנסות שוב או לשלוח הודעה בוואטסאפ.";
@@ -267,6 +271,10 @@ const webhookUrl = (import.meta.env.PUBLIC_NM_CLUB_WEBHOOK_URL ?? "").trim();
           return;
         }
 
+        const progressToken =
+          typeof payload.progressToken === "string" && payload.progressToken.trim()
+            ? payload.progressToken.trim()
+            : "";
         const session = {
           memberName,
           phone: phoneStored,
@@ -280,6 +288,7 @@ const webhookUrl = (import.meta.env.PUBLIC_NM_CLUB_WEBHOOK_URL ?? "").trim();
             typeof payload.liveStatus === "string" && payload.liveStatus.trim()
               ? payload.liveStatus.trim()
               : "LIVE",
+          ...(progressToken ? { progressToken } : {}),
         };
         localStorage.setItem(KEY, JSON.stringify(session));
         renderLoggedIn(session);

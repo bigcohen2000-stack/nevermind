@@ -207,6 +207,11 @@ const initAdminDashboard = () => {
         handleUnauthorized();
         return;
       }
+      if (response.status === 429) {
+        showError(payload?.error ? String(payload.error) : "יותר מדי בקשות. נסה שוב בעוד רגע.");
+        setLoading(false);
+        return;
+      }
       if (!response.ok || !payload || payload.ok !== true) {
         showError(payload?.error ? String(payload.error) : "השרת לא החזיר נתוני ניהול.");
         setLoading(false);
@@ -301,6 +306,10 @@ const initAdminDashboard = () => {
           return;
         }
 
+        if (response.status === 429) {
+          setStatus(payload?.error ? String(payload.error) : "יותר מדי בקשות. נסה שוב בעוד רגע.");
+          return;
+        }
         if (!response.ok || !payload || payload.ok !== true) {
           const message = payload?.error ? String(payload.error) : "השרת לא אישר את הבקשה.";
           setStatus(message);
@@ -347,6 +356,10 @@ const initAdminDashboard = () => {
         const payload = await response.json().catch(() => null);
         if (response.status === 401 || response.status === 403) {
           handleUnauthorized();
+          return;
+        }
+        if (response.status === 429) {
+          showError(payload?.error ? String(payload.error) : "יותר מדי בקשות. נסה שוב בעוד רגע.");
           return;
         }
         if (!response.ok || !payload || payload.ok !== true) {

@@ -1,0 +1,18 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import MeAccountSettings from "../../components/me/MeAccountSettings";
+---
+
+<Layout title="הגדרות | אזור אישי" description="סיכום חשבון מקומי וסנכרון עם שרת המועדון.">
+  <section class="mx-auto max-w-5xl space-y-10 px-4 py-14 text-right text-[var(--nm-fg)]">
+    <header class="space-y-3">
+      <p class="text-sm font-semibold text-[color-mix(in_srgb,var(--nm-fg)_58%,var(--nm-bg))]">אזור אישי</p>
+      <h1 class="text-[clamp(1.85rem,1.5rem+1.2vw,2.65rem)] font-semibold leading-tight">הגדרות</h1>
+      <p class="max-w-2xl text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+        פרטי התחברות נשמרים במכשיר. סיכום קריאה מגיע מהשרת כשיש טוקן התקדמות אחרי כניסה למועדון.
+      </p>
+    </header>
+
+    <MeAccountSettings client:visible />
+  </section>
+</Layout>

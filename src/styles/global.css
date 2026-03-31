@@ -1019,6 +1019,22 @@ article .nm-subscription-callout a.nm-subscription-callout__cta,
   }
 }
 
+/* מרכזי מאמרים / ספריות: פס עליון שונה כדי לזהות הקשר בלי לקרוא את כל הכותרת */
+[data-nm-hub="curated"] {
+  --nm-hub-stripe: var(--nm-accent);
+}
+[data-nm-hub="forbidden"] {
+  --nm-hub-stripe: var(--nm-inverse);
+}
+[data-nm-hub="reading"] {
+  --nm-hub-stripe: color-mix(in srgb, var(--nm-accent) 50%, var(--nm-fg));
+}
+
+[data-nm-hub] {
+  border-block-start: 3px solid var(--nm-hub-stripe);
+  padding-block-start: 0.75rem;
+}
+
 @media print {
   body::before {
     display: none !important;
@@ -1037,6 +1053,11 @@ article .nm-subscription-callout a.nm-subscription-callout__cta,
     display: none !important;
   }
 
+  [data-nm-hub] {
+    border-block-start: none !important;
+    padding-block-start: 0 !important;
+  }
+
   body {
     background: #fff !important;
     color: #1a1a1a !important;
@@ -1046,6 +1067,12 @@ article .nm-subscription-callout a.nm-subscription-callout__cta,
     max-width: 100% !important;
     padding-top: 0.5rem !important;
     padding-bottom: 1rem !important;
+  }
+
+  .nm-article-shell {
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
   }
 
   footer {

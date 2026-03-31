@@ -1,4 +1,4 @@
-﻿---
+---
 import Layout from "../layouts/Layout.astro";
 import { glossaryConcepts } from "../data/glossary";
 import appConfig from "../config/appConfig.json";
@@ -29,7 +29,7 @@ const waNumber = String(appConfig.contact.whatsAppNumber ?? "").replace(/\D/g, "
   title="מרחב גילוי"
   description="חיפוש בארכיון התכנים ודרכים להעמיק בשיחה, בלי אשף שלבים."
 >
-  <TopicQueryLandingBanner client:load />
+  <TopicQueryLandingBanner client:visible />
   <section class="mx-auto max-w-7xl space-y-12 px-4 pb-28 pt-16 text-[var(--nm-fg)] md:pb-20 md:py-20">
     <nav
       aria-label="קפיצה לחלקי העמוד"
@@ -42,7 +42,7 @@ const waNumber = String(appConfig.contact.whatsAppNumber ?? "").replace(/\D/g, "
       <a href="/intake/" class="rounded-full px-3 py-1.5 hover:bg-[var(--nm-tint)]">לפני שיחה</a>
     </nav>
 
-    <ServicesPricingStickyBar client:load />
+    <ServicesPricingStickyBar client:idle />
 
     <header class="space-y-8 text-center">
       <h1 class="text-[clamp(2rem,1.5rem+2.2vw,3.5rem)] font-semibold leading-[1.08] tracking-tight">
@@ -156,7 +156,7 @@ const waNumber = String(appConfig.contact.whatsAppNumber ?? "").replace(/\D/g, "
                 ) : null}
                 {hasExt ? (
                   <div class="mt-5">
-                    <ServicePricingBlock client:load serviceJson={serviceJson} layout="compact" />
+                    <ServicePricingBlock client:visible serviceJson={serviceJson} layout="compact" />
                   </div>
                 ) : (
                   <div class="mt-5 flex flex-wrap items-center justify-end gap-2">
@@ -213,7 +213,7 @@ const waNumber = String(appConfig.contact.whatsAppNumber ?? "").replace(/\D/g, "
 
   <div class="mx-auto flex max-w-7xl justify-end px-4 pb-16" aria-label="פתיחת שיחה אחרי קריאה">
     <DirectLink
-      client:load
+      client:idle
       whatsAppNumber={appConfig.contact.whatsAppNumber}
       fallbackEmail={appConfig.contact.email}
     />

@@ -3,11 +3,45 @@ import Layout from "../../layouts/Layout.astro";
 ---
 
 <Layout title="סימולטורים | אזור אישי" description="עמוד הסימולטורים באזור האישי.">
-  <section class="mx-auto max-w-4xl space-y-5 px-4 py-16 text-right text-[var(--nm-fg)]">
-    <p class="text-sm font-light text-[color-mix(in_srgb,var(--nm-fg)_60%,var(--nm-bg))]">אזור אישי</p>
-    <h1 class="text-[clamp(1.8rem,1.5rem+1.2vw,2.6rem)] font-light">הסימולטורים</h1>
-    <p class="leading-8 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
-      כאן יופיעו הסימולטורים. המקום שלך לתרגל לראות ולהבין דרך שאלות פשוטות.
-    </p>
+  <section class="mx-auto max-w-5xl space-y-12 px-4 py-14 text-right text-[var(--nm-fg)]">
+    <header class="space-y-4 rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-8 shadow-[0_20px_50px_color-mix(in_srgb,var(--nm-fg)_4%,transparent)]">
+      <p class="text-sm font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">אזור אישי</p>
+      <h1 class="text-[clamp(1.9rem,1.5rem+1.3vw,2.7rem)] font-semibold leading-tight">הסימולטורים</h1>
+      <p class="max-w-2xl text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+        כאן יופיעו סימולטורים לתרגול. הממשק נשאר נקי כדי שלא ייסחף הוויזואליה.
+      </p>
+      <div class="flex justify-start pt-2">
+        <img
+          src="/images/logo.svg"
+          alt=""
+          width="120"
+          height="36"
+          loading="lazy"
+          decoding="async"
+          class="h-9 w-auto opacity-80"
+        />
+      </div>
+    </header>
+
+    <div class="grid gap-6 md:grid-cols-2">
+      <article
+        class="flex flex-col justify-between rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 p-6 shadow-[0_12px_36px_color-mix(in_srgb,var(--nm-fg)_5%,transparent)]"
+      >
+        <div>
+          <h2 class="text-lg font-semibold text-[var(--nm-fg)]">סימולטור ראשון</h2>
+          <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">מקום לתוכן כשיהיה מוכן. בלי עומס על הדף.</p>
+        </div>
+        <p class="mt-6 text-xs text-[color-mix(in_srgb,var(--nm-fg)_48%,var(--nm-bg))]">מצב טיוטה</p>
+      </article>
+      <article
+        class="flex flex-col justify-between rounded-[1.6rem] border border-dashed border-[color-mix(in_srgb,var(--nm-fg)_14%,transparent)] bg-[var(--nm-surface-muted)] p-6"
+      >
+        <div>
+          <h2 class="text-lg font-semibold text-[var(--nm-fg)]">עוד כלי</h2>
+          <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">כרטיס שני לשימוש עתידי. אותו קו עיצובי.</p>
+        </div>
+        <p class="mt-6 text-xs text-[color-mix(in_srgb,var(--nm-fg)_48%,var(--nm-bg))]">מצב טיוטה</p>
+      </article>
+    </div>
   </section>
 </Layout>

@@ -2,7 +2,6 @@
 import "@fontsource-variable/assistant/wght.css";
 import "@fontsource/heebo/index.css";
 import "../styles/global.css";
-import { getCollection } from "astro:content";
 import { ClientRouter } from "astro:transitions";
 import A11yWidget from "../components/A11yWidget.astro";
 import Analytics from "../components/Analytics.astro";
@@ -316,6 +315,9 @@ const articleSchema = frontmatter
       author: {
         "@type": "Person",
         name: frontmatter.author ?? "השם לא משנה",
+        jobTitle: "כותב וחוקר מנגנוני חשיבה ומציאות",
+        description:
+          "תוכן אנליטי: עובדות, מנגנונים, והפרדה בין סיפור למציאות. ללא טשטוש שיווקי.",
       },
       datePublished: toIso(frontmatter.pubDate),
       dateModified: toIso(frontmatter.updatedDate) ?? toIso(frontmatter.pubDate),
@@ -340,16 +342,37 @@ const articleModifiedMeta = hasArticleDates
   : undefined;
 
 const normalizedFaqItems = Array.isArray(faqItems) ? faqItems : [];
-const fallbackFaqItems =
-  hasInquirySection && normalizedFaqItems.length === 0 && frontmatter?.description
+const qSchemaRaw = typeof frontmatter?.questionForSchema === "string" ? frontmatter.questionForSchema.trim() : "";
+const descForFaqAnswer =
+  typeof frontmatter?.description === "string" && frontmatter.description.trim().length > 0
+    ? frontmatter.description.trim()
+    : pageDescription;
+
+const fromQuestionSchema =
+  qSchemaRaw.length > 0
+    ? [{ question: qSchemaRaw, answer: descForFaqAnswer }]
+    : [];
+
+type FaqPair = { question: string; answer: string };
+const mergedFaqItems: FaqPair[] = [...fromQuestionSchema];
+for (const item of normalizedFaqItems) {
+  const q = typeof (item as FaqPair)?.question === "string" ? String((item as FaqPair).question).trim() : "";
+  const a = typeof (item as FaqPair)?.answer === "string" ? String((item as FaqPair).answer).trim() : "";
+  if (!q || !a) continue;
+  if (!mergedFaqItems.some((x) => x.question === q)) mergedFaqItems.push({ question: q, answer: a });
+}
+
+const fallbackFaqItems: FaqPair[] =
+  mergedFaqItems.length === 0 && hasInquirySection && frontmatter?.description
     ? [
         {
           question: `מה בודקים במאמר "${frontmatter.title ?? pageTitle}"?`,
-          answer: frontmatter.description,
+          answer: String(frontmatter.description),
         },
       ]
     : [];
-const faqItemsForSchema = normalizedFaqItems.length > 0 ? normalizedFaqItems : fallbackFaqItems;
+
+const faqItemsForSchema: FaqPair[] = mergedFaqItems.length > 0 ? mergedFaqItems : fallbackFaqItems;
 const faqSchema =
   faqItemsForSchema.length > 0
     ? {
@@ -467,7 +490,6 @@ const coreStructuredData = [
   articleSchema,
   videoObjectSchema,
 ].filter(Boolean);
-const randomArticlePaths = (await getCollection("articles", ({ data }) => data.draft !== true)).map((entry) => `/articles/${entry.slug}`);
 
 const socialLinks = [
   { label: "פייסבוק", href: "https://www.facebook.com/nevermindyakir", mark: "f" },
@@ -648,9 +670,10 @@ const socialLinks = [
               <button
                 type="button"
                 data-random-article-trigger
+                aria-label="פתיחת מאמר אקראי מהארכיון"
                 class="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full bg-[var(--nm-accent)] px-3.5 py-2 text-sm font-medium text-[var(--nm-on-accent)] transition-colors duration-200 [transition-timing-function:ease] hover:bg-[var(--nm-accent-hover)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-red)] sm:px-4"
               >
-                בואו נבדוק
+                תפתיעו אותי
               </button>
               <button
                 id="search-trigger"
@@ -894,7 +917,7 @@ const socialLinks = [
     <PwaInstallPrompt />
     <Analytics />
 
-    <script is:inline defer define:vars={{ randomArticlePaths }}>
+    <script is:inline defer>
       document.addEventListener("astro:page-load", () => {
         if (window.__nmLayoutCleanup) {
           window.__nmLayoutCleanup();
@@ -1031,13 +1054,22 @@ const socialLinks = [
           window.dispatchEvent(new CustomEvent("open-search"));
         };
 
-        const onRandomClick = (event) => {
+        const onRandomClick = async (event) => {
           event.preventDefault();
           if (event.currentTarget instanceof HTMLElement) {
             window.__nmSetButtonLoading?.(event.currentTarget, "\u05d1\u05d5\u05d3\u05e7 \u05d0\u05ea \u05e9\u05d5\u05e8\u05e9 \u05d4\u05e8\u05e6\u05d5\u05df...");
           }
           startRouteProgress();
-          const paths = Array.isArray(randomArticlePaths) ? randomArticlePaths : [];
+          let paths = [];
+          try {
+            const res = await fetch("/article-paths.json", { credentials: "same-origin" });
+            if (res.ok) {
+              const data = await res.json();
+              paths = Array.isArray(data?.paths) ? data.paths : [];
+            }
+          } catch {
+            paths = [];
+          }
           if (!paths.length) return;
 
           const currentPath = window.location.pathname.replace(/\/$/, "");

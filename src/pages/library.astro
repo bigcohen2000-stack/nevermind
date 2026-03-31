@@ -1,4 +1,4 @@
-﻿---
+---
 import { getCollection } from "astro:content";
 import Layout from "../layouts/Layout.astro";
 import ArticleCard from "../components/ArticleCard.astro";
@@ -43,7 +43,12 @@ const tags = Array.from(tagSet).sort((left, right) => left.localeCompare(right, 
 ---
 
 <Layout title="ספרייה מובנית" description="מאמרים מסודרים לפי נושא, עומק, וסוג גישה. בוחרים מסנן אחד, ורואים מה באמת מתאים עכשיו.">
-  <section id="library-filter-root" class="mx-auto max-w-6xl space-y-8 px-4 pb-20 text-right" data-library-root>
+  <section
+    id="library-filter-root"
+    class="mx-auto max-w-6xl space-y-8 px-4 pb-20 text-right"
+    data-library-root
+    data-nm-hub="curated"
+  >
     <header class="space-y-4">
       <p class="text-sm font-semibold text-[var(--nm-accent)]">ספרייה</p>
       <h1 class="text-[clamp(2.2rem,1.8rem+1.8vw,3.4rem)] font-semibold text-[var(--nm-fg)]">ספרייה מובנית</h1>

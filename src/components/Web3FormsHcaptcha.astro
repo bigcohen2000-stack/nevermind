@@ -1,4 +1,4 @@
-﻿---
+---
 export interface Props {
   idSuffix?: string;
 }
@@ -11,7 +11,7 @@ const labelId = `nm-hcaptcha-label-${idSuffix}`;
 
 {
   enabled ? (
-    <div class="flex flex-col items-end gap-2 py-2" data-nm-hcaptcha-wrap>
+    <div class="flex flex-col items-end gap-2 py-2" data-nm-hcaptcha-wrap aria-live="polite">
       <p id={labelId} class="text-xs leading-[1.6] text-[color-mix(in_srgb,var(--nm-fg)_55%,var(--nm-bg))]">
         אימות לפני שליחה
       </p>
