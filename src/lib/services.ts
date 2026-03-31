@@ -49,6 +49,9 @@ export type StageService = ServiceStage["services"][number] & {
   extensions_gated?: boolean;
   update?: boolean;
   override_on_extension?: boolean;
+  /** שורת מחיר/משך (מחירון) */
+  price_note?: string;
+  subtitle?: string;
 };
 
 export type PremiumMemberPriceRow = { service_id: string; member_price: number; label: string };
@@ -479,9 +482,8 @@ export function buildServiceActionWhatsAppHref(
 ): string {
   const merged = mergeServiceWithExtension(service, selectedExtension ?? null);
   const preface = buildWhatsAppCrmPreface(service.title);
-  const paymentLink = typeof service.payment_link === "string" ? service.payment_link.trim() : "";
   const actionLine = merged.action_text?.trim() || `אני רוצה להתקדם עם ${service.title}`;
-  const paymentLine = paymentLink ? `לינק תשלום לשלב הבא: ${paymentLink}` : "אשמח ללינק תשלום אחרי התאמה קצרה.";
+  const paymentLine = "נתאם תשלום בתוך השיחה אחרי התאמה קצרה. בלי לינק אוטומטי בהודעה.";
   const variant =
     selectedExtension?.label?.trim() ? `\nאופציה נבחרה: ${selectedExtension.label.trim()}` : "";
   const body = `${actionLine}${variant}\nמחיר: ${formatMoney(merged.price_full)}\n${paymentLine}`;
@@ -496,7 +498,6 @@ export function buildServiceReservationWhatsAppHref(
   const merged = mergeServiceWithExtension(service, selectedExtension ?? null);
   const preface = buildWhatsAppCrmPreface(service.title);
   const price = formatMoney(merged.price_full);
-  const paymentLink = typeof service.payment_link === "string" ? service.payment_link.trim() : "";
   const featureLines = Array.isArray(service.features)
     ? service.features.map((f) => (typeof f === "string" ? f : f.text ?? "").trim()).filter(Boolean)
     : [];
@@ -506,9 +507,8 @@ export function buildServiceReservationWhatsAppHref(
       : service.subtitle?.trim()
         ? `מה זה כולל בפועל: ${service.subtitle.trim()}`
         : "";
-  const paymentLine = paymentLink
-    ? `לינק לתשלום מאושר (מיועד להמשך רק בתוך השיחה הזו אחרי התאמה קצרה, לא כפרסום חיצוני): ${paymentLink}`
-    : "מבקש לינק תשלום מאושר אחרי תיאום קצר כאן בשיחה.";
+  const paymentLine =
+    "תשלום: נתאם רק בתוך השיחה הזו אחרי התאמה קצרה. בלי לינק חיצוני בהודעה.";
   const variantLine = selectedExtension?.label?.trim()
     ? `אופציה: ${selectedExtension.label.trim()}`
     : "";

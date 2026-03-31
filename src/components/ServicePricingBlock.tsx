@@ -164,6 +164,11 @@ export default function ServicePricingBlock({ serviceJson, layout = "full" }: Pr
                   {" "}
                   ({formatMoney(service.price_full)})
                 </span>
+                {service.price_note?.trim() || service.subtitle?.trim() ? (
+                  <span className="mt-1 block text-xs font-normal leading-relaxed text-[color-mix(in_srgb,var(--nm-fg)_55%,var(--nm-bg))]">
+                    {service.price_note?.trim() || service.subtitle?.trim()}
+                  </span>
+                ) : null}
               </span>
             </label>
           ) : null}
@@ -242,7 +247,7 @@ export default function ServicePricingBlock({ serviceJson, layout = "full" }: Pr
             </div>
           )}
 
-          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-stretch sm:justify-start sm:gap-2">
+          <div className="flex flex-col gap-2 overflow-hidden rounded-[1.25rem] sm:flex-row sm:flex-wrap sm:items-stretch sm:justify-start sm:gap-2">
             <a
               href={primaryHref}
               {...(primaryExternal ? { target: "_blank", rel: "noreferrer" } : {})}

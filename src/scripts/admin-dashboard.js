@@ -46,9 +46,11 @@ const initAdminDashboard = () => {
   const contentEl = root.querySelector("[data-admin-content]");
   const recentLoginsEl = root.querySelector("[data-admin-recent-logins]");
   const fraudFlagsEl = root.querySelector("[data-admin-fraud-flags]");
+  const pageBeaconsEl = root.querySelector("[data-admin-page-beacons]");
   const summaryMembers = root.querySelector('[data-admin-stat="members"]');
   const summaryRecent = root.querySelector('[data-admin-stat="recent"]');
   const summaryFlags = root.querySelector('[data-admin-stat="flags"]');
+  const summaryDeep = root.querySelector('[data-admin-stat="deep"]');
   const summaryLastFlag = root.querySelector('[data-admin-stat="last-flag"]');
   const resetForm = root.querySelector("[data-admin-reset-form]");
   const resetStatus = root.querySelector("[data-admin-reset-status]");
@@ -134,10 +136,14 @@ const initAdminDashboard = () => {
     const stats = payload?.stats || {};
     const recentLogins = Array.isArray(payload?.recentLogins) ? payload.recentLogins : [];
     const fraudFlags = Array.isArray(payload?.fraudFlags) ? payload.fraudFlags : [];
+    const pageViewBeacons = Array.isArray(payload?.pageViewBeacons) ? payload.pageViewBeacons : [];
 
     if (summaryMembers instanceof HTMLElement) summaryMembers.textContent = String(stats.members ?? 0);
     if (summaryRecent instanceof HTMLElement) summaryRecent.textContent = String(stats.recentLogins ?? recentLogins.length);
     if (summaryFlags instanceof HTMLElement) summaryFlags.textContent = String(stats.flaggedMembers ?? fraudFlags.length);
+    if (summaryDeep instanceof HTMLElement) {
+      summaryDeep.textContent = String(stats.pageViewBeacons ?? pageViewBeacons.length ?? 0);
+    }
     if (summaryLastFlag instanceof HTMLElement) summaryLastFlag.textContent = stats.lastFlaggedAt ? formatDateTime(stats.lastFlaggedAt) : "לא זמין";
 
     renderItems(
@@ -170,6 +176,22 @@ const initAdminDashboard = () => {
         return row;
       },
       "כרגע אין flags פתוחים."
+    );
+
+    renderItems(
+      pageBeaconsEl,
+      pageViewBeacons,
+      (item) => {
+        const row = document.createElement("li");
+        row.className = "rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 px-4 py-3";
+        row.innerHTML = `
+          <p class="text-sm font-semibold text-[var(--nm-fg)]">${item.path || "/"}</p>
+          <p class="mt-1 text-xs leading-6 text-[color-mix(in_srgb,var(--nm-fg)_65%,var(--nm-bg))]">${formatDateTime(item.seenAt)}</p>
+          <p class="mt-1 text-xs leading-6 text-[color-mix(in_srgb,var(--nm-fg)_52%,var(--nm-bg))]">${item.ipFingerprint || "ללא מזהה"}</p>
+        `;
+        return row;
+      },
+      "עדיין אין ביקוני צפייה במאמרים. אחרי כניסה של חבר, פתח מאמר מתחת ל-/articles/."
     );
   };
 

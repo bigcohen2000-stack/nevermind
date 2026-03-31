@@ -12,6 +12,7 @@ import ClubKeywordWall from "../../components/ClubKeywordWall.astro";
 import SocialParadoxes from "../../components/SocialParadoxes.astro";
 import SubscribeBanner from "../../components/SubscribeBanner.astro";
 import TruthBlock from "../../components/TruthBlock.astro";
+import ArticleYoutubeGate from "../../components/ArticleYoutubeGate.astro";
 import ArticleLayout from "../../layouts/ArticleLayout.astro";
 import Layout from "../../layouts/Layout.astro";
 
@@ -54,6 +55,13 @@ const mdxComponents = {
   SubscribeBanner,
   TruthBlock,
 };
+const youtubeIdArticle =
+  typeof frontmatter.youtubeId === "string" && frontmatter.youtubeId.trim()
+    ? frontmatter.youtubeId.trim()
+    : undefined;
+const videoSummaryPointsArticle = Array.isArray(frontmatter.videoSummaryPoints)
+  ? frontmatter.videoSummaryPoints
+  : [];
 ---
 
 <Layout
@@ -80,6 +88,17 @@ const mdxComponents = {
         ) : null
       }
     </header>
+
+    {
+      youtubeIdArticle ? (
+        <ArticleYoutubeGate
+          youtubeId={youtubeIdArticle}
+          title={frontmatter.title}
+          isPremium={Boolean(frontmatter.isPremium)}
+          videoSummaryPoints={videoSummaryPointsArticle}
+        />
+      ) : null
+    }
 
     <div class="nm-article-shell mt-8 rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_9%,transparent)] bg-[var(--nm-bg-canvas)] px-5 py-8 shadow-[0_18px_42px_rgba(26,26,26,0.03)] md:px-8">
       <ArticleLayout frontmatter={frontmatter}>

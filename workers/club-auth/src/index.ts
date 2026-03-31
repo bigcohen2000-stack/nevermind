@@ -61,6 +61,13 @@ type FraudFlagEntry = {
   lastPath?: string;
 };
 
+/** Deep File: צפיות בדפים אחרי כניסה (בלי טלפון בגוף). */
+type DeepPageBeacon = {
+  path: string;
+  seenAt: string;
+  ipHash: string;
+};
+
 type AdminSessionPayload = {
   role: "admin";
   iat: number;
@@ -80,6 +87,8 @@ const RECENT_LOGIN_LIMIT = 24;
 const FRAUD_FLAG_LIMIT = 24;
 const KV_LIST_LIMIT = 1000;
 const CLUB_MEMBER_DEFAULT_EXPIRES_DAYS = 365;
+const DEEP_PAGE_VIEWS_KEY = "deep:page_views";
+const MAX_DEEP_PAGE_VIEWS = 200;
 
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
@@ -100,6 +109,10 @@ export default {
         200,
         corsHeaders
       );
+    }
+
+    if (request.method === "POST" && url.pathname === "/log/club-page") {
+      return handleClubPageBeacon(request, env, corsHeaders);
     }
 
     if (request.method === "POST" && url.pathname === "/admin/login") {
@@ -270,11 +283,21 @@ async function handleAdminOverview(request: Request, env: Env, headers: Headers)
   const auth = await requireAdminAuth(request, env, headers);
   if (auth instanceof Response) return auth;
 
-  const [memberKeys, recentLogins, fraudFlags] = await Promise.all([
+  const [memberKeys, recentLogins, fraudFlags, deepRawList] = await Promise.all([
     listKvKeys(env.CLUB_MEMBERS, "member:"),
     readRecentLogins(env.CLUB_ACTIVITY),
     readFraudFlags(env.CLUB_ACTIVITY),
+    readDeepPageBeaconList(env.CLUB_ACTIVITY),
   ]);
+
+  const pageViewBeacons = deepRawList
+    .sort((left, right) => Date.parse(right.seenAt) - Date.parse(left.seenAt))
+    .slice(0, 48)
+    .map((entry) => ({
+      path: entry.path,
+      seenAt: entry.seenAt,
+      ipFingerprint: entry.ipHash.slice(0, 8),
+    }));
 
   return json(
     {
@@ -284,9 +307,11 @@ async function handleAdminOverview(request: Request, env: Env, headers: Headers)
         recentLogins: recentLogins.length,
         flaggedMembers: fraudFlags.length,
         lastFlaggedAt: fraudFlags[0]?.flaggedAt ?? "",
+        pageViewBeacons: deepRawList.length,
       },
       recentLogins,
       fraudFlags,
+      pageViewBeacons,
     },
     200,
     headers
@@ -633,4 +658,46 @@ async function readFraudFlags(namespace: KVNamespace): Promise<FraudFlagEntry[]>
     .filter((entry): entry is FraudFlagEntry => Boolean(entry && typeof entry.phone === "string" && typeof entry.flaggedAt === "string"))
     .sort((left, right) => Date.parse(right.flaggedAt) - Date.parse(left.flaggedAt))
     .slice(0, FRAUD_FLAG_LIMIT);
+}
+
+async function readDeepPageBeaconList(namespace: KVNamespace): Promise<DeepPageBeacon[]> {
+  const raw = await namespace.get<DeepPageBeacon[]>(DEEP_PAGE_VIEWS_KEY, "json");
+  if (!Array.isArray(raw)) return [];
+  return raw.filter(
+    (entry) =>
+      entry &&
+      typeof entry.path === "string" &&
+      typeof entry.seenAt === "string" &&
+      typeof entry.ipHash === "string"
+  );
+}
+
+async function handleClubPageBeacon(request: Request, env: Env, headers: Headers): Promise<Response> {
+  let payload: { path?: string } | null = null;
+  try {
+    payload = (await request.json()) as { path?: string };
+  } catch {
+    return json({ ok: false, error: "הבקשה לא נקראה כמו שצריך." }, 400, headers);
+  }
+
+  const path = String(payload?.path ?? "").trim().slice(0, 500);
+  if (!path || !path.startsWith("/")) {
+    return json({ ok: false, error: "חסר נתיב תקין." }, 400, headers);
+  }
+
+  const nowIso = new Date().toISOString();
+  const ip = readClientIp(request);
+  const ipHash = await sha256Hex(`${env.CLUB_IP_PEPPER}:${ip}`);
+  const entry: DeepPageBeacon = { path, seenAt: nowIso, ipHash };
+
+  const existing = await readDeepPageBeaconList(env.CLUB_ACTIVITY);
+  const next = [...existing, entry].slice(-MAX_DEEP_PAGE_VIEWS);
+
+  try {
+    await env.CLUB_ACTIVITY.put(DEEP_PAGE_VIEWS_KEY, JSON.stringify(next));
+  } catch {
+    return json({ ok: false, error: "שמירה נכשלה." }, 502, headers);
+  }
+
+  return json({ ok: true }, 200, headers);
 }
