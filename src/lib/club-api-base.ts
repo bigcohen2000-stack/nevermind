@@ -12,3 +12,8 @@ export function memberProgressUrl(): string {
   const o = getClubWorkerOrigin();
   return o ? `${o}/member/progress` : "";
 }
+
+export function memberInsightsUrl(): string {
+  const o = getClubWorkerOrigin();
+  return o ? `${o}/member/insights` : "";
+}

@@ -122,6 +122,28 @@ const hasQuestionForSchema = Boolean(String(frontmatter.questionForSchema ?? "")
 
     {frontmatter.isPremium ? null : <ClubKeywordWall />}
   </section>
+
+  <script is:inline define:vars={{ slug: entry.slug, title: frontmatter.title }}>
+    (() => {
+      try {
+        const row = { slug, title, at: Date.now() };
+        localStorage.setItem("nm_last_article_open", JSON.stringify(row));
+        const key = "nm_article_open_log";
+        const prev = JSON.parse(localStorage.getItem(key) || "[]");
+        const arr = Array.isArray(prev) ? prev : [];
+        const next = [row, ...arr.filter((x) => x && x.slug !== row.slug)].slice(0, 40);
+        localStorage.setItem(key, JSON.stringify(next));
+        const onceKey = `nm_sec_once_${slug}`;
+        if (!sessionStorage.getItem(onceKey)) {
+          sessionStorage.setItem(onceKey, "1");
+          const sec = Math.floor(Number.parseInt(localStorage.getItem("nm_reading_seconds_local") || "0", 10) || 0);
+          localStorage.setItem("nm_reading_seconds_local", String(sec + 180));
+        }
+      } catch {
+        /* ignore */
+      }
+    })();
+  </script>
 </Layout>
 
 <style>

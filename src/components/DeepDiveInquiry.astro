@@ -13,12 +13,12 @@ const list = Array.isArray(questions) ? questions.filter((s) => typeof s === "st
 {
   list.length > 0 && (
     <section
-      class="mx-auto max-w-[72ch] rounded-[1.5rem] border border-[color-mix(in_srgb,var(--nm-inverse)_18%,transparent)] bg-[var(--nm-inverse)] px-6 py-6 text-right text-[var(--nm-inverse-fg)]"
+      class="nm-deep-dive-inquiry mx-auto max-w-[72ch] rounded-[1.5rem] border border-[color-mix(in_srgb,#FAFAF8_22%,transparent)] bg-[var(--nm-inverse)] px-6 py-6 text-right text-[#FAFAF8] antialiased"
       aria-label={title}
     >
-      <p class="text-xs font-semibold uppercase tracking-[0.2em] text-[color-mix(in_srgb,var(--nm-inverse-fg)_55%,transparent)]">חקירה עמוקה</p>
-      <h2 class="mt-2 text-[clamp(1.2rem,1.05rem+0.45vw,1.45rem)] font-semibold leading-snug">{title}</h2>
-      <ol class="mt-5 list-decimal space-y-4 pr-5 text-[clamp(0.98rem,0.93rem+0.2vw,1.08rem)] leading-8 marker:text-[var(--nm-accent)]">
+      <p class="text-xs font-semibold uppercase tracking-[0.2em] text-[#FAFAF8]/85">חקירה עמוקה</p>
+      <h2 class="mt-2 text-[clamp(1.2rem,1.05rem+0.45vw,1.45rem)] font-semibold leading-snug text-[#FAFAF8]">{title}</h2>
+      <ol class="mt-5 list-decimal space-y-4 pr-5 text-[clamp(0.98rem,0.93rem+0.2vw,1.08rem)] leading-[1.75] text-[#FAFAF8] marker:text-[var(--nm-accent)]">
         {list.map((q) => (
           <li>{q}</li>
         ))}
@@ -26,3 +26,12 @@ const list = Array.isArray(questions) ? questions.filter((s) => typeof s === "st
     </section>
   )
 }
+
+<style is:global>
+  /* דף המאמר כופה צבע כהה על li/h2 בתוך .nm-article — כאן רקע כהה וטקסט #FAFAF8 */
+  .nm-article-shell .nm-article .nm-deep-dive-inquiry h2,
+  .nm-article-shell .nm-article .nm-deep-dive-inquiry li,
+  .nm-article-shell .nm-article .nm-deep-dive-inquiry p {
+    color: #fafaf8;
+  }
+</style>

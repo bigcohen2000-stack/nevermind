@@ -507,8 +507,7 @@ export function buildServiceReservationWhatsAppHref(
       : service.subtitle?.trim()
         ? `מה זה כולל בפועל: ${service.subtitle.trim()}`
         : "";
-  const paymentLine =
-    "תשלום: נתאם רק בתוך השיחה הזו אחרי התאמה קצרה. בלי לינק חיצוני בהודעה.";
+  const paymentLine = "תשלום: נתאם רק בתוך השיחה הזו אחרי התאמה קצרה.";
   const variantLine = selectedExtension?.label?.trim()
     ? `אופציה: ${selectedExtension.label.trim()}`
     : "";
@@ -518,7 +517,7 @@ export function buildServiceReservationWhatsAppHref(
     includesLine,
     paymentLine,
     "",
-    "אם זה לא רלוונטי — תגיב בקצרה ואסיים כאן.",
+    "אשמח לדבר על זה כשיהיה לך זמן.",
   ]
     .filter((line) => line.length > 0)
     .join("\n");

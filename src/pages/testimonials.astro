@@ -1,42 +1,13 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import TestimonialsExperience from "../components/TestimonialsExperience.astro";
 ---
 
 <Layout
   title="המלצות"
-  description="ההוכחה החברתית כאן לא עובדת כמו בפרסום קלאסי. כאן הממליץ הטוב ביותר עליך הוא אתה."
+  description="ציטוטים כחיזוק בלבד. הבדיקה מול השכל הישר שלך. בלי שמות, בלי כוכבים."
 >
-  <article class="mx-auto max-w-[65ch] space-y-10 px-4 py-14 text-right text-[var(--nm-fg)]">
-    <header class="space-y-4">
-      <h1 class="text-[clamp(1.75rem,1.4rem+1.2vw,2.5rem)] font-semibold">המלצות</h1>
-      <p class="leading-[var(--line-height-ui)] text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))]">
-        ציטוטים של אנשים אחרים יכולים לרכך חשש. הם גם יכולים להסיט אותך מהשאלה המדויקת: האם מה שנאמר כאן נשמע נכון בשבילך כשאתה בודק את זה מול השכל הישר שלך.
-      </p>
-    </header>
-
-    <section aria-labelledby="self-check" class="space-y-4 rounded-[1.5rem] border border-[color-mix(in_srgb,var(--nm-accent)_28%,transparent)] bg-[var(--nm-tint)] p-6">
-      <h2 id="self-check" class="text-xl font-semibold text-[var(--nm-fg)]">
-        בדיקה פנימית לפני שמסתמכים על ציטוט
-      </h2>
-      <ul class="list-disc space-y-2 ps-5 text-sm leading-[var(--line-height-ui)] text-[color-mix(in_srgb,var(--nm-fg)_82%,var(--nm-bg))]">
-        <li>האם המשפט הבא נכון גם בלי שם של ממליץ?</li>
-        <li>האם אתה יכול להסביר במילים שלך למה זה רלוונטי אליך?</li>
-        <li>אם התשובה לא, זה לא אומר שהציטוט בלתי אפשרי. זה אומר שהוא לא הוכחה בשבילך עדיין.</li>
-      </ul>
-    </section>
-
-    <section class="space-y-4">
-      <h2 class="text-xl font-semibold">דוגמה לניסוח שמחזיק את העקרון</h2>
-      <blockquote class="rounded-[1.25rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white p-5 text-sm leading-[var(--line-height-ui)] text-[color-mix(in_srgb,var(--nm-fg)_82%,var(--nm-bg))]">
-        "הבנתי משהו על עצמי בזמן שקראתי. לא בגלל מישהו אחר. בגלל שזה נחת על נקודה שכבר הייתה פתוחה אצלי."
-      </blockquote>
-      <p class="text-xs text-[color-mix(in_srgb,var(--nm-fg)_52%,var(--nm-bg))]">שם ותאריך יתווספו כשיהיו מוכנים לפרסום מבוקר.</p>
-    </section>
-
-    <p class="text-sm leading-[var(--line-height-ui)] text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">
-      רוצה להמשיך מניסיון אישי? <a href="/book/" class="font-semibold text-[var(--nm-accent)] underline-offset-2 hover:underline">קביעת שיחה</a>
-      {" · "}
-      <a href="/articles/" class="font-semibold text-[var(--nm-accent)] underline-offset-2 hover:underline">ארכיון</a>
-    </p>
+  <article class="mx-auto max-w-6xl px-4 py-14 text-right text-[var(--nm-fg)]">
+    <TestimonialsExperience />
   </article>
 </Layout>

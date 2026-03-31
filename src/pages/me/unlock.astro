@@ -2,7 +2,7 @@
 import { getCollection } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
 import ServiceCard from "../../components/ServiceCard.astro";
-import MeUnlockArticleList from "../../components/me/MeUnlockArticleList";
+import MePersonalDashboard from "../../components/me/MePersonalDashboard";
 import appConfig from "../../config/appConfig.json";
 import { findServiceById, type FlatService } from "../../lib/services";
 
@@ -12,15 +12,14 @@ const sortedUnlock = articleEntries.sort((a, b) => {
   const db = b.data.updatedDate ?? b.data.pubDate;
   return db.getTime() - da.getTime();
 });
-const unlockArticleRows = sortedUnlock.map((e) => ({
+const dashboardArticles = sortedUnlock.map((e) => ({
   slug: e.slug,
   title: e.data.title,
   pubDate: e.data.pubDate.toISOString(),
-  updatedDate: e.data.updatedDate?.toISOString(),
   tags: e.data.tags ?? [],
   difficultyLevel: e.data.difficultyLevel,
 }));
-const buildTimeMs = Date.now();
+const totalPublished = articleEntries.length;
 
 const portalAccess = findServiceById("portal-access");
 const phonePerspective = findServiceById("phone-perspective");
@@ -51,7 +50,7 @@ const fallbackPhonePerspective = ({
   description: "מדברים קצר. מבינים מה באמת קורה. נכנסים לצעד הבא בלי בלבול.",
   price_full: 450,
   action_type: "whatsapp",
-  action_text: "אני רוצה להתחיל",
+  action_text: "אני רוצה להתקדם",
   visible: true,
   badges: [],
   features: [],
@@ -72,108 +71,93 @@ const validCodesRaw =
   import.meta.env.PUBLIC_DASHBOARD_CODES ||
   import.meta.env.NEXT_PUBLIC_DASHBOARD_CODES ||
   "";
+const whatsAppDigits = String(whatsAppNumber || "").replace(/\D/g, "");
 ---
 
-<Layout title="קוד אישי" description="כניסה עם קוד שקיבלת. קישורים למסלולים ולתוכן." noIndex={true}>
-  <section class="mx-auto max-w-6xl space-y-16 px-4 py-14 text-[var(--nm-fg)]">
-    <p class="text-right text-sm text-[color-mix(in_srgb,var(--nm-fg)_58%,var(--nm-bg))]">
-      <a href="/me/" class="font-semibold text-[var(--nm-accent)] underline underline-offset-4">חזרה לאזור האישי</a>
-    </p>
-
-    <div
-      id="unlock-unauthorized"
-      class="space-y-10 rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white px-6 py-10 text-right md:px-10"
-    >
-      <header class="space-y-4">
-        <p class="text-sm font-light text-[color-mix(in_srgb,var(--nm-fg)_60%,var(--nm-bg))]">קוד אישי</p>
-        <h1 class="text-[clamp(2.1rem,1.6rem+2.2vw,3.6rem)] font-light leading-tight">המפתח שלך.</h1>
-        <p class="text-[clamp(1.05rem,1rem+0.2vw,1.2rem)] leading-8 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
-          כאן הכל נהיה פשוט.
-        </p>
-      </header>
-
-      <ol class="space-y-2 text-[1.03rem] leading-8">
-        <li>1. מדברים.</li>
-        <li>2. משלמים.</li>
-        <li>3. נכנסים.</li>
-      </ol>
-
-      <div class="space-y-4">
-        <label for="unlock-code-input" class="block text-sm font-light text-[color-mix(in_srgb,var(--nm-fg)_66%,var(--nm-bg))]">
-          הקוד האישי שלך
-        </label>
-        <input
-          id="unlock-code-input"
-          type="password"
-          autocomplete="off"
-          placeholder="הכנס את הקוד שקיבלת"
-          class="w-full rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_16%,transparent)] bg-white px-5 py-3 text-right text-[1rem] outline-none transition focus:border-[var(--nm-accent)]"
-        />
-        <button
-          id="unlock-enter"
-          type="button"
-          class="inline-flex min-h-[46px] items-center justify-center rounded-full bg-[var(--nm-accent)] px-8 py-2.5 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]"
-        >
-          כניסה
-        </button>
-        <p id="unlock-error" class="hidden text-sm text-[var(--nm-accent)]">
-          <a
-            id="unlock-wa-link"
-            href={`https://wa.me/${String(whatsAppNumber || "").replace(/\D/g, "")}`}
-            class="underline underline-offset-4"
-          >
-            הקוד לא נכון. בוא נדבר בוואטסאפ.
-          </a>
-        </p>
-      </div>
-
-      <div class="space-y-2 border-t border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] pt-6 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_65%,var(--nm-bg))]">
-        <p>אתה מתחבר מ-IP: <span id="unlock-viewer-ip">בודק...</span></p>
-        <p>הקוד אישי. אסור להעביר אותו לאחרים.</p>
-      </div>
-    </div>
-
-    <div
-      id="unlock-authorized"
-      class="hidden space-y-12 rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white px-6 py-10 text-right md:px-10"
-    >
-      <header class="space-y-4">
-        <p class="text-sm font-light text-[color-mix(in_srgb,var(--nm-fg)_60%,var(--nm-bg))]">קוד אישי</p>
-        <h2 class="text-[clamp(1.9rem,1.4rem+2vw,3.1rem)] font-light leading-tight">מה יש לך פה.</h2>
-      </header>
-
-      <nav aria-label="ניווט אחרי קוד">
-        <ul class="space-y-3 text-[1.03rem] leading-8">
-          <li><a href="/articles/" class="underline underline-offset-4">כל המאמרים -></a></li>
-          <li><a href="/simulators/" class="underline underline-offset-4">הסימולטורים -></a></li>
-          <li><a href="/me/learning/" class="underline underline-offset-4">לוח הלמידה -></a></li>
-          <li><a href="/me/settings/" class="underline underline-offset-4">הגדרות -></a></li>
-        </ul>
-      </nav>
-
-      <section class="grid gap-6 lg:grid-cols-2">
-        <ServiceCard service={archiveCard} />
-        <ServiceCard service={consultationCard} />
-      </section>
-
-      <button id="unlock-logout" type="button" class="text-sm underline underline-offset-4">
-        יציאה
-      </button>
-    </div>
-
-    <section
-      class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] px-5 py-8 md:px-8"
-      aria-labelledby="unlock-articles-heading"
-    >
-      <h2 id="unlock-articles-heading" class="text-xl font-semibold text-[var(--nm-fg)]">מאמרים באתר</h2>
-      <p class="mt-2 text-sm text-[color-mix(in_srgb,var(--nm-fg)_62%,var(--nm-bg))]">
-        ממוין מהעדכני ביותר. הסינון רץ מקומית בדפדפן.
+<Layout title="לוח בקרה | אזור אישי" description="סיכום קריאה, המלצות ויומן תובנות. הנתונים נשמרים במכשיר וחלקם בשרת כשיש מועדון פעיל." noIndex={true}>
+  <div class="min-h-[70vh]" style="background-color: #FAFAF8; color: #1A1A1A;">
+    <section class="mx-auto max-w-4xl space-y-12 px-4 py-12 md:py-16">
+      <p class="text-right text-sm font-medium" style="color: rgba(26, 26, 26, 0.55);">
+        <a href="/me/" class="font-semibold underline underline-offset-4" style="color: #1A1A1A;">חזרה לאזור האישי</a>
       </p>
-      <div class="mt-6">
-        <MeUnlockArticleList client:visible articles={unlockArticleRows} buildTimeMs={buildTimeMs} />
+
+      <div
+        id="unlock-unauthorized"
+        class="space-y-10 rounded-[1.5rem] border px-6 py-10 text-right md:px-10"
+        style="border-color: rgba(26, 26, 26, 0.1); background: #fff;"
+      >
+        <header class="space-y-4">
+          <p class="text-sm font-medium" style="color: rgba(26, 26, 26, 0.55);">כניסה</p>
+          <h1 class="text-[clamp(2rem,1.6rem+2vw,3.2rem)] font-semibold leading-tight tracking-tight" style="color: #1A1A1A;">המפתח שלך</h1>
+          <p class="text-[clamp(1.05rem,1rem+0.2vw,1.15rem)] leading-relaxed" style="color: rgba(26, 26, 26, 0.72);">
+            כאן הכל נהיה פשוט
+          </p>
+        </header>
+
+        <ol class="space-y-2 text-[1.03rem] leading-relaxed" style="color: #1A1A1A;">
+          <li>1. מדברים</li>
+          <li>2. משלמים</li>
+          <li>3. נכנסים</li>
+        </ol>
+
+        <div class="space-y-4">
+          <label for="unlock-code-input" class="block text-sm font-medium" style="color: rgba(26, 26, 26, 0.66);">
+            הקוד האישי שלך
+          </label>
+          <input
+            id="unlock-code-input"
+            type="password"
+            autocomplete="off"
+            placeholder="הכנס את הקוד שקיבלת"
+            class="w-full rounded-full border px-5 py-3 text-right text-[1rem] outline-none transition"
+            style="border-color: rgba(26, 26, 26, 0.16); background: #fff; color: #1A1A1A;"
+          />
+          <button
+            id="unlock-enter"
+            type="button"
+            class="inline-flex min-h-[46px] items-center justify-center rounded-full px-8 py-2.5 text-sm font-semibold text-white transition hover:opacity-95"
+            style="background-color: #D42B2B;"
+          >
+            כניסה
+          </button>
+          <p id="unlock-error" class="hidden text-sm" style="color: #D42B2B;">
+            <a
+              id="unlock-wa-link"
+              href={`https://wa.me/${whatsAppDigits}`}
+              class="underline underline-offset-4"
+            >
+              הקוד לא נכון. בוא נדבר בוואטסאפ
+            </a>
+          </p>
+        </div>
+
+        <div class="space-y-2 border-t pt-6 text-sm leading-relaxed" style="border-color: rgba(26, 26, 26, 0.1); color: rgba(26, 26, 26, 0.62);">
+          <p>אתה מתחבר מ-IP: <span id="unlock-viewer-ip">בודק</span></p>
+          <p>הקוד אישי. אסור להעביר אותו לאחרים</p>
+        </div>
+      </div>
+
+      <div id="unlock-authorized" class="hidden space-y-10">
+        <MePersonalDashboard client:load articles={dashboardArticles} totalPublished={totalPublished} whatsAppDigits={whatsAppDigits} />
+
+        <nav class="flex flex-wrap justify-end gap-4 text-sm font-medium" style="color: rgba(26, 26, 26, 0.72);" aria-label="קישורים מהירים">
+          <a href="/articles/" class="underline underline-offset-4" style="color: #1A1A1A;">מאמרים</a>
+          <a href="/simulators/" class="underline underline-offset-4" style="color: #1A1A1A;">סימולטורים</a>
+          <a href="/me/learning/" class="underline underline-offset-4" style="color: #1A1A1A;">לוח הלמידה</a>
+          <a href="/me/settings/" class="underline underline-offset-4" style="color: #1A1A1A;">הגדרות</a>
+        </nav>
+
+        <section class="grid gap-6 lg:grid-cols-2">
+          <ServiceCard service={archiveCard} />
+          <ServiceCard service={consultationCard} />
+        </section>
+
+        <button id="unlock-logout" type="button" class="text-sm font-medium underline underline-offset-4" style="color: rgba(26, 26, 26, 0.72);">
+          יציאה
+        </button>
       </div>
     </section>
-  </section>
+  </div>
 
   <script is:inline define:vars={{ whatsAppNumber, validCodesRaw }}>
     (() => {
@@ -222,8 +206,8 @@ const validCodesRaw =
 
       const updateWhatsAppLink = () => {
         if (!waLink || !number) return;
-        const message = "היי, הקוד לא עובד לי. אפשר לבדוק את זה יחד?";
-        waLink.setAttribute("href", `https://wa.me/${number}?text=${encodeURIComponent(message)}`);
+        const message = "היי, הקוד לא עובד לי. אפשר לבדוק את זה יחד";
+        waLink.setAttribute("href", `https://wa.me/${number.replace(/\D/g, "")}?text=${encodeURIComponent(message)}`);
       };
 
       const hasPremiumSession = () => {

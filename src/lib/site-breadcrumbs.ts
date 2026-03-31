@@ -53,7 +53,7 @@ const SEGMENT_LABELS: Record<string, string> = {
   library: "ספרייה מובנית",
   search: "חיפוש",
   me: "אזור אישי",
-  unlock: "קוד אישי",
+  unlock: "לוח בקרה",
   dashboard: "לוח ניהול",
   learning: "לוח למידה",
   settings: "הגדרות",

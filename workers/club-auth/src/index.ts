@@ -250,6 +250,77 @@ async function handleMemberProgressPost(
   return json({ ok: true, progress: next }, 200, corsHeaders);
 }
 
+type InsightsStored = {
+  text: string;
+  updatedAt: string;
+};
+
+async function handleMemberInsightsGet(
+  request: Request,
+  env: Env,
+  _ipHash: string,
+  corsHeaders: Headers
+): Promise<Response> {
+  const authHeader = String(request.headers.get("authorization") ?? "").trim();
+  if (!authHeader.startsWith("Bearer ")) {
+    return json({ ok: false, error: "צריך טוקן התקדמות." }, 401, corsHeaders);
+  }
+  const token = authHeader.slice(7).trim();
+  const payload = await verifyProgressToken(token, env);
+  if (!payload) {
+    return json({ ok: false, error: "הטוקן לא תקף או שפג." }, 401, corsHeaders);
+  }
+  const key = `insights:${payload.phone}`;
+  const raw = await env.CLUB_MEMBERS.get(key);
+  if (!raw) {
+    return json({ ok: true, insights: { text: "", updatedAt: "" } }, 200, corsHeaders);
+  }
+  try {
+    const parsed = JSON.parse(raw) as InsightsStored;
+    return json(
+      {
+        ok: true,
+        insights: {
+          text: typeof parsed.text === "string" ? parsed.text : "",
+          updatedAt: typeof parsed.updatedAt === "string" ? parsed.updatedAt : "",
+        },
+      },
+      200,
+      corsHeaders
+    );
+  } catch {
+    return json({ ok: true, insights: { text: "", updatedAt: "" } }, 200, corsHeaders);
+  }
+}
+
+async function handleMemberInsightsPut(
+  request: Request,
+  env: Env,
+  ipHash: string,
+  corsHeaders: Headers
+): Promise<Response> {
+  const authHeader = String(request.headers.get("authorization") ?? "").trim();
+  if (!authHeader.startsWith("Bearer ")) {
+    return json({ ok: false, error: "צריך טוקן התקדמות." }, 401, corsHeaders);
+  }
+  const token = authHeader.slice(7).trim();
+  const payload = await verifyProgressToken(token, env);
+  if (!payload) {
+    return json({ ok: false, error: "הטוקן לא תקף או שפג." }, 401, corsHeaders);
+  }
+  let body: { text?: string } | null = null;
+  try {
+    body = (await request.json()) as { text?: string };
+  } catch {
+    return json({ ok: false, error: "הבקשה לא נקראה כמו שצריך." }, 400, corsHeaders);
+  }
+  const text = String(body?.text ?? "").slice(0, 8000);
+  const updatedAt = new Date().toISOString();
+  const next: InsightsStored = { text, updatedAt };
+  await env.CLUB_MEMBERS.put(`insights:${payload.phone}`, JSON.stringify(next));
+  return json({ ok: true, insights: next, lastIpPrefix: ipHash.slice(0, 12) }, 200, corsHeaders);
+}
+
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
@@ -305,6 +376,22 @@ export default {
       const limited = await checkRateLimit(env, ipHash, "progress_post", 90, 60, corsHeaders);
       if (limited) return limited;
       return handleMemberProgressPost(request, env, ipHash, corsHeaders);
+    }
+
+    if (request.method === "GET" && url.pathname === "/member/insights") {
+      const ip = readClientIp(request);
+      const ipHash = await sha256Hex(`${env.CLUB_IP_PEPPER}:${ip}`);
+      const limited = await checkRateLimit(env, ipHash, "insights_get", 120, 60, corsHeaders);
+      if (limited) return limited;
+      return handleMemberInsightsGet(request, env, ipHash, corsHeaders);
+    }
+
+    if (request.method === "PUT" && url.pathname === "/member/insights") {
+      const ip = readClientIp(request);
+      const ipHash = await sha256Hex(`${env.CLUB_IP_PEPPER}:${ip}`);
+      const limited = await checkRateLimit(env, ipHash, "insights_put", 60, 60, corsHeaders);
+      if (limited) return limited;
+      return handleMemberInsightsPut(request, env, ipHash, corsHeaders);
     }
 
     if (request.method !== "POST" || !isLoginPath(url.pathname)) {
