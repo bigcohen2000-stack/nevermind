@@ -1,682 +1,200 @@
----
+﻿---
 import { getCollection } from "astro:content";
-import Layout from "../../layouts/Layout.astro";
 import ClubAdminPanel from "../../components/admin/ClubAdminPanel.astro";
-import fs from "node:fs/promises";
-import fsSync from "node:fs";
-import path from "node:path";
-import appConfig from "../../config/appConfig.json";
-import { buildArticleJsonLdPreview, buildTruthBlockPreview } from "../../lib/article-schema-preview";
-import { resolveArticleHeroImage } from "../../lib/resolve-article-hero-image";
-import { validateAndClassify } from "../../utils/contentValidator";
-
-const pageTitle = "לוח ניהול";
-const pageDescription =
-  "ציון בריאות תוכן לכל מאמר לפי Insight, עדכניות SEO ויחס רכיבי QA.";
-const nowMs = Date.now();
-const dayMs = 24 * 60 * 60 * 1000;
-const recencyWindowDays = 90;
+import ContentHealthWidget from "../../components/dashboard/ContentHealthWidget";
+import DashboardCard from "../../components/dashboard/DashboardCard.astro";
+import DashboardCommandBar from "../../components/dashboard/DashboardCommandBar";
+import DashboardNav from "../../components/dashboard/DashboardNav.astro";
+import HelpText from "../../components/dashboard/HelpText.astro";
+import ImageAutomationGuide from "../../components/dashboard/ImageAutomationGuide.astro";
+import LiveConnectionsWidget from "../../components/dashboard/LiveConnectionsWidget";
+import LiveSecurityFeedWidget from "../../components/dashboard/LiveSecurityFeedWidget";
+import MechanismCard from "../../components/dashboard/MechanismCard.astro";
+import SystemSettingsPanel from "../../components/dashboard/SystemSettingsPanel.astro";
+import Layout from "../../layouts/Layout.astro";
+import {
+  buildDashboardContentHealth,
+  buildDashboardOverviewSummary,
+  buildDashboardSearchIndex,
+} from "../../lib/dashboard-data";
 
 const articles = await getCollection("articles");
+const contentHealthItems = buildDashboardContentHealth(articles);
+const overview = buildDashboardOverviewSummary(contentHealthItems);
+const searchIndex = buildDashboardSearchIndex(contentHealthItems);
 
-const siteUrlRaw = String((appConfig as { site?: { url?: string } }).site?.url ?? "").replace(/\/$/, "");
-const siteUrlSlash = siteUrlRaw ? `${siteUrlRaw}/` : "https://www.nevermind.co.il/";
-const publicSiteUrl = siteUrlRaw || "https://www.nevermind.co.il";
-const lookerDashboardUrl = String(
-  import.meta.env.PUBLIC_ADMIN_LOOKER_DASHBOARD_URL ?? "https://lookerstudio.google.com/reporting/51ee9864-bc0b-4a85-8b24-da7ce5fd43eb"
-).trim();
+const pageTitle = "דשבורד ניהול";
+const pageDescription = "דשבורד ניהול פנימי עם חיפוש מהיר, מצב אתר, בקרה על תוכן ואבטחה.";
 
-const countQaComponents = (body: string) => {
-  const patterns = [/<SkepticBox\b/g, /<FAQ\b/g, /<Reflection\b/g];
-  return patterns.reduce((sum, pattern) => sum + ((body.match(pattern) || []).length || 0), 0);
-};
-
-const computeContentQualityScore = (wordCount: number, qaCount: number) => {
-  if (qaCount <= 0) return 0;
-  const ratio = wordCount / qaCount;
-  const delta = Math.abs(ratio - 300);
-  const closeness = Math.max(0, 1 - Math.min(delta / 300, 1));
-  return Math.round(closeness * 30);
-};
-
-const rows = articles
-  .map((entry) => {
-    const title = entry.data.title || entry.slug || entry.id;
-    const originalInsight = String(entry.data.originalInsight || "").trim();
-    const hasOriginalInsight = originalInsight.length > 0;
-    const insightScore = hasOriginalInsight ? 40 : 0;
-
-    const updatedAt = entry.data.updatedDate ?? entry.data.pubDate;
-    const updatedMs = updatedAt instanceof Date ? updatedAt.getTime() : NaN;
-    const ageDays = Number.isFinite(updatedMs) ? (nowMs - updatedMs) / dayMs : Number.POSITIVE_INFINITY;
-    const recencyScore = ageDays <= recencyWindowDays ? 30 : 0;
-
-    const body = entry.body || "";
-    const wordCount = body.replace(/<[^>]*>/g, " ").split(/\s+/).filter(Boolean).length;
-    const qaCount = countQaComponents(body);
-    const contentQualityScore = computeContentQualityScore(wordCount, qaCount);
-
-    const score = insightScore + recencyScore + contentQualityScore;
-
-    const badge =
-      score < 50
-        ? {
-            label: "Critical",
-            tone: "bg-[color-mix(in_srgb,var(--nm-accent)_8%,var(--nm-bg-canvas))] text-[var(--nm-accent)] border-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)]",
-          }
-        : score < 80
-          ? {
-              label: "Needs Update",
-              tone: "bg-[var(--nm-tint-strong)] text-[var(--nm-fg)] border-[color-mix(in_srgb,var(--nm-accent)_24%,transparent)]",
-            }
-          : {
-              label: "Premium Health",
-              tone: "bg-[var(--nm-inverse)] text-[var(--nm-inverse-fg)] border-[color-mix(in_srgb,var(--nm-fg)_22%,transparent)]",
-            };
-
-    const idBase = entry.id.replace(/\.mdx$/i, "");
-    const slugTail = idBase.split("/").pop() || entry.slug || "article";
-    const generatorHref = `/admin/generator/?slug=${encodeURIComponent(slugTail)}&title=${encodeURIComponent(title)}`;
-
-    const articleFilePath = path.join(process.cwd(), "src/content/articles", entry.id);
-    let rawDisk = "";
-    try {
-      rawDisk = fsSync.readFileSync(articleFilePath, "utf8");
-    } catch {
-      rawDisk = "";
-    }
-    const classified = validateAndClassify(rawDisk);
-    const forbiddenHits = classified.matchedBlocklist;
-    const sensitiveHits = classified.matchedSensitive;
-
-    const slugForUrl = entry.slug || slugTail;
-    const hero = resolveArticleHeroImage(slugForUrl, entry.data.image);
-    const ogAbs = hero.startsWith("http") ? hero : new URL(hero.replace(/^\//, ""), siteUrlSlash).toString();
-    const previewJsonLd = buildArticleJsonLdPreview(entry, {
-      pagePath: `/articles/${slugForUrl}/`,
-      ogImageAbsolute: ogAbs,
-      articlePaywalled: Boolean(entry.data.isPremium),
-    });
-    const truthPreview = buildTruthBlockPreview(entry);
-
-    return {
-      title,
-      score,
-      badge,
-      insightScore,
-      recencyScore,
-      contentQualityScore,
-      wordCount,
-      qaCount,
-      updatedLabel: Number.isFinite(updatedMs)
-        ? new Intl.DateTimeFormat("he-IL", { year: "numeric", month: "2-digit", day: "2-digit" }).format(
-            new Date(updatedMs)
-          )
-        : "לא זמין",
-      generatorHref,
-      previewKey: slugForUrl,
-      forbiddenHits,
-      sensitiveHits,
-      previewJsonLd,
-      truthPreview,
-    };
-  })
-  .sort((a, b) => a.score - b.score);
-
-const previewPack = rows.map((r) => ({
-  key: r.previewKey,
-  jsonLd: r.previewJsonLd,
-  truth: r.truthPreview,
-}));
-const previewPackJson = JSON.stringify(previewPack).replace(/</g, "\\u003c");
-
-type SearchGapRow = {
-  query: string;
-  count: number;
-  lastSeen: string;
-};
-
-const gapFilePath = path.resolve(process.cwd(), "src/pages/admin/search-gaps.json");
-let searchGaps: SearchGapRow[] = [];
-try {
-  const raw = await fs.readFile(gapFilePath, "utf8");
-  const parsed = JSON.parse(raw);
-  if (Array.isArray(parsed)) {
-    searchGaps = parsed
-      .filter((item) => item && typeof item.query === "string")
-      .map((item) => ({
-        query: String(item.query),
-        count: Number(item.count) > 0 ? Number(item.count) : 1,
-        lastSeen: String(item.lastSeen || ""),
-      }))
-      .sort((a, b) => b.count - a.count);
-  }
-} catch {
-  searchGaps = [];
-}
+const overviewCards = [
+  {
+    label: "מאמרים במערכת",
+    value: String(overview.totalArticles),
+    helper: "כל התוכן הפעיל",
+  },
+  {
+    label: "דורשים טיפול",
+    value: String(overview.criticalArticles),
+    helper: "נטישה גבוהה או עדכון ישן",
+  },
+  {
+    label: "במעקב",
+    value: String(overview.watchArticles),
+    helper: "כדאי לרענן בקרוב",
+  },
+  {
+    label: "תקינים",
+    value: String(overview.healthyArticles),
+    helper: "תוכן שמחזיק טוב כרגע",
+  },
+];
 ---
 
 <Layout title={pageTitle} description={pageDescription} noIndex={true}>
-  <section class="mx-auto max-w-7xl space-y-8 px-4 pb-14 text-right text-[var(--nm-fg)]">
-    <header class="rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/85 p-6 shadow-[0_24px_70px_rgba(26,26,26,0.06)]">
-      <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--nm-accent)]">NeverMind · ניהול</p>
-      <h1 class="mt-3 text-[clamp(2rem,1.6rem+1.4vw,3rem)] font-semibold">לוח ניהול</h1>
-      <p class="mt-3 max-w-3xl text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
-        ציון בריאות תוכן לכל מאמר (0–100): Original Insight (40), עדכניות SEO בתוך 90 ימים אחרונים (30), ויחס איכות תוכן לפי רכיבי QA (30).
-      </p>
-      <p class="mt-3 max-w-3xl text-xs leading-6 text-[color-mix(in_srgb,var(--nm-fg)_58%,var(--nm-bg))]">
-        הכניסה לכאן מנוהלת ב-Cloudflare Access. אין כאן טופס סיסמה באתר.
-      </p>
-    </header>
+  <div class="min-h-screen bg-[#FAFAF8] text-[#1A1A1A] dark:bg-[#1A1A1A] dark:text-[#FAFAF8]">
+    <main class="mx-auto max-w-7xl px-4 pb-16 pt-8 lg:px-6">
+      <DashboardCommandBar client:load index={searchIndex} />
 
-    <ClubAdminPanel />
+      <div class="grid gap-6 lg:grid-cols-[15rem_minmax(0,1fr)]">
+        <DashboardNav />
 
-    <section class="grid gap-4 lg:grid-cols-2">
-      <article class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 p-5 shadow-[0_20px_60px_rgba(26,26,26,0.05)]">
-        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">Pulse + תפעול</p>
-        <h2 class="mt-2 text-xl font-semibold text-[var(--nm-fg)]">כלי בקרה מהירים</h2>
-        <p id="nm-uptime-status" class="mt-3 inline-flex items-center gap-2 rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-3 py-1 text-sm">
-          <span class="size-2 rounded-full bg-gray-400" data-uptime-dot></span>
-          <span data-uptime-text>בודק זמינות...</span>
-        </p>
-        <p class="mt-3 text-xs text-[color-mix(in_srgb,var(--nm-fg)_58%,var(--nm-bg))]">
-          מדד משתמשים חיים מוצג דרך Looker. עדכון מגיע לפי ריענון GA4.
-        </p>
-        <div class="mt-4 flex flex-wrap gap-2">
-          <button id="nm-purge-cache-btn" type="button" class="inline-flex min-h-[44px] items-center justify-center rounded-full bg-[var(--nm-accent)] px-4 py-2 text-sm font-semibold text-[var(--nm-on-accent)] transition-all hover:scale-[1.02] hover:bg-[var(--nm-accent-hover)]">
-            ניקוי מטמון
-          </button>
-          <span id="nm-purge-cache-state" class="inline-flex min-h-[44px] items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-4 py-2 text-sm text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">ממתין</span>
-        </div>
-      </article>
-
-      <article class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 p-5 shadow-[0_20px_60px_rgba(26,26,26,0.05)]">
-        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">Mobile First</p>
-        <h2 class="mt-2 text-xl font-semibold text-[var(--nm-fg)]">תצוגת מובייל חיה</h2>
-        <div class="mt-4 flex justify-center">
-          <div class="w-[min(100%,24rem)] rounded-[2.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_14%,transparent)] bg-[#111] p-2 shadow-[0_12px_40px_rgba(0,0,0,0.25)]">
-            <div class="mb-2 h-5 w-24 rounded-full bg-[#1f1f1f] mx-auto"></div>
-            <iframe
-              src={publicSiteUrl}
-              title="Mobile preview"
-              loading="lazy"
-              class="h-[640px] w-full rounded-[1.6rem] border-0 bg-white"
-            />
-          </div>
-        </div>
-        <p class="mt-3 text-xs text-[color-mix(in_srgb,var(--nm-fg)_58%,var(--nm-bg))]">
-          אם המסגרת לא נטענת, בדוק CSP ו־frame-ancestors עבור הדומיין.
-        </p>
-      </article>
-    </section>
-
-    <section class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 p-5 shadow-[0_20px_60px_rgba(26,26,26,0.05)]">
-      <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">Analytics</p>
-      <h2 class="mt-2 text-xl font-semibold text-[var(--nm-fg)]">Looker Dashboard</h2>
-      <iframe src={lookerDashboardUrl} title="Looker dashboard" loading="lazy" class="mt-4 h-[420px] w-full rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white" />
-    </section>
-
-    <div id="nm-psi-config" class="hidden" data-site-url={publicSiteUrl}></div>
-
-    <section class="grid gap-4 lg:grid-cols-2" aria-label="ביצועים ועומק שימוש">
-      <article class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 p-5 shadow-[0_20px_60px_rgba(26,26,26,0.05)]">
-        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">Core Web Vitals</p>
-        <h2 class="mt-2 text-xl font-semibold text-[var(--nm-fg)]">PageSpeed — מובייל</h2>
-        <p class="mt-2 text-xs leading-6 text-[color-mix(in_srgb,var(--nm-fg)_58%,var(--nm-bg))]">
-          דגימה אחת לפי קריאה ל-Google PSI. לא מדידה רציפה. המפתח נשמר בשרת בלבד.
-        </p>
-        <div class="mt-4 flex flex-wrap items-center gap-2">
-          <button
-            id="nm-psi-btn"
-            type="button"
-            class="inline-flex min-h-[44px] items-center justify-center rounded-full bg-[var(--nm-accent)] px-4 py-2 text-sm font-semibold text-[var(--nm-on-accent)] transition-all hover:scale-[1.02] hover:bg-[var(--nm-accent-hover)]"
-          >
-            הרץ בדיקה
-          </button>
-          <span id="nm-psi-status" class="text-sm text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]" role="status" aria-live="polite"></span>
-        </div>
-        <div id="nm-psi-result" class="mt-3 hidden space-y-2 rounded-xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-4 text-sm text-[var(--nm-fg)]" aria-live="polite"></div>
-      </article>
-
-      <article class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 p-5 shadow-[0_20px_60px_rgba(26,26,26,0.05)]">
-        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">עומק שימוש</p>
-        <h2 class="mt-2 text-xl font-semibold text-[var(--nm-fg)]">Deep File</h2>
-        <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
-          צפיות במאמרים אחרי כניסת חבר נרשמות ב־Worker (ביקון לכל טאב). הרשימה המלאה מופיעה למעלה ב־Club Admin.
-        </p>
-        <p class="mt-3 text-xs text-[color-mix(in_srgb,var(--nm-fg)_56%,var(--nm-bg))]">
-          הרחבות עתידיות: <code class="rounded bg-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] px-1.5 py-0.5">docs/DEEP_FILE_ROADMAP.md</code>
-        </p>
-      </article>
-    </section>
-
-    <div class="overflow-x-auto rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/92 shadow-[0_24px_70px_rgba(26,26,26,0.06)]">
-      <table class="min-w-full text-right">
-        <thead class="border-b border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)]">
-          <tr class="text-sm font-semibold text-[color-mix(in_srgb,var(--nm-fg)_75%,var(--nm-bg))]">
-            <th class="px-4 py-3">מאמר</th>
-            <th class="px-4 py-3">Health</th>
-            <th class="px-4 py-3">פירוק ציון</th>
-            <th class="px-4 py-3">Content Score</th>
-            <th class="px-4 py-3">עדכון אחרון</th>
-            <th class="px-4 py-3">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row) => (
-            <tr class="border-b border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] text-sm align-top">
-              <td class="px-4 py-4 font-semibold text-[var(--nm-fg)]">{row.title}</td>
-              <td class="px-4 py-4">
-                <div class="flex flex-col items-end gap-2">
-                  <span class={`inline-flex rounded-full border px-3 py-1 text-xs font-semibold ${row.badge.tone}`}>{row.badge.label}</span>
-                  <span class="text-lg font-semibold text-[var(--nm-fg)]">{row.score}</span>
+        <div class="space-y-8">
+          <section id="overview" class="space-y-4">
+            <div class="overflow-hidden rounded-[32px] border-[0.5px] border-[rgba(26,26,26,0.1)] bg-[radial-gradient(circle_at_top_left,_rgba(212,43,43,0.16),_transparent_34%),linear-gradient(135deg,#ffffff_0%,#f4f2ed_100%)] p-6 shadow-[0_24px_70px_rgba(26,26,26,0.06)] dark:border-[rgba(250,250,248,0.12)] dark:bg-[radial-gradient(circle_at_top_left,_rgba(212,43,43,0.18),_transparent_30%),linear-gradient(135deg,rgba(255,255,255,0.06)_0%,rgba(255,255,255,0.02)_100%)]">
+              <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#D42B2B] dark:text-[#ff8a8a]">Dashboard</p>
+              <div class="mt-3 grid gap-5 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] lg:items-end">
+                <div class="space-y-3 text-right">
+                  <h1 class="text-[clamp(2rem,1.55rem+1.6vw,3.2rem)] font-semibold leading-tight text-[#1A1A1A] dark:text-[#FAFAF8]">מצב האתר עכשיו</h1>
+                  <p class="max-w-3xl text-sm leading-7 text-[#1A1A1A]/62 dark:text-[#FAFAF8]/64">
+                    דשבורד פנימי מאחורי הקלעים עם חיפוש מהיר, בקרה על חיבורים, פיד אבטחה, בריאות תוכן וזרימת עבודה קלה לתמונות.
+                  </p>
+                  <div class="flex flex-wrap items-center justify-between gap-3">
+                    <HelpText text="למה: כל אזור מסביר מה הוא מודד, איך הנתון מחושב, ומה יקרה אחרי פעולה. כך אפשר לעבוד מהר בלי לנחש מה עומד מאחורי כל כרטיס." />
+                    <MechanismCard
+                      title="איך הדשבורד מתועד"
+                      summary="שכבת ההסבר מחוברת ישירות לפונקציות שמזינות את הנתונים, כדי שהתיעוד יישאר נאמן ללוגיקה ולא יהיה טקסט שיווקי מנותק."
+                      details={[
+                        "בריאות תוכן נקבעת מתוך updatedDate, pubDate, ימים מהעדכון ו־bounceRate יציב לפי slug.",
+                        "נתוני Cloudflare כרגע נמשכים דרך endpoints mock עם חוזה נתונים קבוע, כך שאפשר להחליף מקור בלי לשכתב את ה־UI.",
+                      ]}
+                    />
+                  </div>
                 </div>
-              </td>
-              <td class="px-4 py-4 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">
-                <div>Insight: {row.insightScore}/40</div>
-                <div>Recency: {row.recencyScore}/30</div>
-                <div>Quality: {row.contentQualityScore}/30</div>
-                <div class="text-xs text-[color-mix(in_srgb,var(--nm-fg)_56%,var(--nm-bg))]">
-                  {row.wordCount} מילים · {row.qaCount} רכיבי QA
+                <div class="grid gap-3 sm:grid-cols-2">
+                  {overviewCards.map((card) => (
+                    <div class="rounded-[24px] border-[0.5px] border-[rgba(26,26,26,0.1)] bg-white/84 p-4 backdrop-blur-sm dark:border-[rgba(250,250,248,0.12)] dark:bg-[rgba(255,255,255,0.05)]">
+                      <p class="text-xs text-[#1A1A1A]/45 dark:text-[#FAFAF8]/48">{card.label}</p>
+                      <p class="mt-2 text-3xl font-semibold text-[#1A1A1A] dark:text-[#FAFAF8]">{card.value}</p>
+                      <p class="mt-1 text-xs text-[#1A1A1A]/42 dark:text-[#FAFAF8]/46">{card.helper}</p>
+                    </div>
+                  ))}
                 </div>
-              </td>
-              <td class="px-4 py-4 align-top">
-                <div class="flex max-w-[16rem] flex-col gap-2">
-                  {row.forbiddenHits.length > 0 ? (
-                    <span class="inline-flex flex-col gap-1 rounded-xl border border-red-600/35 bg-red-50 px-3 py-2 text-xs font-semibold text-red-900">
-                      <span>חסומים בבילד:</span>
-                      <span>{row.forbiddenHits.join(", ")}</span>
-                    </span>
-                  ) : (
-                    <span class="text-xs text-[color-mix(in_srgb,var(--nm-fg)_58%,var(--nm-bg))]">פסילה: נקי</span>
-                  )}
-                  {row.sensitiveHits.length > 0 ? (
-                    <span class="inline-flex flex-col gap-1 rounded-xl border border-amber-600/40 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-950">
-                      <span>נושא רגיש — המלצת פרימיום:</span>
-                      <span>{row.sensitiveHits.join(", ")}</span>
-                    </span>
-                  ) : null}
+              </div>
+            </div>
+          </section>
+
+          <section class="grid gap-6 xl:grid-cols-2">
+            <section id="connections">
+              <DashboardCard
+                eyebrow="מדדים ובקרה"
+                title="CF Live Connections"
+                description="שכבת mock קלה שמתנהגת כמו תצוגת Free Tier ומוכנה להחלפה לנתונים חיים."
+                sublabel="Fetching raw traffic and security flags via GraphQL Analytics API"
+                helpText="למה: הכרטיס נותן מבט מהיר על session, מדינה, מכשיר וסטטוס אימות. איך: endpoint מאומת יוצר bucket של 15 שניות ומחזיר חמישה חיבורים בפורמט קבוע, כדי שה־UI יישאר יציב גם לפני חיבור למקור חי."
+                mechanismTitle="מאחורי הקלעים של CF Live Connections"
+                mechanismSummary="functions/api/dashboard/live-connections.js מאשר בקשה לפי localhost, skip auth או Cf-Access-Jwt-Assertion, ואז מייצר feed יציב מתוך bucket זמן של 15 שניות."
+                mechanismDetails={[
+                  "חמש שורות נבנות כל פעם מחדש מתוך makeIp, רשימות מדינות, מכשירים וסטטוסי auth.",
+                  "ה־widget מושך את הנתונים מחדש כל 15 שניות ושומר על אותו מבנה שנרצה לחבר בהמשך ל־GraphQL Analytics API.",
+                ]}
+              >
+                <LiveConnectionsWidget client:load endpoint="/api/dashboard/live-connections" />
+              </DashboardCard>
+            </section>
+
+            <section id="security-feed">
+              <DashboardCard
+                eyebrow="מדדים ובקרה"
+                title="Live Security Feed"
+                description="אם מגיעים שלושה ניסיונות מאותו IP נוצרת אזעקה. הפיד רץ בצד לקוח ומתעדכן כל כמה שניות."
+                sublabel="Fetching raw traffic and security flags via GraphQL Analytics API"
+                helpText="למה: הכרטיס מבליט חריגות במקום לדרוש קריאת לוגים ידנית. איך: endpoint יוצר שישה אירועים, מקבץ ניסיונות לפי IP, ומסמן alarm רק כאשר אותו IP מגיע לשלושה ניסיונות בחלון קצר."
+                mechanismTitle="מאחורי הקלעים של פיד האבטחה"
+                mechanismSummary="functions/api/dashboard/security-feed.js משתמש ב־bucket של 12 שניות, יוצר רשימת IP חוזרת, סופר attempts לכל IP, וממיר את התוצאה ל־events ו־alarms."
+                mechanismDetails={[
+                  "severity מחושב לפי מספר ניסיונות: 1 נמוך, 2 בינוני, 3 ומעלה גבוה.",
+                  "ה־widget מושך את ה־feed כל 12 שניות, כך שהסימולציה מרגישה חיה אבל נשארת קלה מאוד."
+                ]}
+              >
+                <LiveSecurityFeedWidget client:load endpoint="/api/dashboard/security-feed" />
+              </DashboardCard>
+            </section>
+          </section>
+
+          <section id="content-health">
+            <DashboardCard
+              eyebrow="תוכן ומאמרים"
+              title="Content Health"
+              description="ברירת צבע אדומה כאשר bounceRate גבוה מ־70 או כשעברו יותר מ־90 יום מהעדכון האחרון."
+              helpText="למה: הכרטיס ממיין קודם את המקומות שדורשים החלטה מערכתית. איך: בריאות כל מאמר נבנית מתוך updatedDate או pubDate, חישוב ימים מהעדכון, ו־bounceRate יציב שנגזר מה־slug עם הטיית freshness."
+              mechanismTitle="מאחורי הקלעים של חישוב הבריאות"
+              mechanismSummary="buildDashboardContentHealth מסנן drafts, בוחר updatedDate או pubDate, מחשב daysSinceUpdate, מוסיף freshnessBias ל־bounceRate יציב, ואז קובע tone לפי ספים קבועים."
+              mechanismDetails={[
+                "critical כאשר bounceRate גבוה מ־70 או daysSinceUpdate גבוה מ־90.",
+                "watch כאשר bounceRate גבוה מ־60 או daysSinceUpdate גבוה מ־45.",
+                "ok כאשר המאמר מתחת לשני הספים הללו."
+              ]}
+            >
+              <div class="mb-4 space-y-3">
+                <HelpText text="מקרא צבעים: אדום מצביע על נטישה גבוהה או על תוכן ישן, אפור מצביע על אזור מעקב, וירוק מצביע על תוכן יציב. הרשימה עצמה כבר ממוינת כך שהפריטים הדחופים נמצאים קודם." />
+                <div class="flex flex-wrap gap-2 text-xs">
+                  <span class="inline-flex items-center rounded-full border-[0.5px] border-[rgba(212,43,43,0.18)] bg-[rgba(212,43,43,0.08)] px-3 py-1 font-medium text-[#D42B2B] dark:border-[rgba(212,43,43,0.22)] dark:bg-[rgba(212,43,43,0.12)] dark:text-[#ff8a8a]">אדום: bounceRate מעל 70 או יותר מ־90 ימים</span>
+                  <span class="inline-flex items-center rounded-full border-[0.5px] border-[rgba(26,26,26,0.1)] bg-[rgba(26,26,26,0.04)] px-3 py-1 font-medium text-[#1A1A1A]/72 dark:border-[rgba(250,250,248,0.12)] dark:bg-[rgba(255,255,255,0.05)] dark:text-[#FAFAF8]/72">אפור: bounceRate מעל 60 או יותר מ־45 ימים</span>
+                  <span class="inline-flex items-center rounded-full border-[0.5px] border-[rgba(5,150,105,0.18)] bg-[rgba(5,150,105,0.08)] px-3 py-1 font-medium text-[rgb(5,120,90)] dark:border-[rgba(16,185,129,0.2)] dark:bg-[rgba(16,185,129,0.12)] dark:text-[rgb(110,231,183)]">ירוק: כל השאר</span>
                 </div>
-              </td>
-              <td class="px-4 py-4 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">{row.updatedLabel}</td>
-              <td class="px-4 py-4">
-                <div class="flex flex-col items-end gap-2">
-                  <button
-                    type="button"
-                    class="nm-preview-schema-btn inline-flex items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-white px-4 py-2 text-xs font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]"
-                    data-preview-key={row.previewKey}
-                  >
-                    Preview Schema
-                  </button>
-                  <a
-                    href={row.generatorHref}
-                    class="inline-flex items-center rounded-full bg-[var(--nm-accent)] px-4 py-2 text-xs font-semibold text-white transition hover:bg-[var(--nm-accent-hover)]"
-                  >
-                    עריכה ב-Generator
-                  </a>
-                </div>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+              </div>
+              <ContentHealthWidget client:load items={contentHealthItems} />
+            </DashboardCard>
+          </section>
 
-    <section class="space-y-4 rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/92 p-5 shadow-[0_24px_70px_rgba(26,26,26,0.06)]">
-      <header class="space-y-2">
-        <p class="text-sm font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">Insight Gaps</p>
-        <h2 class="text-2xl font-semibold text-[var(--nm-fg)]">מה הקהל מחפש ולא מוצא</h2>
-      </header>
+          <section id="access" class="space-y-4">
+            <div class="rounded-[32px] border-[0.5px] border-[rgba(26,26,26,0.1)] bg-white/84 p-5 shadow-[0_24px_70px_rgba(26,26,26,0.05)] dark:border-[rgba(250,250,248,0.12)] dark:bg-[rgba(255,255,255,0.05)]">
+              <div class="mb-4 space-y-2">
+                <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#D42B2B] dark:text-[#ff8a8a]">ניהול גישה</p>
+                <h2 class="text-2xl font-semibold text-[#1A1A1A] dark:text-[#FAFAF8]">Club Admin</h2>
+                <HelpText text="למה: אזור הגישה נשאר תפעולי גם בזמן ריפקטור. איך: ה־panel הקיים ממשיך לעבוד מול worker ו־proxy, והדשבורד החדש עוטף אותו עם שפה ברורה יותר מבלי לשנות את פעולות הליבה." />
+              </div>
+              <ClubAdminPanel />
+            </div>
+          </section>
 
-      <p id="insight-gaps-empty" class:list={["text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_65%,var(--nm-bg))]", searchGaps.length > 0 && "hidden"]}>
-        עדיין אין פערי חיפוש מתועדים. כשמשתמש יחפש בלי תוצאות, המונח יופיע כאן אוטומטית.
-      </p>
+          <section id="image-automation">
+            <DashboardCard
+              eyebrow="תוכן ומאמרים"
+              title="Image Automation"
+              description="המרה מסודרת ל־webp, שם קובץ נקי, ונתיב אחיד ל־assets/images בלי תלות בכתיבה בזמן ריצה."
+              helpText="למה: זו נקודת הכניסה לעריכת תמונות בלי תקלות שם קובץ, בלי פורמטים כפולים, ובלי חיפוש ידני אחרי assets. מה קורה אחר כך: הנתיב שחוזר מהסקריפט יכול להיכנס ישירות ל־content או ל־Generator."
+            >
+              <ImageAutomationGuide />
+            </DashboardCard>
+          </section>
 
-      <div id="insight-gaps-table-wrap" class:list={["overflow-x-auto", searchGaps.length === 0 && "hidden"]}>
-        <table class="min-w-full text-right">
-          <thead class="border-b border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)]">
-            <tr class="text-sm font-semibold text-[color-mix(in_srgb,var(--nm-fg)_75%,var(--nm-bg))]">
-              <th class="px-4 py-3">מילת חיפוש</th>
-              <th class="px-4 py-3">כמות פעמים</th>
-              <th class="px-4 py-3">תאריך אחרון</th>
-              <th class="px-4 py-3">Actions</th>
-            </tr>
-          </thead>
-          <tbody id="insight-gaps-body">
-            {searchGaps.map((row) => (
-              <tr class="border-b border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] text-sm">
-                <td class="px-4 py-3 font-semibold text-[var(--nm-fg)]">{row.query}</td>
-                <td class="px-4 py-3 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">{row.count}</td>
-                <td class="px-4 py-3 text-[color-mix(in_srgb,var(--nm-fg)_66%,var(--nm-bg))]">
-                  {new Intl.DateTimeFormat("he-IL", { year: "numeric", month: "2-digit", day: "2-digit" }).format(
-                    new Date(row.lastSeen || Date.now())
-                  )}
-                </td>
-                <td class="px-4 py-3">
-                  <a
-                    href={`/admin/generator/?title=${encodeURIComponent(row.query)}`}
-                    class="inline-flex items-center rounded-full bg-[var(--nm-accent)] px-4 py-2 text-xs font-semibold text-white transition hover:bg-[var(--nm-accent-hover)]"
-                  >
-                    צור מאמר בנושא
-                  </a>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </section>
-  </section>
-
-  <dialog
-    id="nm-schema-preview-dialog"
-    class="fixed inset-0 z-[200] max-h-[90vh] w-[min(100%,42rem)] max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-[var(--nm-bg-canvas)] p-0 text-right shadow-2xl backdrop:bg-black/40 open:top-1/2 open:left-1/2"
-  >
-    <div class="max-h-[90vh] overflow-auto p-5">
-      <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <h2 class="text-lg font-semibold text-[var(--nm-fg)]">Preview Schema</h2>
-        <div class="flex flex-wrap items-center justify-end gap-2">
-          <button
-            type="button"
-            class="inline-flex items-center rounded-full bg-[var(--nm-accent)] px-4 py-2 text-xs font-semibold text-white transition hover:bg-[var(--nm-accent-hover)]"
-            data-rich-results-copy
-          >
-            Copy to Rich Results Tester
-          </button>
-          <button
-            type="button"
-            class="rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-4 py-2 text-sm font-semibold text-[var(--nm-fg)]"
-            data-schema-preview-close
-          >
-            סגור
-          </button>
+          <section id="settings">
+            <DashboardCard
+              eyebrow="הגדרות מערכת"
+              title="Cloudflare Notes"
+              description="הקשחות שצריך להשלים בדשבורד של Cloudflare כדי לשמור על סביבת ניהול סגורה ונקייה מאינדוקס."
+              helpText="למה: גם UI נקי צריך גבולות מערכת ברורים. איך: Access, noindex ו־Full strict הם השכבות ששומרות על הדשבורד פרטי, מאובטח ויציב."
+            >
+              <SystemSettingsPanel />
+            </DashboardCard>
+          </section>
         </div>
       </div>
-      <p id="nm-rich-results-hint" class="mb-3 text-xs text-[color-mix(in_srgb,var(--nm-fg)_58%,var(--nm-bg))]" aria-live="polite"></p>
-      <p class="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--nm-accent)]">JSON-LD Article</p>
-      <pre
-        id="nm-schema-preview-ld"
-        class="mb-6 max-h-[40vh] overflow-auto rounded-xl bg-[var(--nm-surface-muted)] p-4 text-left text-xs leading-relaxed text-[var(--nm-fg)] whitespace-pre-wrap"
-      />
-      <p class="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--nm-accent)]">TruthBlock / שדות</p>
-      <div id="nm-schema-preview-truth" class="space-y-2 rounded-xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/80 p-4 text-sm text-[var(--nm-fg)]" />
-    </div>
-  </dialog>
+    </main>
+  </div>
 
   <script>
     import "../../scripts/admin-dashboard.js";
-  </script>
-
-  <script is:inline id="nm-dashboard-schema-pack" type="application/json" set:html={previewPackJson} />
-
-  <script is:inline>
-    document.addEventListener("astro:page-load", async () => {
-      const packEl = document.getElementById("nm-dashboard-schema-pack");
-      const dialog = document.getElementById("nm-schema-preview-dialog");
-      const preLd = document.getElementById("nm-schema-preview-ld");
-      const truthBox = document.getElementById("nm-schema-preview-truth");
-      const closeBtn = document.querySelector("[data-schema-preview-close]");
-      const richResultsCopyBtn = document.querySelector("[data-rich-results-copy]");
-      const richResultsHint = document.getElementById("nm-rich-results-hint");
-
-      let previewMap = {};
-      /** @type {Record<string, unknown> | null} */
-      let lastArticleJsonLd = null;
-
-      const buildRichResultsPasteHtml = (jsonLd) => {
-        const json = JSON.stringify(jsonLd);
-        const closeLd = "\u003c/script\u003e";
-        return `<!DOCTYPE html>
-<html lang="he">
-<head><meta charset="utf-8"><title>NeverMind schema</title></head>
-<body>
-<script type="application/ld+json">
-${json}
-${closeLd}
-</body>
-</html>`;
-      };
-      if (packEl?.textContent) {
-        try {
-          const arr = JSON.parse(packEl.textContent);
-          if (Array.isArray(arr)) {
-            previewMap = Object.fromEntries(arr.map((item) => [item.key, item]));
-          }
-        } catch {
-          previewMap = {};
-        }
-      }
-
-      const openPreview = (key) => {
-        const row = previewMap[key];
-        if (!row || !(dialog instanceof HTMLDialogElement) || !(preLd instanceof HTMLElement) || !(truthBox instanceof HTMLElement)) return;
-        lastArticleJsonLd = row.jsonLd && typeof row.jsonLd === "object" ? row.jsonLd : null;
-        if (richResultsHint) richResultsHint.textContent = "";
-        preLd.textContent = JSON.stringify(row.jsonLd, null, 2);
-        const q = row.truth?.questionForSchema || "";
-        const o = row.truth?.originalInsight || "";
-        truthBox.replaceChildren();
-        const line = (label, val) => {
-          const p = document.createElement("p");
-          const s = document.createElement("span");
-          s.className = "font-semibold";
-          s.textContent = label + " ";
-          p.appendChild(s);
-          p.appendChild(document.createTextNode(val || "—"));
-          return p;
-        };
-        truthBox.appendChild(line("questionForSchema:", q));
-        truthBox.appendChild(line("originalInsight:", o));
-        dialog.showModal();
-      };
-
-      document.querySelectorAll(".nm-preview-schema-btn").forEach((btn) => {
-        btn.addEventListener("click", () => {
-          const key = btn.getAttribute("data-preview-key") || "";
-          openPreview(key);
-        });
-      });
-
-      closeBtn?.addEventListener("click", () => {
-        if (dialog instanceof HTMLDialogElement) dialog.close();
-      });
-
-      richResultsCopyBtn?.addEventListener("click", async () => {
-        if (!lastArticleJsonLd) {
-          if (richResultsHint) richResultsHint.textContent = "אין JSON-LD טעון. פתח תחילה Preview Schema למאמר.";
-          return;
-        }
-        const html = buildRichResultsPasteHtml(lastArticleJsonLd);
-        try {
-          await navigator.clipboard.writeText(html);
-          window.open("https://search.google.com/test/rich-results", "_blank", "noopener,noreferrer");
-          if (richResultsHint) {
-            richResultsHint.textContent =
-              "הועתק HTML מלא. בכלי של גוגל: בחר Code (לא URL), הדבק, הרץ בדיקה.";
-          }
-        } catch {
-          window.open("https://search.google.com/test/rich-results", "_blank", "noopener,noreferrer");
-          if (richResultsHint) {
-            richResultsHint.textContent =
-              "לא ניתן להעתיק אוטומטית. פתח את הכלי, בחר Code, והעתק ידנית את תוכן ה-JSON-LD מהחלון.";
-          }
-        }
-      });
-
-      const tableBody = document.getElementById("insight-gaps-body");
-      const emptyState = document.getElementById("insight-gaps-empty");
-      const tableWrap = document.getElementById("insight-gaps-table-wrap");
-      const purgeBtn = document.getElementById("nm-purge-cache-btn");
-      const purgeState = document.getElementById("nm-purge-cache-state");
-      const uptimeStatus = document.getElementById("nm-uptime-status");
-
-      const setUptime = (ok) => {
-        if (!(uptimeStatus instanceof HTMLElement)) return;
-        const dot = uptimeStatus.querySelector("[data-uptime-dot]");
-        const text = uptimeStatus.querySelector("[data-uptime-text]");
-        if (dot instanceof HTMLElement) {
-          dot.classList.toggle("bg-emerald-500", ok);
-          dot.classList.toggle("bg-red-500", !ok);
-          dot.classList.remove("bg-gray-400");
-        }
-        if (text instanceof HTMLElement) {
-          text.textContent = ok ? "האתר מגיב" : "האתר לא מגיב";
-        }
-      };
-
-      const checkUptime = async () => {
-        try {
-          const res = await fetch("/", { method: "HEAD", cache: "no-store" });
-          setUptime(res.ok);
-        } catch {
-          setUptime(false);
-        }
-      };
-
-      if (purgeBtn instanceof HTMLButtonElement && purgeState instanceof HTMLElement) {
-        purgeBtn.addEventListener("click", async () => {
-          purgeBtn.disabled = true;
-          purgeState.textContent = "מנקה...";
-          try {
-            const response = await fetch("/api/admin/purge-cache", { method: "POST", headers: { accept: "application/json" } });
-            const payload = await response.json().catch(() => null);
-            if (!response.ok || !payload?.ok) throw new Error("purge failed");
-            purgeState.textContent = "נקי";
-          } catch {
-            purgeState.textContent = "שגיאה";
-          } finally {
-            purgeBtn.disabled = false;
-          }
-        });
-      }
-
-      const psiBtn = document.getElementById("nm-psi-btn");
-      const psiStatus = document.getElementById("nm-psi-status");
-      const psiResult = document.getElementById("nm-psi-result");
-      const psiCfg = document.getElementById("nm-psi-config");
-      const psiSiteUrl = psiCfg?.getAttribute("data-site-url")?.trim() || "https://www.nevermind.co.il";
-
-      const fillPsiResult = (el, payload) => {
-        if (!(el instanceof HTMLElement)) return;
-        el.replaceChildren();
-        const perf = payload?.performanceScore;
-        const warn = typeof perf === "number" && perf < 95;
-        const scoreP = document.createElement("p");
-        scoreP.className = warn
-          ? "text-lg font-semibold text-red-700"
-          : "text-lg font-semibold text-[var(--nm-fg)]";
-        scoreP.textContent =
-          typeof perf === "number" ? `ציון ביצועים (מובייל): ${perf}` : "ציון ביצועים: לא זמין";
-        el.appendChild(scoreP);
-        const addLine = (label, val) => {
-          const p = document.createElement("p");
-          p.className = "text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))]";
-          p.textContent = `${label}: ${val}`;
-          el.appendChild(p);
-        };
-        const ms = (n) => (typeof n === "number" && Number.isFinite(n) ? `${n} ms` : "—");
-        const num = (n, d) => {
-          if (typeof n !== "number" || !Number.isFinite(n)) return "—";
-          if (d != null) return String(Math.round(n * 10 ** d) / 10 ** d);
-          return String(n);
-        };
-        addLine("LCP", ms(payload?.lcpMs));
-        addLine("CLS", num(payload?.cls, 3));
-        addLine("TBT", ms(payload?.tbtMs));
-        if (payload?.inpMs != null) addLine("INP", ms(payload.inpMs));
-        const t = document.createElement("p");
-        t.className = "text-xs text-[color-mix(in_srgb,var(--nm-fg)_56%,var(--nm-bg))]";
-        t.textContent = `URL: ${String(payload?.url || psiSiteUrl)}`;
-        el.appendChild(t);
-      };
-
-      if (psiBtn instanceof HTMLButtonElement && psiStatus instanceof HTMLElement && psiResult instanceof HTMLElement) {
-        psiBtn.addEventListener("click", async () => {
-          psiBtn.disabled = true;
-          psiStatus.textContent = "בודק...";
-          psiResult.classList.add("hidden");
-          try {
-            const q = new URLSearchParams({ url: psiSiteUrl, strategy: "mobile" });
-            const response = await fetch(`/api/admin/psi?${q.toString()}`, {
-              headers: { accept: "application/json" },
-              cache: "no-store",
-            });
-            const payload = await response.json().catch(() => null);
-            if (!response.ok || !payload?.ok) {
-              const err = payload && typeof payload.error === "string" ? payload.error : "שגיאה";
-              psiStatus.textContent = err.length > 120 ? `${err.slice(0, 120)}…` : err;
-              return;
-            }
-            fillPsiResult(psiResult, payload);
-            psiResult.classList.remove("hidden");
-            const fetched = payload?.fetchedAt ? new Date(String(payload.fetchedAt)) : null;
-            const stamp =
-              fetched && !Number.isNaN(fetched.getTime())
-                ? new Intl.DateTimeFormat("he-IL", {
-                    year: "numeric",
-                    month: "2-digit",
-                    day: "2-digit",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  }).format(fetched)
-                : "";
-            psiStatus.textContent = stamp ? `עודכן ${stamp}` : "הושלם";
-          } catch {
-            psiStatus.textContent = "שגיאת רשת או תגובה לא תקינה.";
-          } finally {
-            psiBtn.disabled = false;
-          }
-        });
-      }
-
-      void checkUptime();
-      window.setInterval(checkUptime, 60000);
-
-      try {
-        const response = await fetch("/api/log-search-gap", { headers: { accept: "application/json" } });
-        if (!response.ok) return;
-        const payload = await response.json();
-        const rows = Array.isArray(payload?.rows) ? payload.rows : [];
-
-        if (!rows.length) {
-          if (emptyState) emptyState.classList.remove("hidden");
-          if (tableWrap) tableWrap.classList.add("hidden");
-          return;
-        }
-
-        if (emptyState) emptyState.classList.add("hidden");
-        if (tableWrap) tableWrap.classList.remove("hidden");
-        if (!(tableBody instanceof HTMLElement)) return;
-
-        const formatDate = (value) => {
-          const date = new Date(value);
-          if (Number.isNaN(date.getTime())) return "לא זמין";
-          return new Intl.DateTimeFormat("he-IL", { year: "numeric", month: "2-digit", day: "2-digit" }).format(date);
-        };
-
-        tableBody.innerHTML = rows
-          .map((row) => {
-            const query = String(row?.query || "").trim();
-            const count = Number(row?.count) > 0 ? Number(row.count) : 1;
-            const lastSeen = formatDate(row?.lastSeen);
-            const href = `/admin/generator/?title=${encodeURIComponent(query)}`;
-            return `
-              <tr class="border-b border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] text-sm">
-                <td class="px-4 py-3 font-semibold text-[var(--nm-fg)]">${query}</td>
-                <td class="px-4 py-3 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">${count}</td>
-                <td class="px-4 py-3 text-[color-mix(in_srgb,var(--nm-fg)_66%,var(--nm-bg))]">${lastSeen}</td>
-                <td class="px-4 py-3">
-                  <a href="${href}" class="inline-flex items-center rounded-full bg-[var(--nm-accent)] px-4 py-2 text-xs font-semibold text-white transition hover:bg-[var(--nm-accent-hover)]">
-                    צור מאמר בנושא
-                  </a>
-                </td>
-              </tr>
-            `;
-          })
-          .join("");
-      } catch {
-        // keep static fallback table/empty state
-      }
-    });
   </script>
 </Layout>

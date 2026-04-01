@@ -1,0 +1,70 @@
+﻿---
+import HelpText from "./HelpText.astro";
+import MechanismCard from "./MechanismCard.astro";
+import StepIndicator from "./StepIndicator.astro";
+
+const imageSteps = [
+  {
+    label: "Link Input",
+    detail: "הסקריפט מקבל URL חיצוני או נתיב קובץ מקומי.",
+  },
+  {
+    label: "WebP Conversion",
+    detail: "Sharp מסובב לפי metadata וממיר ל־webp באיכות מבוקרת.",
+  },
+  {
+    label: "Sanitized Renaming",
+    detail: "השם עובר slugify כדי לייצר קובץ נקי ויציב.",
+  },
+  {
+    label: "Assets Storage",
+    detail: "הפלט נשמר תחת public/assets/images לפי folder שנבחר.",
+  },
+];
+---
+
+<div class="space-y-4">
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <HelpText text="למה: הזרימה הזו מונעת שמות קבצים מבולגנים ושומרת על נתיב אחיד ל־assets. איך: מזינים קישור או קובץ, מריצים את הסקריפט, ומקבלים חזרה publicPath מוכן לשימוש ב־Generator או ב־frontmatter." />
+    <MechanismCard
+      title="מאחורי הקלעים של ההמרה"
+      summary="הסקריפט scripts/import-dashboard-image.mjs קורא buffer, ממיר דרך Sharp, בודק התנגשות שם קובץ, ושומר את הפלט ל־public/assets/images."
+      details={[
+        "אם קיים כבר קובץ באותו שם, מתווסף suffix קצר כדי למנוע דריסה.",
+        "ההמרה לא רצה בפרודקשן על Pages כי סביבת הריצה שם סטטית וללא כתיבה לדיסק.",
+      ]}
+    />
+  </div>
+
+  <StepIndicator steps={imageSteps} />
+
+  <div class="grid gap-4 lg:grid-cols-[minmax(0,1fr)_20rem]">
+    <div class="space-y-4">
+      <div class="rounded-[24px] border-[0.5px] border-[rgba(26,26,26,0.1)] bg-[#FAFAF8] p-4 dark:border-[rgba(250,250,248,0.12)] dark:bg-[rgba(255,255,255,0.03)]">
+        <p class="text-sm font-semibold text-[#1A1A1A] dark:text-[#FAFAF8]">Pipeline מקומי ל־images</p>
+        <HelpText text="למה: אין כתיבה לדיסק בזמן ריצה ב־Cloudflare Pages. מה קורה: הסקריפט רץ מקומית, מבצע המרה, ומחזיר נתיב מוכן לעבודה." class="mt-2" />
+      </div>
+
+      <div class="rounded-[24px] border-[0.5px] border-[rgba(26,26,26,0.1)] bg-white p-4 dark:border-[rgba(250,250,248,0.12)] dark:bg-[rgba(255,255,255,0.04)]">
+        <p class="text-sm font-semibold text-[#1A1A1A] dark:text-[#FAFAF8]">איך מריצים</p>
+        <div class="mt-3 space-y-3 text-sm text-[#1A1A1A]/62 dark:text-[#FAFAF8]/64">
+          <p>מתמונה מקומית</p>
+          <pre class="overflow-x-auto rounded-[18px] bg-[#1A1A1A] p-4 text-left text-xs leading-6 text-[#FAFAF8]"><code>node scripts/import-dashboard-image.mjs --input "C:\\path\\image.jpg" --title "Article Cover" --folder articles</code></pre>
+          <p>מקישור חיצוני</p>
+          <pre class="overflow-x-auto rounded-[18px] bg-[#1A1A1A] p-4 text-left text-xs leading-6 text-[#FAFAF8]"><code>node scripts/import-dashboard-image.mjs --url "https://example.com/image.png" --title "Article Cover" --folder articles</code></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="rounded-[24px] border-[0.5px] border-[rgba(26,26,26,0.1)] bg-white p-4 dark:border-[rgba(250,250,248,0.12)] dark:bg-[rgba(255,255,255,0.04)]">
+      <p class="text-sm font-semibold text-[#1A1A1A] dark:text-[#FAFAF8]">פלט שמוחזר</p>
+      <HelpText text="מה קורה אחר כך: ה־publicPath נכנס ישירות ל־content או ל־Generator, וה־resolveArticleHeroImage יודע לחפש קודם בנתיב החדש הזה." class="mt-2" />
+      <pre class="mt-3 overflow-x-auto rounded-[18px] bg-[#FAFAF8] p-4 text-left text-xs leading-6 text-[#1A1A1A] dark:bg-[rgba(255,255,255,0.04)] dark:text-[#FAFAF8]"><code>{`{
+  "ok": true,
+  "publicPath": "/assets/images/articles/article-cover.webp",
+  "diskPath": "public/assets/images/articles/article-cover.webp",
+  "filename": "article-cover.webp"
+}`}</code></pre>
+    </div>
+  </div>
+</div>

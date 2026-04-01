@@ -1,67 +1,11 @@
----
-import { getCollection } from "astro:content";
+﻿---
 import Layout from "../../layouts/Layout.astro";
-import ServiceCard from "../../components/ServiceCard.astro";
-import MePersonalDashboard from "../../components/me/MePersonalDashboard";
 import appConfig from "../../config/appConfig.json";
-import { findServiceById, type FlatService } from "../../lib/services";
-
-const articleEntries = await getCollection("articles", ({ data }) => !data.draft);
-const sortedUnlock = articleEntries.sort((a, b) => {
-  const da = a.data.updatedDate ?? a.data.pubDate;
-  const db = b.data.updatedDate ?? b.data.pubDate;
-  return db.getTime() - da.getTime();
-});
-const dashboardArticles = sortedUnlock.map((e) => ({
-  slug: e.slug,
-  title: e.data.title,
-  pubDate: e.data.pubDate.toISOString(),
-  tags: e.data.tags ?? [],
-  difficultyLevel: e.data.difficultyLevel,
-}));
-const totalPublished = articleEntries.length;
-
-const portalAccess = findServiceById("portal-access");
-const phonePerspective = findServiceById("phone-perspective");
-
-const fallbackPortalAccess = ({
-  id: "portal-access",
-  title: "מנוי ארכיון NeverMind",
-  subtitle: "גישה מלאה · קצב שלך",
-  description:
-    "גישה לכל המאמרים והסרטונים - כולל הפודקאסט המלא. יותר מ-12,000 שעות שפותחות הכל: יחסים, אהבה, פחדים ומה שקורה באמת.",
-  price_full: 175,
-  payment_flow: "direct",
-  payment_link: "https://mrng.to/by3pWXMyqz",
-  payment_cta: "הצטרפות (175 ₪/חודש)",
-  action_type: "payment",
-  action_text: "הצטרפות (175 ₪/חודש)",
-  visible: true,
-  badges: ["מנוי הארכיון"],
-  features: [],
-  stageName: "אזור אישי",
-  targetAudience: "מי שרוצה ללמוד בקצב שלו",
-} as unknown as FlatService);
-
-const fallbackPhonePerspective = ({
-  id: "phone-perspective",
-  title: "שיחת מיקוד 20 דקות",
-  subtitle: "שיחה קצרה כדי לראות מה נכון עכשיו",
-  description: "מדברים קצר. מבינים מה באמת קורה. נכנסים לצעד הבא בלי בלבול.",
-  price_full: 450,
-  action_type: "whatsapp",
-  action_text: "אני רוצה להתקדם",
-  visible: true,
-  badges: [],
-  features: [],
-  stageName: "אזור אישי",
-  targetAudience: "מי שצריך בהירות מהירה",
-} as unknown as FlatService);
-
-const archiveCard = portalAccess
-  ? { ...portalAccess, title: "למידה עצמאית", badges: ["מנוי הארכיון"] }
-  : fallbackPortalAccess;
-const consultationCard = phonePerspective ?? fallbackPhonePerspective;
+import AccountVitalsCard from "../../components/me/unlock/AccountVitalsCard.astro";
+import CookieConsentBar from "../../components/me/unlock/CookieConsentBar.astro";
+import NavigationGrid from "../../components/me/unlock/NavigationGrid.astro";
+import PwaInstallCard from "../../components/me/unlock/PwaInstallCard.astro";
+import SecurityBadge from "../../components/me/unlock/SecurityBadge.astro";
 
 const whatsAppNumber =
   import.meta.env.PUBLIC_WHATSAPP_NUMBER ||
@@ -72,118 +16,255 @@ const validCodesRaw =
   import.meta.env.NEXT_PUBLIC_DASHBOARD_CODES ||
   "";
 const whatsAppDigits = String(whatsAppNumber || "").replace(/\D/g, "");
+const ga4Enabled = Boolean(
+  String(import.meta.env.PUBLIC_GA_MEASUREMENT_ID || import.meta.env.GA4_MEASUREMENT_ID || "").trim(),
+);
+
+const previewItems = [
+  {
+    id: "library",
+    href: "/library/",
+    label: "Library",
+    description: "ספריית תוכן שקטה לקריאה ממושכת.",
+    premium: true,
+    locked: true,
+  },
+  {
+    id: "articles",
+    href: "/articles/",
+    label: "Articles",
+    description: "מעבר ישיר למאמרים ולעדכונים האחרונים.",
+    premium: false,
+    locked: false,
+  },
+  {
+    id: "depth",
+    href: "/me/learning/",
+    label: "Depth",
+    description: "רצף למידה אישי ומעקב על התקדמות.",
+    premium: true,
+    locked: true,
+  },
+  {
+    id: "contact",
+    href: `https://wa.me/${whatsAppDigits}`,
+    label: "Contact",
+    description: "ערוץ ישיר להבהרה קצרה כשצריך.",
+    premium: false,
+    locked: false,
+  },
+];
+
+const authorizedItems = previewItems.map((item) => ({
+  ...item,
+  locked: item.premium ? false : item.locked,
+}));
 ---
 
-<Layout title="לוח בקרה | אזור אישי" description="סיכום קריאה, המלצות ויומן תובנות. הנתונים נשמרים במכשיר וחלקם בשרת כשיש מועדון פעיל." noIndex={true}>
-  <div class="min-h-[70vh]" style="background-color: #FAFAF8; color: #1A1A1A;">
-    <section class="mx-auto max-w-4xl space-y-12 px-4 py-12 md:py-16">
-      <p class="text-right text-sm font-medium" style="color: rgba(26, 26, 26, 0.55);">
-        <a href="/me/" class="font-semibold underline underline-offset-4" style="color: #1A1A1A;">חזרה לאזור האישי</a>
-      </p>
+<Layout title="פורטל פרימיום" description="כניסה אישית לפורטל הפרימיום של NeverMind" noIndex={true}>
+  <div class="unlock-portal min-h-screen bg-[#FAFAF8] text-[#1A1A1A] dark:bg-[#1A1A1A] dark:text-[#FAFAF8]">
+    <section class="mx-auto max-w-6xl px-4 pb-24 pt-10 md:px-6 md:pt-14">
+      <div class="grid gap-6 lg:grid-cols-[minmax(0,1.2fr)_22rem] lg:items-start">
+        <div class="space-y-6">
+          <div class="unlock-fade rounded-[32px] border-[0.5px] border-[rgba(26,26,26,0.1)] bg-white/72 p-6 shadow-[0_24px_60px_rgba(26,26,26,0.05)] backdrop-blur-md dark:border-[rgba(250,250,248,0.12)] dark:bg-[rgba(255,255,255,0.05)]">
+            <div class="space-y-4 text-right">
+              <a href="/me/" class="inline-flex text-sm text-[rgba(26,26,26,0.58)] underline underline-offset-4 dark:text-[rgba(250,250,248,0.62)]">
+                חזרה לאזור האישי
+              </a>
+              <SecurityBadge />
+              <div class="space-y-3">
+                <p class="text-xs tracking-[0.18em] text-[rgba(26,26,26,0.42)] dark:text-[rgba(250,250,248,0.46)]">PREMIUM ENTRY PORTAL</p>
+                <h1 class="text-[clamp(2rem,1.5rem+2vw,3.4rem)] font-semibold leading-tight tracking-[-0.03em]">
+                  כניסה מדויקת לפורטל הפרימיום
+                </h1>
+                <p class="max-w-3xl text-[clamp(1rem,0.96rem+0.2vw,1.08rem)] leading-8 text-[rgba(26,26,26,0.68)] dark:text-[rgba(250,250,248,0.66)]">
+                  כאן נכנסים עם קוד אישי, עוברים ישירות לנכסים שלך, ושומרים את החוויה נקייה, מהירה ושקטה.
+                </p>
+              </div>
+            </div>
+          </div>
 
-      <div
-        id="unlock-unauthorized"
-        class="space-y-10 rounded-[1.5rem] border px-6 py-10 text-right md:px-10"
-        style="border-color: rgba(26, 26, 26, 0.1); background: #fff;"
-      >
-        <header class="space-y-4">
-          <p class="text-sm font-medium" style="color: rgba(26, 26, 26, 0.55);">כניסה</p>
-          <h1 class="text-[clamp(2rem,1.6rem+2vw,3.2rem)] font-semibold leading-tight tracking-tight" style="color: #1A1A1A;">המפתח שלך</h1>
-          <p class="text-[clamp(1.05rem,1rem+0.2vw,1.15rem)] leading-relaxed" style="color: rgba(26, 26, 26, 0.72);">
-            כאן הכל נהיה פשוט
-          </p>
-        </header>
+          <section id="unlock-gate" class="unlock-fade rounded-[32px] border-[0.5px] border-[rgba(26,26,26,0.1)] bg-white/76 p-6 shadow-[0_24px_60px_rgba(26,26,26,0.05)] backdrop-blur-md dark:border-[rgba(250,250,248,0.12)] dark:bg-[rgba(255,255,255,0.05)]" style="animation-delay: 80ms;">
+            <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_17rem] lg:items-end">
+              <div class="space-y-4 text-right">
+                <div class="space-y-2">
+                  <p class="text-sm text-[rgba(26,26,26,0.48)] dark:text-[rgba(250,250,248,0.5)]">כניסה</p>
+                  <h2 class="text-2xl font-semibold">הקוד האישי שלך</h2>
+                  <p class="text-sm leading-7 text-[rgba(26,26,26,0.62)] dark:text-[rgba(250,250,248,0.62)]">
+                    הקוד נשמר רק על המכשיר שלך. אם הקוד תקין, הפורטל נפתח מיד בלי מעבר נוסף.
+                  </p>
+                </div>
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
+                  <input
+                    id="unlock-code-input"
+                    type="password"
+                    autocomplete="off"
+                    placeholder="הכנס קוד אישי"
+                    class="min-h-[52px] w-full rounded-full border-[0.5px] border-[rgba(26,26,26,0.12)] bg-[#FAFAF8] px-5 text-right text-base text-[#1A1A1A] outline-none transition placeholder:text-[rgba(26,26,26,0.34)] focus:border-[rgba(212,43,43,0.2)] dark:border-[rgba(250,250,248,0.14)] dark:bg-[rgba(255,255,255,0.04)] dark:text-[#FAFAF8] dark:placeholder:text-[rgba(250,250,248,0.32)] dark:focus:border-[rgba(212,43,43,0.26)]"
+                  />
+                  <button
+                    id="unlock-enter"
+                    type="button"
+                    class="inline-flex min-h-[52px] items-center justify-center rounded-full border-[0.5px] border-[rgba(26,26,26,0.12)] px-6 text-sm font-medium text-[#1A1A1A] transition hover:border-[rgba(212,43,43,0.2)] dark:border-[rgba(250,250,248,0.14)] dark:text-[#FAFAF8] dark:hover:border-[rgba(212,43,43,0.25)]"
+                  >
+                    כניסה
+                  </button>
+                </div>
+                <p id="unlock-error" class="hidden text-sm text-[#D42B2B] dark:text-[#ff8a8a]">
+                  הקוד לא זוהה. אפשר לעבור ל־WhatsApp לבדיקה קצרה.
+                </p>
+              </div>
+              <div class="rounded-[28px] border-[0.5px] border-[rgba(26,26,26,0.08)] bg-[rgba(250,250,248,0.7)] p-4 text-right dark:border-[rgba(250,250,248,0.12)] dark:bg-[rgba(255,255,255,0.04)]">
+                <p class="text-xs tracking-[0.18em] text-[rgba(26,26,26,0.42)] dark:text-[rgba(250,250,248,0.46)]">SESSION</p>
+                <p class="mt-3 text-sm text-[rgba(26,26,26,0.62)] dark:text-[rgba(250,250,248,0.62)]">IP נצפה</p>
+                <p id="unlock-viewer-ip" class="mt-1 font-mono text-sm text-[#1A1A1A] dark:text-[#FAFAF8]">בודק</p>
+                <a id="unlock-wa-link" href={`https://wa.me/${whatsAppDigits}`} class="mt-4 inline-flex text-sm text-[#1A1A1A] underline underline-offset-4 dark:text-[#FAFAF8]">
+                  מעבר ל־WhatsApp
+                </a>
+              </div>
+            </div>
+          </section>
 
-        <ol class="space-y-2 text-[1.03rem] leading-relaxed" style="color: #1A1A1A;">
-          <li>1. מדברים</li>
-          <li>2. משלמים</li>
-          <li>3. נכנסים</li>
-        </ol>
+          <section id="unlock-preview" class="space-y-4">
+            <div class="unlock-fade flex items-end justify-between gap-4 text-right" style="animation-delay: 160ms;">
+              <div>
+                <p class="text-xs tracking-[0.18em] text-[rgba(26,26,26,0.42)] dark:text-[rgba(250,250,248,0.46)]">NAVIGATION</p>
+                <h2 class="mt-2 text-2xl font-semibold">הפורטל שלך</h2>
+              </div>
+              <button id="unlock-logout" type="button" class="hidden text-sm text-[rgba(26,26,26,0.58)] underline underline-offset-4 dark:text-[rgba(250,250,248,0.62)]">
+                יציאה
+              </button>
+            </div>
 
-        <div class="space-y-4">
-          <label for="unlock-code-input" class="block text-sm font-medium" style="color: rgba(26, 26, 26, 0.66);">
-            הקוד האישי שלך
-          </label>
-          <input
-            id="unlock-code-input"
-            type="password"
-            autocomplete="off"
-            placeholder="הכנס את הקוד שקיבלת"
-            class="w-full rounded-full border px-5 py-3 text-right text-[1rem] outline-none transition"
-            style="border-color: rgba(26, 26, 26, 0.16); background: #fff; color: #1A1A1A;"
-          />
-          <button
-            id="unlock-enter"
-            type="button"
-            class="inline-flex min-h-[46px] items-center justify-center rounded-full px-8 py-2.5 text-sm font-semibold text-white transition hover:opacity-95"
-            style="background-color: #0F172A;"
-          >
-            כניסה
-          </button>
-          <p id="unlock-error" class="hidden text-sm" style="color: #0F172A;">
-            <a
-              id="unlock-wa-link"
-              href={`https://wa.me/${whatsAppDigits}`}
-              class="underline underline-offset-4"
-            >
-              הקוד לא נכון. בוא נדבר בוואטסאפ
-            </a>
-          </p>
+            <div id="unlock-nav-preview" class="unlock-fade" style="animation-delay: 220ms;">
+              <NavigationGrid items={previewItems} />
+            </div>
+            <div id="unlock-nav-authorized" class="hidden unlock-fade" style="animation-delay: 220ms;">
+              <NavigationGrid items={authorizedItems} />
+            </div>
+          </section>
         </div>
 
-        <div class="space-y-2 border-t pt-6 text-sm leading-relaxed" style="border-color: rgba(26, 26, 26, 0.1); color: rgba(26, 26, 26, 0.62);">
-          <p>אתה מתחבר מ-IP: <span id="unlock-viewer-ip">בודק</span></p>
-          <p>הקוד אישי. אסור להעביר אותו לאחרים</p>
+        <div class="space-y-6 lg:sticky lg:top-28">
+          <div class="unlock-fade" style="animation-delay: 120ms;">
+            <AccountVitalsCard status="פעיל" lastConnection="ממתין לכניסה" ga4Status={ga4Enabled ? "פעילה" : "לא פעילה"} />
+          </div>
+          <div class="unlock-fade" style="animation-delay: 200ms;">
+            <PwaInstallCard />
+          </div>
         </div>
-      </div>
-
-      <div id="unlock-authorized" class="hidden space-y-10">
-        <MePersonalDashboard client:load articles={dashboardArticles} totalPublished={totalPublished} whatsAppDigits={whatsAppDigits} />
-
-        <nav class="flex flex-wrap justify-end gap-4 text-sm font-medium" style="color: rgba(26, 26, 26, 0.72);" aria-label="קישורים מהירים">
-          <a href="/articles/" class="underline underline-offset-4" style="color: #1A1A1A;">מאמרים</a>
-          <a href="/simulators/" class="underline underline-offset-4" style="color: #1A1A1A;">סימולטורים</a>
-          <a href="/me/learning/" class="underline underline-offset-4" style="color: #1A1A1A;">לוח הלמידה</a>
-          <a href="/me/settings/" class="underline underline-offset-4" style="color: #1A1A1A;">הגדרות</a>
-        </nav>
-
-        <section class="grid gap-6 lg:grid-cols-2">
-          <ServiceCard service={archiveCard} />
-          <ServiceCard service={consultationCard} />
-        </section>
-
-        <button id="unlock-logout" type="button" class="text-sm font-medium underline underline-offset-4" style="color: rgba(26, 26, 26, 0.72);">
-          יציאה
-        </button>
       </div>
     </section>
+
+    <CookieConsentBar />
   </div>
 
-  <script is:inline define:vars={{ whatsAppNumber, validCodesRaw }}>
+  <style>
+    .unlock-portal :global(#nm-cookie-banner),
+    .unlock-portal :global(#nm-pwa-install-root) {
+      display: none !important;
+    }
+
+    .unlock-fade {
+      opacity: 0;
+      transform: translateY(12px);
+      animation: unlock-fade-in 640ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    .unlock-card--locked {
+      filter: grayscale(0.24);
+    }
+
+    .unlock-card--locked::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(250, 250, 248, 0) 0%, rgba(250, 250, 248, 0.08) 100%);
+      pointer-events: none;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .unlock-card--locked::after {
+        background: linear-gradient(180deg, rgba(26, 26, 26, 0) 0%, rgba(26, 26, 26, 0.14) 100%);
+      }
+    }
+
+    @keyframes unlock-fade-in {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .unlock-fade {
+        opacity: 1;
+        transform: none;
+        animation: none;
+      }
+    }
+  </style>
+
+  <script is:inline define:vars={{ whatsAppNumber, validCodesRaw, ga4Enabled }}>
     (() => {
       const storageKey = "nm_access_code";
-      const unauthorized = document.getElementById("unlock-unauthorized");
-      const authorized = document.getElementById("unlock-authorized");
+      const cookieKey = "nm-cookie-consent";
       const input = document.getElementById("unlock-code-input");
       const enterButton = document.getElementById("unlock-enter");
       const errorLine = document.getElementById("unlock-error");
+      const logoutButton = document.getElementById("unlock-logout");
       const waLink = document.getElementById("unlock-wa-link");
-      const logout = document.getElementById("unlock-logout");
-      const viewerIp = document.getElementById("unlock-viewer-ip");
-
+      const ipField = document.getElementById("unlock-viewer-ip");
+      const previewGrid = document.getElementById("unlock-nav-preview");
+      const authorizedGrid = document.getElementById("unlock-nav-authorized");
+      const pwaCard = document.getElementById("unlock-pwa-card");
+      const pwaInstallButton = document.getElementById("unlock-pwa-install");
+      const cookieBar = document.getElementById("unlock-cookie-bar");
+      const cookieAccept = document.getElementById("unlock-cookie-accept");
+      const cookieDecline = document.getElementById("unlock-cookie-decline");
+      const statusField = document.querySelector("[data-vital-status]");
+      const connectionField = document.querySelector("[data-vital-connection]");
+      const ga4Field = document.querySelector("[data-vital-ga4]");
       const number = String(whatsAppNumber || "").trim();
       const validCodes = String(validCodesRaw || "")
         .split(",")
         .map((c) => c.trim())
         .filter(Boolean);
 
-      const params = new URLSearchParams(window.location.search);
-      const returnTo = params.get("returnTo");
+      let installPromptEvent = null;
 
-      const showAuthorized = (on) => {
-        if (!unauthorized || !authorized) return;
-        unauthorized.classList.toggle("hidden", on);
-        authorized.classList.toggle("hidden", !on);
+      const readJson = (key) => {
+        try {
+          const raw = localStorage.getItem(key);
+          return raw ? JSON.parse(raw) : null;
+        } catch {
+          return null;
+        }
+      };
+
+      const formatDateTime = (value) => {
+        const date = new Date(value || "");
+        if (Number.isNaN(date.getTime())) return "ממתין";
+        return date.toLocaleString("he-IL", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+      };
+
+      const hasPremiumSession = () => {
+        const raw = readJson("nm-premium-access");
+        const expiresAt = Date.parse(String(raw?.expiresAt || ""));
+        return Number.isFinite(expiresAt) && expiresAt > Date.now();
+      };
+
+      const readClubSession = () => {
+        if (typeof window.__nmReadClubSession === "function") {
+          return window.__nmReadClubSession();
+        }
+        return readJson("nm_club_session");
       };
 
       const isCodeValid = (value) => {
@@ -193,73 +274,132 @@ const whatsAppDigits = String(whatsAppNumber || "").replace(/\D/g, "");
         return validCodes.includes(clean);
       };
 
+      const setAuthorizedState = (authorized) => {
+        if (previewGrid) previewGrid.classList.toggle("hidden", authorized);
+        if (authorizedGrid) authorizedGrid.classList.toggle("hidden", !authorized);
+        if (logoutButton) logoutButton.classList.toggle("hidden", !authorized);
+        if (statusField instanceof HTMLElement) {
+          statusField.textContent = authorized ? "פעיל" : "ממתין לאימות";
+        }
+      };
+
+      const syncVitals = (authorized) => {
+        const session = readClubSession();
+        if (connectionField instanceof HTMLElement) {
+          connectionField.textContent = authorized
+            ? formatDateTime(session?.lastLoginAt || Date.now())
+            : "ממתין לכניסה";
+        }
+        if (ga4Field instanceof HTMLElement) {
+          ga4Field.textContent = ga4Enabled ? "פעילה" : "לא פעילה";
+        }
+      };
+
+      const syncAccessState = () => {
+        const storedCode = localStorage.getItem(storageKey) || "";
+        const authorized = isCodeValid(storedCode) || hasPremiumSession();
+        setAuthorizedState(authorized);
+        syncVitals(authorized);
+        return authorized;
+      };
+
+      const syncCookieBar = () => {
+        let value = null;
+        try {
+          value = localStorage.getItem(cookieKey);
+        } catch {
+          value = null;
+        }
+        if (!cookieBar) return;
+        cookieBar.classList.toggle("hidden", value === "accepted" || value === "declined");
+      };
+
       const fetchIp = async () => {
-        if (!viewerIp) return;
+        if (!(ipField instanceof HTMLElement)) return;
         try {
-          const res = await fetch("https://api.ipify.org?format=json");
-          const data = await res.json();
-          viewerIp.textContent = data?.ip ? String(data.ip) : "לא זוהה";
+          const response = await fetch("https://api.ipify.org?format=json");
+          const data = await response.json();
+          ipField.textContent = data?.ip ? String(data.ip) : "לא זוהה";
         } catch {
-          viewerIp.textContent = "לא זוהה";
+          ipField.textContent = "לא זוהה";
         }
       };
 
-      const updateWhatsAppLink = () => {
-        if (!waLink || !number) return;
-        const message = "היי, הקוד לא עובד לי. אפשר לבדוק את זה יחד";
-        waLink.setAttribute("href", `https://wa.me/${number.replace(/\D/g, "")}?text=${encodeURIComponent(message)}`);
+      const syncWhatsAppLink = () => {
+        if (!(waLink instanceof HTMLAnchorElement) || !number) return;
+        const message = "היי, הקוד האישי לא זוהה. אפשר לבדוק יחד";
+        waLink.href = `https://wa.me/${number.replace(/\D/g, "")}?text=${encodeURIComponent(message)}`;
       };
 
-      const hasPremiumSession = () => {
+      window.addEventListener("beforeinstallprompt", (event) => {
+        event.preventDefault();
+        installPromptEvent = event;
+        if (pwaCard) pwaCard.classList.remove("hidden");
+      });
+
+      pwaInstallButton?.addEventListener("click", async () => {
+        if (!installPromptEvent) return;
+        installPromptEvent.prompt();
         try {
-          const raw = localStorage.getItem("nm-premium-access");
-          if (!raw) return false;
-          const parsed = JSON.parse(raw);
-          const expiresAt = Date.parse(String(parsed?.expiresAt || ""));
-          return Number.isFinite(expiresAt) && expiresAt > Date.now();
+          await installPromptEvent.userChoice;
         } catch {
-          return false;
+          /* ignore */
         }
-      };
+        installPromptEvent = null;
+        if (pwaCard) pwaCard.classList.add("hidden");
+      });
 
-      const goReturnPath = () => {
-        if (!returnTo) return;
-        if (!returnTo.startsWith("/")) return;
-        window.location.href = returnTo;
-      };
+      cookieAccept?.addEventListener("click", () => {
+        try {
+          localStorage.setItem(cookieKey, "accepted");
+        } catch {
+          /* ignore */
+        }
+        syncCookieBar();
+        window.dispatchEvent(new CustomEvent("nm-cookie-accepted"));
+      });
 
-      const existing = localStorage.getItem(storageKey) || "";
-      const alreadyAuthorized = isCodeValid(existing) || hasPremiumSession();
-      showAuthorized(alreadyAuthorized);
-      if (alreadyAuthorized) {
-        goReturnPath();
-      }
+      cookieDecline?.addEventListener("click", () => {
+        try {
+          localStorage.setItem(cookieKey, "declined");
+        } catch {
+          /* ignore */
+        }
+        syncCookieBar();
+      });
 
-      fetchIp();
-      updateWhatsAppLink();
+      enterButton?.addEventListener("click", () => {
+        const code = String(input instanceof HTMLInputElement ? input.value : "").trim();
+        if (isCodeValid(code)) {
+          localStorage.setItem(storageKey, code);
+          errorLine?.classList.add("hidden");
+          syncAccessState();
+          return;
+        }
+        errorLine?.classList.remove("hidden");
+      });
 
-      if (enterButton && input) {
-        enterButton.addEventListener("click", () => {
-          const code = String(input.value || "").trim();
-          if (isCodeValid(code)) {
-            localStorage.setItem(storageKey, code);
-            if (errorLine) errorLine.classList.add("hidden");
-            showAuthorized(true);
-            goReturnPath();
-            return;
+      if (input instanceof HTMLInputElement) {
+        input.addEventListener("keydown", (event) => {
+          if (event.key === "Enter") {
+            event.preventDefault();
+            enterButton?.click();
           }
-          if (errorLine) errorLine.classList.remove("hidden");
-          showAuthorized(false);
         });
       }
 
-      if (logout) {
-        logout.addEventListener("click", () => {
-          localStorage.removeItem(storageKey);
-          localStorage.removeItem("nm-premium-access");
-          window.location.reload();
-        });
-      }
+      logoutButton?.addEventListener("click", () => {
+        localStorage.removeItem(storageKey);
+        localStorage.removeItem("nm-premium-access");
+        syncAccessState();
+      });
+
+      syncWhatsAppLink();
+      fetchIp();
+      syncCookieBar();
+      syncAccessState();
+      window.addEventListener("nm-club-session-changed", syncAccessState);
+      window.addEventListener("storage", syncAccessState);
     })();
   </script>
 </Layout>

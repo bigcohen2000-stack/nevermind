@@ -1,0 +1,30 @@
+﻿---
+export type StepIndicatorItem = {
+  label: string;
+  detail?: string;
+};
+
+const {
+  steps = [],
+  class: className = "",
+} = Astro.props as {
+  steps?: StepIndicatorItem[];
+  class?: string;
+};
+---
+
+<ol class:list={[
+  "grid gap-2 sm:grid-cols-2 xl:grid-cols-4",
+  className,
+]}>
+  {steps.map((step, index) => (
+    <li class="rounded-[20px] border-[0.5px] border-[rgba(26,26,26,0.1)] bg-white/74 px-4 py-3 shadow-[0_10px_24px_rgba(26,26,26,0.04)] backdrop-blur-sm dark:border-[rgba(250,250,248,0.12)] dark:bg-[rgba(255,255,255,0.05)]">
+      <div class="flex items-center justify-between gap-3">
+        <span class="text-[11px] font-semibold tracking-[0.16em] text-[#D42B2B] dark:text-[#ff8a8a]">{String(index + 1).padStart(2, "0")}</span>
+        <span class="text-[11px] text-[#1A1A1A]/36 dark:text-[#FAFAF8]/36">{index < steps.length - 1 ? "→" : "•"}</span>
+      </div>
+      <p class="mt-2 text-sm font-medium text-[#1A1A1A] dark:text-[#FAFAF8]">{step.label}</p>
+      {step.detail ? <p class="mt-1 text-xs leading-6 text-[#1A1A1A]/66 dark:text-[#FAFAF8]/68">{step.detail}</p> : null}
+    </li>
+  ))}
+</ol>

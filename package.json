@@ -17,6 +17,7 @@
     "postbuild": "node scripts/generate-rss.mjs && node scripts/check-internal-links.mjs && node scripts/postbuild-article-seo-check.mjs",
     "preview": "astro preview",
     "check": "astro check",
+    "image:import": "node scripts/import-dashboard-image.mjs",
     "format": "prettier --write .",
     "pagefind": "pagefind --site dist",
     "pre-deploy": "npm run verify:prod-env && node scripts/pre-deploy-check.js",

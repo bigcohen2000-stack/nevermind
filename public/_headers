@@ -25,6 +25,18 @@
 /admin/*
   Cache-Control: no-store
 
+/dashboard/*
+  X-Robots-Tag: noindex, nofollow, noarchive, nosnippet
+  Cache-Control: private, no-store
+
+/api/admin/*
+  X-Robots-Tag: noindex, nofollow, noarchive, nosnippet
+  Cache-Control: private, no-store
+
+/api/club-admin/*
+  X-Robots-Tag: noindex, nofollow, noarchive, nosnippet
+  Cache-Control: private, no-store
+
 /me/unlock/*
   X-Robots-Tag: noindex, nofollow
   Cache-Control: private, no-store
@@ -34,3 +46,4 @@
 
 /me/learning/*
   Cache-Control: private, no-store
+

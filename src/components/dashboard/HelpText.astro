@@ -1,0 +1,20 @@
+﻿---
+const {
+  text,
+  tone = "default",
+  class: className = "",
+} = Astro.props;
+
+const toneClass =
+  tone === "accent"
+    ? "text-[#1A1A1A]/72 dark:text-[#FAFAF8]/72"
+    : "text-[#1A1A1A]/70 dark:text-[#FAFAF8]/70";
+---
+
+<p class:list={[
+  "text-xs leading-6",
+  toneClass,
+  className,
+]}>
+  {text}
+</p>

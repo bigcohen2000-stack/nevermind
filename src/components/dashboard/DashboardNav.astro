@@ -1,0 +1,47 @@
+﻿---
+const sections = [
+  {
+    group: "מצב האתר",
+    items: [
+      { href: "#overview", label: "סקירה", note: "המצב עכשיו" },
+      { href: "#connections", label: "חיבורים חיים", note: "Cloudflare mock" },
+      { href: "#security-feed", label: "פיד אבטחה", note: "ניסיונות חריגים" },
+    ],
+  },
+  {
+    group: "ניהול ותוכן",
+    items: [
+      { href: "#content-health", label: "בריאות תוכן", note: "מאמרים לעדכון" },
+      { href: "#access", label: "ניהול גישה", note: "Club Admin" },
+      { href: "#image-automation", label: "אוטומציית תמונות", note: "webp ונתיבים" },
+    ],
+  },
+  {
+    group: "מערכת",
+    items: [{ href: "#settings", label: "הגדרות", note: "Access, noindex, SSL" }],
+  },
+];
+---
+
+<aside class="hidden lg:block">
+  <div class="sticky top-32 rounded-[28px] border border-black/8 bg-white/78 p-4 shadow-[0_18px_50px_rgba(26,26,26,0.05)] backdrop-blur-sm">
+    <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#D42B2B]">Dashboard</p>
+    <nav class="mt-4 space-y-5" aria-label="ניווט פנימי">
+      {sections.map((section) => (
+        <div class="space-y-2">
+          <p class="text-sm font-semibold text-[#1A1A1A]">{section.group}</p>
+          <ul class="space-y-2">
+            {section.items.map((item) => (
+              <li>
+                <a href={item.href} class="flex items-center justify-between rounded-2xl border border-black/7 bg-[#FAFAF8] px-3 py-2 text-sm text-black/70 transition hover:border-[#D42B2B]/25 hover:text-[#1A1A1A]">
+                  <span>{item.label}</span>
+                  <span class="text-xs text-black/45">{item.note}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </nav>
+  </div>
+</aside>
