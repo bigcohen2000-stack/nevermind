@@ -1,0 +1,24 @@
+---
+interface Props {
+  eyebrow?: string;
+  title: string;
+  subtitle: string;
+}
+
+const { eyebrow = "NeverMind", title, subtitle } = Astro.props;
+---
+
+<section
+  class="mx-auto max-w-5xl px-5 pb-16 pt-20 text-right sm:px-8 sm:pb-20 sm:pt-24 lg:px-12"
+  aria-labelledby="home-hero-title"
+>
+  <div class="space-y-6">
+    <p class="text-xs font-semibold uppercase tracking-[0.28em] text-[var(--nm-accent)]">{eyebrow}</p>
+    <h1 id="home-hero-title" class="text-[var(--nm-text-display)] font-semibold leading-[1.08] text-[var(--nm-fg)]">
+      {title}
+    </h1>
+    <p class="max-w-2xl text-[var(--nm-text-lead)] leading-relaxed text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+      {subtitle}
+    </p>
+  </div>
+</section>

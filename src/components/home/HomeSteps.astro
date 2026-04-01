@@ -1,0 +1,36 @@
+---
+type Step = { title: string; body: string };
+
+interface Props {
+  steps: Step[];
+}
+
+const { steps } = Astro.props;
+---
+
+<section
+  class="mx-auto max-w-4xl border-t border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] px-5 py-20 sm:px-8 lg:px-12"
+  aria-labelledby="home-steps-heading"
+>
+  <h2 id="home-steps-heading" class="text-[clamp(1.35rem,1.15rem+0.8vw,1.85rem)] font-semibold text-[var(--nm-fg)]">
+    שלושה צעדים
+  </h2>
+  <ol class="mt-10 space-y-10 text-right" role="list">
+    {
+      steps.map((step, i) => (
+        <li class="flex gap-5">
+          <span
+            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)] bg-[var(--nm-tint)] text-sm font-semibold text-[var(--nm-accent)]"
+            aria-hidden="true"
+          >
+            {i + 1}
+          </span>
+          <div class="min-w-0 flex-1 space-y-2">
+            <h3 class="text-base font-semibold text-[var(--nm-fg)]">{step.title}</h3>
+            <p class="text-[var(--nm-text-body)] leading-relaxed text-[color-mix(in_srgb,var(--nm-fg)_74%,var(--nm-bg))]">{step.body}</p>
+          </div>
+        </li>
+      ))
+    }
+  </ol>
+</section>

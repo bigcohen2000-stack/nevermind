@@ -18,7 +18,7 @@ type ClubSession = {
 
 const BG = "#FAFAF8";
 const FG = "#1A1A1A";
-const ACCENT = "#D42B2B";
+const ACCENT = "#0F172A";
 
 const LS_LAST = "nm_last_article_open";
 const LS_LOG = "nm_article_open_log";
@@ -439,7 +439,7 @@ export default function MePersonalDashboard({ articles, totalPublished, whatsApp
           value={insightsText}
           onChange={(e) => setInsightsText(e.target.value)}
           rows={4}
-          className="mt-2 w-full resize-y rounded-xl border px-4 py-3 text-sm leading-relaxed outline-none ring-0 focus:border-[color-mix(in_srgb,#D42B2B_35%,transparent)]"
+          className="mt-2 w-full resize-y rounded-xl border px-4 py-3 text-sm leading-relaxed outline-none ring-0 focus:border-[color-mix(in_srgb,#0F172A_35%,transparent)]"
           style={{ borderColor: `${FG}18`, color: FG, background: BG }}
         />
         <div className="mt-3 flex flex-wrap items-center justify-end gap-3">

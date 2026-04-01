@@ -2,19 +2,19 @@
 
 /**
  * פלטת NeverMind / השם לא משנה. בוטיק, ללא Dark Mode.
- * רקע, טקסט, אדום דגש בלבד (+ נגזרות mix).
+ * רקע, טקסט, דגש מותג (#0F172A) (+ נגזרות mix).
  */
 :root {
   color-scheme: light;
 
-  /* מקור האמת: #1A1A1A טקסט, #FAFAF8 משטח, #D42B2B דגש */
+  /* מקור האמת: #1A1A1A טקסט, #FAFAF8 משטח, #0F172A דגש מותג */
   --color-text-primary: #1a1a1a;
   --color-surface-page: #fafaf8;
   --color-surface-canvas: #fafaf8;
   --color-text-secondary: color-mix(in srgb, var(--color-text-primary) 72%, var(--color-surface-page));
   --color-surface-muted: color-mix(in srgb, var(--color-text-primary) 4%, var(--color-surface-page));
-  --color-accent: #d42b2b;
-  --color-accent-hover: color-mix(in srgb, var(--color-accent) 88%, var(--color-text-primary));
+  --color-accent: #0f172a;
+  --color-accent-hover: color-mix(in srgb, var(--color-accent) 88%, #ffffff);
   --color-on-accent: #fafaf8;
   /* כפתורים כהים / בלוקי ניגוד: שחור מותג על רקע בהיר */
   --color-inverse-bg: #1a1a1a;
@@ -54,6 +54,10 @@
   --content-width: 65ch;
   --line-height-ui: 1.6;
   --line-height-article: 1.8;
+  /* טיפוגרפיה נוזלית: גוף וכותרות */
+  --nm-text-body: clamp(1rem, 0.96rem + 0.22vw, 1.125rem);
+  --nm-text-lead: clamp(1.05rem, 0.98rem + 0.35vw, 1.25rem);
+  --nm-text-display: clamp(2rem, 1.55rem + 2vw, 3.25rem);
   --transition-fast: 0.2s ease;
   --transition-medium: 0.3s ease;
   --nm-feedback-press-scale: 0.98;
@@ -96,6 +100,30 @@ html[data-nm-a11y-links="on"] a[href]:focus-visible {
 
 @import "./components.css";
 
+/* מצבי טעינה: שלד פשוט במקום ספינר */
+@keyframes nm-skeleton-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 0.92;
+  }
+}
+
+.nm-skeleton {
+  border-radius: 0.75rem;
+  background: color-mix(in srgb, var(--nm-fg) 12%, var(--nm-bg));
+  animation: nm-skeleton-pulse 1.15s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nm-skeleton {
+    animation: none;
+    opacity: 0.72;
+  }
+}
+
 html {
   scroll-behavior: smooth;
 }
@@ -107,7 +135,7 @@ html[lang="he"] {
 
 body {
   font-family: "Heebo", "Assistant Variable", system-ui, -apple-system, "Segoe UI", sans-serif;
-  font-size: 1rem;
+  font-size: var(--nm-text-body);
   line-height: var(--line-height-ui);
   letter-spacing: 0;
   -webkit-font-smoothing: antialiased;
@@ -657,12 +685,12 @@ body.is-premium .nm-header-bar {
   background-color: #1a1a1a !important;
   -webkit-backdrop-filter: none !important;
   backdrop-filter: none !important;
-  border-bottom: 1px solid color-mix(in srgb, #d42b2b 38%, transparent) !important;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-accent) 38%, transparent) !important;
 }
 
 body.is-premium .nm-header-bar.nm-header--scrolled {
   background-color: #141414 !important;
-  border-bottom-color: color-mix(in srgb, #d42b2b 50%, transparent) !important;
+  border-bottom-color: color-mix(in srgb, var(--color-accent) 50%, transparent) !important;
 }
 
 body.is-premium .nm-header-brand {
@@ -670,7 +698,7 @@ body.is-premium .nm-header-brand {
 }
 
 body.is-premium .nm-header-brand:hover {
-  color: #d42b2b !important;
+  color: var(--color-accent) !important;
 }
 
 body.is-premium .nm-nav-pill {
@@ -695,8 +723,8 @@ body.is-premium .nm-nav-link:hover {
 
 body.is-premium a.nm-nav-link--active {
   color: #fafaf8 !important;
-  background-color: color-mix(in srgb, #d42b2b 42%, transparent) !important;
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, #d42b2b 65%, transparent) !important;
+  background-color: color-mix(in srgb, var(--color-accent) 42%, transparent) !important;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-accent) 65%, transparent) !important;
 }
 
 body.is-premium .nm-header-services-link {
@@ -706,8 +734,8 @@ body.is-premium .nm-header-services-link {
 }
 
 body.is-premium .nm-header-services-link:hover {
-  border-color: color-mix(in srgb, #d42b2b 45%, transparent) !important;
-  color: #d42b2b !important;
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent) !important;
+  color: var(--color-accent) !important;
 }
 
 body.is-premium #search-trigger {
@@ -717,17 +745,17 @@ body.is-premium #search-trigger {
 }
 
 body.is-premium #search-trigger:hover {
-  border-color: color-mix(in srgb, #d42b2b 40%, transparent) !important;
-  color: #d42b2b !important;
+  border-color: color-mix(in srgb, var(--color-accent) 40%, transparent) !important;
+  color: var(--color-accent) !important;
 }
 
 body.is-premium [data-nm-service-card] {
-  border-color: color-mix(in srgb, #d42b2b 52%, transparent) !important;
-  box-shadow: 0 14px 40px color-mix(in srgb, #d42b2b 12%, transparent) !important;
+  border-color: color-mix(in srgb, var(--color-accent) 52%, transparent) !important;
+  box-shadow: 0 14px 40px color-mix(in srgb, var(--color-accent) 12%, transparent) !important;
 }
 
 body.is-premium [data-nm-service-card]:hover {
-  border-color: color-mix(in srgb, #d42b2b 72%, transparent) !important;
+  border-color: color-mix(in srgb, var(--color-accent) 72%, transparent) !important;
 }
 
 @media print {
@@ -798,7 +826,7 @@ main p a[href]:where(:not([class*="rounded-full"]))::after {
   left: 50%;
   right: 50%;
   height: 1px;
-  background: #d42b2b;
+  background: var(--color-accent);
   transition:
     left 0.25s ease,
     right 0.25s ease;

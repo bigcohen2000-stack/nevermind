@@ -51,10 +51,11 @@ function plainQuote(q: QuoteItem): string {
     </div>
   </header>
 
-  <!-- מובייל: קרוסלה אופקית, משפט למסך -->
-  <div class="relative -mx-4 sm:mx-0 sm:hidden">
+  <!-- מובייל: קרוסלה אופקית, משפט למסך. dir=ltr על המסלול כדי לייצב snap/scrollLeft מול overflow-x בדף -->
+  <div class="relative w-full min-w-0 sm:hidden">
     <div
-      class="nm-testimonials-carousel nm-testimonials-carousel--mobile flex w-full touch-pan-x snap-x snap-mandatory overflow-x-auto overscroll-x-contain scroll-smooth [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      class="nm-testimonials-carousel nm-testimonials-carousel--mobile flex w-full min-w-0 touch-pan-x snap-x snap-mandatory overflow-x-auto overscroll-x-contain scroll-smooth [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      dir="ltr"
       role="region"
       aria-roledescription="קרוסלה"
       aria-label="המלצות. החלק לצד כדי לעבור בין משפטים"
@@ -67,7 +68,8 @@ function plainQuote(q: QuoteItem): string {
           const labelId = `nm-testimonial-m-${i + 1}`;
           return (
             <article
-              class="nm-testimonials-slide flex w-[min(100%,100vw)] min-w-full shrink-0 snap-center snap-always flex-col justify-center px-5 py-8"
+              class="nm-testimonials-slide flex w-full min-w-full shrink-0 snap-center snap-always flex-col justify-center px-5 py-8"
+              dir="rtl"
               style="min-height: min(100dvh, calc(100svh - 2rem));"
               data-nm-testimonial-slide
               aria-hidden={i === 0 ? "false" : "true"}
@@ -87,15 +89,15 @@ function plainQuote(q: QuoteItem): string {
                 </p>
                 <p class="nm-testimonials-slide-quote text-[30px] font-semibold leading-[1.45] text-[var(--nm-fg)] [text-wrap:balance]">
                   {q.before}
-                  <span class="font-bold text-[#D42B2B]">{q.highlight}</span>
+                  <span class="font-bold text-[var(--nm-accent)]">{q.highlight}</span>
                   {q.after}
-                  <span class="ms-0.5 inline-block text-[#D42B2B]">.</span>
+                  <span class="ms-0.5 inline-block text-[var(--nm-accent)]">.</span>
                 </p>
               </div>
               <div class="relative z-[2] mx-auto mt-8 flex justify-center">
                 <button
                   type="button"
-                  class="nm-testimonial-check inline-flex min-h-[44px] items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_14%,transparent)] bg-white/90 px-4 py-2 text-xs font-semibold text-[var(--nm-fg)] transition hover:border-[color-mix(in_srgb,#D42B2B_35%,transparent)] hover:bg-[var(--nm-tint)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D42B2B]"
+                  class="nm-testimonial-check inline-flex min-h-[44px] items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_14%,transparent)] bg-white/90 px-4 py-2 text-xs font-semibold text-[var(--nm-fg)] transition hover:border-[color-mix(in_srgb,var(--nm-accent)_35%,transparent)] hover:bg-[var(--nm-tint)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nm-accent)]"
                   data-testimonial-check
                   aria-describedby={labelId}
                 >
@@ -153,15 +155,15 @@ function plainQuote(q: QuoteItem): string {
               </p>
               <p class="text-[1.02rem] font-medium leading-[1.75] text-[var(--nm-fg)]">
                 {q.before}
-                <span class="font-semibold text-[#D42B2B]">{q.highlight}</span>
+                <span class="font-semibold text-[var(--nm-accent)]">{q.highlight}</span>
                 {q.after}
-                <span class="ms-0.5 inline-block text-[#D42B2B]">.</span>
+                <span class="ms-0.5 inline-block text-[var(--nm-accent)]">.</span>
               </p>
             </div>
             <div class="relative z-[2] mt-4">
               <button
                 type="button"
-                class="nm-testimonial-check inline-flex min-h-[40px] items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_14%,transparent)] bg-white/90 px-4 py-2 text-xs font-semibold text-[var(--nm-fg)] transition hover:border-[color-mix(in_srgb,#D42B2B_35%,transparent)] hover:bg-[var(--nm-tint)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D42B2B]"
+                class="nm-testimonial-check inline-flex min-h-[40px] items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_14%,transparent)] bg-white/90 px-4 py-2 text-xs font-semibold text-[var(--nm-fg)] transition hover:border-[color-mix(in_srgb,var(--nm-accent)_35%,transparent)] hover:bg-[var(--nm-tint)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nm-accent)]"
                 data-testimonial-check
                 aria-describedby={labelId}
               >
@@ -228,6 +230,10 @@ function plainQuote(q: QuoteItem): string {
     transition: opacity 0.35s ease;
   }
 
+  .nm-testimonials-carousel--mobile {
+    -webkit-overflow-scrolling: touch;
+  }
+
 </style>
 
 <script>
@@ -259,6 +265,23 @@ function plainQuote(q: QuoteItem): string {
     if (!slides.length) return;
 
     root.dataset.nmCarouselInit = "1";
+
+    function scrollCarouselToStart() {
+      try {
+        root.scrollTo({ left: 0, top: 0, behavior: "auto" });
+      } catch {
+        root.scrollLeft = 0;
+      }
+      requestAnimationFrame(() => {
+        try {
+          root.scrollTo({ left: 0, top: 0, behavior: "auto" });
+        } catch {
+          root.scrollLeft = 0;
+        }
+      });
+    }
+
+    scrollCarouselToStart();
 
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     let lastIdx = -1;
@@ -328,10 +351,16 @@ function plainQuote(q: QuoteItem): string {
     });
   }
 
-  bindTestimonialChecks();
-  initTestimonialsCarousel();
-  document.addEventListener("astro:page-load", () => {
+  function bootTestimonials() {
     bindTestimonialChecks();
     initTestimonialsCarousel();
-  });
+  }
+
+  bootTestimonials();
+  const w = window;
+  if (!w["__nmTestimonialsNav"]) {
+    w["__nmTestimonialsNav"] = true;
+    document.addEventListener("astro:page-load", bootTestimonials);
+    document.addEventListener("astro:after-swap", bootTestimonials);
+  }
 </script>

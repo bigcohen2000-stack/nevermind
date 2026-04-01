@@ -167,7 +167,7 @@ const initAdminDashboard = () => {
       fraudFlags,
       (item) => {
         const row = document.createElement("li");
-        row.className = "rounded-[1.2rem] border border-[color-mix(in_srgb,#D42B2B_22%,transparent)] bg-[var(--nm-tint)] px-4 py-3";
+        row.className = "rounded-[1.2rem] border border-[color-mix(in_srgb,#0F172A_22%,transparent)] bg-[var(--nm-tint)] px-4 py-3";
         row.innerHTML = `
           <p class="text-sm font-semibold text-[var(--nm-fg)]">${item.phone || "ללא טלפון"}</p>
           <p class="mt-1 text-xs leading-6 text-[color-mix(in_srgb,var(--nm-fg)_65%,var(--nm-bg))]">סומן ב-${formatDateTime(item.flaggedAt)}</p>

@@ -1,0 +1,52 @@
+---
+import appConfig from "../../config/appConfig.json";
+
+const contact = appConfig.contact as { email?: string; whatsAppNumber?: string };
+const waDigits = String(contact.whatsAppNumber ?? "").replace(/\D/g, "");
+---
+
+<section
+  class="mx-auto max-w-4xl px-5 pb-24 pt-8 sm:px-8 lg:px-12"
+  aria-labelledby="home-contact-heading"
+>
+  <div
+    class="rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[color-mix(in_srgb,var(--nm-fg)_3%,var(--nm-bg))] p-8 text-right md:p-10"
+  >
+    <h2 id="home-contact-heading" class="text-lg font-semibold text-[var(--nm-fg)]">
+      קשר וניווט
+    </h2>
+    <p class="mt-3 max-w-xl text-[var(--nm-text-body)] leading-relaxed text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">
+      בוחרים נתיב: שירותים, טופס לפני שיחה, או ארכיון קריאה.
+    </p>
+    <nav class="mt-8 flex flex-wrap justify-end gap-3" aria-label="קישורי דף הבית">
+      <a
+        href="/services/"
+        class="inline-flex min-h-[44px] items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-[var(--nm-bg-canvas)] px-5 py-2.5 text-sm font-semibold text-[var(--nm-fg)] transition hover:border-[color-mix(in_srgb,var(--nm-accent)_28%,transparent)] hover:text-[var(--nm-accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nm-accent)]"
+      >
+        שירותים
+      </a>
+      <a
+        href="/intake/"
+        class="inline-flex min-h-[44px] items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-[var(--nm-bg-canvas)] px-5 py-2.5 text-sm font-semibold text-[var(--nm-fg)] transition hover:border-[color-mix(in_srgb,var(--nm-accent)_28%,transparent)] hover:text-[var(--nm-accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nm-accent)]"
+      >
+        טופס לפני שיחה
+      </a>
+      <a
+        href="/articles/"
+        class="inline-flex min-h-[44px] items-center rounded-full bg-[var(--nm-inverse)] px-5 py-2.5 text-sm font-semibold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-inverse-hover)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nm-accent)]"
+      >
+        ארכיון מאמרים
+      </a>
+      {waDigits ? (
+        <a
+          href={`https://wa.me/${waDigits}`}
+          target="_blank"
+          rel="noreferrer"
+          class="inline-flex min-h-[44px] items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-5 py-2.5 text-sm font-semibold text-[var(--nm-fg)] transition hover:border-[color-mix(in_srgb,var(--nm-accent)_28%,transparent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nm-accent)]"
+        >
+          וואטסאפ
+        </a>
+      ) : null}
+    </nav>
+  </div>
+</section>

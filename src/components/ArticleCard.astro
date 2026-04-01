@@ -114,7 +114,7 @@ const articleHref = `/articles/${slug}/`;
   <div class="mt-5 flex flex-1 flex-col">
     <div class="flex items-start justify-between gap-3">
       {isPremium ? (
-        <span class="inline-flex shrink-0 items-center gap-1 rounded-full border border-[color-mix(in_srgb,#D42B2B_28%,transparent)] bg-[color-mix(in_srgb,#D42B2B_6%,white)] px-2.5 py-1 text-[0.68rem] font-semibold text-[#9a1f1f]">
+        <span class="inline-flex shrink-0 items-center gap-1 rounded-full border border-[color-mix(in_srgb,var(--nm-accent)_28%,transparent)] bg-[color-mix(in_srgb,var(--nm-accent)_6%,white)] px-2.5 py-1 text-[0.68rem] font-semibold text-[var(--nm-accent)]">
           <span aria-hidden="true">נעול</span>
           <span>Premium</span>
         </span>
@@ -161,7 +161,7 @@ const articleHref = `/articles/${slug}/`;
     aria-label={`זמן קריאה משוער ${readingMinutes} דקות`}
   >
     <div
-      class="h-full rounded-e-sm bg-gradient-to-l from-[#D42B2B] to-[color-mix(in_srgb,#D42B2B_75%,#1a1a1a)] transition-[width] duration-500 ease-out"
+      class="h-full rounded-e-sm bg-gradient-to-l from-[var(--nm-accent)] to-[color-mix(in_srgb,var(--nm-accent)_75%,#1a1a1a)] transition-[width] duration-500 ease-out"
       style={`width: ${readingBarPercent}%`}
     />
   </div>

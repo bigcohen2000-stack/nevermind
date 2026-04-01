@@ -41,7 +41,7 @@ function renderEmptyState(resultsContainer) {
         href="${waHref}"
         target="_blank"
         rel="noopener noreferrer"
-        class="inline-flex min-h-[44px] items-center justify-center rounded-xl border border-[color-mix(in_srgb,#1A1A1A_22%,transparent)] bg-transparent px-5 py-3 text-center text-[clamp(0.9rem,0.85rem+0.2vw,1rem)] font-semibold text-[#1A1A1A] transition hover:bg-[color-mix(in_srgb,#1A1A1A_6%,transparent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D42B2B]"
+        class="inline-flex min-h-[44px] items-center justify-center rounded-xl border border-[color-mix(in_srgb,#1A1A1A_22%,transparent)] bg-transparent px-5 py-3 text-center text-[clamp(0.9rem,0.85rem+0.2vw,1rem)] font-semibold text-[#1A1A1A] transition hover:bg-[color-mix(in_srgb,#1A1A1A_6%,transparent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0F172A]"
         aria-label="פתיחת וואטסאפ עם הודעה מוכנה על החיפוש שלא הניב תוצאות"
       >שליחה בוואטסאפ עם טקסט מוכן</a>`
     : "";
@@ -60,28 +60,28 @@ function renderEmptyState(resultsContainer) {
           <li>
             <a
               href="/tags/hidden-assumption"
-              class="flex w-full items-center gap-2 rounded-xl py-2 ps-1 pe-1 text-[clamp(0.9rem,0.85rem+0.2vw,1rem)] font-medium text-[#1A1A1A] underline-offset-4 transition hover:bg-[color-mix(in_srgb,#1A1A1A_5%,transparent)] hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D42B2B]"
+              class="flex w-full items-center gap-2 rounded-xl py-2 ps-1 pe-1 text-[clamp(0.9rem,0.85rem+0.2vw,1rem)] font-medium text-[#1A1A1A] underline-offset-4 transition hover:bg-[color-mix(in_srgb,#1A1A1A_5%,transparent)] hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0F172A]"
             >
               <span>הנחה סמויה</span>
-              <span class="ms-auto shrink-0 text-[#D42B2B]" aria-hidden="true">←</span>
+              <span class="ms-auto shrink-0 text-[#0F172A]" aria-hidden="true">←</span>
             </a>
           </li>
           <li>
             <a
               href="/articles/why-bad-things-happen/"
-              class="flex w-full items-center gap-2 rounded-xl py-2 ps-1 pe-1 text-[clamp(0.9rem,0.85rem+0.2vw,1rem)] font-medium text-[#1A1A1A] underline-offset-4 transition hover:bg-[color-mix(in_srgb,#1A1A1A_5%,transparent)] hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D42B2B]"
+              class="flex w-full items-center gap-2 rounded-xl py-2 ps-1 pe-1 text-[clamp(0.9rem,0.85rem+0.2vw,1rem)] font-medium text-[#1A1A1A] underline-offset-4 transition hover:bg-[color-mix(in_srgb,#1A1A1A_5%,transparent)] hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0F172A]"
             >
-              <span class="shrink-0 text-[#D42B2B]" aria-hidden="true">←</span>
+              <span class="shrink-0 text-[#0F172A]" aria-hidden="true">←</span>
               <span>למה דברים רעים קורים</span>
             </a>
           </li>
           <li>
             <a
               href="/library/"
-              class="flex w-full items-center gap-2 rounded-xl py-2 ps-1 pe-1 text-[clamp(0.9rem,0.85rem+0.2vw,1rem)] font-medium text-[#1A1A1A] underline-offset-4 transition hover:bg-[color-mix(in_srgb,#1A1A1A_5%,transparent)] hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D42B2B]"
+              class="flex w-full items-center gap-2 rounded-xl py-2 ps-1 pe-1 text-[clamp(0.9rem,0.85rem+0.2vw,1rem)] font-medium text-[#1A1A1A] underline-offset-4 transition hover:bg-[color-mix(in_srgb,#1A1A1A_5%,transparent)] hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0F172A]"
             >
               <span>כל המאמרים</span>
-              <span class="ms-auto shrink-0 text-[#D42B2B]" aria-hidden="true">←</span>
+              <span class="ms-auto shrink-0 text-[#0F172A]" aria-hidden="true">←</span>
             </a>
           </li>
         </ul>
@@ -89,7 +89,7 @@ function renderEmptyState(resultsContainer) {
       <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:justify-end">
         <a
           href="/services#balcony-experience"
-          class="inline-flex min-h-[44px] items-center justify-center rounded-xl bg-[#D42B2B] px-6 py-3 text-center text-[clamp(0.95rem,0.9rem+0.2vw,1.05rem)] font-bold text-white transition hover:bg-[color-mix(in_srgb,#D42B2B_92%,#1A1A1A)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1A1A1A]"
+          class="inline-flex min-h-[44px] items-center justify-center rounded-xl bg-[#0F172A] px-6 py-3 text-center text-[clamp(0.95rem,0.9rem+0.2vw,1.05rem)] font-bold text-white transition hover:bg-[color-mix(in_srgb,#0F172A_92%,#1A1A1A)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1A1A1A]"
           aria-label="מעבר לפרטי האולפן לפריקת נושא בפודקאסט"
         >אני רוצה לפרק את זה באולפן</a>
         ${waLinkBlock}

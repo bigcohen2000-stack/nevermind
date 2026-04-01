@@ -29,6 +29,7 @@ const webhookUrl = (import.meta.env.PUBLIC_NM_CLUB_WEBHOOK_URL ?? "").trim();
           name="fullName"
           type="text"
           autocomplete="name"
+          enterkeyhint="next"
           required
           minlength="2"
           maxlength="80"
@@ -56,6 +57,8 @@ const webhookUrl = (import.meta.env.PUBLIC_NM_CLUB_WEBHOOK_URL ?? "").trim();
           name="password"
           type="password"
           autocomplete="current-password"
+          enterkeyhint="done"
+          spellcheck="false"
           required
           minlength="4"
           maxlength="128"
