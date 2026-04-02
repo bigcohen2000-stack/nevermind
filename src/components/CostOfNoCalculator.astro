@@ -1,0 +1,150 @@
+---
+import appConfig from "../config/appConfig.json";
+import { FloatingInput } from "./ui/FloatingInput";
+
+interface Props {
+  phone?: string;
+  minHours?: number;
+  defaultHours?: number;
+  maxHours?: number;
+  ctaLabel?: string;
+}
+
+const {
+  phone = appConfig.contact.whatsAppNumber,
+  minHours = 1,
+  defaultHours = 5,
+  maxHours = 40,
+  ctaLabel = "זמן לעשות סדר - תיאום שיחת מיקוד",
+} = Astro.props;
+
+const baseMessage = "היי, אני רוצה לעשות סדר סביב החלטה שממשיכה לשרוף לי זמן וקשב.";
+const defaultHref = `https://wa.me/${phone}?text=${encodeURIComponent(baseMessage)}`;
+
+const toMonthPhrase = (days: number) => {
+  const months = days / 22;
+
+  if (months < 0.75) return "כמעט חודש של ימי עבודה מלאים";
+  if (months < 1.25) return "בערך חודש של ימי עבודה מלאים";
+  if (months < 1.75) return "בערך חודש וחצי של ימי עבודה מלאים";
+  if (months < 2.25) return "בערך חודשיים של ימי עבודה מלאים";
+
+  const rounded = Math.round(months);
+  return `בערך ${rounded} חודשי עבודה מלאים`;
+};
+
+const initialYearHours = defaultHours * 52;
+const initialWorkDays = Math.max(1, Math.round(initialYearHours / 8));
+const initialMonthPhrase = toMonthPhrase(initialWorkDays);
+---
+
+<section
+  data-cost-of-no
+  data-phone={phone}
+  data-base-message={baseMessage}
+  class="not-prose rounded-[2.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 p-6 text-right text-[var(--nm-fg)] shadow-[0_26px_70px_rgba(26,26,26,0.08)] backdrop-blur-sm md:p-8"
+  aria-label="מחשבון מחיר חוסר ההחלטה"
+>
+  <div class="space-y-3">
+    <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">מחיר חוסר ההחלטה</p>
+    <h2 class="text-[clamp(1.8rem,1.4rem+1vw,2.6rem)] font-semibold leading-[1.08]">כמה קשב אתה כבר שורף על אותו בלבול?</h2>
+    <p class="max-w-3xl text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
+      זה לא חישוב כלכלי. זה מדד לזמן, קשב ותנועה שלא קרתה. לפעמים המחיר של "עוד קצת לחשוב" כבר גדול יותר מהבחירה עצמה.
+    </p>
+  </div>
+
+  <div class="mt-8 grid gap-6 lg:grid-cols-[minmax(0,21rem)_minmax(0,1fr)] lg:items-start">
+    <div class="space-y-3 text-right">
+      <FloatingInput
+        client:load
+        id="nm-cost-weekly-hours"
+        name="weekly_hours"
+        label="כמה שעות בשבוע אתה מקדיש למחשבות סובבות על ההתלבטות הזו"
+        type="number"
+        min={minHours}
+        max={maxHours}
+        step={1}
+        inputMode="numeric"
+        defaultValue={String(defaultHours)}
+        dataCostInput={true}
+        hideValidation={true}
+        className="[&_.nm-floating-control]:bg-[var(--nm-surface-muted)] [&_.nm-floating-control]:text-lg [&_.nm-floating-control]:font-medium"
+      />
+      <p class="text-xs leading-6 text-[var(--nm-fg)]/52">אפשר להכניס כל מספר בין {minHours} ל־{maxHours} שעות.</p>
+    </div>
+
+    <div class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-accent)_14%,transparent)] bg-[color-mix(in_srgb,var(--nm-accent)_6%,var(--nm-bg-canvas))] p-5 md:p-6">
+      <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">התוצאה</p>
+      <div class="mt-4 space-y-4">
+        <p data-cost-year-hours class="text-[clamp(2.15rem,1.8rem+1.2vw,3.3rem)] font-semibold leading-none">
+          זה שווה ל־{initialYearHours} שעות בשנה.
+        </p>
+        <p data-cost-workdays class="text-[1.05rem] leading-8 text-[color-mix(in_srgb,var(--nm-fg)_76%,var(--nm-bg))]">
+          במונחי עבודה: הפסדת {initialMonthPhrase} רק על בלבול.
+        </p>
+      </div>
+
+      <a
+        data-cost-whatsapp
+        href={defaultHref}
+        target="_blank"
+        rel="noreferrer"
+        class="mt-6 inline-flex items-center justify-center rounded-full bg-[var(--nm-accent)] px-6 py-3 text-sm font-semibold text-[var(--nm-on-accent)] transition duration-300 hover:translate-y-[-1px] hover:bg-[var(--nm-accent-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color-mix(in_srgb,var(--nm-accent)_25%,transparent)]"
+      >
+        {ctaLabel}
+      </a>
+    </div>
+  </div>
+</section>
+
+<script is:inline>
+  document.addEventListener("astro:page-load", () => {
+    const root = document.querySelector("[data-cost-of-no]");
+    if (!(root instanceof HTMLElement)) return;
+
+    const input = root.querySelector("[data-cost-input]");
+    const yearHoursNode = root.querySelector("[data-cost-year-hours]");
+    const workdaysNode = root.querySelector("[data-cost-workdays]");
+    const whatsappLink = root.querySelector("[data-cost-whatsapp]");
+
+    if (!(input instanceof HTMLInputElement) || !(yearHoursNode instanceof HTMLElement) || !(workdaysNode instanceof HTMLElement) || !(whatsappLink instanceof HTMLAnchorElement)) {
+      return;
+    }
+
+    const min = Number(input.min || 1);
+    const max = Number(input.max || 40);
+    const baseMessage = root.dataset.baseMessage || "היי, אני רוצה לעשות סדר סביב החלטה שממשיכה לשרוף לי זמן וקשב.";
+    const phone = root.dataset.phone || "972555634035";
+
+    const toMonthPhrase = (days) => {
+      const months = days / 22;
+
+      if (months < 0.75) return "כמעט חודש של ימי עבודה מלאים";
+      if (months < 1.25) return "בערך חודש של ימי עבודה מלאים";
+      if (months < 1.75) return "בערך חודש וחצי של ימי עבודה מלאים";
+      if (months < 2.25) return "בערך חודשיים של ימי עבודה מלאים";
+
+      return `בערך ${Math.round(months)} חודשי עבודה מלאים`;
+    };
+
+    const render = () => {
+      const raw = Number(input.value || min);
+      const weeklyHours = Math.min(max, Math.max(min, Number.isFinite(raw) ? raw : min));
+      input.value = String(weeklyHours);
+
+      const yearlyHours = weeklyHours * 52;
+      const workDays = Math.max(1, Math.round(yearlyHours / 8));
+      const monthPhrase = toMonthPhrase(workDays);
+
+      yearHoursNode.textContent = `זה שווה ל־${yearlyHours} שעות בשנה.`;
+      workdaysNode.textContent = `במונחי עבודה: הפסדת ${monthPhrase} רק על בלבול.`;
+
+      const message = `${baseMessage}\nאני מעריך שאני שורף בערך ${weeklyHours} שעות בשבוע על ההתלבטות הזו, שזה בערך ${yearlyHours} שעות בשנה.`;
+      whatsappLink.href = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+    };
+
+    input.addEventListener("input", render);
+    input.addEventListener("change", render);
+    render();
+  });
+</script>

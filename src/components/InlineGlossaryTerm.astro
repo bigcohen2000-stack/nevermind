@@ -1,0 +1,74 @@
+---
+interface Props {
+  term: string;
+  definition: string;
+}
+
+const { term, definition } = Astro.props as Props;
+---
+
+<details class="nm-inline-glossary" dir="rtl">
+  <summary class="nm-inline-glossary__summary">{term}</summary>
+  <span class="nm-inline-glossary__tooltip" role="note">{definition}</span>
+</details>
+
+<style>
+  .nm-inline-glossary {
+    position: relative;
+    display: inline-block;
+    vertical-align: baseline;
+  }
+
+  .nm-inline-glossary__summary {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    list-style: none;
+    border: 0;
+    color: var(--nm-accent);
+    font-weight: 700;
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    text-underline-offset: 0.22em;
+  }
+
+  .nm-inline-glossary__summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .nm-inline-glossary__tooltip {
+    position: absolute;
+    inset-inline-end: 0;
+    inset-block-end: calc(100% + 0.7rem);
+    z-index: 20;
+    min-inline-size: min(14rem, 70vw);
+    max-inline-size: min(18rem, 80vw);
+    border: 1px solid color-mix(in srgb, var(--nm-fg) 12%, transparent);
+    border-radius: 0.95rem;
+    background: color-mix(in srgb, var(--nm-bg) 94%, white);
+    box-shadow: 0 18px 40px color-mix(in srgb, var(--nm-fg) 10%, transparent);
+    padding-inline: 0.85rem;
+    padding-block: 0.72rem;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: color-mix(in srgb, var(--nm-fg) 88%, var(--nm-bg));
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(0.25rem);
+    transition:
+      opacity 0.18s ease,
+      transform 0.18s ease;
+  }
+
+  .nm-inline-glossary:hover .nm-inline-glossary__tooltip,
+  .nm-inline-glossary:focus-within .nm-inline-glossary__tooltip,
+  .nm-inline-glossary[open] .nm-inline-glossary__tooltip {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .nm-inline-glossary__tooltip {
+      transition: none;
+    }
+  }
+</style>

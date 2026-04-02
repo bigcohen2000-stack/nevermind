@@ -1,4 +1,4 @@
-﻿import { ARTICLE_TAG_WHITELIST, ARTICLE_TAG_WHITELIST_SET } from "../data/article-tags.js";
+import { ARTICLE_TAG_WHITELIST, ARTICLE_TAG_WHITELIST_SET } from "../data/article-tags.js";
 import { ROBOTIC_BLOCKLIST, SENSITIVE_TOPIC_WARNING, validateAndClassify } from "../utils/contentValidator.js";
 
 const wizardGlobal = globalThis;
@@ -8,7 +8,7 @@ const WORD_WARN = 900;
 const WORD_DEEP = 1400;
 const LONG_SENTENCE_WORDS = 20;
 
-/** ׳׳—׳׳¥ ׳׳–׳”׳” ׳¡׳¨׳˜׳•׳ ׳׳›׳ ׳§׳™׳©׳•׳¨ ׳™׳•׳˜׳™׳•׳‘ ׳ ׳₪׳•׳¥ ׳׳• ׳׳–׳”׳” 11 ׳×׳•׳•׳™׳ */
+/** מחלץ מזהה סרטון מכל קישור יוטיוב נפוץ או מזהה 11 תווים */
 export function extractYoutubeId(raw) {
   const s = String(raw || "").trim();
   if (!s) return "";
@@ -101,11 +101,11 @@ function runBlockingChecks(data) {
   const taken = Array.isArray(boot.existingSlugs) ? boot.existingSlugs : [];
 
   if (!slug) {
-    errors.push("׳—׳¡׳¨׳” ׳›׳×׳•׳‘׳× ׳‘׳׳ ׳’׳׳™׳× ׳§׳˜׳ ׳” (slug).");
+    errors.push("חסרה כתובת באנגלית קטנה (slug).");
   } else if (!SLUG_EN_RE.test(slug)) {
-    errors.push("׳”׳›׳×׳•׳‘׳× ׳‘׳׳ ׳’׳׳™׳× ׳§׳˜׳ ׳”, ׳׳§׳₪׳™׳ ׳‘׳׳‘׳“, ׳‘׳׳™ ׳¨׳•׳•׳—׳™׳.");
+    errors.push("הכתובת באנגלית קטנה, מקפים בלבד, בלי רווחים.");
   } else if (taken.includes(slug)) {
-    errors.push("׳”׳›׳×׳•׳‘׳× ׳‘׳׳ ׳’׳׳™׳× ׳›׳‘׳¨ ׳§׳™׳™׳׳× ׳‘׳׳¢׳¨׳›׳×. ׳‘׳—׳¨ ׳©׳ ׳׳—׳¨.");
+    errors.push("הכתובת באנגלית כבר קיימת במערכת. בחר שם אחר.");
   }
 
   const tagParts = tagsClean
@@ -114,12 +114,12 @@ function runBlockingChecks(data) {
     .filter(Boolean);
 
   if (!tagParts.length) {
-    errors.push("׳—׳¡׳¨׳•׳× ׳×׳’׳™׳•׳× ׳׳”׳¨׳©׳™׳׳” ׳”׳׳׳•׳©׳¨׳×. ׳‘׳—׳¨ ׳׳₪׳—׳•׳× ׳×׳’׳™׳× ׳׳—׳×.");
+    errors.push("חסרות תגיות מהרשימה המאושרת. בחר לפחות תגית אחת.");
   }
 
-  if (!data.questionForSchema.trim()) errors.push("׳—׳¡׳¨׳” ׳©׳׳׳” ׳׳׳ ׳•׳¢׳™ ׳—׳™׳₪׳•׳© (׳©׳׳‘ 1).");
-  if (!data.aha.trim()) errors.push("׳—׳¡׳¨׳” ׳×׳•׳‘׳ ׳× ׳׳™׳‘׳” (׳©׳׳‘ 1).");
-  if (!data.imageAlt.trim()) errors.push("׳—׳¡׳¨ ׳×׳™׳׳•׳¨ ׳×׳׳•׳ ׳” (׳©׳׳‘ 1).");
+  if (!data.questionForSchema.trim()) errors.push("חסרה שאלה למנועי חיפוש (שלב 1).");
+  if (!data.aha.trim()) errors.push("חסרה תובנת ליבה (שלב 1).");
+  if (!data.imageAlt.trim()) errors.push("חסר תיאור תמונה (שלב 1).");
 
   return errors;
 }
@@ -128,17 +128,17 @@ function runPreflight(data) {
   const warnings = [];
   const youtubeId = data.youtubeId.trim();
   if (youtubeId && !YOUTUBE_ID_RE.test(youtubeId)) {
-    warnings.push("׳׳–׳”׳” YouTube ׳׳ ׳×׳§׳™׳ (׳¦׳₪׳•׳™ ׳‘׳“׳™׳•׳§ 11 ׳×׳•׳•׳™׳).");
+    warnings.push("מזהה YouTube לא תקין (צפוי בדיוק 11 תווים).");
   }
 
   const summary = data.summary.trim();
   if (summary.length > 0 && (summary.length < 150 || summary.length > 160)) {
-    warnings.push(`׳׳•׳¨׳ ׳”׳×׳§׳¦׳™׳¨ ׳׳—׳™׳₪׳•׳©: ׳‘׳™׳ 150 ׳ײ¾160 ׳×׳•׳•׳™׳. ׳›׳¢׳×: ${summary.length}.`);
+    warnings.push(`אורך התקציר לחיפוש: בין 150 ל־160 תווים. כעת: ${summary.length}.`);
   }
 
   const wordCount = countWords(data.body);
   if (wordCount > 0 && wordCount < 120) {
-    warnings.push(`׳׳¢׳˜ ׳׳™׳׳™׳ ׳‘׳˜׳™׳•׳˜׳” (${wordCount}). ׳׳ ׳–׳” ׳׳›׳•׳•׳, ׳‘׳¡׳“׳¨.`);
+    warnings.push(`מעט מילים בטיוטה (${wordCount}). אם זה מכוון, בסדר.`);
   }
   const bodyLines = data.body.split("\n");
   const hashes = bodyLines.filter((line) => /^#{1,6}\s/.test(line.trim()));
@@ -154,12 +154,12 @@ function runPreflight(data) {
     if (lvl > 0) lastLevel = lvl;
   }
   if (skip) {
-    warnings.push("׳‘׳˜׳™׳•׳˜׳” ׳™׳© ׳“׳™׳׳•׳’ ׳‘׳¨׳׳× ׳›׳•׳×׳¨׳•׳× (׳׳׳©׳ ׳ײ¾## ׳ײ¾####). ׳¢׳“׳™׳£ ׳¨׳¦׳£ H2ג†’H3.");
+    warnings.push("בטיוטה יש דילוג ברמת כותרות (למשל מ־## ל־####). עדיף רצף H2→H3.");
   }
   if (wordCount >= WORD_DEEP) {
-    warnings.push(`׳”׳˜׳™׳•׳˜׳” ׳׳¨׳•׳›׳” (${wordCount} ׳׳™׳׳™׳). ׳׳×׳׳™׳ ׳‘׳“׳¨׳ ׳›׳׳ ׳׳¨׳׳× ׳¢׳•׳׳§ ׳’׳‘׳•׳”׳”.`);
+    warnings.push(`הטיוטה ארוכה (${wordCount} מילים). מתאים בדרך כלל לרמת עומק גבוהה.`);
   } else if (wordCount >= WORD_WARN) {
-    warnings.push(`׳”׳˜׳™׳•׳˜׳” ׳׳¢׳ ${WORD_WARN} ׳׳™׳׳™׳. ׳©׳§׳•׳ ׳¨׳׳× ׳¢׳•׳׳§ ׳׳×׳§׳“׳׳™׳ ׳׳• ׳¢׳•׳׳§.`);
+    warnings.push(`הטיוטה מעל ${WORD_WARN} מילים. שקול רמת עומק מתקדמים או עומק.`);
   }
 
   return warnings;
@@ -232,47 +232,47 @@ function validateExternalMdx(raw) {
   const parsed = parseFrontmatter(raw);
 
   if (!parsed.frontmatter.trim()) {
-    errors.push("׳—׳¡׳¨ frontmatter ׳‘׳×׳—׳™׳׳× ׳”׳§׳•׳‘׳¥.");
+    errors.push("חסר frontmatter בתחילת הקובץ.");
     return { errors, warnings, slug: "", body: "" };
   }
 
   for (const key of REQUIRED_FRONTMATTER_KEYS) {
     const value = key === "tags" ? parseYamlTags(parsed.frontmatter) : readSimpleYamlValue(parsed.frontmatter, key);
     const missing = Array.isArray(value) ? value.length === 0 : !String(value || "").trim();
-    if (missing) errors.push(`׳—׳¡׳¨ ׳©׳“׳” ׳—׳•׳‘׳”: ${key}`);
+    if (missing) errors.push(`חסר שדה חובה: ${key}`);
   }
 
   const slug = readSimpleYamlValue(parsed.frontmatter, "slug").trim();
   if (slug && !SLUG_EN_RE.test(slug)) {
-    errors.push("slug ׳׳ ׳×׳§׳™׳. ׳ ׳“׳¨׳© ׳׳ ׳’׳׳™׳× ׳§׳˜׳ ׳” + ׳׳§׳₪׳™׳.");
+    errors.push("slug לא תקין. נדרש אנגלית קטנה + מקפים.");
   }
 
   const tags = parseYamlTags(parsed.frontmatter);
   for (const tag of tags) {
     if (!ARTICLE_TAG_WHITELIST_SET.has(tag)) {
-      errors.push(`׳×׳’׳™׳× ׳׳ ׳‘׳¨׳©׳™׳׳”: "${tag}"`);
+      errors.push(`תגית לא ברשימה: "${tag}"`);
     }
   }
 
-  if (/\b׳©׳׳‘\b/.test(parsed.body)) {
-    warnings.push('׳ ׳׳¦׳׳” ׳”׳׳™׳׳” "׳©׳׳‘" ׳‘׳’׳•׳£ ׳”׳׳׳׳¨. ׳׳”׳—׳׳™׳£ ׳‘׳׳¡׳₪׳•׳¨ ׳׳• ׳‘׳ ׳§׳•׳“׳•׳×.');
+  if (/\bשלב\b/.test(parsed.body)) {
+    warnings.push('נמצאה המילה "שלב" בגוף המאמר. להחליף במספור או בנקודות.');
   }
 
   const bodyLines = parsed.body.split("\n").map((line) => line.trim()).filter(Boolean);
   const questionLine = [...bodyLines].reverse().find((line) => line.includes("?"));
   if (!questionLine) {
-    errors.push("׳—׳¡׳¨׳” ׳©׳׳׳” ׳₪׳×׳•׳—׳” ׳‘׳¡׳•׳£.");
+    errors.push("חסרה שאלה פתוחה בסוף.");
   } else {
-    const realityQuestionRe = /(׳׳¦׳׳|׳‘׳—׳™׳™׳ ׳©׳׳|׳‘׳™׳•׳ ׳©׳׳|׳‘׳׳¦׳™׳׳•׳× ׳©׳׳|׳׳×׳”|׳©׳׳)/;
+    const realityQuestionRe = /(אצלך|בחיים שלך|ביום שלך|במציאות שלך|אתה|שלך)/;
     if (!realityQuestionRe.test(questionLine)) {
-      errors.push("׳”׳©׳׳׳” ׳‘׳¡׳•׳£ ׳—׳™׳™׳‘׳× ׳׳”׳×׳™׳™׳—׳¡ ׳׳׳¦׳™׳׳•׳× ׳©׳ ׳”׳§׳•׳¨׳.");
+      errors.push("השאלה בסוף חייבת להתייחס למציאות של הקורא.");
     }
   }
 
   return { errors, warnings, slug, body: parsed.body };
 }
 
-/** ׳˜׳™׳•׳˜׳× MDX ׳׳”׳•׳¨׳“׳” ׳׳§׳•׳׳™׳× ג€” ׳‘׳׳™ ׳׳•׳“׳ ׳—׳™׳¦׳•׳ ׳™ */
+/** טיוטת MDX להורדה מקומית — בלי מודל חיצוני */
 function buildMdxStub(data) {
   const today = new Date().toISOString().slice(0, 10);
   const slug = data.slug.trim() || "draft-article";
@@ -281,13 +281,13 @@ function buildMdxStub(data) {
     .map((tag) => tag.trim())
     .filter(Boolean);
   const tagsYaml = tagParts.map((t) => `"${yq(t)}"`).join(", ");
-  const body = data.body.trim() || "<!-- ׳’׳•׳£ ׳”׳׳׳׳¨ -->\n";
+  const body = data.body.trim() || "<!-- גוף המאמר -->\n";
 
   return `---
-title: "${yq(data.topic || "׳›׳•׳×׳¨׳× ׳–׳׳ ׳™׳×")}"
-description: "${yq(data.summary || "׳×׳§׳¦׳™׳¨ ׳׳—׳™׳₪׳•׳©")}"
+title: "${yq(data.topic || "כותרת זמנית")}"
+description: "${yq(data.summary || "תקציר לחיפוש")}"
 pubDate: ${today}
-author: "׳”׳©׳ ׳׳ ׳׳©׳ ׳”"
+author: "השם לא משנה"
 questionForSchema: "${yq(data.questionForSchema)}"
 originalInsight: "${yq(data.aha)}"
 difficultyLevel: ${data.difficultyLevel || "beginner"}
@@ -486,7 +486,7 @@ function setupArticleWizard() {
     const wordCount = countWords(data.body);
 
     if (wordCountEl instanceof HTMLElement) {
-      wordCountEl.textContent = `׳׳™׳׳™׳ ׳‘׳˜׳™׳•׳˜׳”: ${wordCount}`;
+      wordCountEl.textContent = `מילים בטיוטה: ${wordCount}`;
     }
 
     const sentenceWarn = document.getElementById("wiz-sentence-warn");
@@ -494,7 +494,7 @@ function setupArticleWizard() {
       const n = countLongSentences(data.body);
       if (n > 0) {
         sentenceWarn.classList.remove("hidden");
-        sentenceWarn.textContent = `׳ ׳׳¦׳׳• ${n} ׳׳©׳₪׳˜׳™׳ ׳׳¨׳•׳›׳™׳ (׳׳¢׳ ${LONG_SENTENCE_WORDS} ׳׳™׳׳™׳). ׳©׳§׳•׳ ׳׳₪׳¦׳.`;
+        sentenceWarn.textContent = `נמצאו ${n} משפטים ארוכים (מעל ${LONG_SENTENCE_WORDS} מילים). שקול לפצל.`;
       } else {
         sentenceWarn.classList.add("hidden");
         sentenceWarn.textContent = "";
@@ -511,7 +511,7 @@ function setupArticleWizard() {
     if (blockersEl instanceof HTMLElement) {
       if (blockers.length > 0) {
         blockersEl.classList.remove("hidden");
-        blockersEl.textContent = ["׳׳ ׳¢׳•׳‘׳¨׳™׳ ׳׳©׳׳‘ 3 ׳¢׳“ ׳©׳׳×׳§׳ ׳™׳:", ...blockers.map((item) => `ג€¢ ${item}`)].join("\n");
+        blockersEl.textContent = ["לא עוברים לשלב 3 עד שמתקנים:", ...blockers.map((item) => `• ${item}`)].join("\n");
       } else {
         blockersEl.classList.add("hidden");
         blockersEl.textContent = "";
@@ -531,12 +531,12 @@ function setupArticleWizard() {
       ].join("\n");
       const classification = validateAndClassify(scanBlob);
       if (classification.recommendPremium) {
-        warnings.push(`${SENSITIVE_TOPIC_WARNING} ֲ· ׳–׳•׳”׳•: ${classification.matchedSensitive.join(", ")}`);
+        warnings.push(`${SENSITIVE_TOPIC_WARNING} · זוהו: ${classification.matchedSensitive.join(", ")}`);
       }
       preflightEl.textContent =
         warnings.length > 0
-          ? ["׳׳–׳”׳¨׳•׳×:", ...warnings.map((item) => `ג€¢ ${item}`)].join("\n")
-          : "׳׳™׳ ׳׳–׳”׳¨׳•׳×. ׳׳ ׳׳™׳ ׳—׳¡׳™׳׳•׳× ׳‘׳׳“׳•׳, ׳׳₪׳©׳¨ ׳׳”׳×׳§׳“׳.";
+          ? ["אזהרות:", ...warnings.map((item) => `• ${item}`)].join("\n")
+          : "אין אזהרות. אם אין חסימות באדום, אפשר להתקדם.";
     }
   };
 
@@ -547,7 +547,7 @@ function setupArticleWizard() {
       progress.style.width = `${(current / 3) * 100}%`;
     }
     if (stepLabel instanceof HTMLElement) {
-      stepLabel.textContent = `׳¦׳¢׳“ ${current} ׳׳×׳•׳ 3`;
+      stepLabel.textContent = `צעד ${current} מתוך 3`;
     }
 
     root.querySelectorAll("[data-wiz-tab]").forEach((el) => {
@@ -599,19 +599,19 @@ function setupArticleWizard() {
 [Context: NeverMind Project]
 Act as a high-end content strategist for NeverMind. Write an article about ${data.topic || "[Topic]"} for ${data.audience || "[Audience]"}. The core insight is ${data.aha || "[originalInsight]"}.${bottomLine}${inversionNote}
 
-[Content policy ג€” Hebrew instruction for the model]
-׳—׳•׳§׳™ ׳×׳•׳›׳: ׳”׳™׳” ׳׳•׳“׳¢ ׳׳›׳ ׳©׳ ׳•׳©׳׳™׳ ׳›׳׳• ׳¡׳׳™׳, ׳׳™׳, ׳₪׳•׳¨׳ ׳•, ׳”׳™׳׳•׳¨׳™׳ ׳•׳”׳×׳׳›׳¨׳•׳™׳•׳× (׳•׳‘׳™׳˜׳•׳™׳™׳ ׳§׳¨׳•׳‘׳™׳ ׳‘׳׳ ׳’׳׳™׳× ׳›׳’׳•׳ drugs, porn, gambling, addiction) ׳’׳•׳¨׳׳™׳ ׳׳–׳™׳”׳•׳™ ׳₪׳¨׳™׳׳™׳•׳ ׳‘׳–׳¨׳™׳׳× ׳”׳׳×׳¨. ׳׳ ׳”׳ ׳•׳©׳ ׳ ׳•׳’׳¢ ׳׳›׳, ׳”׳’׳“׳¨ isPremium: true. ׳”׳©׳×׳׳© ׳‘׳©׳₪׳” ׳™׳©׳™׳¨׳” ׳׳ ׳׳—׳¨׳׳™׳×. ׳‘׳׳™ ׳¡׳ ׳¡׳¦׳™׳”. ׳‘׳׳™ ׳”׳ ׳—׳™׳•׳× ׳׳₪׳¨׳•׳× ׳—׳•׳§.
+[Content policy - Hebrew instruction for the model]
+חוקי תוכן: היה מודע לכך שנושאים כמו סמים, מין, פורנו, הימורים והתמכרויות (וביטויים קרובים באנגלית כגון drugs, porn, gambling, addiction) גורמים לזיהוי פרימיום בזרימת האתר. אם הנושא נוגע לכך, הגדר isPremium: true. השתמש בשפה ישירה אך אחראית. בלי סנסציה. בלי הנחיות מפרות חוק.
 
 You MUST output a single MDX file with YAML frontmatter.
 
-Mandatory frontmatter ג€” always generate these keys with real, non-empty values (never placeholder text, never skip):
+Mandatory frontmatter - always generate these keys with real, non-empty values (never placeholder text, never skip):
 - questionForSchema
 - originalInsight
 - difficultyLevel (beginner | advanced | deep)
-- mindShiftIntensity (integer 1ג€“5)
+- mindShiftIntensity (integer 1-5)
 - imageAlt
 
-Forbidden robotic / corporate clichֳ© vocabulary ג€” do NOT use these strings anywhere in the entire output (including YAML values, title, description, and body). Case-insensitive; includes multi-word phrases:
+Forbidden robotic / corporate cliche vocabulary - do NOT use these strings anywhere in the entire output (including YAML values, title, description, and body). Case-insensitive; includes multi-word phrases:
 ${roboticBannedList}
 
 Wizard inputs vs final file: Values typed in the wizard (topic, bullets, draft body inside [DRAFT_BODY_START]...[DRAFT_BODY_END]) may include rough notes or placeholder phrasing. The final MDX you produce must rewrite this into clean NeverMind voice and MUST obey every rule above. Do not paste robotic or filler phrasing from the draft into the published text.
@@ -620,20 +620,20 @@ Required frontmatter keys (all must be present with non-empty values where noted
 - title: Hebrew title
 - description: meta description ~150-160 chars
 - pubDate: YYYY-MM-DD
-- author: default "׳”׳©׳ ׳׳ ׳׳©׳ ׳”"
-- questionForSchema: distilled search-facing question (Hebrew) ג€” ${data.questionForSchema || "[fill]"}
-- originalInsight: same core as the article spine ג€” ${data.aha || "[fill]"}
-- difficultyLevel: one of beginner | advanced | deep ג€” use ${data.difficultyLevel}
-- mindShiftIntensity: integer 1-5 ג€” use ${data.mindShiftIntensity}
-- imageAlt: Hebrew. Describe the CONCEPT the hero image stands for, not only pixels. Pattern: [brief visible scene] ג€” [semantic role for the article]. Example shape: "׳׳“׳ ׳¢׳•׳׳“ ׳׳•׳ ׳׳¨׳׳” ׳©׳‘׳•׳¨׳” ג€” ׳™׳™׳¦׳•׳’ ׳•׳™׳–׳•׳׳׳™ ׳׳₪׳™׳¨׳•׳§ ׳”׳׳’׳•". Search engines use this for topical/philosophical context; keep concrete + interpretive in one line. Wizard draft: ${data.imageAlt || "[fill]"}
-- slug: REQUIRED, English only, kebab-case, aligned with title ג€” ${data.slug || "[Slug]"}
+- author: default "השם לא משנה"
+- questionForSchema: distilled search-facing question (Hebrew) - ${data.questionForSchema || "[fill]"}
+- originalInsight: same core as the article spine - ${data.aha || "[fill]"}
+- difficultyLevel: one of beginner | advanced | deep - use ${data.difficultyLevel}
+- mindShiftIntensity: integer 1-5 - use ${data.mindShiftIntensity}
+- imageAlt: Hebrew. Describe the CONCEPT the hero image stands for, not only pixels. Pattern: [brief visible scene] — [semantic role for the article]. Example shape: "אדם עומד מול מראה שבורה — ייצוג ויזואלי לפירוק האגו". Search engines use this for topical/philosophical context; keep concrete + interpretive in one line. Wizard draft: ${data.imageAlt || "[fill]"}
+- slug: REQUIRED, English only, kebab-case, aligned with title - ${data.slug || "[Slug]"}
 - tags: array; ONLY these exact Hebrew strings (comma-separated canonical list): ${canonicalTagsCsv}
 - image: default hero path ${defaultImagePath} unless a different asset is explicitly intended
 - isPremium: ${data.isPremium}
 - youtubeId, bottomLine, inversionNote, reflectionQuestions, faq: as in project conventions
 
 Tags rule: never invent a tag outside the canonical list. Slug rule: [a-z0-9-] only.
-imageAlt rule: must fuse literal scene with symbolic meaning tied to the article thesis; avoid generic stock phrases ("׳×׳׳•׳ ׳” ׳©׳ ׳׳“׳").
+imageAlt rule: must fuse literal scene with symbolic meaning tied to the article thesis; avoid generic stock phrases ("תמונה של אדם").
 
 Style: ${data.tone || "[Tone]"}. Ensure the piece includes: ${normalizedPoints || "[Key Points]"}. Length intent: ${data.length || "[Length]"}. Draft body (if any) should be refined, not duplicated blindly:
 [DRAFT_BODY_START]
@@ -643,13 +643,13 @@ ${depthBlock}
 Follow the brand identity: zero fluff, focus on thought-shifts, NeverMind voice (direct, analytical, no filler).
 [Output Instructions: Markdown; no fluff; focus on Thought-Shifts; structure for web reading.
 - Use the following heading order and exact labels (must match exactly):
-  1) ## ׳׳” ׳”׳׳ ׳’׳ ׳•׳ ׳›׳׳
-  2) ## ׳©׳׳׳× ׳”׳™׳₪׳•׳
-  3) ### ׳ ׳™׳¡׳•׳™ ׳§׳¦׳¨
-  4) ## ׳¡׳™׳›׳•׳ ׳₪׳¨׳§׳˜׳™
-- Never use the Hebrew word "׳©׳׳‘" inside the article body.
+  1) ## מה המנגנון כאן
+  2) ## שאלת היפוך
+  3) ### ניסוי קצר
+  4) ## סיכום פרקטי
+- Never use the Hebrew word "שלב" inside the article body.
 - End with exactly one open question about the reader's own reality (not about the article).
-- Inside at least 2 headings above, weave 2-3 natural SEO phrases derived from the topic (use Hebrew patterns like: ׳׳™׳ {topic}, ׳׳™׳ ׳׳”׳₪׳¡׳™׳§ {topic}, ׳₪׳×׳¨׳•׳ ... ׳‘׳–׳•׳’׳™׳•׳× when relevant).
+- Inside at least 2 headings above, weave 2-3 natural SEO phrases derived from the topic (use Hebrew patterns like: איך {topic}, איך להפסיק {topic}, פתרון ... בזוגיות when relevant).
 - Two-layer writing: each paragraph has two sentences. First sentence simple and concrete. Second sentence deeper and more precise.
 - Keep paragraphs short. No generic filler.
 ]`;
@@ -660,7 +660,7 @@ Follow the brand identity: zero fluff, focus on thought-shifts, NeverMind voice 
     return `${prompt}
 
 [Delivery rule for external model]
-׳§׳— ׳׳× ׳”׳₪׳¨׳•׳׳₪׳˜ ׳”׳–׳” ׳•׳×׳™׳™׳¦׳¨ ׳₪׳׳˜ MDX ׳׳׳. ׳׳ ׳×׳¡׳™׳¨ ׳©׳“׳•׳× ׳—׳•׳‘׳”. ׳׳ ׳×׳›׳ ׳™׳¡ ׳ ׳™׳¡׳•׳— ׳¨׳•׳‘׳•׳˜׳™. ׳”׳—׳–׳¨ ׳¨׳§ ׳§׳•׳‘׳¥ ׳׳—׳“ ׳׳”׳“׳‘׳§׳”.`;
+קח את הפרומפט הזה ותייצר פלט MDX מלא. אל תסיר שדות חובה. אל תכניס ניסוח רובוטי. החזר רק קובץ אחד להדבקה.`;
   };
 
   const onCopyPackage = async () => {
@@ -668,11 +668,11 @@ Follow the brand identity: zero fluff, focus on thought-shifts, NeverMind voice 
     try {
       await navigator.clipboard.writeText(buildQuickPackage());
       if (saveStatus instanceof HTMLElement) {
-        saveStatus.textContent = "׳—׳‘׳™׳׳× ׳™׳¦׳™׳¨׳” ׳׳”׳™׳¨׳” ׳”׳•׳¢׳×׳§׳”. ׳׳₪׳©׳¨ ׳׳”׳“׳‘׳™׳§ ׳‘׳׳•׳“׳ ׳—׳™׳¦׳•׳ ׳™.";
+        saveStatus.textContent = "חבילת יצירה מהירה הועתקה. אפשר להדביק במודל חיצוני.";
       }
     } catch {
       if (saveStatus instanceof HTMLElement) {
-        saveStatus.textContent = "׳׳ ׳ ׳™׳×׳ ׳׳”׳¢׳×׳™׳§ ׳›׳¨׳’׳¢. ׳׳₪׳©׳¨ ׳׳”׳¢׳×׳™׳§ ׳™׳“׳ ׳™׳× ׳׳”׳©׳“׳”.";
+        saveStatus.textContent = "לא ניתן להעתיק כרגע. אפשר להעתיק ידנית מהשדה.";
       }
     }
   };
@@ -687,15 +687,15 @@ Follow the brand identity: zero fluff, focus on thought-shifts, NeverMind voice 
     externalValidated = check.errors.length === 0;
     if (check.errors.length > 0) {
       result.classList.remove("hidden");
-      result.textContent = ["׳—׳¡׳™׳׳•׳×:", ...check.errors.map((item) => `ג€¢ ${item}`)].join("\n");
-      if (saveStatus instanceof HTMLElement) saveStatus.textContent = "׳™׳© ׳—׳¡׳™׳׳•׳× ׳׳₪׳ ׳™ ׳”׳•׳¨׳“׳”.";
+      result.textContent = ["חסימות:", ...check.errors.map((item) => `• ${item}`)].join("\n");
+      if (saveStatus instanceof HTMLElement) saveStatus.textContent = "יש חסימות לפני הורדה.";
       return;
     }
 
-    const warnings = check.warnings.length > 0 ? ["׳׳–׳”׳¨׳•׳×:", ...check.warnings.map((item) => `ג€¢ ${item}`)] : ["׳׳™׳ ׳׳–׳”׳¨׳•׳×."];
+    const warnings = check.warnings.length > 0 ? ["אזהרות:", ...check.warnings.map((item) => `• ${item}`)] : ["אין אזהרות."];
     result.classList.remove("hidden");
     result.textContent = warnings.join("\n");
-    if (saveStatus instanceof HTMLElement) saveStatus.textContent = "׳”׳§׳•׳‘׳¥ ׳¢׳‘׳¨ ׳‘׳“׳™׳§׳” ׳‘׳¡׳™׳¡׳™׳×.";
+    if (saveStatus instanceof HTMLElement) saveStatus.textContent = "הקובץ עבר בדיקה בסיסית.";
 
     const openGithub = document.getElementById("wiz-open-github");
     if (openGithub instanceof HTMLAnchorElement && check.slug) {
@@ -716,7 +716,7 @@ Follow the brand identity: zero fluff, focus on thought-shifts, NeverMind voice 
       wrap.classList.add("hidden");
       return;
     }
-    source.textContent = `׳˜׳¢׳ ׳” ׳׳‘׳“׳™׳§׳”: ${selectedClaim}`;
+    source.textContent = `טענה לבדיקה: ${selectedClaim}`;
     wrap.classList.remove("hidden");
   };
 
@@ -730,7 +730,7 @@ Follow the brand identity: zero fluff, focus on thought-shifts, NeverMind voice 
     root.classList.toggle("nm-wizard--focus", focusMode);
     const btn = document.getElementById("wiz-focus-toggle");
     if (btn instanceof HTMLButtonElement) {
-      btn.textContent = focusMode ? "׳™׳¦׳™׳׳” ׳׳׳¦׳‘ ׳׳™׳§׳•׳“" : "׳׳¦׳‘ ׳׳™׳§׳•׳“";
+      btn.textContent = focusMode ? "יציאה ממצב מיקוד" : "מצב מיקוד";
     }
   };
 
@@ -742,7 +742,7 @@ Follow the brand identity: zero fluff, focus on thought-shifts, NeverMind voice 
       return;
     }
     const text = out instanceof HTMLTextAreaElement ? out.value.trim() : "";
-    body.textContent = text || "(׳¨׳™׳§ ג€” ׳׳—׳¥ ׳§׳•׳“׳ ׳¢׳ ׳׳–׳§׳§ ׳׳׳׳׳¨)";
+    body.textContent = text || "(ריק — לחץ קודם על לזקק למאמר)";
     dialog.showModal();
   };
 
@@ -773,7 +773,7 @@ Follow the brand identity: zero fluff, focus on thought-shifts, NeverMind voice 
     const blockers = runBlockingChecks(data);
     if (blockers.length > 0) {
       if (saveStatus instanceof HTMLElement) {
-        saveStatus.textContent = ["׳׳ ׳ ׳™׳×׳ ׳׳”׳¢׳×׳™׳§ ׳׳₪׳ ׳™ ׳×׳™׳§׳•׳:", ...blockers.map((item) => `ג€¢ ${item}`)].join("\n");
+        saveStatus.textContent = ["לא ניתן להעתיק לפני תיקון:", ...blockers.map((item) => `• ${item}`)].join("\n");
       }
       return;
     }
@@ -782,18 +782,18 @@ Follow the brand identity: zero fluff, focus on thought-shifts, NeverMind voice 
     try {
       await navigator.clipboard.writeText(text);
       if (copyBtn instanceof HTMLButtonElement) {
-        const originalText = copyBtn.textContent || "׳”׳¢׳×׳§ ׳׳× ׳›׳ ׳§׳•׳“ ׳”-MDX";
-        copyBtn.textContent = "׳”׳•׳¢׳×׳§";
+        const originalText = copyBtn.textContent || "העתק את כל קוד ה-MDX";
+        copyBtn.textContent = "הועתק";
         window.setTimeout(() => {
           copyBtn.textContent = originalText;
         }, 2000);
       }
       if (saveStatus instanceof HTMLElement) {
-        saveStatus.textContent = "׳§׳•׳“ MDX ׳׳׳ ׳”׳•׳¢׳×׳§ ׳׳׳•׳—.";
+        saveStatus.textContent = "קוד MDX מלא הועתק ללוח.";
       }
     } catch {
       if (saveStatus instanceof HTMLElement) {
-        saveStatus.textContent = "׳׳ ׳ ׳™׳×׳ ׳׳”׳¢׳×׳™׳§ ׳›׳¨׳’׳¢.";
+        saveStatus.textContent = "לא ניתן להעתיק כרגע.";
       }
     }
   };
@@ -985,7 +985,7 @@ Follow the brand identity: zero fluff, focus on thought-shifts, NeverMind voice 
       const blockers = runBlockingChecks(data);
       if (blockers.length > 0) {
         if (saveStatus instanceof HTMLElement) {
-          saveStatus.textContent = "׳׳ ׳ ׳™׳×׳ ׳׳”׳•׳¨׳™׳“ ׳׳₪׳ ׳™ ׳×׳™׳§׳•׳ ׳”׳—׳¡׳™׳׳•׳×.";
+          saveStatus.textContent = "לא ניתן להוריד לפני תיקון החסימות.";
         }
         return;
       }
@@ -993,15 +993,15 @@ Follow the brand identity: zero fluff, focus on thought-shifts, NeverMind voice 
 
     if (external) {
       if (!externalValidated) {
-        if (saveStatus instanceof HTMLElement) saveStatus.textContent = "׳™׳© ׳׳”׳¨׳™׳¥ ׳‘׳“׳™׳§׳” ׳¢׳ ׳₪׳׳˜ ׳—׳™׳¦׳•׳ ׳™ ׳׳₪׳ ׳™ ׳”׳•׳¨׳“׳”.";
+        if (saveStatus instanceof HTMLElement) saveStatus.textContent = "יש להריץ בדיקה על פלט חיצוני לפני הורדה.";
         return;
       }
       if (!selectedClaim) {
-        if (saveStatus instanceof HTMLElement) saveStatus.textContent = '׳׳—׳¥ "׳”׳₪׳•׳ ׳˜׳¢׳ ׳”" ׳׳₪׳ ׳™ ׳”׳•׳¨׳“׳”.';
+        if (saveStatus instanceof HTMLElement) saveStatus.textContent = 'לחץ "הפוך טענה" לפני הורדה.';
         return;
       }
       if (!inversion) {
-        if (saveStatus instanceof HTMLElement) saveStatus.textContent = "׳ ׳“׳¨׳© ׳׳׳׳ ׳”׳™׳₪׳•׳ ׳׳˜׳¢׳ ׳” ׳׳₪׳ ׳™ ׳”׳•׳¨׳“׳”.";
+        if (saveStatus instanceof HTMLElement) saveStatus.textContent = "נדרש למלא היפוך לטענה לפני הורדה.";
         return;
       }
     }
@@ -1022,7 +1022,7 @@ Follow the brand identity: zero fluff, focus on thought-shifts, NeverMind voice 
     window.setTimeout(() => URL.revokeObjectURL(url), 1500);
 
     if (saveStatus instanceof HTMLElement) {
-      saveStatus.textContent = "׳§׳•׳‘׳¥ MDX ׳”׳•׳¨׳“. ׳׳”׳¢׳‘׳™׳¨ ׳ײ¾src/content/articles/ ׳•׳׳”׳“׳‘׳™׳§ ׳‘-GitHub.";
+      saveStatus.textContent = "קובץ MDX הורד. להעביר ל־src/content/articles/ ולהדביק ב-GitHub.";
     }
   }
 
@@ -1043,7 +1043,7 @@ Follow the brand identity: zero fluff, focus on thought-shifts, NeverMind voice 
     }
 
     if (saveStatus instanceof HTMLElement) {
-      saveStatus.textContent = savedViaHook ? "׳ ׳©׳׳¨ ׳“׳¨׳ ׳—׳™׳‘׳•׳¨ ׳—׳™׳¦׳•׳ ׳™." : "׳ ׳©׳׳¨ ׳‘׳“׳₪׳“׳₪׳ ׳‘׳׳‘׳“.";
+      saveStatus.textContent = savedViaHook ? "נשמר דרך חיבור חיצוני." : "נשמר בדפדפן בלבד.";
     }
   }
 

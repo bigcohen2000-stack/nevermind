@@ -1,0 +1,35 @@
+---
+interface Props {
+  to: string;
+  title?: string;
+  message?: string;
+}
+
+const {
+  to,
+  title = "Redirecting...",
+  message = "This page has moved.",
+} = Astro.props;
+
+const destination = typeof to === "string" && to.trim() ? to.trim() : "/";
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="refresh" content={`0;url=${destination}`} />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="canonical" href={destination} />
+    <title>{title}</title>
+    <script is:inline define:vars={{ destination }}>
+      if (typeof window !== "undefined") {
+        window.location.replace(destination);
+      }
+    </script>
+  </head>
+  <body>
+    <main>
+      <p>{message} <a href={destination}>Continue</a>.</p>
+    </main>
+  </body>
+</html>

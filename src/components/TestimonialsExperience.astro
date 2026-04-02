@@ -1,0 +1,366 @@
+---
+/**
+ * עמוד המלצות: ציטוטים כחיזוק בלבד. הבדיקה מול השכל הישר של הקורא.
+ */
+type Kind = "מחשבה" | "פעולה";
+
+type QuoteItem = {
+  kind: Kind;
+  /** טקסט לפני המילה המודגשת */
+  before: string;
+  /** מילה אחת אדומה */
+  highlight: string;
+  /** טקסט אחרי המילה המודגשת (עד נקודה אדומה) */
+  after: string;
+};
+
+const quotes: QuoteItem[] = [
+  { kind: "מחשבה", before: "לפני הייתי מבולבל. עכשיו אני מבין מה קורה לי ב", highlight: "פנים", after: "" },
+  { kind: "פעולה", before: "לפני דחיתי. עכשיו אני פותח את הנושא ב", highlight: "בהירות", after: "" },
+  { kind: "מחשבה", before: "לפני חיפשתי להסביר. עכשיו אני בודק ", highlight: "עובדות", after: " לפני מסקנה" },
+  { kind: "פעולה", before: "לפני נמנעתי משאלה. עכשיו אני שואל ", highlight: "ישר", after: "" },
+  { kind: "מחשבה", before: "לפני הכול נשמע דחוף. עכשיו יש רגע של ", highlight: "שקט", after: "" },
+  { kind: "פעולה", before: "לפני נשארתי בקצה. עכשיו אני רואה את השורש ב", highlight: "עומק", after: "" },
+  { kind: "מחשבה", before: "לפני רציתי אישור מבחוץ. עכשיו אני בודק ", highlight: "בעצמי", after: "" },
+  { kind: "פעולה", before: "לפני ניסיתי לשכנע. עכשיו אני מביא שאלה אחת שמכריחה ", highlight: "התבוננות", after: "" },
+  { kind: "מחשבה", before: "לפני הייתי על אוטומט. עכשיו אני מזהה את ה", highlight: "מנגנון", after: "" },
+  { kind: "פעולה", before: "לפני נעלמתי. עכשיו אני חוזר עם גבול ברור בלי ", highlight: "תיאוריה", after: "" },
+];
+
+const introExample =
+  "הבנתי משהו על עצמי לא בגלל מישהו אחר, אלא בגלל שזה נחת על נקודה שהייתה פתוחה אצלי";
+
+function plainQuote(q: QuoteItem): string {
+  return `${q.before}${q.highlight}${q.after}`.replace(/\s+/g, " ").trim();
+}
+---
+
+<section class="nm-testimonials-root space-y-12 text-right" style="color: #1a1a1a;">
+  <header class="space-y-4">
+    <p class="text-sm font-medium text-[color-mix(in_srgb,var(--nm-fg)_58%,var(--nm-bg))]">
+      אלו מילים של אנשים אחרים, בדוק אם הן נכונות גם לך
+    </p>
+    <h1 class="text-[clamp(1.75rem,1.4rem+1.2vw,2.5rem)] font-semibold leading-tight text-[var(--nm-fg)]">המלצות</h1>
+    <div class="space-y-3 text-[color-mix(in_srgb,var(--nm-fg)_82%,var(--nm-bg))]">
+      <p class="leading-[var(--line-height-ui)]">
+        ציטוטים כאן הם רק חיזוק. הבדיקה האמיתית היא מול השכל הישר שלך. אם משפט נשמע נכון בלי שם וללא לחץ חיצוני, שווה לעצור עליו. אם לא, זה לא הופך אותך לשגוי. זה רק אומר שהניסוח עדיין לא נח על המציאות שלך.
+      </p>
+      <p class="rounded-[1.25rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/80 px-5 py-4 text-sm leading-[var(--line-height-ui)] text-[color-mix(in_srgb,var(--nm-fg)_88%,var(--nm-bg))]">
+        דוגמה: {introExample}
+      </p>
+    </div>
+  </header>
+
+  <!-- מובייל: קרוסלה אופקית, משפט למסך. dir=ltr על המסלול כדי לייצב snap/scrollLeft מול overflow-x בדף -->
+  <div class="relative w-full min-w-0 sm:hidden">
+    <div
+      class="nm-testimonials-carousel nm-testimonials-carousel--mobile flex w-full min-w-0 touch-pan-x snap-x snap-mandatory overflow-x-auto overscroll-x-contain scroll-smooth [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      dir="ltr"
+      role="region"
+      aria-roledescription="קרוסלה"
+      aria-label="המלצות. החלק לצד כדי לעבור בין משפטים"
+      tabindex="0"
+      data-nm-testimonials-carousel
+    >
+      {
+        quotes.map((q, i) => {
+          const plain = plainQuote(q);
+          const labelId = `nm-testimonial-m-${i + 1}`;
+          return (
+            <article
+              class="nm-testimonials-slide flex w-full min-w-full shrink-0 snap-center snap-always flex-col justify-center px-5 py-8"
+              dir="rtl"
+              style="min-height: min(100dvh, calc(100svh - 2rem));"
+              data-nm-testimonial-slide
+              aria-hidden={i === 0 ? "false" : "true"}
+            >
+              <p id={labelId} class="sr-only">
+                חוויה של משתמש: {plain}
+              </p>
+              <div class="relative z-[1] mx-auto flex w-full max-w-[min(100%,24rem)] flex-col space-y-5 text-center" aria-hidden="true">
+                <span
+                  class="pointer-events-none absolute inset-x-0 top-0 flex justify-center font-serif text-[clamp(3rem,18vw,5rem)] font-light leading-none text-[color-mix(in_srgb,var(--nm-fg)_6%,transparent)] select-none"
+                  aria-hidden="true"
+                >
+                  "
+                </span>
+                <p class="text-[0.7rem] font-semibold uppercase tracking-[0.12em] text-[color-mix(in_srgb,var(--nm-fg)_48%,var(--nm-bg))]">
+                  [{q.kind}]
+                </p>
+                <p class="nm-testimonials-slide-quote text-[30px] font-semibold leading-[1.45] text-[var(--nm-fg)] [text-wrap:balance]">
+                  {q.before}
+                  <span class="font-bold text-[var(--nm-accent)]">{q.highlight}</span>
+                  {q.after}
+                  <span class="ms-0.5 inline-block text-[var(--nm-accent)]">.</span>
+                </p>
+              </div>
+              <div class="relative z-[2] mx-auto mt-8 flex justify-center">
+                <button
+                  type="button"
+                  class="nm-testimonial-check inline-flex min-h-[44px] items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_14%,transparent)] bg-white/90 px-4 py-2 text-xs font-semibold text-[var(--nm-fg)] transition hover:border-[color-mix(in_srgb,var(--nm-accent)_35%,transparent)] hover:bg-[var(--nm-tint)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nm-accent)]"
+                  data-testimonial-check
+                  aria-describedby={labelId}
+                >
+                  זה נשמע לך הגיוני
+                </button>
+              </div>
+            </article>
+          );
+        })
+      }
+    </div>
+    <div
+      class="nm-testimonials-swipe-hint pointer-events-none absolute bottom-2 left-0 right-0 flex flex-col items-center gap-0.5 text-[color-mix(in_srgb,var(--nm-fg)_45%,var(--nm-bg))] motion-reduce:opacity-80"
+      aria-hidden="true"
+      data-nm-swipe-hint
+    >
+      <span class="sr-only">יש עוד משפטים. המעבר הוא החלקה לצדדים</span>
+      <svg
+        class="nm-testimonials-hint-arrow h-5 w-5 shrink-0 opacity-90"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M12 5v14M5 12l7 7 7-7" />
+      </svg>
+    </div>
+  </div>
+
+  <div class="hidden gap-5 sm:grid sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
+    {
+      quotes.map((q, i) => {
+        const plain = plainQuote(q);
+        const labelId = `nm-testimonial-${i + 1}`;
+        return (
+          <article
+            class="nm-testimonial-card group relative overflow-hidden rounded-[1.35rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-6 shadow-[0_12px_36px_rgba(26,26,26,0.04)] transition-transform duration-300 will-change-transform hover:scale-[1.02] motion-reduce:hover:scale-100 [animation:nmTestFade_0.65s_ease_forwards] motion-reduce:animate-none motion-reduce:opacity-100"
+            style={`animation-delay: ${Math.min(i * 55, 550)}ms; opacity: 0;`}
+          >
+            <p id={labelId} class="sr-only">
+              חוויה של משתמש: {plain}
+            </p>
+            <div class="relative z-[1] space-y-4" aria-hidden="true">
+              <span
+                class="pointer-events-none absolute inset-0 flex items-start justify-start ps-4 pt-2 font-serif text-[clamp(4rem,12vw,7rem)] font-light leading-none text-[color-mix(in_srgb,var(--nm-fg)_5%,transparent)] select-none"
+                aria-hidden="true"
+              >
+                "
+              </span>
+              <p class="text-[0.6875rem] font-semibold uppercase tracking-[0.12em] text-[color-mix(in_srgb,var(--nm-fg)_48%,var(--nm-bg))]">
+                [{q.kind}]
+              </p>
+              <p class="text-[1.02rem] font-medium leading-[1.75] text-[var(--nm-fg)]">
+                {q.before}
+                <span class="font-semibold text-[var(--nm-accent)]">{q.highlight}</span>
+                {q.after}
+                <span class="ms-0.5 inline-block text-[var(--nm-accent)]">.</span>
+              </p>
+            </div>
+            <div class="relative z-[2] mt-4">
+              <button
+                type="button"
+                class="nm-testimonial-check inline-flex min-h-[40px] items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_14%,transparent)] bg-white/90 px-4 py-2 text-xs font-semibold text-[var(--nm-fg)] transition hover:border-[color-mix(in_srgb,var(--nm-accent)_35%,transparent)] hover:bg-[var(--nm-tint)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nm-accent)]"
+                data-testimonial-check
+                aria-describedby={labelId}
+              >
+                זה נשמע לך הגיוני
+              </button>
+            </div>
+          </article>
+        );
+      })
+    }
+  </div>
+
+  <p class="text-sm leading-[var(--line-height-ui)] text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">
+    רוצה להמשיך מניסיון אישי
+    {" · "}
+    <a href="/book/" class="font-semibold text-[var(--nm-accent)] underline-offset-2 hover:underline">קביעת שיחה</a>
+    {" · "}
+    <a href="/articles/" class="font-semibold text-[var(--nm-accent)] underline-offset-2 hover:underline">ארכיון</a>
+  </p>
+
+  <p class="text-sm font-medium text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+    איזה משפט נשאר אצלך בלי שמישהו אחר צריך לאשר אותו
+  </p>
+</section>
+
+<style>
+  @keyframes nmTestFade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .nm-testimonial-card {
+      opacity: 1;
+      animation: none;
+    }
+  }
+
+  @keyframes nmTestHintBounce {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(5px);
+    }
+  }
+
+  .nm-testimonials-hint-arrow {
+    animation: nmTestHintBounce 1.35s ease-in-out infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .nm-testimonials-hint-arrow {
+      animation: none;
+    }
+  }
+
+  .nm-testimonials-swipe-hint {
+    transition: opacity 0.35s ease;
+  }
+
+  .nm-testimonials-carousel--mobile {
+    -webkit-overflow-scrolling: touch;
+  }
+
+</style>
+
+<script>
+  function bindTestimonialChecks() {
+    document.querySelectorAll("[data-testimonial-check]").forEach((btn) => {
+      if (btn instanceof HTMLButtonElement && btn.dataset.nmBound === "1") return;
+      if (btn instanceof HTMLButtonElement) btn.dataset.nmBound = "1";
+      btn.addEventListener("click", () => {
+        const el = btn;
+        if (!(el instanceof HTMLButtonElement)) return;
+        const prev = el.textContent;
+        el.textContent = "סומן";
+        el.setAttribute("aria-pressed", "true");
+        window.setTimeout(() => {
+          el.textContent = prev || "זה נשמע לך הגיוני";
+          el.removeAttribute("aria-pressed");
+        }, 2200);
+      });
+    });
+  }
+
+  function initTestimonialsCarousel() {
+    const root = document.querySelector("[data-nm-testimonials-carousel]");
+    if (!(root instanceof HTMLElement)) return;
+    if (root.dataset.nmCarouselInit === "1") return;
+
+    const slides = [...root.querySelectorAll("[data-nm-testimonial-slide]")];
+    const hint = document.querySelector("[data-nm-swipe-hint]");
+    if (!slides.length) return;
+
+    root.dataset.nmCarouselInit = "1";
+
+    function scrollCarouselToStart() {
+      try {
+        root.scrollTo({ left: 0, top: 0, behavior: "auto" });
+      } catch {
+        root.scrollLeft = 0;
+      }
+      requestAnimationFrame(() => {
+        try {
+          root.scrollTo({ left: 0, top: 0, behavior: "auto" });
+        } catch {
+          root.scrollLeft = 0;
+        }
+      });
+    }
+
+    scrollCarouselToStart();
+
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let lastIdx = -1;
+
+    function pickActiveIndex() {
+      const rect = root.getBoundingClientRect();
+      const mid = rect.left + rect.width / 2;
+      let best = 0;
+      let bestDist = Infinity;
+      slides.forEach((slide, i) => {
+        const r = slide.getBoundingClientRect();
+        const c = r.left + r.width / 2;
+        const d = Math.abs(c - mid);
+        if (d < bestDist) {
+          bestDist = d;
+          best = i;
+        }
+      });
+      return best;
+    }
+
+    function applySlideState(idx) {
+      slides.forEach((s, i) => {
+        s.setAttribute("aria-hidden", i === idx ? "false" : "true");
+      });
+      if (idx !== lastIdx) {
+        if (lastIdx >= 0 && !reduceMotion && typeof navigator.vibrate === "function") {
+          navigator.vibrate(12);
+        }
+        lastIdx = idx;
+      }
+      if (hint instanceof HTMLElement) {
+        hint.classList.toggle("opacity-0", idx === slides.length - 1);
+      }
+    }
+
+    const observer = new IntersectionObserver(
+      () => {
+        applySlideState(pickActiveIndex());
+      },
+      { root, threshold: [0, 0.25, 0.5, 0.75, 1] }
+    );
+
+    slides.forEach((s) => observer.observe(s));
+
+    root.addEventListener(
+      "scroll",
+      () => {
+        applySlideState(pickActiveIndex());
+      },
+      { passive: true }
+    );
+
+    if ("onscrollend" in window) {
+      root.addEventListener("scrollend", () => applySlideState(pickActiveIndex()));
+    }
+
+    applySlideState(0);
+
+    root.addEventListener("keydown", (e) => {
+      if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+      e.preventDefault();
+      const w = root.clientWidth;
+      const rtl = getComputedStyle(root).direction === "rtl";
+      const goNext = rtl ? e.key === "ArrowLeft" : e.key === "ArrowRight";
+      root.scrollBy({ left: goNext ? w : -w, behavior: reduceMotion ? "auto" : "smooth" });
+    });
+  }
+
+  function bootTestimonials() {
+    bindTestimonialChecks();
+    initTestimonialsCarousel();
+  }
+
+  bootTestimonials();
+  const w = window;
+  if (!w["__nmTestimonialsNav"]) {
+    w["__nmTestimonialsNav"] = true;
+    document.addEventListener("astro:page-load", bootTestimonials);
+    document.addEventListener("astro:after-swap", bootTestimonials);
+  }
+</script>

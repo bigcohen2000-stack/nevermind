@@ -1,0 +1,49 @@
+---
+import type { ThoughtShift } from "../lib/services";
+
+interface Props {
+  items: ThoughtShift[];
+  heading?: string;
+  eyebrow?: string;
+  intro?: string;
+}
+
+const {
+  items,
+  heading = "זה לא עוד המלצה. זו הבנה עמוקה של מה שכבר קיים, ופתיחה לאפשרויות חדשות - אם תרצה.",
+  eyebrow = "לפני ואחרי",
+  intro = "",
+} = Astro.props as Props;
+---
+
+<section class="philosophy-section space-y-6 text-right">
+  <div class="space-y-3">
+    <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--nm-accent)]">{eyebrow}</p>
+    <h2 class="text-[clamp(1.9rem,1.5rem+1vw,2.8rem)] font-semibold leading-snug text-[var(--nm-fg)]">{heading}</h2>
+    {
+      intro ? (
+        <p class="max-w-3xl text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">{intro}</p>
+      ) : null
+    }
+  </div>
+
+  <div class="grid gap-5 lg:grid-cols-3">
+    {items.map((item) => (
+      <article class="overflow-hidden rounded-[1.9rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/84 shadow-[0_18px_50px_rgba(26,26,26,0.05)]">
+        <header class="border-b border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] bg-[var(--nm-surface-muted)] px-5 py-4">
+          <h3 class="text-lg font-semibold text-[var(--nm-fg)]">{item.title}</h3>
+        </header>
+        <div class="grid gap-px bg-[var(--nm-inverse)]/8 md:grid-cols-2">
+          <div class="space-y-3 bg-white px-5 py-5">
+            <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[color-mix(in_srgb,var(--nm-fg)_45%,var(--nm-bg))]">דפוס ישן</p>
+            <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_64%,var(--nm-bg))]">{item.before}</p>
+          </div>
+          <div class="space-y-3 bg-[var(--nm-tint)] px-5 py-5">
+            <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">דפוס NeverMind</p>
+            <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_82%,var(--nm-bg))]">{item.after}</p>
+          </div>
+        </div>
+      </article>
+    ))}
+  </div>
+</section>

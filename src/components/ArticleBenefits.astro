@@ -1,0 +1,39 @@
+---
+interface Props {
+  reflectionQuestions: string[];
+  bottomLine: string;
+}
+
+const { reflectionQuestions, bottomLine } = Astro.props as Props;
+const example = Array.isArray(reflectionQuestions) ? reflectionQuestions[0] : "";
+const exampleClean = String(example || "").trim().replace(/\?$/, "");
+---
+
+<section
+  class="mx-auto max-w-[72ch] rounded-[1.5rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-5 py-4 text-right shadow-sm"
+  aria-label="מה תקבל מהמאמר הזה"
+>
+  <p class="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--nm-accent)]">מה תקבל</p>
+  <h2 class="mt-2 text-[clamp(1.15rem,1rem+0.5vw,1.35rem)] font-semibold text-[var(--nm-fg)]">
+    3-4 נקודות קצרות שפותחות כיוון
+  </h2>
+
+  <ul class="mt-4 space-y-3">
+    <li class="rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] bg-white/70 px-4 py-3">
+      מסגרת קצרה שמפרידה עובדה מול סיפור
+    </li>
+    <li class="rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] bg-white/70 px-4 py-3">
+      שאלת היפוך שמערערת את ההנחה שמחזיקה את הלופ
+    </li>
+    <li class="rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] bg-white/70 px-4 py-3">
+      תרגיל 10 שניות שאתה יכול לעשות עכשיו בלי לשכנע את עצמך
+    </li>
+    <li
+      class="rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] bg-white/70 px-4 py-3"
+      aria-label="דוגמה"
+    >
+      {exampleClean ? `דוגמה: ${exampleClean}.` : `השורה התחתונה: ${bottomLine}`}
+    </li>
+  </ul>
+</section>
+

@@ -1,0 +1,115 @@
+---
+import { buildArticleContextWhatsAppHref } from "../lib/services";
+import { microPosts } from "../data/microPosts";
+import BigQuestionLayout from "./BigQuestionLayout.astro";
+
+interface GlossaryTerm {
+  term: string;
+  definition: string;
+}
+
+interface Props {
+  pageTitle: string;
+  tags?: string[];
+  articleTitle?: string;
+  glossaryTerms?: GlossaryTerm[];
+}
+
+const { pageTitle, tags = [], articleTitle = "", glossaryTerms } = Astro.props as Props;
+const recentMicroPosts = microPosts.slice(0, 3);
+const contextWaHref = buildArticleContextWhatsAppHref({ tags, articleTitle: articleTitle || pageTitle });
+---
+
+<aside class="nm-article-sidebar-contextual space-y-5 lg:sticky lg:top-28">
+  <section
+    class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/88 p-5 shadow-[0_18px_60px_rgba(26,26,26,0.06)]"
+    aria-labelledby="nm-logical-question-heading"
+  >
+    <div class="space-y-2 text-right">
+      <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">במסלול הקריאה</p>
+      <h2 id="nm-logical-question-heading" class="text-[1.05rem] font-semibold leading-snug text-[var(--nm-fg)]">
+        רכיבים חכמים לפי הקשר
+      </h2>
+      <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_64%,var(--nm-bg))]">
+        כאן יושבת עצירה שמחברת בין מה שקראת לבין איך אתה מנסח לעצמך את השאלה. זה חלק ממסגרת העמוד, לא תוספת מחוץ לזרימה.
+      </p>
+    </div>
+
+    <div class="mt-5 border-t border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] pt-5">
+      <BigQuestionLayout tags={tags} articleTitle={articleTitle || pageTitle} glossaryTerms={glossaryTerms} />
+    </div>
+
+    <div class="mt-5 flex flex-wrap gap-2">
+      <a
+        href={contextWaHref}
+        target="_blank"
+        rel="noreferrer"
+        class="inline-flex min-h-[44px] flex-1 items-center justify-center rounded-full bg-[#25D366] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#1FAE55] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#25D366]"
+      >
+        להמשיך את השיחה בוואטסאפ
+      </a>
+      <a
+        href="/services/"
+        class="inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-4 py-2.5 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-tint)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-red)]"
+      >
+        למרחב הגילוי
+      </a>
+    </div>
+
+    <details
+      class="mt-5 rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] bg-[color-mix(in_srgb,var(--nm-surface-muted)_70%,white)] px-4 py-3 text-right"
+      data-nm-sidebar-editorial
+    >
+      <summary
+        class="cursor-pointer list-none text-sm font-semibold text-[var(--nm-fg)] marker:content-none [&::-webkit-details-marker]:hidden"
+      >
+        <span class="inline-flex w-full items-center justify-between gap-2">
+          <span>איך נכנס טקסט לכאן: שלושה שלבים</span>
+          <span class="text-xs font-normal text-[color-mix(in_srgb,var(--nm-fg)_48%,var(--nm-bg))]" aria-hidden="true">⌄</span>
+        </span>
+      </summary>
+      <div class="mt-4 space-y-3 border-t border-[color-mix(in_srgb,var(--nm-fg)_6%,transparent)] pt-4 text-sm leading-[var(--line-height-ui)] text-[color-mix(in_srgb,var(--nm-fg)_76%,var(--nm-bg))]">
+        <p>
+          <span class="font-semibold text-[var(--nm-fg)]">שלב 1 · איסוף וביקורת:</span>
+          סריקת כל הטקסט והבקשות. רעיון שחזר מטיוטה נכנס פנימה בלי להשמיט.
+        </p>
+        <p>
+          <span class="font-semibold text-[var(--nm-fg)]">שלב 2 · קבינט:</span>
+          Copy: תובנה מרכזית והיפוכים, בלי מילוי. SEO:
+          <span class="whitespace-nowrap">questionForSchema</span>
+          מדויק מהטקסט. מיקום רכיב
+          <span class="whitespace-nowrap">מעבר למילים</span>
+          בנקודת הסדק בקריאה, לא באמצע פסקה.
+        </p>
+        <p>
+          <span class="font-semibold text-[var(--nm-fg)]">שלב 3 · MDX:</span>
+          Frontmatter תקני, פסקאות קצרות, מרווח קריאה, שפה ישירה.
+        </p>
+        <p class="text-xs text-[color-mix(in_srgb,var(--nm-fg)_52%,var(--nm-bg))]">
+          דוגמה לבקשה חדה למודל: ״צור שאלת לוגיקה שמתאימה לפסקה השלישית״ — חדה יותר משאלה גנרית על כל המאמר.
+        </p>
+      </div>
+    </details>
+  </section>
+
+  <section class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-5 text-right">
+    <div class="space-y-2">
+      <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">מיקרו־פוסטים</p>
+      <h3 class="text-xl font-semibold text-[var(--nm-fg)]">תשובות קצרות אחרונות</h3>
+    </div>
+    <div class="mt-4 space-y-3">
+      {recentMicroPosts.map((post) => (
+        <a
+          href={`/questions/#${post.slug}`}
+          class="block rounded-[1.3rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white px-4 py-4 transition hover:border-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)] hover:bg-[var(--nm-tint-hover)]"
+        >
+          <p class="text-sm font-semibold leading-7 text-[var(--nm-fg)]">{post.question}</p>
+          <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_64%,var(--nm-bg))]">{post.answer}</p>
+        </a>
+      ))}
+    </div>
+    <a href="/questions/" class="mt-4 inline-flex text-sm font-semibold text-[var(--nm-accent)] transition hover:opacity-75">
+      לכל המיקרו־פוסטים
+    </a>
+  </section>
+</aside>

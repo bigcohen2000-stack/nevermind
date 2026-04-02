@@ -1,0 +1,59 @@
+---
+/**
+ * קריאה להרשמה מעל אזור תוכן נעול (פרימיום).
+ */
+interface Props {
+  articleTitle: string;
+  ctaHref: string;
+  ctaLabel?: string;
+  hookLine?: string;
+}
+
+const {
+  articleTitle,
+  ctaHref,
+  ctaLabel = "לפתיחת הגישה המלאה",
+  hookLine,
+} = Astro.props;
+
+const line =
+  hookLine ??
+  `עצרת בשיא. המנגנון שמאחורי ${articleTitle.trim() || "המאמר"} נחשף במועדון.`;
+
+const ctaAriaLabel = `${ctaLabel} — גישה לתוכן מלא במועדון NeverMind, מאמר: ${articleTitle.trim() || "זה"}`;
+---
+
+<section
+  class="nm-subscription-callout not-prose relative my-8 overflow-hidden rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-accent)_28%,transparent)] bg-[#FAFAF8] text-right shadow-[0_28px_64px_color-mix(in_srgb,var(--nm-fg)_7%,transparent)]"
+  dir="rtl"
+  aria-label="הרשמה לתוכן מלא"
+>
+  <div
+    class="pointer-events-none absolute inset-y-0 start-0 w-1 bg-[var(--nm-accent)]"
+    aria-hidden="true"
+  >
+  </div>
+  <div
+    class="pointer-events-none absolute -end-16 -top-16 size-48 rounded-full bg-[color-mix(in_srgb,var(--nm-accent)_08%,transparent)]"
+    aria-hidden="true"
+  >
+  </div>
+  <div class="relative px-[clamp(1.35rem,4vw,2.5rem)] py-[clamp(1.75rem,4vw,2.75rem)] ps-6">
+    <p class="text-[0.7rem] font-semibold uppercase tracking-[0.2em] text-[var(--nm-accent)]">מועדון NeverMind</p>
+    <p class="mt-4 text-[clamp(1.08rem,0.98rem+0.45vw,1.38rem)] font-semibold leading-[1.45] text-[#1a1a1a]">
+      {line}
+    </p>
+    <p class="mt-4 max-w-[52ch] text-[0.95rem] leading-[1.75] text-[color-mix(in_srgb,#1a1a1a_64%,#FAFAF8)]">
+      כדי לראות את האמת במלואה, נכנסים דרך המסלול המלא. הבסיס נשאר פתוח. ההמשך מדויק יותר.
+    </p>
+    <div class="mt-8 flex flex-wrap items-center justify-end gap-3">
+      <a
+        href={ctaHref}
+        class="nm-subscription-callout__cta inline-flex min-h-[48px] min-w-[min(100%,11rem)] items-center justify-center rounded-full bg-[var(--nm-accent)] px-8 py-3 text-[0.95rem] font-semibold text-[#FAFAF8] no-underline shadow-[0_14px_36px_color-mix(in_srgb,var(--nm-accent)_35%,transparent)] transition-colors duration-200 hover:bg-[color-mix(in_srgb,var(--nm-accent)_88%,#1a1a1a)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nm-accent)]"
+        aria-label={ctaAriaLabel}
+      >
+        {ctaLabel}
+      </a>
+    </div>
+  </div>
+</section>

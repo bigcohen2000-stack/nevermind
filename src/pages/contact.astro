@@ -143,19 +143,22 @@ const tel = appConfig.contact.phoneTel?.trim() || "";
 
         try {
           const res = await fetch(contactForm.action, { method: "POST", body: fd });
-          const text = await res.text();
-          if (res.ok) {
+          const payload = await res.json().catch(() => null);
+          if (res.ok && payload?.success === true) {
             contactForm.reset();
             showStatus("השאלה נקלטה.");
             window.__nmHapticSuccess?.();
             window.__nmAnnounce?.("השאלה נקלטה");
           } else {
-            const lower = text.toLowerCase();
-            showStatus(
-              lower.includes("hcaptcha") || lower.includes("mandatory")
-                ? "השרת לא אישר קבלה. אפשר לנסות שוב או פשוט לשלוח לנו הודעה בוואטסאפ."
-                : "השרת לא אישר קבלה. אפשר לנסות שוב או פשוט לשלוח לנו הודעה בוואטסאפ."
-            );
+            const errorCode = String(payload?.error || "").toLowerCase();
+            const message = typeof payload?.message === "string" && payload.message.trim()
+              ? payload.message.trim()
+              : errorCode.includes("hcaptcha") || errorCode.includes("mandatory")
+                ? "צריך להשלים את האימות לפני השליחה."
+                : errorCode.includes("missing_form_access_key")
+                  ? "שרת הטפסים עדיין לא הוגדר בפרודקשן."
+                  : "השרת לא אישר קבלה. אפשר לנסות שוב או פשוט לשלוח לנו הודעה בוואטסאפ.";
+            showStatus(message);
           }
         } catch {
           showStatus("השרת לא אישר קבלה. אפשר לנסות שוב או פשוט לשלוח לנו הודעה בוואטסאפ.");

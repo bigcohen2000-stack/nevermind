@@ -1,0 +1,119 @@
+---
+import appConfig from "../config/appConfig.json";
+import { buildArticleContextLeadMessage, buildArticleMeetingWhatsAppMessage } from "../lib/services";
+
+export interface Props {
+  phone?: string;
+  tags?: string[];
+  topic?: string;
+  articleTitle?: string;
+  articleSlug?: string;
+  meetingIntent?: boolean;
+  variant?: "fab" | "inline";
+  label?: string;
+}
+
+const {
+  phone = appConfig.contact.whatsAppNumber,
+  tags = [],
+  topic = "",
+  articleTitle = "",
+  articleSlug = "",
+  meetingIntent = false,
+  variant = "fab",
+  label = "מחשבה אחת נקייה - ישר לוואטסאפ",
+} = Astro.props;
+
+const slugTrim = String(articleSlug ?? "").trim();
+const titleTrim = String(articleTitle ?? "").trim();
+const useMeeting =
+  meetingIntent && Boolean(slugTrim) && Boolean(titleTrim);
+
+const leadMessage = useMeeting
+  ? buildArticleMeetingWhatsAppMessage({ title: titleTrim, slug: slugTrim })
+  : buildArticleContextLeadMessage({ tags, topic, articleTitle: titleTrim });
+
+const baseWa = `https://wa.me/${phone}`;
+const hrefWithText = `${baseWa}?text=${encodeURIComponent(leadMessage)}`;
+const prefillEncoded = encodeURIComponent(leadMessage);
+---
+
+{
+  variant === "inline" ? (
+    <a
+      href={hrefWithText}
+      target="_blank"
+      rel="noreferrer"
+      class="inline-flex w-full items-center justify-center gap-2 rounded-full border border-[color-mix(in_srgb,var(--nm-accent)_35%,transparent)] bg-[var(--nm-tint)] px-5 py-3 text-sm font-semibold text-[var(--nm-fg)] transition-colors hover:bg-[var(--nm-tint-hover)] [letter-spacing:0]"
+      aria-label={label}
+    >
+      <span aria-hidden="true" class="text-[var(--nm-accent)]">●</span>
+      {label}
+    </a>
+  ) : (
+    <a
+      data-whatsapp
+      data-wa-base={baseWa}
+      data-wa-prefill={prefillEncoded}
+      href={hrefWithText}
+      target="_blank"
+      rel="noreferrer"
+      aria-label="מחשבה אחת נקייה - ישר לוואטסאפ"
+      title="מחשבה אחת נקייה - ישר לוואטסאפ"
+      class="fixed bottom-[4.75rem] left-5 z-40 flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-[var(--nm-bg-canvas)]/95 shadow-sm backdrop-blur-md md:hidden opacity-0 pointer-events-none transition-none"
+    >
+      <span class="block h-2.5 w-2.5 rounded-full bg-[var(--nm-accent)]" aria-hidden="true" />
+    </a>
+  )
+}
+
+{variant === "fab" && (
+  <script is:inline>
+    document.addEventListener("astro:page-load", () => {
+      if (window.__nmWhatsappCleanup) {
+        window.__nmWhatsappCleanup();
+      }
+
+      const whatsappButton = document.querySelector("[data-whatsapp]");
+      const base = whatsappButton?.getAttribute("data-wa-base") ?? "";
+      const prefillAttr = whatsappButton?.getAttribute("data-wa-prefill") ?? "";
+
+      const waScrollThresholdPx = 400;
+      const updateWhatsappVisibility = () => {
+        if (!whatsappButton) return;
+        const y = window.scrollY || document.documentElement.scrollTop || 0;
+        const shouldShow = y > waScrollThresholdPx;
+
+        whatsappButton.classList.toggle("opacity-100", shouldShow);
+        whatsappButton.classList.toggle("pointer-events-auto", shouldShow);
+      };
+
+      const updateWhatsappHref = () => {
+        if (!whatsappButton || !base) return;
+        let message = "";
+        try {
+          message = prefillAttr ? decodeURIComponent(prefillAttr) : "";
+        } catch {
+          message = "";
+        }
+        if (!message) {
+          const rawTitle = document.title ? document.title.split("|")[0].trim() : "NeverMind";
+          const pageTitle = rawTitle || "NeverMind";
+          message = `[Lead | Source: ${pageTitle}]\nמחשבה אחת נקייה - ישר לוואטסאפ`;
+        }
+        const encoded = encodeURIComponent(message);
+        whatsappButton.setAttribute("href", `${base}?text=${encoded}`);
+      };
+
+      updateWhatsappHref();
+      document.addEventListener("scroll", updateWhatsappVisibility, { passive: true });
+      window.addEventListener("resize", updateWhatsappVisibility, { passive: true });
+      updateWhatsappVisibility();
+
+      window.__nmWhatsappCleanup = () => {
+        document.removeEventListener("scroll", updateWhatsappVisibility);
+        window.removeEventListener("resize", updateWhatsappVisibility);
+      };
+    });
+  </script>
+)}

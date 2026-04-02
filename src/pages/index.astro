@@ -1,15 +1,15 @@
----
+﻿---
 import { getCollection } from "astro:content";
 import Layout from "../layouts/Layout.astro";
-import HomeHero from "../components/home/HomeHero.astro";
-import HomeValueCards from "../components/home/HomeValueCards.astro";
-import HomeSteps from "../components/home/HomeSteps.astro";
 import HomeContact from "../components/home/HomeContact.astro";
 import MinimalAudioPlayer from "../components/MinimalAudioPlayer.astro";
+import appConfig from "../config/appConfig.json";
+import { buildWhatsAppHref } from "../lib/services";
 import { jsonLdForInlineScript } from "../lib/json-ld-inline";
 
 const allArticles = await getCollection("articles", ({ data }) => data.draft !== true);
 const sortedArticles = allArticles.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+const sampleArticles = sortedArticles.slice(0, 3);
 const siteUrl = Astro.site?.toString() ?? "https://www.nevermind.co.il";
 const siteUrlNoSlash = siteUrl.replace(/\/$/, "");
 const homeArticleListSchema = {
@@ -28,61 +28,367 @@ const homeArticleListSchema = {
   })),
 };
 
+const faqItems = [
+  {
+    question: "האם זה אנונימי",
+    answer: "אפשר לקרוא, לבדוק ולהתחיל בשקט. אם צריך דיסקרטיות בשיחה או בהצטרפות, מדברים על זה מראש ומתאימים את הדרך הנכונה.",
+  },
+  {
+    question: "האם יש התחייבות",
+    answer: "לא. אפשר להתחיל ממאמר, משיחה, או ממנוי, ולראות אם זה נכון לך בלי לחץ.",
+  },
+  {
+    question: "האם צריך רקע כדי להבין את האתר",
+    answer: "לא. כל הטקסטים נכתבים כדי להיות ברורים גם בלי רקע קודם. מתחילים ממה שמעסיק אותך עכשיו.",
+  },
+  {
+    question: "האם זה מתאים לכל גיל",
+    answer: "השפה פשוטה, אבל חלק מהנושאים עמוקים יותר. לכן בודקים לפי הנושא, הרגישות, והבשלות של מי שקורא.",
+  },
+];
+
 const valueCards = [
   {
-    title: "עובדות לפני סיפור",
-    body: "מפרידים בין מה שקרה לבין מה שסיפרת לעצמך על זה. זה מוריד רעש.",
+    title: "בהירות על מה שמפעיל אותך",
+    body: "לא עוד ניחוש כללי. רואים מה באמת יצר את הרעש ומה רק נוסף עליו אחר כך.",
   },
   {
     title: "שקט לפני החלטה",
-    body: "לא ממהרים לסגור מעגל. נותנים למשפט הלא נוח להישמע בלי להילחץ לתשובה.",
+    body: "לא ממהרים להגיב. קודם רואים מה נכון, ורק אז בוחרים צעד.",
   },
   {
-    title: "גבול ברור",
-    body: "יודעים מתי להפסיק לנבור ומתי לחזור ליום. זה לא כישלון. זה ניהול קשב.",
+    title: "יכולת להפריד עובדה מסיפור",
+    body: "מה קרה בפועל, מה פירשת, ומה עשית בגלל זה. שם מתחיל הסדר.",
+  },
+  {
+    title: "שפה לבדיקה עצמית",
+    body: "מילים פשוטות שאפשר לחזור אליהן גם לבד, בלי להיות תלוי בזיכרון של שיחה אחת.",
+  },
+  {
+    title: "גישה לתוכן עמוק בקצב שלך",
+    body: "אפשר לקרוא לאט, לעצור, לחזור, ולהמשיך רק כשבאמת ברור מה קראת.",
   },
 ];
 
-const steps = [
+const stepCards = [
   {
-    title: "בוחרים נושא אחד",
-    body: "לא רשימת ליקויים. נקודה אחת שמסבכת את המציאות אצלך עכשיו.",
+    title: "1. בוחרים נושא",
+    body: "לא את כל החיים. רק נקודה אחת שמבקשת בהירות עכשיו.",
   },
   {
-    title: "כותבים במילים פשוטות",
-    body: "מה ראית, מה ניסית, מה נשאר פתוח. בלי לשפוט את עצמך בזמן הכתיבה.",
+    title: "2. כותבים בפשטות",
+    body: "מה קרה, מה חשבת, ומה נשאר פתוח. בלי דרמה ובלי קישוטים.",
   },
   {
-    title: "בודקים מול השכל הישר",
-    body: "המשפט עומד או נופל. אם הוא נשבר, מחפשים משפט אחר שמתאר את אותו מצב.",
+    title: "3. בודקים מול השכל הישר",
+    body: "אם המשפט עומד, נשארים איתו. אם הוא נופל, מחפשים ניסוח אמיתי יותר.",
   },
+];
+
+const membersOnlyItems = [
+  "סרטון בכל מאמר",
+  "תכנים שלא יכולים להיות פומביים",
+  "גישה לקבוצה השקטה",
+  "גישה לעומק, בהירות וחופש",
+  "גישה לעץ שורש הבעיה",
+  "גישה לספרייה האסורה",
+  "עדכונים שקטים בלי רעש",
+];
+
+const premiumFutureTags = [
+  "אלוהים",
+  "דת",
+  "הכל אחד",
+  "מיניות",
+  "הדרכת הורים",
+  "פחדים עמוקים",
+  "אילומינטי",
+  "זהות",
+  "משמעות",
+];
+
+const notHereItems = [
+  "לא טיפול",
+  "לא הרגעה",
+  "לא מוטיבציה",
+  "לא פתרונות מהירים",
+];
+
+const starterLinks = [
+  { href: "/about/", label: "מה זה NeverMind", note: "היכרות קצרה עם השיטה והכיוון" },
+  { href: "#home-steps", label: "שלושת הצעדים", note: "איך מתחילים לבדוק בלי להסתבך" },
+  {
+    href: sampleArticles[0] ? `/articles/${sampleArticles[0].slug}/` : "/articles/",
+    label: "מאמר ראשון מומלץ",
+    note: sampleArticles[0]?.data.title ?? "כניסה שקטה דרך הארכיון",
+  },
+  {
+    href: (import.meta.env.PUBLIC_HOME_AUDIO_URL ?? "").trim() ? "#home-audio" : "/me/unlock/",
+    label: (import.meta.env.PUBLIC_HOME_AUDIO_URL ?? "").trim() ? "האזנה קצרה" : "מה נפתח למנויים",
+    note: (import.meta.env.PUBLIC_HOME_AUDIO_URL ?? "").trim()
+      ? "דוגמה קצרה לקצב של NeverMind"
+      : "סרטונים ותכנים שלא פתוחים לכולם",
+  },
+  { href: "/faq/", label: "שאלות נפוצות", note: "לפני שממשיכים, רואים את התמונה הפשוטה" },
 ];
 
 const demoAudio = (import.meta.env.PUBLIC_HOME_AUDIO_URL ?? "").trim();
+const waHref = buildWhatsAppHref(
+  "היי, הגעתי מדף הבית. רוצה להבין איך מצטרפים ל-NeverMind ומה נפתח אחרי ההצטרפות."
+);
+const pwaSupportedLabel = "כדאי להתקין את NeverMind כאפליקציה";
+const emailAddress = String((appConfig.contact as { email?: string }).email ?? "").trim();
 ---
 
 <Layout
   title="NeverMind | הבנה לפני תגובה"
-  description="דף הבית: שלושה עקרונות, שלושה צעדים, וקישורים לשירותים ולארכיון."
+  description="NeverMind היא שיטה שמפרידה בין עובדה, פירוש ותגובה, כדי לראות מה באמת מפעיל אותך בלי רעש ובלי דרמה."
+  faqItems={faqItems}
 >
-  <HomeHero
-    title="חשיבה צלולה בלי רעש"
-    subtitle="האתר בנוי כך שתוכל לקרוא לאט, לבדוק כל משפט, ולחזור ליום בלי להסביר למישהו אחר מה עבר בראש."
-  />
+  <section class="mx-auto max-w-6xl space-y-14 px-5 pb-24 pt-14 text-right sm:px-8 lg:px-12">
+    <header class="grid gap-6 rounded-[2.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/92 px-6 py-8 shadow-[0_24px_80px_rgba(26,26,26,0.06)] lg:grid-cols-[minmax(0,1.15fr)_minmax(18rem,0.85fr)] lg:px-10">
+      <div class="space-y-5">
+        <p class="text-sm font-semibold text-[var(--nm-accent)]">כרגע האתר פתוח לחקירה שקטה</p>
+        <h1 class="text-[clamp(2.2rem,1.75rem+2vw,4.3rem)] font-semibold leading-[1.08] text-[var(--nm-fg)]">
+          NeverMind — שיטה שמפרידה בין עובדה, פירוש ותגובה.
+        </h1>
+        <p class="max-w-3xl text-[clamp(1rem,0.96rem+0.28vw,1.18rem)] leading-8 text-[color-mix(in_srgb,var(--nm-fg)_74%,var(--nm-bg))]">
+          כדי לראות מה באמת מפעיל אותך, בלי רעש ובלי דרמה.
+        </p>
+        <p class="max-w-3xl text-base leading-8 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
+          האתר בנוי לקריאה איטית, לבדיקה שקטה, ולחזרה למציאות עם קצת יותר סדר בראש.
+        </p>
 
-  <HomeValueCards cards={valueCards} />
+        <div class="flex flex-wrap justify-end gap-3 pt-1">
+          <a
+            href="/me/unlock/"
+            class="inline-flex min-h-[48px] items-center rounded-full bg-[var(--nm-accent)] px-6 py-3 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]"
+          >
+            רוצה להצטרף ל-NeverMind
+          </a>
+          <a
+            href="/services/"
+            class="inline-flex min-h-[48px] items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-white px-6 py-3 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]"
+          >
+            אני רוצה להעמיק
+          </a>
+          <a
+            href={waHref}
+            target="_blank"
+            rel="noreferrer"
+            class="inline-flex min-h-[48px] items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-6 py-3 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]"
+          >
+            אני רוצה לדבר
+          </a>
+        </div>
 
-  <HomeSteps steps={steps} />
+        <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_62%,var(--nm-bg))]">
+          גישה לסרטונים מלאים, תכנים שלא מפורסמים בפומבי, והקבוצה השקטה.
+        </p>
+      </div>
 
-  {
-    demoAudio ? (
-      <section class="mx-auto max-w-2xl px-5 pb-12 sm:px-8 lg:px-12" aria-label="דוגמת האזנה">
-        <MinimalAudioPlayer src={demoAudio} title="האזנה קצרה" />
-      </section>
-    ) : null
-  }
+      <div class="grid gap-4">
+        <article class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-5">
+          <p class="text-sm font-semibold text-[var(--nm-accent)]">מה מקבלים כאן</p>
+          <ul class="mt-3 space-y-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+            {valueCards.map((card) => (
+              <li class="flex gap-2"><span aria-hidden="true" class="text-[var(--nm-accent)]">•</span><span>{card.title}</span></li>
+            ))}
+          </ul>
+        </article>
+
+        <article class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-5 shadow-[0_16px_40px_rgba(26,26,26,0.04)]">
+          <p class="text-sm font-semibold text-[var(--nm-fg)]">{pwaSupportedLabel}</p>
+          <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
+            גישה מהירה, בלי דפדפן, ובלי הסחות.
+          </p>
+          <button
+            type="button"
+            id="home-install-trigger"
+            class="mt-4 inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-5 py-2.5 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]"
+          >
+            התקנה
+          </button>
+        </article>
+      </div>
+    </header>
+
+    <section class="space-y-5" aria-labelledby="home-values-heading">
+      <div class="space-y-2">
+        <p class="text-sm font-semibold text-[var(--nm-accent)]">מה מקבלים כאן</p>
+        <h2 id="home-values-heading" class="text-[clamp(1.8rem,1.45rem+1vw,2.8rem)] font-semibold text-[var(--nm-fg)]">
+          מקום שבודק מה מפעיל אותך, במקום רק לסדר את הסימפטום
+        </h2>
+      </div>
+      <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-5">
+        {valueCards.map((card) => (
+          <article class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-5 shadow-[0_16px_40px_rgba(26,26,26,0.04)]">
+            <h3 class="text-base font-semibold text-[var(--nm-fg)]">{card.title}</h3>
+            <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">{card.body}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section id="home-steps" class="space-y-5" aria-labelledby="home-steps-heading">
+      <div class="space-y-2">
+        <p class="text-sm font-semibold text-[var(--nm-accent)]">שלושה צעדים</p>
+        <h2 id="home-steps-heading" class="text-[clamp(1.8rem,1.45rem+1vw,2.8rem)] font-semibold text-[var(--nm-fg)]">
+          מסלול פשוט להתחלה
+        </h2>
+      </div>
+      <div class="grid gap-4 md:grid-cols-3">
+        {stepCards.map((step) => (
+          <article class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/92 p-6 shadow-[0_18px_50px_rgba(26,26,26,0.04)]">
+            <h3 class="text-lg font-semibold text-[var(--nm-fg)]">{step.title}</h3>
+            <p class="mt-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">{step.body}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section class="grid gap-5 lg:grid-cols-[minmax(0,1.05fr)_minmax(18rem,0.95fr)]">
+      <article class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/92 p-6 shadow-[0_18px_50px_rgba(26,26,26,0.04)]">
+        <p class="text-sm font-semibold text-[var(--nm-accent)]">מסלול למתחילים</p>
+        <h2 class="mt-2 text-[clamp(1.7rem,1.42rem+0.8vw,2.4rem)] font-semibold text-[var(--nm-fg)]">אם לא ברור מאיפה להתחיל, מתחילים מכאן</h2>
+        <div class="mt-5 grid gap-3">
+          {starterLinks.map((item) => (
+            <a
+              href={item.href}
+              class="rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] px-4 py-4 transition hover:border-[color-mix(in_srgb,var(--nm-accent)_20%,transparent)] hover:bg-[var(--nm-surface-muted)]"
+            >
+              <p class="text-sm font-semibold text-[var(--nm-fg)]">{item.label}</p>
+              <p class="mt-1 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_66%,var(--nm-bg))]">{item.note}</p>
+            </a>
+          ))}
+        </div>
+        <a
+          href="/about/"
+          class="mt-5 inline-flex min-h-[46px] items-center rounded-full bg-[var(--nm-accent)] px-5 py-3 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]"
+        >
+          התחל כאן
+        </a>
+      </article>
+
+      <article class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/92 p-6 shadow-[0_18px_50px_rgba(26,26,26,0.04)]">
+        <p class="text-sm font-semibold text-[var(--nm-accent)]">מה לא תמצא כאן</p>
+        <ul class="mt-4 space-y-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+          {notHereItems.map((item) => (
+            <li class="flex gap-2"><span aria-hidden="true" class="text-[var(--nm-accent)]">•</span><span>{item}</span></li>
+          ))}
+        </ul>
+        <p class="mt-4 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_66%,var(--nm-bg))]">
+          זה לא מקום לעוד דחיפה. זה מקום לראות מה נכון, ואז לנשום לפני שמגיבים.
+        </p>
+      </article>
+    </section>
+
+    <section class="grid gap-5 lg:grid-cols-[minmax(0,1.15fr)_minmax(18rem,0.85fr)]">
+      <article class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/92 p-6 shadow-[0_18px_50px_rgba(26,26,26,0.04)]">
+        <p class="text-sm font-semibold text-[var(--nm-accent)]">מה נפתח אחרי הצטרפות</p>
+        <ul class="mt-4 grid gap-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))] md:grid-cols-2">
+          {membersOnlyItems.map((item) => (
+            <li class="rounded-[1.1rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] px-4 py-3">{item}</li>
+          ))}
+        </ul>
+        <div class="mt-5 flex flex-wrap justify-end gap-3">
+          <a
+            href="/me/unlock/"
+            class="inline-flex min-h-[46px] items-center rounded-full bg-[var(--nm-accent)] px-5 py-3 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]"
+          >
+            בקשה להצטרף
+          </a>
+          <a
+            href={waHref}
+            target="_blank"
+            rel="noreferrer"
+            class="inline-flex min-h-[46px] items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-5 py-3 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]"
+          >
+            בוא נדבר בוואטסאפ
+          </a>
+        </div>
+      </article>
+
+      <article class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/92 p-6 shadow-[0_18px_50px_rgba(26,26,26,0.04)]">
+        <p class="text-sm font-semibold text-[var(--nm-accent)]">בקרוב בפרימיום</p>
+        <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
+          יש כאן נושאים שלא תמיד נכון לפתוח בעמוד פתוח. אלו רק התגיות שמחכות בפנים.
+        </p>
+        <div class="mt-4 flex flex-wrap gap-2">
+          {premiumFutureTags.map((tag) => (
+            <span class="rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-3 py-1.5 text-sm text-[var(--nm-fg)]">{tag}</span>
+          ))}
+        </div>
+      </article>
+    </section>
+
+    <section class="space-y-5" aria-labelledby="home-preview-heading">
+      <div class="space-y-2">
+        <p class="text-sm font-semibold text-[var(--nm-accent)]">טעימה מהתוכן</p>
+        <h2 id="home-preview-heading" class="text-[clamp(1.8rem,1.45rem+1vw,2.8rem)] font-semibold text-[var(--nm-fg)]">
+          כמה שערים פתוחים להתחלה שקטה
+        </h2>
+      </div>
+      <div class="grid gap-5 lg:grid-cols-3">
+        {sampleArticles.map((article) => (
+          <a
+            href={`/articles/${article.slug}/`}
+            class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/92 p-6 shadow-[0_18px_50px_rgba(26,26,26,0.04)] transition hover:border-[color-mix(in_srgb,var(--nm-accent)_20%,transparent)] hover:bg-[var(--nm-surface-muted)]"
+          >
+            <p class="text-lg font-semibold text-[var(--nm-fg)]">{article.data.title}</p>
+            <p class="mt-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
+              {article.data.description}
+            </p>
+            <p class="mt-4 text-xs font-semibold text-[var(--nm-accent)]">מעבר לטקסט הפתוח יש עוד שכבות למנויים</p>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    {
+      demoAudio ? (
+        <section id="home-audio" class="mx-auto max-w-2xl rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/92 px-5 py-6 shadow-[0_18px_50px_rgba(26,26,26,0.04)]" aria-label="האזנה קצרה">
+          <p class="mb-4 text-sm font-semibold text-[var(--nm-accent)]">האזנה קצרה</p>
+          <MinimalAudioPlayer src={demoAudio} title="דוגמת האזנה" />
+        </section>
+      ) : null
+    }
+
+    <section class="space-y-5 rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/92 p-6 shadow-[0_18px_50px_rgba(26,26,26,0.04)]">
+      <div class="text-right">
+        <p class="text-sm font-semibold text-[var(--nm-accent)]">שאלות נפוצות לפני הצטרפות</p>
+        <h2 class="mt-2 text-[clamp(1.7rem,1.42rem+0.8vw,2.4rem)] font-semibold text-[var(--nm-fg)]">לפני שממשיכים, רואים את התמונה הפשוטה</h2>
+      </div>
+      <div class="grid gap-3">
+        {faqItems.map((item) => (
+          <details class="rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] px-4 py-4 text-right">
+            <summary class="cursor-pointer list-none text-sm font-semibold text-[var(--nm-fg)] marker:hidden">{item.question}</summary>
+            <p class="mt-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">{item.answer}</p>
+          </details>
+        ))}
+      </div>
+      {emailAddress ? (
+        <p class="text-xs leading-7 text-[color-mix(in_srgb,var(--nm-fg)_55%,var(--nm-bg))]">
+          אם צריך, אפשר גם לכתוב בשקט ל־{emailAddress}
+        </p>
+      ) : null}
+    </section>
+  </section>
 
   <HomeContact />
+
+  <script is:inline>
+    document.addEventListener("astro:page-load", () => {
+      const trigger = document.getElementById("home-install-trigger");
+      if (!(trigger instanceof HTMLButtonElement)) return;
+      trigger.onclick = () => {
+        const hiddenAction = document.getElementById("nm-pwa-install-action");
+        if (hiddenAction instanceof HTMLButtonElement) {
+          hiddenAction.click();
+        }
+      };
+    });
+  </script>
 
   <script is:inline type="application/ld+json" set:html={jsonLdForInlineScript(homeArticleListSchema)} />
 </Layout>

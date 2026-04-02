@@ -1,0 +1,81 @@
+---
+interface Props {
+  title?: string;
+  description?: string;
+  buttonLabel?: string;
+  /** ברירת מחדל: עמוד שירותים - איך מצטרפים למסלול המלא */
+  href?: string;
+}
+
+const {
+  title = "מכאן הלאה - נכנסים לפרטים",
+  description =
+    "הבסיס תמיד יהיה פתוח לכולם. ההמשך של המאמר הזה מיועד למי שרוצה לקחת את ההבנה צעד אחד קדימה ולהשקיע בתהליך. הגישה פתוחה לחברי המסלול המלא.",
+  buttonLabel = "איך מצטרפים?",
+  href = "/services/",
+} = Astro.props;
+---
+
+<section data-premium-lock class="nm-premium-lock not-prose my-10 rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/94 p-6 text-right shadow-[0_24px_70px_rgba(26,26,26,0.08)]">
+  <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">Premium</p>
+  <h2 class="mt-3 text-[clamp(1.4rem,1.1rem+0.8vw,1.9rem)] font-semibold text-[var(--nm-fg)]">{title}</h2>
+  <p class="mt-3 text-[1rem] leading-8 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">{description}</p>
+  <div class="mt-5 flex justify-end">
+    <a
+      href={href}
+      class="inline-flex items-center rounded-full bg-[var(--nm-accent)] px-5 py-3 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]"
+    >
+      {buttonLabel}
+    </a>
+  </div>
+</section>
+
+<script is:inline>
+  document.addEventListener("astro:page-load", () => {
+    const locks = Array.from(document.querySelectorAll("[data-premium-lock]"));
+    locks.forEach((lock) => {
+      if (!(lock instanceof HTMLElement)) return;
+      if (lock.dataset.premiumLockInitialized === "true") return;
+
+      const parent = lock.parentElement;
+      if (!(parent instanceof HTMLElement)) return;
+
+      const hiddenNodes = [];
+      let sibling = lock.nextElementSibling;
+      while (sibling) {
+        const next = sibling.nextElementSibling;
+        hiddenNodes.push(sibling);
+        sibling = next;
+      }
+
+      if (hiddenNodes.length === 0) {
+        lock.dataset.premiumLockInitialized = "true";
+        return;
+      }
+
+      const previewShell = document.createElement("section");
+      previewShell.className = "nm-premium-lock__preview mt-4 overflow-hidden rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)]";
+
+      const inner = document.createElement("div");
+      inner.className = "nm-premium-lock__preview-inner max-h-64 overflow-hidden px-6 py-5";
+      hiddenNodes.forEach((node) => inner.appendChild(node));
+
+      const fade = document.createElement("div");
+      fade.className = "nm-premium-lock__fade h-24 bg-gradient-to-t from-[var(--nm-surface-muted)] to-transparent";
+
+      previewShell.appendChild(inner);
+      previewShell.appendChild(fade);
+      lock.insertAdjacentElement("afterend", previewShell);
+      lock.dataset.premiumLockInitialized = "true";
+    });
+  });
+</script>
+
+<style>
+  .nm-premium-lock__preview-inner {
+    filter: blur(10px);
+    opacity: 0.72;
+    pointer-events: none;
+    user-select: none;
+  }
+</style>

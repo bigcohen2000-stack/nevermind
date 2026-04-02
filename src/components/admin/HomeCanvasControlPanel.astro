@@ -1,0 +1,164 @@
+---
+import homeCanvas from "../../config/homeCanvas.json";
+import { FloatingInput } from "../ui/FloatingInput";
+---
+
+<form id="home-canvas-form" class="space-y-6 rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/82 p-6 shadow-[0_30px_90px_rgba(26,26,26,0.08)] backdrop-blur-md">
+  <div class="space-y-2 text-right">
+    <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--nm-accent)]">Home Canvas</p>
+    <h2 class="text-2xl font-semibold text-[var(--nm-fg)]">לוח לוגי בדף הבית</h2>
+    <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_64%,var(--nm-bg))]">
+      ציטוט, וידאו (YouTube ID ריק מסתיר את הנגן), TrendGraph, שאלה פתוחה וכותרות. ראה <code class="rounded bg-[var(--nm-surface-muted)] px-1">src/config/canvas-and-paths.md</code>.
+    </p>
+  </div>
+
+  <div class="grid gap-4 md:grid-cols-3">
+    <article class="rounded-[1.5rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-4 text-right">
+      <p class="text-base font-semibold text-[var(--nm-fg)]">TrendGraph</p>
+      <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_64%,var(--nm-bg))]">{homeCanvas.showTrendGraph ? "מוצג" : "מוסתר"}</p>
+    </article>
+    <article class="rounded-[1.5rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-4 text-right">
+      <p class="text-base font-semibold text-[var(--nm-fg)]">וידאו</p>
+      <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_64%,var(--nm-bg))]">
+        {String(homeCanvas.featuredVideo?.youtubeId ?? "").trim() ? "מוגדר" : "לא מוגדר (אריח מוסתר)"}
+      </p>
+    </article>
+    <article class="rounded-[1.5rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-4 text-right">
+      <p class="text-base font-semibold text-[var(--nm-fg)]">שאלה פתוחה</p>
+      <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_64%,var(--nm-bg))] truncate">{homeCanvas.openQuestion?.text?.slice(0, 42) ?? "-"}...</p>
+    </article>
+  </div>
+
+  <FloatingInput
+    client:load
+    id="home-canvas-input"
+    label="homeCanvas.json"
+    multiline
+    rows={22}
+    dir="ltr"
+    spellCheck={false}
+    defaultValue={JSON.stringify(homeCanvas, null, 2)}
+    hideValidation={true}
+    className="[&_.nm-floating-control--textarea]:min-h-[28rem] [&_.nm-floating-control]:bg-[var(--nm-code-bg)] [&_.nm-floating-control]:font-mono [&_.nm-floating-control]:text-sm [&_.nm-floating-control]:leading-7 [&_.nm-floating-control]:text-[var(--nm-code-fg)]"
+  />
+
+  <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:justify-end">
+    <button id="pick-home-canvas-file" type="button" class="inline-flex items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white px-5 py-3 text-sm font-semibold text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))] transition hover:bg-[var(--nm-surface-muted)]">בחר homeCanvas.json</button>
+    <button id="save-home-canvas-file" type="button" class="inline-flex items-center justify-center rounded-full bg-[var(--nm-accent)] px-5 py-3 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]">שמור לקובץ האמיתי</button>
+    <button id="copy-home-canvas-json" type="button" class="inline-flex items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white px-5 py-3 text-sm font-semibold text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))] transition hover:bg-[var(--nm-surface-muted)]">העתק JSON</button>
+    <button id="export-home-canvas-json" type="button" class="inline-flex items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white px-5 py-3 text-sm font-semibold text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))] transition hover:bg-[var(--nm-surface-muted)]">הורד homeCanvas.json</button>
+  </div>
+
+  <div class="rounded-[1.5rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-4 text-right">
+    <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">Config Sync</p>
+    <p id="home-canvas-file-status" class="mt-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
+      עדיין לא נבחר קובץ יעד. אפשר לבחור את <code>src/config/homeCanvas.json</code> ולשמור אליו ישירות מתוך Chrome.
+    </p>
+  </div>
+</form>
+
+<script is:inline>
+  document.addEventListener("astro:page-load", () => {
+    const input = document.getElementById("home-canvas-input");
+    const pickButton = document.getElementById("pick-home-canvas-file");
+    const saveButton = document.getElementById("save-home-canvas-file");
+    const copyButton = document.getElementById("copy-home-canvas-json");
+    const exportButton = document.getElementById("export-home-canvas-json");
+    const status = document.getElementById("home-canvas-file-status");
+
+    if (!(input instanceof HTMLTextAreaElement)) return;
+    if (!(pickButton instanceof HTMLButtonElement)) return;
+    if (!(saveButton instanceof HTMLButtonElement)) return;
+    if (!(copyButton instanceof HTMLButtonElement)) return;
+    if (!(exportButton instanceof HTMLButtonElement)) return;
+    if (!(status instanceof HTMLElement)) return;
+
+    let fileHandle = null;
+
+    const pulse = (button, successText, fallbackText) => {
+      button.textContent = successText;
+      window.setTimeout(() => {
+        button.textContent = fallbackText;
+      }, 1400);
+    };
+
+    const validate = () => {
+      const parsed = JSON.parse(input.value);
+      if (!parsed || typeof parsed !== "object") throw new Error("homeCanvas.json לא אובייקט תקין.");
+      if (!parsed.dailyQuote || typeof parsed.dailyQuote.text !== "string") {
+        throw new Error("חסר dailyQuote.text.");
+      }
+      if (!parsed.openQuestion || typeof parsed.openQuestion.text !== "string") {
+        throw new Error("חסר openQuestion.text.");
+      }
+      if (typeof parsed.showTrendGraph !== "boolean") {
+        throw new Error("showTrendGraph חייב להיות boolean.");
+      }
+      if (!parsed.featuredVideo || typeof parsed.featuredVideo !== "object") {
+        throw new Error("חסר featuredVideo.");
+      }
+      return parsed;
+    };
+
+    copyButton.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(input.value);
+        pulse(copyButton, "JSON הועתק", "העתק JSON");
+      } catch {
+        pulse(copyButton, "ההעתקה נכשלה", "העתק JSON");
+      }
+    });
+
+    exportButton.addEventListener("click", () => {
+      const blob = new Blob([`${input.value.trim()}\n`], { type: "application/json;charset=utf-8" });
+      const href = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = href;
+      anchor.download = "homeCanvas.json";
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      URL.revokeObjectURL(href);
+      pulse(exportButton, "הקובץ ירד", "הורד homeCanvas.json");
+    });
+
+    pickButton.addEventListener("click", async () => {
+      if (typeof window.showOpenFilePicker !== "function") {
+        status.textContent = "הדפדפן הזה לא תומך בכתיבה ישירה לקובץ. השתמש בהעתקה ידנית.";
+        pulse(pickButton, "לא נתמך", "בחר homeCanvas.json");
+        return;
+      }
+      try {
+        const [handle] = await window.showOpenFilePicker({
+          multiple: false,
+          types: [{ description: "JSON", accept: { "application/json": [".json"] } }],
+        });
+        fileHandle = handle;
+        status.textContent = `קובץ יעד נבחר: ${handle.name}.`;
+        pulse(pickButton, "הקובץ נבחר", "בחר homeCanvas.json");
+      } catch {
+        status.textContent = "בחירת הקובץ בוטלה או נכשלה.";
+        pulse(pickButton, "הבחירה בוטלה", "בחר homeCanvas.json");
+      }
+    });
+
+    saveButton.addEventListener("click", async () => {
+      if (!fileHandle) {
+        status.textContent = "בחר קודם את src/config/homeCanvas.json ואז שמור.";
+        pulse(saveButton, "חסר קובץ יעד", "שמור לקובץ האמיתי");
+        return;
+      }
+      try {
+        validate();
+        const writable = await fileHandle.createWritable();
+        await writable.write(`${input.value.trim()}\n`);
+        await writable.close();
+        status.textContent = `הקובץ ${fileHandle.name} עודכן בהצלחה.`;
+        pulse(saveButton, "נשמר לקובץ", "שמור לקובץ האמיתי");
+      } catch (error) {
+        status.textContent = error instanceof Error ? error.message : "השמירה הישירה נכשלה.";
+        pulse(saveButton, "השמירה נכשלה", "שמור לקובץ האמיתי");
+      }
+    });
+  });
+</script>

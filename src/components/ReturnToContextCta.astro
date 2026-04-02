@@ -1,0 +1,17 @@
+---
+/** קישור חזרה: ממולא ב־Layout לפי מסלול קודם (sessionStorage) או referrer. */
+interface Props {
+  class?: string;
+}
+const { class: className = "" } = Astro.props;
+---
+
+<div class:list={["text-right", className]}>
+  <a
+    data-nm-return-cta-link
+    href="/articles/"
+    class="inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-accent)_28%,transparent)] bg-[var(--nm-tint)] px-5 py-2.5 text-sm font-semibold text-[var(--nm-accent)] transition hover:bg-[var(--nm-tint-hover)]"
+  >
+    חזור לארכיון
+  </a>
+</div>

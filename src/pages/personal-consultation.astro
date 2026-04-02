@@ -1,166 +1,420 @@
----
+﻿---
 import Layout from "../layouts/Layout.astro";
 import ServiceCard from "../components/ServiceCard.astro";
 import ThoughtShiftProof from "../components/ThoughtShiftProof.astro";
 import CostOfNoCalculator from "../components/CostOfNoCalculator.astro";
 import DecisionSimulator from "../components/DecisionSimulator.astro";
 import WhyThisIsNotForYou from "../components/WhyThisIsNotForYou.astro";
-import { findServiceById, servicesThoughtShifts, type FlatService } from "../lib/services";
+import {
+  assertServicePricingConsistency,
+  buildWhatsAppHref,
+  findServiceById,
+  servicesThoughtShifts,
+  type FlatService,
+} from "../lib/services";
 
 const consultationService = findServiceById("phone-perspective");
-const subscriptionService = findServiceById("retainer-subscription");
-const authorityService = findServiceById("podcast-mic");
+const deepService = findServiceById("personal-clinic");
+const studioService = findServiceById("podcast-mic");
+const archiveService = findServiceById("portal-access");
 
 const fallbackConsultation = ({
   id: "phone-perspective",
-  title: "שיחת מיקוד של 20 דקות",
-  subtitle: "כדי להפריד בין עובדה לפירוש בזמן אמת",
-  description: "שיחה קצרה למצב שבו יש החלטה, קונפליקט, או תקיעות שצריך לפרק עכשיו.",
+  title: "שיחת מיקוד",
+  subtitle: "20–60 דקות של בהירות במקום עוד שבועות של רעש",
+  description: "שיחה קצרה ומדויקת למצב שבו יש תקיעות, החלטה, פחד, או קונפליקט שצריך לפרק עכשיו.",
   price_full: 450,
   action_type: "whatsapp",
-  action_text: "אני רוצה להתחיל",
+  action_text: "קביעת שיחה",
   visible: true,
-  badges: [],
-  features: ["שיחה קצרה ומדויקת", "פירוק של הנחה אחת מרכזית", "כיוון פעולה אחד ברור"],
-  stageName: "בהירות מיידית",
-  targetAudience: "למי שצריך תשובה עכשיו",
+  badges: ["בהירות מיידית"],
+  features: [
+    { text: "טלפון או וידאו", icon: "phone" },
+    { text: "20–60 דקות", icon: "time" },
+    { text: "כיוון ברור להמשך", icon: "default" },
+  ],
+  stageName: "מה זה שיחת מיקוד",
+  targetAudience: "למי שצריך סדר עכשיו",
 } as unknown as FlatService);
 
-const fallbackSubscription = ({
-  id: "retainer-subscription",
-  title: "מסלול המשך חודשי",
-  subtitle: "למי שלא מחפש עוד תוכן, אלא רצף עבודה",
-  description: "שני מפגשים בחודש וליווי מתמשך למי שרוצה לראות מנגנונים חוזרים ולא רק לפתור רגע אחד.",
-  price_full: 1800,
+const fallbackDeep = ({
+  id: "personal-clinic",
+  title: "מפגש עומק",
+  subtitle: "זמן ארוך יותר למי שלא רוצה למהר",
+  description: "מפגש פרונטלי או ממושך יותר, כשכבר ברור ששיחה קצרה לא תספיק כדי לראות את השכבות שמתחת.",
+  price_full: 900,
   action_type: "whatsapp",
-  action_text: "אני רוצה מסלול המשך",
+  action_text: "קביעת שיחה",
   visible: true,
-  badges: ["מסלול עומק"],
-  features: ["שני מפגשים בכל חודש", "מקום לשאלות בין מפגשים", "רצף שמאפשר לראות תבנית"],
-  stageName: "ליווי והמשכיות",
-  targetAudience: "למי שרוצה גב קבוע",
+  badges: ["עומק ושקט"],
+  features: [
+    { text: "פרונטלי או זמן ארוך", icon: "location" },
+    { text: "תיעוד לפי צורך", icon: "privacy" },
+    { text: "פירוק שכבות עמוקות", icon: "default" },
+  ],
+  stageName: "כשצריך עוד זמן",
+  targetAudience: "למי ששיחה קצרה לא מספיקה לו",
 } as unknown as FlatService);
 
-const fallbackAuthority = ({
+const fallbackStudio = ({
   id: "podcast-mic",
-  title: "סשן אולפן ותוכן",
-  subtitle: "כשהמטרה היא להפוך הבנה למסמך, פרק, או מסר מדויק",
-  description: "יום אולפן קצר למי שרוצה לבנות תוכן חד מתוך הבנה ולא מתוך רעש.",
+  title: "אולפן ותוכן",
+  subtitle: "כשצריך לזקק מסר, שיחה, או פרק מתוך בהירות",
+  description: "מסלול למי שרוצה להפוך הבנה לחומר חי, שיחה מצולמת, או מסר שאפשר להוציא החוצה בלי רעש.",
   price_full: 2950,
   action_type: "invoice",
-  action_text: "אני רוצה לבדוק התאמה",
+  action_text: "בדיקת התאמה",
   visible: true,
-  badges: ["עבודה אסטרטגית"],
-  features: ["מיקוד מסר", "צילום או הקלטה", "תרגום של רעיון למבנה"],
-  stageName: "השפעה ותוכן",
-  targetAudience: "למי שבונה קול ברור החוצה",
+  badges: ["אולפן ומסר"],
+  features: [
+    { text: "פודקאסט או צילום", icon: "video" },
+    { text: "מיקוד מסר", icon: "default" },
+    { text: "תרגום רעיון למבנה ברור", icon: "content" },
+  ],
+  stageName: "כשיש גם קול החוצה",
+  targetAudience: "למי שבונה מסר מדויק",
+} as unknown as FlatService);
+
+const fallbackArchive = ({
+  id: "portal-access",
+  title: "מנוי ארכיון",
+  subtitle: "למי שרוצה לחקור לבד, בקצב שלו",
+  description: "גישה לכל הסרטונים, לתכנים המלאים, ולשכבות שלא מתאימות לעמוד פתוח רגיל.",
+  price_full: 175,
+  action_type: "link",
+  action_href: "/me/unlock/",
+  action_text: "בקשה להצטרף",
+  visible: true,
+  badges: ["מנוי חודשי"],
+  features: [
+    { text: "סרטון בכל מאמר", icon: "video" },
+    { text: "תכנים שלא מפורסמים בפומבי", icon: "privacy" },
+    { text: "גישה לקבוצה השקטה", icon: "group" },
+  ],
+  stageName: "כשמעדיפים לחקור לבד",
+  targetAudience: "למי שרוצה רצף שקט של למידה",
 } as unknown as FlatService);
 
 const featuredServices: FlatService[] = [
   consultationService ?? fallbackConsultation,
-  subscriptionService ?? fallbackSubscription,
-  authorityService ?? fallbackAuthority,
+  deepService ?? fallbackDeep,
+  studioService ?? fallbackStudio,
+  archiveService ?? fallbackArchive,
 ];
+
+assertServicePricingConsistency(featuredServices);
+
+const joinClubHref = "/me/unlock/";
+const joinClubWaHref = buildWhatsAppHref(
+  "היי, הגעתי מעמוד השיחה האישית. רוצה להבין איך מצטרפים ל-NeverMind ומה נפתח אחרי ההצטרפות."
+);
 
 const mechanismCards = [
   {
     title: "עובדה",
-    body: "מה קרה בפועל, בלי שיפוט ובלי סיפור שמתווסף אחר כך.",
+    body: "מה קרה בפועל, בלי הסבר מסביב ובלי הסיפור שנוסף אחרי זה.",
   },
   {
     title: "פירוש",
-    body: "המשפט שהמוח מוסיף, ואז מתחיל לנהל פחד, תקיעות, או הימנעות.",
+    body: "מה הראש הוסיף לעובדה, ואיך זה מתחיל לייצר רעש, פחד, או תקיעות.",
   },
   {
-    title: "פעולה",
-    body: "אחרי שהפירוש נבדק, בוחרים צעד אחד שאפשר באמת לבצע.",
+    title: "תגובה",
+    body: "מה אתה עושה בגלל הפירוש, ואיך בוחרים צעד שקט ומדויק יותר.",
   },
 ];
 
 const benefits = [
-  "בהירות מול החלטה שקפאה יותר מדי זמן.",
-  "פירוק של קונפליקט זוגי או אישי בלי להסתבך בעוד שכבות.",
-  "הבנה של מה באמת מפעיל אותך לפני שמגיבים שוב מאותו מקום.",
+  "פירוק של מה שמפעיל אותך עכשיו",
+  "הפרדה בין עובדה, פירוש ותגובה",
+  "בהירות על החלטה תקועה",
+  "שקט לפני פעולה",
+  "כיוון ברור להמשך",
+];
+
+const fitItems = [
+  "למי שתקוע בהחלטה ולא רוצה להסתובב איתה עוד שבועות",
+  "למי שמרגיש רעש פנימי ורוצה לראות מה בדיוק מפעיל אותו",
+  "למי שרוצה להבין מנגנון, לא רק לפרוק תחושה",
+];
+
+const notHereItems = [
+  "לא טיפול",
+  "לא הרגעה",
+  "לא אישור",
+  "לא פתרונות מהירים",
+];
+
+const membersOnlyItems = [
+  "סרטונים מלאים",
+  "תכנים שלא מפורסמים בפומבי",
+  "גישה לקבוצה השקטה",
+  "גישה לעומק ולספרייה האסורה",
+  "גישה לעץ שורש הבעיה",
+];
+
+const premiumFutureTags = [
+  "מיניות",
+  "דת",
+  "אלוהים",
+  "הכל אחד",
+  "פחדים עמוקים",
+  "הדרכת הורים",
+  "אילומינטי",
+  "זהות",
+];
+
+const faqItems = [
+  {
+    question: "מה זה שיחת מיקוד",
+    answer: "שיחה קצרה שמפרידה בין מה שקרה, מה פירשת, ומה אתה עומד לעשות עכשיו. המטרה היא בהירות, לא עומס חדש.",
+  },
+  {
+    question: "האם זה טיפול",
+    answer: "לא. זו בדיקה בהירה של המנגנון שמחזיק את הבעיה, כדי לראות מה נכון לעשות עכשיו.",
+  },
+  {
+    question: "איך בוחרים בין שיחת מיקוד למפגש עומק",
+    answer: "אם יש נושא אחד דחוף וברור, לרוב מתחילים בשיחת מיקוד. אם כבר ברור שיש כמה שכבות עמוקות, מפגש עומק יכול להתאים יותר.",
+  },
+  {
+    question: "האם אפשר רק לשאול לפני שקובעים",
+    answer: "כן. בכל מסלול יש גם דרך לשאול שאלה קצרה לפני שמחליטים איך נכון להמשיך.",
+  },
+  {
+    question: "מה נפתח אחרי ההצטרפות",
+    answer: "סרטונים מלאים, תכנים שלא מפורסמים בפומבי, הקבוצה השקטה, ועוד שכבות עומק שלא נכנסות לעמוד פתוח רגיל.",
+  },
 ];
 ---
 
-<Layout title="מיקוד אישי" description="שיחה אישית שמפרקת את המנגנון שמחזיק תקיעות, פחד, או קונפליקט, ובונה צעד פעולה ברור.">
-  <section class="mx-auto max-w-6xl space-y-16 px-4 pb-20 text-right text-[var(--nm-fg)]">
-    <header class="grid gap-8 rounded-[2.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/88 px-6 py-10 shadow-[0_24px_80px_rgba(26,26,26,0.06)] lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:px-10">
+<Layout
+  title="שיחת מיקוד אישית"
+  description="שיחת מיקוד שמפרידה בין עובדה, פירוש ותגובה כדי לראות מה מחזיק את הבעיה, ומה נכון לעשות עכשיו בלי רעש מיותר."
+  faqItems={faqItems}
+  breadcrumbCurrentLabel="שיחה אישית"
+>
+  <section class="mx-auto max-w-6xl space-y-14 px-4 pb-24 pt-12 text-right text-[var(--nm-fg)]">
+    <header class="grid gap-6 rounded-[2.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 px-6 py-8 shadow-[0_24px_80px_rgba(26,26,26,0.06)] lg:grid-cols-[minmax(0,1.15fr)_minmax(18rem,0.85fr)] lg:px-10">
       <div class="space-y-5">
-        <p class="text-sm font-semibold text-[var(--nm-accent)]">מיקוד אישי</p>
-        <h1 class="text-[clamp(2.4rem,2rem+1.8vw,4rem)] font-semibold leading-[1.1] text-[var(--nm-fg)]">
-          לא עוד עצה. בדיקה של המנגנון שמחזיק את הבעיה.
+        <p class="text-sm font-semibold text-[var(--nm-accent)]">שיחה אישית</p>
+        <h1 class="text-[clamp(2.2rem,1.8rem+1.8vw,4rem)] font-semibold leading-[1.08] text-[var(--nm-fg)]">
+          שיחת מיקוד — פירוק המנגנון שמחזיק את הבעיה
         </h1>
-        <p class="max-w-3xl text-[clamp(1rem,0.96rem+0.25vw,1.15rem)] leading-[1.75] text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
-          כשיש רעש, לא חסר מידע. חסרה הבחנה. בשיחה אחת אנחנו מפרידים בין עובדה, פירוש, ופעולה.
+        <p class="max-w-3xl text-[clamp(1rem,0.96rem+0.25vw,1.15rem)] leading-8 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+          20–60 דקות של בהירות במקום עוד שבועות של רעש.
         </p>
-        <div class="flex flex-wrap justify-end gap-3 pt-2">
-          <a href="#pricing" class="inline-flex min-h-[44px] items-center rounded-full bg-[var(--nm-accent)] px-5 py-3 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]">
-            לראות מסלולים
+        <p class="max-w-3xl text-base leading-8 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
+          לא עוד עצה, ולא עוד סיבוב סביב אותה תחושה. בודקים יחד מה קרה, מה נוסף לזה בפנים, ומה נכון לעשות עכשיו מתוך שקט.
+        </p>
+
+        <div class="flex flex-wrap justify-end gap-3 pt-1">
+          <a
+            href={joinClubHref}
+            class="inline-flex min-h-[48px] items-center rounded-full bg-[var(--nm-accent)] px-6 py-3 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]"
+          >
+            רוצה להצטרף ל-NeverMind
           </a>
-          <a href="/intake/" class="inline-flex min-h-[44px] items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-white px-5 py-3 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]">
-            אני צריך הכוונה
+          <a
+            href="#pricing"
+            class="inline-flex min-h-[48px] items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-white px-6 py-3 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]"
+          >
+            מסלולים ומחירים
           </a>
         </div>
       </div>
 
-      <aside class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-6">
-        <p class="text-sm font-semibold text-[var(--nm-accent)]">איך זה עובד</p>
-        <div class="mt-4 grid gap-3">
-          {mechanismCards.map((item) => (
-            <article class="rounded-[1.3rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white px-4 py-4">
-              <h2 class="text-lg font-semibold text-[var(--nm-fg)]">{item.title}</h2>
-              <p class="mt-2 text-sm leading-[1.7] text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">{item.body}</p>
-            </article>
-          ))}
-        </div>
-      </aside>
+      <div class="grid gap-4">
+        <article class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-5">
+          <p class="text-sm font-semibold text-[var(--nm-accent)]">מה מקבלים בשיחה</p>
+          <ul class="mt-3 space-y-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+            {benefits.map((item) => (
+              <li class="flex gap-2"><span aria-hidden="true" class="text-[var(--nm-accent)]">•</span><span>{item}</span></li>
+            ))}
+          </ul>
+        </article>
+
+        <article class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-5 shadow-[0_16px_40px_rgba(26,26,26,0.04)]">
+          <p class="text-sm font-semibold text-[var(--nm-fg)]">כדאי להתקין את NeverMind כאפליקציה</p>
+          <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
+            גישה מהירה, בלי דפדפן, ובלי הסחות בדרך. אם הדפדפן שלך תומך בזה, הצעת התקנה תיפתח מיד.
+          </p>
+          <button
+            type="button"
+            id="personal-install-trigger"
+            class="mt-4 inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-5 py-2.5 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]"
+          >
+            התקנה
+          </button>
+        </article>
+      </div>
     </header>
 
-    <section class="grid gap-5 md:grid-cols-3">
-      {benefits.map((item) => (
-        <article class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-5 shadow-[0_18px_50px_rgba(26,26,26,0.04)]">
-          <p class="text-base leading-[1.75] text-[var(--nm-fg)]">{item}</p>
-        </article>
-      ))}
-    </section>
-
-    <ThoughtShiftProof items={servicesThoughtShifts} heading="מה משתנה אחרי שיחה מדויקת" eyebrow="לפני ואחרי" />
-
-    <CostOfNoCalculator />
-
-    <DecisionSimulator />
-
-    <WhyThisIsNotForYou
-      title="למי זה לא מתאים כרגע"
-      intro="העבודה כאן לא מלטפת את הסיפור. היא בודקת אותו. לכן צריך רצון לראות, לא רק רצון להירגע."
-      items={[
-        "למי שמחפש אישור שהוא כבר צודק.",
-        "למי שרוצה שמישהו אחר יחליט במקומו.",
-        "למי שמעדיף להישאר ברמת הסימפטום ולא לגעת בהנחה שמפעילה אותו.",
-      ]}
-      closing="אם זה לא הזמן שלך להיכנס לשיחה כזאת, זה לגיטימי. עדיף לחכות לרגע שבו יש נכונות אמיתית לראות."
-    />
-
-    <section id="pricing" class="space-y-6">
-      <div class="space-y-3">
-        <p class="text-sm font-semibold text-[var(--nm-accent)]">מסלולי עבודה</p>
-        <h2 class="text-[clamp(2rem,1.6rem+1vw,3rem)] font-semibold text-[var(--nm-fg)]">המחירון מסודר לפי עומק, לא לפי רעש.</h2>
-        <p class="max-w-3xl text-sm leading-[1.75] text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">
-          מתחילים במה שמתאים למצב הנוכחי. אם צריך עומק, ממשיכים. אם צריך בהירות מיידית, לא מעמיסים מסלול ארוך.
+    <section class="space-y-5">
+      <div class="space-y-2">
+        <p class="text-sm font-semibold text-[var(--nm-accent)]">מה זה שיחת מיקוד</p>
+        <h2 class="text-[clamp(1.8rem,1.5rem+0.9vw,2.7rem)] font-semibold text-[var(--nm-fg)]">לא עוד עומס. פירוק אחד ברור של מה שמחזיק את הבעיה</h2>
+        <p class="max-w-3xl text-base leading-8 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">
+          זה מתאים כשיש נושא אחד שמבקש סדר עכשיו. לא חייבים לספר הכול, ולא צריך להגיע מוכנים. מתחילים ממה שמציק, ורואים מה באמת מחזיק אותו.
         </p>
       </div>
 
-      <div class="grid items-stretch gap-6 lg:grid-cols-2 xl:grid-cols-3">
+      <div class="grid gap-4 md:grid-cols-3">
+        <article class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 p-5 shadow-[0_16px_40px_rgba(26,26,26,0.04)]">
+          <p class="text-base font-semibold text-[var(--nm-fg)]">📞 טלפון</p>
+          <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">אפשר להתחיל פשוט, בלי הכנות ובלי טקס.</p>
+        </article>
+        <article class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 p-5 shadow-[0_16px_40px_rgba(26,26,26,0.04)]">
+          <p class="text-base font-semibold text-[var(--nm-fg)]">🎥 וידאו</p>
+          <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">למי שנוח לו לראות את השיחה ולהרגיש נוכחות מלאה יותר.</p>
+        </article>
+        <article class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 p-5 shadow-[0_16px_40px_rgba(26,26,26,0.04)]">
+          <p class="text-base font-semibold text-[var(--nm-fg)]">🕒 20–60 דקות</p>
+          <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">רק כמה שצריך כדי להבין מה נכון עכשיו, בלי למרוח זמן.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="space-y-5">
+      <div class="space-y-2">
+        <p class="text-sm font-semibold text-[var(--nm-accent)]">איך זה עובד</p>
+        <h2 class="text-[clamp(1.8rem,1.5rem+0.9vw,2.7rem)] font-semibold text-[var(--nm-fg)]">שלושה צעדים פשוטים, כדי לראות מה קורה בפנים בלי דרמה</h2>
+      </div>
+      <div class="grid gap-4 md:grid-cols-3">
+        {mechanismCards.map((item) => (
+          <article class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-5 shadow-[0_18px_50px_rgba(26,26,26,0.04)]">
+            <h3 class="text-lg font-semibold text-[var(--nm-fg)]">{item.title}</h3>
+            <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">{item.body}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section class="grid gap-5 lg:grid-cols-2">
+      <article class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/92 p-6 shadow-[0_18px_50px_rgba(26,26,26,0.04)]">
+        <p class="text-sm font-semibold text-[var(--nm-accent)]">למי זה מתאים</p>
+        <ul class="mt-4 space-y-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+          {fitItems.map((item) => (
+            <li class="flex gap-2"><span aria-hidden="true" class="text-[var(--nm-accent)]">•</span><span>{item}</span></li>
+          ))}
+        </ul>
+      </article>
+
+      <article class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/92 p-6 shadow-[0_18px_50px_rgba(26,26,26,0.04)]">
+        <p class="text-sm font-semibold text-[var(--nm-accent)]">מה לא תמצא כאן</p>
+        <ul class="mt-4 space-y-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+          {notHereItems.map((item) => (
+            <li class="flex gap-2"><span aria-hidden="true" class="text-[var(--nm-accent)]">•</span><span>{item}</span></li>
+          ))}
+        </ul>
+      </article>
+    </section>
+
+    <section class="grid gap-5 lg:grid-cols-[minmax(0,1.15fr)_minmax(18rem,0.85fr)]">
+      <article class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/92 p-6 shadow-[0_18px_50px_rgba(26,26,26,0.04)]">
+        <p class="text-sm font-semibold text-[var(--nm-accent)]">מה נפתח אחרי הצטרפות</p>
+        <ul class="mt-4 grid gap-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))] md:grid-cols-2">
+          {membersOnlyItems.map((item) => (
+            <li class="rounded-[1.1rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] px-4 py-3">{item}</li>
+          ))}
+        </ul>
+        <div class="mt-5 flex flex-wrap justify-end gap-3">
+          <a
+            href={joinClubHref}
+            class="inline-flex min-h-[46px] items-center rounded-full bg-[var(--nm-accent)] px-5 py-3 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]"
+          >
+            בקשה להצטרף
+          </a>
+          <a
+            href={joinClubWaHref}
+            target="_blank"
+            rel="noreferrer"
+            class="inline-flex min-h-[46px] items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-5 py-3 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]"
+          >
+            בוא נדבר בוואטסאפ
+          </a>
+        </div>
+      </article>
+
+      <article class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/92 p-6 shadow-[0_18px_50px_rgba(26,26,26,0.04)]">
+        <p class="text-sm font-semibold text-[var(--nm-accent)]">יש תכנים שלא יכולים להיות פומביים</p>
+        <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
+          אלו רק התגיות שמחכות בפנים. לא התוכן עצמו.
+        </p>
+        <div class="mt-4 flex flex-wrap gap-2">
+          {premiumFutureTags.map((tag) => (
+            <span class="rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-3 py-1.5 text-sm text-[var(--nm-fg)]">{tag}</span>
+          ))}
+        </div>
+      </article>
+    </section>
+
+    <section id="pricing" class="space-y-6 scroll-mt-28">
+      <div class="space-y-3">
+        <p class="text-sm font-semibold text-[var(--nm-accent)]">מסלולים ומחירים</p>
+        <h2 class="text-[clamp(2rem,1.6rem+1vw,3rem)] font-semibold text-[var(--nm-fg)]">אותו מחירון מסודר, מאותו מקור אמת</h2>
+        <p class="max-w-3xl text-sm leading-8 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">
+          המחיר בכרטיס, הכפתור, והודעת הוואטסאפ נבנים מאותו מקור נתונים. זה אותו בסיס שמופיע גם בעמוד השירותים, כדי שלא יהיו פערים בדרך.
+        </p>
+      </div>
+
+      <div class="grid items-stretch gap-6 lg:grid-cols-2 xl:grid-cols-4">
         {featuredServices.map((featuredService) => (
           <ServiceCard service={featuredService} />
         ))}
       </div>
+    </section>
 
-      <p class="rounded-[1.4rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-5 py-4 text-sm leading-[1.75] text-[color-mix(in_srgb,var(--nm-fg)_66%,var(--nm-bg))]">
-        התשלום מתבצע דרך מערכת Grow. אם צריך לשאול לפני, אפשר לפתוח שאלה קצרה בוואטסאפ מתוך כל כרטיס.
-      </p>
+    <ThoughtShiftProof items={servicesThoughtShifts} heading="מה משתנה אחרי שיחה מדויקת" eyebrow="לפני ואחרי" />
+
+    <section class="space-y-5 rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/92 p-6 shadow-[0_18px_50px_rgba(26,26,26,0.04)]">
+      <div class="space-y-2">
+        <p class="text-sm font-semibold text-[var(--nm-accent)]">אם צריך עוד רגע לבדוק</p>
+        <h2 class="text-[clamp(1.7rem,1.45rem+0.8vw,2.4rem)] font-semibold text-[var(--nm-fg)]">אפשר לראות גם את המחיר של לא לזוז</h2>
+      </div>
+      <div class="grid gap-6 lg:grid-cols-2">
+        <CostOfNoCalculator />
+        <DecisionSimulator />
+      </div>
+    </section>
+
+    <WhyThisIsNotForYou
+      title="למי זה לא מתאים כרגע"
+      intro="העבודה כאן לא מלטפת את הסיפור. היא בודקת אותו. לכן צריך רצון לראות, לא רק רצון להרגיש הקלה רגעית."
+      items={[
+        "למי שמחפש אישור שהוא כבר צודק.",
+        "למי שרוצה שמישהו אחר יחליט במקומו.",
+        "למי שמעדיף להישאר רק ברמת הסימפטום ולא לגעת בהנחה שמפעילה אותו.",
+      ]}
+      closing="אם זה לא הזמן שלך להיכנס לשיחה כזאת, זה לגיטימי. עדיף לחכות לרגע שבו יש נכונות אמיתית לראות."
+    />
+
+    <section class="space-y-5 rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/92 p-6 shadow-[0_18px_50px_rgba(26,26,26,0.04)]">
+      <div class="text-right">
+        <p class="text-sm font-semibold text-[var(--nm-accent)]">שאלות נפוצות</p>
+        <h2 class="mt-2 text-[clamp(1.7rem,1.45rem+0.8vw,2.4rem)] font-semibold text-[var(--nm-fg)]">לפני שקובעים או מצטרפים</h2>
+      </div>
+      <div class="grid gap-3">
+        {faqItems.map((item) => (
+          <details class="rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] px-4 py-4 text-right">
+            <summary class="cursor-pointer list-none text-sm font-semibold text-[var(--nm-fg)] marker:hidden">{item.question}</summary>
+            <p class="mt-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">{item.answer}</p>
+          </details>
+        ))}
+      </div>
     </section>
   </section>
+
+  <script is:inline>
+    document.addEventListener("astro:page-load", () => {
+      const trigger = document.getElementById("personal-install-trigger");
+      if (!(trigger instanceof HTMLButtonElement)) return;
+      trigger.onclick = () => {
+        const hiddenAction = document.getElementById("nm-pwa-install-action");
+        if (hiddenAction instanceof HTMLButtonElement) {
+          hiddenAction.click();
+        }
+      };
+    });
+  </script>
 </Layout>

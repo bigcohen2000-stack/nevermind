@@ -1,4 +1,4 @@
-﻿---
+---
 import "@fontsource-variable/assistant/wght.css";
 import "@fontsource/heebo/index.css";
 import "../styles/global.css";
@@ -45,7 +45,7 @@ const stagingEnabled = Boolean(stagingCfg?.enabled);
 const stagingMessage =
   typeof stagingCfg?.message === "string" && stagingCfg.message.trim().length > 0
     ? stagingCfg.message.trim()
-    : "׳”׳׳×׳¨ ׳‘׳”׳¨׳¦׳”";
+    : "האתר בהרצה";
 const navTopClass = stagingEnabled
   ? "top-[calc(var(--nm-staging-banner-height)+var(--nm-nav-top,1.5rem))]"
   : "top-[var(--nm-nav-top,1.5rem)]";
@@ -79,12 +79,12 @@ const trimMetaDescription = (value: string) => {
   if (normalized.length <= 155) return normalized;
   return `${normalized.slice(0, 152).trimEnd()}...`;
 };
-/** ׳׳˜׳ ׳‘׳¨׳™׳¨׳× ׳׳—׳“׳: ׳׳™׳׳•׳× ׳׳₪׳×׳— SEO + ׳‘׳׳™ ׳׳©׳₪׳˜׳™ ֲ«׳©ג€¦ֲ» */
+/** מטא ברירת מחדל: מילות מפתח SEO + בלי משפטי «ש…» */
 const siteDescription = trimMetaDescription(
-  "׳׳¨׳›׳– ׳—׳§׳™׳¨׳”: ׳©׳§׳˜ ׳ ׳₪׳©׳™, ׳—׳©׳™׳‘׳” ׳¦׳׳•׳׳”, ׳׳׳× ׳׳•׳‘׳™׳™׳§׳˜׳™׳‘׳™׳×, ׳”׳‘׳ ׳” ׳׳•׳©׳׳׳× ׳©׳ ׳¢׳•׳‘׳“׳” ׳׳•׳ ׳¡׳™׳₪׳•׳¨. ׳׳™׳ ׳׳”׳₪׳¡׳™׳§ ׳׳¡׳‘׳•׳ ׳׳×׳•׳ ׳‘׳׳‘׳•׳. NeverMind."
+  "מרכז חקירה: שקט נפשי, חשיבה צלולה, אמת אובייקטיבית, הבנה מושלמת של עובדה מול סיפור. איך להפסיק לסבול מתוך בלבול. NeverMind."
 );
 const seoKeywords =
-  "׳©׳§׳˜ ׳ ׳₪׳©׳™, ׳”׳‘׳ ׳” ׳׳•׳©׳׳׳×, ׳׳׳× ׳׳•׳‘׳™׳™׳§׳˜׳™׳‘׳™׳×, ׳—׳©׳™׳‘׳” ׳¦׳׳•׳׳”, ׳׳™׳ ׳׳”׳₪׳¡׳™׳§ ׳׳¡׳‘׳•׳, NeverMind";
+  "שקט נפשי, הבנה מושלמת, אמת אובייקטיבית, חשיבה צלולה, איך להפסיק לסבול, NeverMind";
 const siteUrl = appConfig.site.url;
 const siteUrlSlash = siteUrl.endsWith("/") ? siteUrl : `${siteUrl}/`;
 const logoPath =
@@ -136,7 +136,7 @@ const logoAbsolute = new URL(logoPath.replace(/^\//, ""), siteUrlSlash).toString
 const wordmarkHe =
   typeof brandCfg.wordmarkHe === "string" && brandCfg.wordmarkHe.trim().length > 0
     ? brandCfg.wordmarkHe.trim()
-    : "׳”׳©׳ ׳׳ ׳׳©׳ ׳”";
+    : "השם לא משנה";
 
 const organizationSchema = {
   "@context": "https://schema.org",
@@ -195,16 +195,16 @@ const currentNavPath = normalizeNavPath(pathName);
 const intentNavItems: { href: string; label: string; activePrefixes: string[] }[] = [
   {
     href: "/blog/",
-    label: "׳׳ ׳™ ׳¨׳•׳¦׳” ׳׳”׳¢׳׳™׳§",
+    label: "אני רוצה להעמיק",
     activePrefixes: ["/blog", "/archive", "/articles", "/journey/mental-health"],
   },
   {
     href: "/studio/",
-    label: "׳׳ ׳™ ׳¨׳•׳¦׳” ׳׳“׳‘׳¨",
+    label: "אני רוצה לדבר",
     activePrefixes: ["/studio", "/services", "/intake", "/personal-consultation", "/contact", "/book"],
   },
-  { href: "/glossary/", label: "׳”׳’׳“׳¨׳•׳× ׳׳—׳“׳©", activePrefixes: ["/glossary"] },
-  { href: "/about/", label: "׳׳•׳“׳•׳× NeverMind", activePrefixes: ["/about"] },
+  { href: "/glossary/", label: "הגדרות מחדש", activePrefixes: ["/glossary"] },
+  { href: "/about/", label: "אודות NeverMind", activePrefixes: ["/about"] },
 ];
 
 const intentNavItemIsCurrent = (prefixes: string[]) => {
@@ -216,53 +216,37 @@ const intentNavItemIsCurrent = (prefixes: string[]) => {
   });
 };
 
-/** ׳§׳™׳©׳•׳¨׳™ ׳₪׳•׳˜׳¨: onlyMd ׳׳¡׳×׳™׳¨ ׳§׳™׳©׳•׳¨ ׳¢׳“ md ׳›׳“׳™ ׳׳¨׳•׳§׳ ׳׳•׳‘׳™׳™׳ */
+/** קישורי פוטר: onlyMd מסתיר קישור עד md כדי לרוקן מובייל */
 const footerLinkColumns: {
   title: string;
-  columnOnlyMd?: boolean;
-  links: { href: string; label: string; onlyMd?: boolean }[];
+  links: { href: string; label: string }[];
 }[] = [
   {
-    title: "׳׳¡׳׳•׳",
+    title: "תוכן",
     links: [
-      { href: "/services/", label: "׳©׳™׳¨׳•׳×׳™׳" },
-      { href: "/book/", label: "׳§׳‘׳™׳¢׳× ׳©׳™׳—׳”" },
-      { href: "/intake/", label: "׳™׳¦׳™׳¨׳× ׳§׳©׳¨" },
-      { href: "/studio/", label: "׳¡׳˜׳•׳“׳™׳•" },
-      { href: "/personal-consultation/", label: "׳©׳™׳—׳” ׳׳™׳©׳™׳×", onlyMd: true },
+      { href: "/library/", label: "ספרייה" },
+      { href: "/articles/", label: "מאמרים" },
+      { href: "/topics/clarity/", label: "בהירות" },
+      { href: "/topics/freedom/", label: "חופש" },
+      { href: "/forbidden-library/", label: "הספרייה האסורה" },
+      { href: "/root-problem-tree/", label: "עץ שורש הבעיה" },
     ],
   },
   {
-    title: "׳×׳•׳›׳",
+    title: "שירות",
     links: [
-      { href: "/blog/", label: "׳׳׳׳¨׳™׳" },
-      { href: "/about/", label: "׳׳•׳“׳•׳×" },
-      { href: "/glossary/", label: "׳׳•׳ ׳—׳™׳" },
-      { href: "/blog/", label: "׳׳ ׳™ ׳¨׳•׳¦׳” ׳׳”׳¢׳׳™׳§", onlyMd: true },
-      { href: "/library/", label: "׳¡׳₪׳¨׳™׳™׳”", onlyMd: true },
+      { href: "/personal-consultation/", label: "שיחה אישית" },
+      { href: "/services/", label: "מחירון" },
+      { href: "/contact/", label: "יצירת קשר" },
     ],
   },
   {
-    title: "׳¢׳•׳׳§",
-    columnOnlyMd: true,
+    title: "מערכת",
     links: [
-      { href: "/topics/clarity/", label: "׳‘׳”׳™׳¨׳•׳×" },
-      { href: "/topics/freedom/", label: "׳—׳•׳₪׳©" },
-      { href: "/topics/self/", label: "׳”׳¢׳¦׳׳™" },
-      { href: "/topics/thought-mechanics/", label: "׳׳›׳ ׳™׳§׳× ׳׳—׳©׳‘׳”" },
-      { href: "/forbidden-library/", label: "׳”׳¡׳₪׳¨׳™׳™׳” ׳”׳׳¡׳•׳¨׳”" },
-      { href: "/root-problem-tree/", label: "׳¢׳¥ ׳©׳•׳¨׳© ׳”׳‘׳¢׳™׳”" },
-    ],
-  },
-  {
-    title: "׳׳¢׳¨׳›׳×",
-    links: [
-      { href: "/contact/", label: "׳™׳¦׳™׳¨׳× ׳§׳©׳¨" },
-      { href: "/privacy/", label: "׳₪׳¨׳˜׳™׳•׳×" },
-      { href: "/terms/", label: "׳×׳ ׳׳™׳" },
-      { href: "/accessibility/", label: "׳ ׳’׳™׳©׳•׳×" },
-      { href: "/about/#nm-about-faq", label: "׳©׳׳׳•׳× ׳ ׳₪׳•׳¦׳•׳×", onlyMd: true },
-      { href: "/testimonials/", label: "׳”׳׳׳¦׳•׳×", onlyMd: true },
+      { href: "/privacy/", label: "פרטיות" },
+      { href: "/terms/", label: "תנאים" },
+      { href: "/accessibility/", label: "נגישות" },
+      { href: "/faq/", label: "שאלות נפוצות" },
     ],
   },
 ];
@@ -315,10 +299,10 @@ const articleSchema = frontmatter
       description: frontmatter.description ?? pageDescription,
       author: {
         "@type": "Person",
-        name: frontmatter.author ?? "׳”׳©׳ ׳׳ ׳׳©׳ ׳”",
-        jobTitle: "׳›׳•׳×׳‘ ׳•׳—׳•׳§׳¨ ׳׳ ׳’׳ ׳•׳ ׳™ ׳—׳©׳™׳‘׳” ׳•׳׳¦׳™׳׳•׳×",
+        name: frontmatter.author ?? "השם לא משנה",
+        jobTitle: "כותב וחוקר מנגנוני חשיבה ומציאות",
         description:
-          "׳×׳•׳›׳ ׳׳ ׳׳™׳˜׳™: ׳¢׳•׳‘׳“׳•׳×, ׳׳ ׳’׳ ׳•׳ ׳™׳, ׳•׳”׳₪׳¨׳“׳” ׳‘׳™׳ ׳¡׳™׳₪׳•׳¨ ׳׳׳¦׳™׳׳•׳×. ׳׳׳ ׳˜׳©׳˜׳•׳© ׳©׳™׳•׳•׳§׳™.",
+          "תוכן אנליטי: עובדות, מנגנונים, והפרדה בין סיפור למציאות. ללא טשטוש שיווקי.",
       },
       datePublished: toIso(frontmatter.pubDate),
       dateModified: toIso(frontmatter.updatedDate) ?? toIso(frontmatter.pubDate),
@@ -367,7 +351,7 @@ const fallbackFaqItems: FaqPair[] =
   mergedFaqItems.length === 0 && hasInquirySection && frontmatter?.description
     ? [
         {
-          question: `׳׳” ׳‘׳•׳“׳§׳™׳ ׳‘׳׳׳׳¨ "${frontmatter.title ?? pageTitle}"?`,
+          question: `מה בודקים במאמר "${frontmatter.title ?? pageTitle}"?`,
           answer: String(frontmatter.description),
         },
       ]
@@ -409,7 +393,7 @@ const videoObjectSchema =
           ...(videoSummaryPointsForSchema.length > 0
             ? {
                 keywords: videoSummaryPointsForSchema.join(", "),
-                transcript: videoSummaryPointsForSchema.map((line: string) => `ג€¢ ${line}`).join("\n"),
+                transcript: videoSummaryPointsForSchema.map((line: string) => `• ${line}`).join("\n"),
               }
             : {}),
           publisher: {
@@ -431,7 +415,7 @@ const videoObjectSchema =
           ...(videoSummaryPointsForSchema.length > 0
             ? {
                 keywords: videoSummaryPointsForSchema.join(", "),
-                transcript: videoSummaryPointsForSchema.map((line: string) => `ג€¢ ${line}`).join("\n"),
+                transcript: videoSummaryPointsForSchema.map((line: string) => `• ${line}`).join("\n"),
               }
             : {}),
           publisher: {
@@ -449,8 +433,8 @@ const podcastSessionProductsSchema = [
   {
     "@context": "https://schema.org",
     "@type": "Product",
-    name: "׳¡׳©׳ ׳׳•׳׳₪׳ ׳₪׳•׳“׳§׳׳¡׳˜ ג€” ׳¢׳“ ׳—׳¦׳™ ׳©׳¢׳”",
-    description: "׳”׳§׳׳˜׳” ׳‘׳׳•׳׳₪׳ ׳₪׳•׳“׳§׳׳¡׳˜, ׳¢׳“ 30 ׳“׳§׳•׳×.",
+    name: "סשן אולפן פודקאסט — עד חצי שעה",
+    description: "הקלטה באולפן פודקאסט, עד 30 דקות.",
     brand: { "@type": "Brand", name: siteTitle },
     sku: "nm-podcast-30",
     url: servicesPageUrl,
@@ -466,8 +450,8 @@ const podcastSessionProductsSchema = [
   {
     "@context": "https://schema.org",
     "@type": "Product",
-    name: "׳¡׳©׳ ׳׳•׳׳₪׳ ׳₪׳•׳“׳§׳׳¡׳˜ ג€” ׳¢׳“ ׳©׳¢׳”",
-    description: "׳”׳§׳׳˜׳” ׳‘׳׳•׳׳₪׳ ׳₪׳•׳“׳§׳׳¡׳˜, ׳¢׳“ 60 ׳“׳§׳•׳×.",
+    name: "סשן אולפן פודקאסט — עד שעה",
+    description: "הקלטה באולפן פודקאסט, עד 60 דקות.",
     brand: { "@type": "Brand", name: siteTitle },
     sku: "nm-podcast-60",
     url: servicesPageUrl,
@@ -493,9 +477,9 @@ const coreStructuredData = [
 ].filter(Boolean);
 
 const socialLinks = [
-  { label: "׳₪׳™׳™׳¡׳‘׳•׳§", href: "https://www.facebook.com/nevermindyakir", mark: "f" },
-  { label: "׳׳™׳ ׳¡׳˜׳’׳¨׳", href: "https://www.instagram.com/nevermind.co.il/", mark: "IG" },
-  { label: "׳˜׳™׳§׳˜׳•׳§", href: "https://www.tiktok.com/@nevermind.co.il", mark: "ג™×" },
+  { label: "פייסבוק", href: "https://www.facebook.com/nevermindyakir", mark: "f" },
+  { label: "אינסטגרם", href: "https://www.instagram.com/nevermind.co.il/", mark: "IG" },
+  { label: "טיקטוק", href: "https://www.tiktok.com/@nevermind.co.il", mark: "♪" },
   { label: "X", href: "https://x.com/nevermindyakir", mark: "X" },
 ];
 
@@ -569,7 +553,7 @@ const socialLinks = [
       href={skipToContentHref}
       class="sr-only transition-colors duration-200 focus:not-sr-only focus:fixed focus:top-4 focus:z-[110] focus:rounded-md focus:bg-[var(--nm-bg-canvas)] focus:px-4 focus:py-2 focus:text-[var(--nm-fg)] focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-[var(--color-red)] shadow-xl focus:start-4"
     >
-      ׳“׳׳’ ׳׳×׳•׳›׳ ׳”׳¨׳׳©׳™
+      דלג לתוכן הראשי
     </a>
 
     {stagingEnabled ? (
@@ -605,7 +589,7 @@ const socialLinks = [
       <nav
         data-nav
         class={`fixed inset-x-0 z-50 transition-[top] duration-300 ${navTopClass}`}
-        aria-label="׳ ׳™׳•׳•׳˜ ׳¨׳׳©׳™"
+        aria-label="ניווט ראשי"
       >
         <div data-site-header-bar class="nm-header-bar w-full px-3 sm:px-4">
           <div class="nm-header-inner mx-auto grid max-w-7xl grid-cols-[1fr_auto] items-center gap-x-3 gap-y-3 py-3 md:grid-cols-[auto_minmax(0,1fr)_auto] md:gap-x-5 md:py-3.5">
@@ -624,12 +608,12 @@ const socialLinks = [
               />
               <span class="flex min-w-0 flex-col items-start gap-0.5">
                 <span class="truncate">{wordmarkHe}</span>
-                <span class="flex gap-0.5 text-[0.55rem] leading-none text-[var(--nm-accent)]" aria-label="׳—׳׳™׳©׳” ׳›׳•׳›׳‘׳™׳" title="׳—׳׳™׳©׳” ׳›׳•׳›׳‘׳™׳">
-                  <span aria-hidden="true">ג˜…</span>
-                  <span aria-hidden="true">ג˜…</span>
-                  <span aria-hidden="true">ג˜…</span>
-                  <span aria-hidden="true">ג˜…</span>
-                  <span aria-hidden="true">ג˜…</span>
+                <span class="flex gap-0.5 text-[0.55rem] leading-none text-[var(--nm-accent)]" aria-label="חמישה כוכבים" title="חמישה כוכבים">
+                  <span aria-hidden="true">★</span>
+                  <span aria-hidden="true">★</span>
+                  <span aria-hidden="true">★</span>
+                  <span aria-hidden="true">★</span>
+                  <span aria-hidden="true">★</span>
                 </span>
               </span>
             </a>
@@ -666,21 +650,21 @@ const socialLinks = [
                 data-astro-prefetch
                 class="nm-header-services-link inline-flex min-h-[44px] items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-[color-mix(in_srgb,var(--nm-bg-canvas)_88%,transparent)] px-3 text-sm font-medium text-[color-mix(in_srgb,var(--nm-fg)_82%,var(--nm-bg))] no-underline transition-colors duration-200 [transition-timing-function:ease] hover:border-[color-mix(in_srgb,var(--nm-accent)_24%,transparent)] hover:text-[var(--nm-accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-red)] sm:px-3.5"
               >
-                ׳©׳™׳¨׳•׳×׳™׳
+                שירותים
               </a>
               <button
                 type="button"
                 data-random-article-trigger
-                aria-label="׳₪׳×׳™׳—׳× ׳׳׳׳¨ ׳׳§׳¨׳׳™ ׳׳”׳׳¨׳›׳™׳•׳"
+                aria-label="פתיחת מאמר אקראי מהארכיון"
                 class="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full bg-[var(--nm-accent)] px-3.5 py-2 text-sm font-medium text-[var(--nm-on-accent)] transition-colors duration-200 [transition-timing-function:ease] hover:bg-[var(--nm-accent-hover)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-red)] sm:px-4"
               >
-                ׳×׳₪׳×׳™׳¢׳• ׳׳•׳×׳™
+                תפתיעו אותי
               </button>
               <button
                 id="search-trigger"
                 type="button"
                 data-search-trigger
-                aria-label="׳—׳™׳₪׳•׳© ׳‘׳׳¨׳›׳– ׳”׳™׳“׳¢"
+                aria-label="חיפוש במרכז הידע"
                 class="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))] transition-colors duration-200 [transition-timing-function:ease] hover:border-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)] hover:text-[var(--nm-accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-red)]"
               >
                 <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -693,7 +677,7 @@ const socialLinks = [
                 data-nm-auth-login
                 class="inline-flex min-h-[44px] items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-white/92 px-3.5 py-2 text-sm font-semibold text-[var(--nm-fg)] no-underline transition hover:border-[color-mix(in_srgb,var(--nm-accent)_28%,transparent)] hover:text-[var(--nm-accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-red)]"
               >
-                ׳›׳ ׳™׳¡׳” ׳׳• ׳”׳¨׳©׳׳”
+                כניסה או הרשמה
               </a>
               <a
                 href="/me/"
@@ -704,7 +688,7 @@ const socialLinks = [
                 <span data-nm-auth-summary>LIVE</span>
               </a>
               <a
-                href="/dashboard/"
+                href="/admin/"
                 data-nm-auth-admin
                 hidden
                 class="hidden inline-flex min-h-[44px] items-center rounded-full border border-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)] bg-[var(--nm-inverse)] px-3.5 py-2 text-sm font-semibold text-[var(--nm-inverse-fg)] no-underline transition hover:bg-[var(--nm-inverse-hover)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-red)]"
@@ -717,7 +701,7 @@ const socialLinks = [
                 hidden
                 class="hidden inline-flex min-h-[44px] items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-[var(--nm-surface-muted)] px-3.5 py-2 text-sm font-semibold text-[var(--nm-fg)] transition hover:border-[color-mix(in_srgb,var(--nm-accent)_28%,transparent)] hover:text-[var(--nm-accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-red)]"
               >
-                ׳™׳¦׳™׳׳”
+                יציאה
               </button>
             </div>
           </div>
@@ -770,33 +754,33 @@ const socialLinks = [
                 neverMind
               </span>
               <span class="text-sm font-medium leading-snug text-[#1A1A1A] group-hover:text-[var(--nm-accent)]">{wordmarkHe}</span>
-              <span class="flex gap-0.5 text-[var(--nm-accent)]" aria-label="׳—׳׳™׳©׳” ׳›׳•׳›׳‘׳™׳" title="׳—׳׳™׳©׳” ׳›׳•׳›׳‘׳™׳">
-                <span aria-hidden="true">ג˜…</span>
-                <span aria-hidden="true">ג˜…</span>
-                <span aria-hidden="true">ג˜…</span>
-                <span aria-hidden="true">ג˜…</span>
-                <span aria-hidden="true">ג˜…</span>
+              <span class="flex gap-0.5 text-[var(--nm-accent)]" aria-label="חמישה כוכבים" title="חמישה כוכבים">
+                <span aria-hidden="true">★</span>
+                <span aria-hidden="true">★</span>
+                <span aria-hidden="true">★</span>
+                <span aria-hidden="true">★</span>
+                <span aria-hidden="true">★</span>
               </span>
             </span>
           </a>
           <p class="max-w-md shrink-0 text-xs leading-relaxed text-[color-mix(in_srgb,#1A1A1A_52%,#FAFAF8)] lg:max-w-sm lg:text-right">
-            ֲ© {new Date().getFullYear()} NeverMind
-            <span class="mx-1 text-[color-mix(in_srgb,#1A1A1A_30%,#FAFAF8)]">ֲ·</span>
-            ׳”׳©׳ ׳׳ ׳׳©׳ ׳”
+            © {new Date().getFullYear()} NeverMind
+            <span class="mx-1 text-[color-mix(in_srgb,#1A1A1A_30%,#FAFAF8)]">·</span>
+            השם לא משנה
           </p>
         </div>
 
         <nav
-          class="mt-14 grid grid-cols-1 gap-y-12 text-right sm:grid-cols-2 lg:grid-cols-4 lg:gap-x-10"
-          aria-label="׳§׳™׳©׳•׳¨׳™ ׳×׳—׳×׳™׳×"
+          class="mt-14 grid grid-cols-1 gap-y-12 text-right sm:grid-cols-2 lg:grid-cols-3 lg:gap-x-10"
+          aria-label="קישורי תחתית"
         >
           {
             footerLinkColumns.map((col) => (
-              <div class:list={["space-y-4", col.columnOnlyMd ? "hidden md:block" : ""]}>
+              <div class="space-y-4">
                 <p class="text-sm font-semibold text-[color-mix(in_srgb,#1A1A1A_62%,#FAFAF8)]">{col.title}</p>
                 <ul class="space-y-2.5 text-sm font-normal" role="list">
                   {col.links.map((link) => (
-                    <li class:list={[link.onlyMd ? "hidden md:block" : ""]}>
+                    <li>
                       <a
                         href={link.href}
                         class="inline-block rounded-md py-0.5 text-[color-mix(in_srgb,#1A1A1A_88%,#FAFAF8)] transition-colors hover:text-[var(--nm-accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nm-accent)]"
@@ -816,7 +800,7 @@ const socialLinks = [
             id="nm-footer-identity-line"
             class="hidden text-xs font-medium text-[color-mix(in_srgb,#1A1A1A_58%,#FAFAF8)]"
           >
-            ׳”׳–׳”׳•׳× ׳”׳׳׳™׳×׳™׳× ׳©׳׳ ׳׳×׳—׳™׳׳” ׳׳™׳₪׳” ׳©׳”׳©׳ ׳©׳׳ ׳ ׳’׳׳¨
+            הזהות האמיתית שלך מתחילה איפה שהשם שלך נגמר
           </p>
 
           <div class="flex flex-wrap items-center justify-start gap-3 gap-y-2 text-sm sm:justify-end">
@@ -828,7 +812,7 @@ const socialLinks = [
                 data-email-domain={emailDomain}
                 class="inline-flex min-h-[44px] items-center rounded-full border border-[color-mix(in_srgb,#1A1A1A_12%,transparent)] bg-transparent px-4 py-2 font-semibold text-[#1A1A1A] transition-colors hover:border-[color-mix(in_srgb,var(--nm-accent)_35%,transparent)] hover:text-[var(--nm-accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nm-accent)]"
               >
-                ׳׳›׳×׳•׳‘ ׳‘׳׳™׳™׳
+                לכתוב במייל
               </button>
             ) : null}
             <a
@@ -836,7 +820,7 @@ const socialLinks = [
               data-astro-prefetch
               class="inline-flex min-h-[44px] items-center rounded-full border border-[color-mix(in_srgb,#1A1A1A_12%,transparent)] px-4 py-2 font-semibold text-[#1A1A1A] transition-colors hover:border-[color-mix(in_srgb,var(--nm-accent)_35%,transparent)] hover:text-[var(--nm-accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nm-accent)]"
             >
-              ׳˜׳•׳₪׳¡ ׳™׳¦׳™׳¨׳× ׳§׳©׳¨
+              טופס יצירת קשר
             </a>
             {waDigits ? (
               <a
@@ -845,7 +829,7 @@ const socialLinks = [
                 rel="noreferrer"
                 class="hidden min-h-[44px] items-center rounded-full border border-[color-mix(in_srgb,#1A1A1A_12%,transparent)] px-4 py-2 font-semibold text-[#1A1A1A] transition-colors hover:border-[color-mix(in_srgb,var(--nm-accent)_35%,transparent)] hover:text-[var(--nm-accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nm-accent)] md:inline-flex"
               >
-                ׳•׳•׳׳˜׳¡׳׳₪
+                וואטסאפ
               </a>
             ) : null}
             <a
@@ -853,7 +837,7 @@ const socialLinks = [
               data-astro-prefetch
               class="inline-flex min-h-[44px] items-center rounded-full bg-[#1A1A1A] px-4 py-2 text-sm font-semibold text-[#FAFAF8] transition hover:bg-[color-mix(in_srgb,#1A1A1A_88%,#FAFAF8)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nm-accent)]"
             >
-              ׳׳—׳™׳¨׳•׳
+              מחירון
             </a>
           </div>
 
@@ -872,13 +856,13 @@ const socialLinks = [
           </div>
 
           <p class="hidden text-[0.7rem] leading-relaxed text-[color-mix(in_srgb,#1A1A1A_48%,#FAFAF8)] md:block">
-            ׳©׳™׳×׳•׳£ ׳׳•׳–׳׳ ׳¢׳ ׳¦׳™׳•׳ ׳׳§׳•׳¨: NeverMind.co.il
+            שיתוף מוזמן עם ציון מקור: NeverMind.co.il
           </p>
 
           <div class="hidden flex-wrap items-center justify-start gap-2 text-[0.65rem] text-[color-mix(in_srgb,#1A1A1A_45%,#FAFAF8)] md:flex md:justify-end">
-            <span>׳׳×׳¨ ׳׳׳•׳‘׳˜׳— SSL</span>
-            <span class="text-[color-mix(in_srgb,#1A1A1A_28%,#FAFAF8)]">ֲ·</span>
-            <span>׳¡׳׳™׳§׳” ׳“׳¨׳ Grow</span>
+            <span>אתר מאובטח SSL</span>
+            <span class="text-[color-mix(in_srgb,#1A1A1A_28%,#FAFAF8)]">·</span>
+            <span>סליקה דרך Grow</span>
           </div>
 
           <div class="flex justify-end">
@@ -899,10 +883,10 @@ const socialLinks = [
       data-scroll-top
       hidden
       class="inline-flex fixed bottom-5 left-5 z-[46] h-11 w-11 items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_14%,transparent)] bg-[var(--nm-bg-canvas)] text-lg font-light leading-none text-[var(--nm-fg)] shadow-[0_6px_20px_color-mix(in_srgb,var(--nm-fg)_8%,transparent)] transition-colors hover:border-[color-mix(in_srgb,var(--nm-accent)_30%,transparent)] hover:text-[var(--nm-accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nm-accent)] md:bottom-6 md:left-6"
-      aria-label="׳—׳–׳¨׳” ׳׳¨׳׳© ׳”׳¢׳׳•׳“"
+      aria-label="חזרה לראש העמוד"
       aria-hidden="true"
     >
-      <span aria-hidden="true">ג†‘</span>
+      <span aria-hidden="true">↑</span>
     </button>
 
     <WhatsAppButton
@@ -955,23 +939,23 @@ const socialLinks = [
         }
 
         window.__nmReturnLabelForPath = (pNorm) => {
-          if (pNorm === "/") return "׳—׳–׳•׳¨ ׳׳“׳£ ׳”׳‘׳™׳×";
-          if (pNorm === "/archive" || pNorm.startsWith("/archive/")) return "׳—׳–׳•׳¨ ׳׳׳¨׳›׳™׳•׳";
-          if (pNorm === "/articles") return "׳—׳–׳•׳¨ ׳׳׳¨׳›׳™׳•׳";
-          if (pNorm.startsWith("/articles/")) return "׳—׳–׳•׳¨ ׳׳׳׳׳¨";
-          if (pNorm === "/studio" || pNorm.startsWith("/studio/")) return "׳—׳–׳•׳¨ ׳׳¡׳˜׳•׳“׳™׳•";
-          if (pNorm === "/about" || pNorm.startsWith("/about/")) return "׳—׳–׳•׳¨ ׳׳”׳‘׳ ׳”";
-          if (pNorm.startsWith("/topics/")) return "׳—׳–׳•׳¨ ׳׳ ׳•׳©׳";
-          if (pNorm.startsWith("/glossary")) return "׳—׳–׳•׳¨ ׳׳”׳’׳“׳¨׳•׳× ׳׳—׳“׳©";
-          if (pNorm.startsWith("/services") || pNorm.startsWith("/intake")) return "׳—׳–׳•׳¨ ׳׳׳•׳— ׳”׳׳׳™׳“׳”";
-          if (pNorm.startsWith("/questions")) return "׳—׳–׳•׳¨ ׳׳©׳׳׳•׳×";
-          if (pNorm === "/now" || pNorm.startsWith("/now/")) return "׳—׳–׳•׳¨ ׳׳׳” ׳”׳׳¦׳‘ ׳¢׳›׳©׳™׳•";
-          return "׳—׳–׳•׳¨ ׳׳׳ ׳©׳‘׳׳×";
+          if (pNorm === "/") return "חזור לדף הבית";
+          if (pNorm === "/archive" || pNorm.startsWith("/archive/")) return "חזור לארכיון";
+          if (pNorm === "/articles") return "חזור לארכיון";
+          if (pNorm.startsWith("/articles/")) return "חזור למאמר";
+          if (pNorm === "/studio" || pNorm.startsWith("/studio/")) return "חזור לסטודיו";
+          if (pNorm === "/about" || pNorm.startsWith("/about/")) return "חזור להבנה";
+          if (pNorm.startsWith("/topics/")) return "חזור לנושא";
+          if (pNorm.startsWith("/glossary")) return "חזור להגדרות מחדש";
+          if (pNorm.startsWith("/services") || pNorm.startsWith("/intake")) return "חזור ללוח הלמידה";
+          if (pNorm.startsWith("/questions")) return "חזור לשאלות";
+          if (pNorm === "/now" || pNorm.startsWith("/now/")) return "חזור למה המצב עכשיו";
+          return "חזור לאן שבאת";
         };
 
         window.__nmResolveReturnTarget = () => {
           let href = "/archive/";
-          let label = "׳—׳–׳•׳¨ ׳׳׳¨׳›׳™׳•׳";
+          let label = "חזור לארכיון";
           const here = `${location.pathname}${location.search}`;
           const hereNorm = location.pathname.replace(/\/+$/, "") || "/";
           try {
@@ -1265,7 +1249,7 @@ const socialLinks = [
           const adminSession = nmReadAdminSession();
           if (adminSession) {
             const lastLogin = nmFormatMemberDateTime(adminSession.loggedInAt);
-            textEl.textContent = lastLogin ? `ADMIN ֲ· ׳›׳ ׳™׳¡׳” ׳׳—׳¨׳•׳ ׳” ${lastLogin}` : "ADMIN ֲ· ׳’׳™׳©׳× ׳ ׳™׳”׳•׳ ׳₪׳¢׳™׳׳”";
+            textEl.textContent = lastLogin ? `ADMIN · כניסה אחרונה ${lastLogin}` : "ADMIN · גישת ניהול פעילה";
             return;
           }
           const session = nmReadClubSession();
@@ -1276,10 +1260,10 @@ const socialLinks = [
           const parts = ["LIVE", session.memberName];
           if (session.phone) parts.push(session.phone);
           const expiry = nmFormatMemberDate(session.expiresAt);
-          if (expiry) parts.push(`׳¢׳“ ${expiry}`);
+          if (expiry) parts.push(`עד ${expiry}`);
           const lastLogin = nmFormatMemberDateTime(session.lastLoginAt);
-          if (lastLogin) parts.push(`׳›׳ ׳™׳¡׳” ׳׳—׳¨׳•׳ ׳” ${lastLogin}`);
-          textEl.textContent = parts.join(" ֲ· ");
+          if (lastLogin) parts.push(`כניסה אחרונה ${lastLogin}`);
+          textEl.textContent = parts.join(" · ");
         };
         const nmSyncHeaderAuth = () => {
           const adminSession = nmReadAdminSession();
@@ -1311,11 +1295,11 @@ const socialLinks = [
           }
           if (memberSummaryEl instanceof HTMLElement) {
             memberSummaryEl.textContent = memberSession
-              ? ["LIVE", memberSession.memberName, memberSession.phone].filter(Boolean).join(" ֲ· ")
+              ? ["LIVE", memberSession.memberName, memberSession.phone].filter(Boolean).join(" · ")
               : "LIVE";
           }
           if (adminSummaryEl instanceof HTMLElement) {
-            adminSummaryEl.textContent = adminSession ? ["Admin", adminSession.label].filter(Boolean).join(" ֲ· ") : "Admin";
+            adminSummaryEl.textContent = adminSession ? ["Admin", adminSession.label].filter(Boolean).join(" · ") : "Admin";
           }
         };
         const nmSyncPremiumUi = () => {
@@ -1360,11 +1344,11 @@ const socialLinks = [
             const title = String(node.getAttribute("data-favorite-title") || slug).trim();
             const active = favoriteSlugs.has(slug);
             node.setAttribute("aria-pressed", active ? "true" : "false");
-            node.setAttribute("aria-label", active ? `׳”׳¡׳¨׳” ׳׳”׳׳•׳¢׳“׳₪׳™׳: ${title}` : `׳©׳׳™׳¨׳” ׳׳׳•׳¢׳“׳₪׳™׳: ${title}`);
+            node.setAttribute("aria-label", active ? `הסרה מהמועדפים: ${title}` : `שמירה למועדפים: ${title}`);
             node.classList.toggle("text-[var(--nm-accent)]", active);
             node.classList.toggle("border-[color-mix(in_srgb,var(--nm-accent)_30%,transparent)]", active);
             const icon = node.querySelector("[data-favorite-icon]");
-            if (icon instanceof HTMLElement) icon.textContent = active ? "ג˜…" : "ג˜†";
+            if (icon instanceof HTMLElement) icon.textContent = active ? "★" : "☆";
           });
         };
         const onFavoriteToggleClick = (event) => {
@@ -1383,11 +1367,11 @@ const socialLinks = [
           if (existingIndex >= 0) {
             favorites.splice(existingIndex, 1);
             writeFavorites(favorites);
-            window.__nmAnnounce?.("׳”׳׳׳׳¨ ׳”׳•׳¡׳¨ ׳׳”׳׳•׳¢׳“׳₪׳™׳.");
+            window.__nmAnnounce?.("המאמר הוסר מהמועדפים.");
           } else {
             favorites.unshift({ slug, title, description, href, savedAt: new Date().toISOString() });
             writeFavorites(favorites);
-            window.__nmAnnounce?.("׳”׳׳׳׳¨ ׳ ׳©׳׳¨ ׳‘׳׳•׳¢׳“׳₪׳™׳.");
+            window.__nmAnnounce?.("המאמר נשמר במועדפים.");
             window.__nmHapticSuccess?.();
           }
           syncFavoriteButtons();
@@ -1404,7 +1388,7 @@ const socialLinks = [
           const path = window.location.pathname;
           const isTrackable = ["/articles/", "/glossary/", "/library", "/about/", "/blog/", "/root-problem-tree/", "/personal-consultation/"].some((prefix) => path.startsWith(prefix));
           if (!isTrackable) return;
-          const titleBase = document.title.replace(/\s*\|\s*NeverMind\s*$/u, "").trim() || "׳¢׳׳•׳“";
+          const titleBase = document.title.replace(/\s*\|\s*NeverMind\s*$/u, "").trim() || "עמוד";
           const history = readHistory().filter((item) => String(item?.href || "") !== path);
           history.unshift({ href: path, title: titleBase, visitedAt: new Date().toISOString() });
           writeHistory(history);
@@ -1419,7 +1403,7 @@ const socialLinks = [
           const hasAdminSession = typeof window.__nmReadAdminSession === "function" && Boolean(window.__nmReadAdminSession());
           window.__nmClearAdminSession?.();
           window.__nmClearClubSession?.();
-          window.__nmAnnounce?.(hasAdminSession ? "׳™׳¦׳™׳׳× ׳”׳ ׳™׳”׳•׳ ׳ ׳©׳׳¨׳” ׳¢׳ ׳”׳׳›׳©׳™׳¨ ׳”׳–׳”." : "׳”׳™׳¦׳™׳׳” ׳ ׳©׳׳¨׳” ׳¢׳ ׳”׳׳›׳©׳™׳¨ ׳”׳–׳”.");
+          window.__nmAnnounce?.(hasAdminSession ? "יציאת הניהול נשמרה על המכשיר הזה." : "היציאה נשמרה על המכשיר הזה.");
         };
         const onNmPageLoadSync = () => {
           nmSyncPremiumUi();
@@ -1452,24 +1436,24 @@ const socialLinks = [
         const formatAvailabilityDateHebrew = (isoString) => {
           const date = new Date(isoString);
           if (Number.isNaN(date.getTime())) return "";
-          const days = ["׳¨׳׳©׳•׳", "׳©׳ ׳™", "׳©׳׳™׳©׳™", "׳¨׳‘׳™׳¢׳™", "׳—׳׳™׳©׳™", "׳©׳™׳©׳™", "׳©׳‘׳×"];
+          const days = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
           const day = date.getDay();
-          const prefix = day === 6 ? '׳׳•׳¦"׳©' : `׳™׳•׳ ${days[day]}`;
+          const prefix = day === 6 ? 'מוצ"ש' : `יום ${days[day]}`;
           const hours = date.getHours().toString().padStart(2, "0");
           const minutes = date.getMinutes().toString().padStart(2, "0");
-          return `׳¢׳•׳“׳›׳ ${prefix} ${hours}:${minutes}`;
+          return `עודכן ${prefix} ${hours}:${minutes}`;
         };
 
         const refreshAvailabilityLines = () => {
           document.querySelectorAll("[data-nm-availability]").forEach((el) => {
             const spotsRaw = el.getAttribute("data-spots");
             const updatedAt = el.getAttribute("data-updated-at")?.trim();
-            const label = (el.getAttribute("data-label") || "׳ ׳•׳×׳¨׳•").trim();
+            const label = (el.getAttribute("data-label") || "נותרו").trim();
             const spots = spotsRaw != null ? Number(spotsRaw) : NaN;
             if (!Number.isFinite(spots) || !updatedAt) return;
-            const unit = spots === 1 ? "׳׳§׳•׳" : "׳׳§׳•׳׳•׳×";
+            const unit = spots === 1 ? "מקום" : "מקומות";
             const datePart = formatAvailabilityDateHebrew(updatedAt);
-            el.textContent = datePart ? `${label} ${spots} ${unit} ֲ· ${datePart}` : `${label} ${spots} ${unit}`;
+            el.textContent = datePart ? `${label} ${spots} ${unit} · ${datePart}` : `${label} ${spots} ${unit}`;
           });
         };
 
@@ -1709,7 +1693,7 @@ const socialLinks = [
           target.setAttribute("tabindex", "-1");
           target.focus({ preventScroll: true });
           target.scrollIntoView({ behavior: "smooth", block: "start" });
-          window.__nmAnnounce?.("׳”׳×׳•׳›׳ ׳¢׳•׳“׳›׳");
+          window.__nmAnnounce?.("התוכן עודכן");
         });
 
         window.__nmLayoutCleanup = () => {
@@ -1906,6 +1890,7 @@ const socialLinks = [
     </script>
   </body>
 </html>
+
 
 
 

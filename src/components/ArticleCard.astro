@@ -1,0 +1,168 @@
+---
+import { MIND_SHIFT_INACTIVE_HEX, MIND_SHIFT_SCALE_HEX } from "../data/mind-shift-scale";
+
+export type DifficultyKey = "beginner" | "advanced" | "deep";
+
+type Props = {
+  slug: string;
+  title: string;
+  description: string;
+  tagsCsv: string;
+  transitionId: string;
+  difficultyKey: DifficultyKey;
+  readingMinutes: number;
+  isPremium?: boolean;
+  mindShiftIntensity?: number;
+  contentFreshnessIso?: string;
+  contentFreshnessIsUpdate?: boolean;
+};
+
+const {
+  slug,
+  title,
+  description,
+  tagsCsv,
+  transitionId,
+  difficultyKey,
+  readingMinutes,
+  isPremium = false,
+  mindShiftIntensity,
+  contentFreshnessIso = "",
+  contentFreshnessIsUpdate = false,
+} = Astro.props;
+
+const freshnessDate =
+  typeof contentFreshnessIso === "string" && /^\d{4}-\d{2}-\d{2}$/.test(contentFreshnessIso.trim())
+    ? contentFreshnessIso.trim()
+    : "";
+const freshnessLabel = contentFreshnessIsUpdate ? "עודכן" : "פורסם";
+const readingBaselineMinutes = 5;
+const readingBarPercent = Math.min(100, Math.round((readingMinutes / readingBaselineMinutes) * 100));
+
+const difficultyLabel: Record<DifficultyKey, string> = {
+  beginner: "מתחילים",
+  advanced: "מתקדמים",
+  deep: "עמוק",
+};
+
+const difficultyBadgeClass: Record<DifficultyKey, string> = {
+  beginner: "border-[#c8e6d8] bg-[#f3faf6] text-[#2a4d3d]",
+  advanced: "border-[#b9d4ea] bg-[#f0f7fc] text-[#254a63]",
+  deep: "border-[#d9d2ea] bg-[#f6f3fb] text-[#3f355b]",
+};
+
+const articleHref = `/articles/${slug}/`;
+---
+
+<article
+  data-article-card
+  data-tags={tagsCsv}
+  data-difficulty={difficultyKey}
+  data-premium={isPremium ? "true" : "false"}
+  class="group relative flex h-full flex-col overflow-hidden rounded-[1.85rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/88 p-5 text-right shadow-[0_20px_55px_rgba(26,26,26,0.05)] transition duration-300 hover:border-[color-mix(in_srgb,var(--nm-accent)_28%,transparent)] hover:shadow-[0_24px_70px_rgba(26,26,26,0.08)]"
+>
+  <div class="absolute inset-inline-start-4 inset-block-start-4 z-10 flex items-center gap-2">
+    <button
+      type="button"
+      data-nm-favorite-toggle
+      data-favorite-slug={slug}
+      data-favorite-title={title}
+      data-favorite-description={description}
+      data-favorite-href={articleHref}
+      aria-pressed="false"
+      aria-label={`שמירה למועדפים: ${title}`}
+      class="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-white/92 text-[var(--nm-fg)] transition hover:border-[color-mix(in_srgb,var(--nm-accent)_30%,transparent)] hover:text-[var(--nm-accent)]"
+    >
+      <span aria-hidden="true" data-favorite-icon>☆</span>
+    </button>
+  </div>
+
+  <div class="flex min-w-0 flex-wrap items-center justify-end gap-2 pe-14">
+    <span class:list={["inline-flex items-center rounded-full border px-2.5 py-1 text-[0.72rem] font-semibold", difficultyBadgeClass[difficultyKey]]}>
+      {difficultyLabel[difficultyKey]}
+    </span>
+    <span class="inline-flex items-center rounded-full border border-[#e5e1dc] bg-[#faf9f7] px-2.5 py-1 text-[0.72rem] font-medium text-[#5a5652]">
+      {readingMinutes} דקות קריאה
+    </span>
+    {mindShiftIntensity != null && mindShiftIntensity >= 1 && mindShiftIntensity <= 5 ? (
+      <span
+        class="inline-flex items-center gap-1 rounded-full border border-[#1A1A1A]/12 bg-white/90 px-2 py-1 text-[0.65rem] font-semibold text-[#3d3558]"
+        aria-label={`עוצמת חידוד תודעתי ${mindShiftIntensity} מתוך 5`}
+      >
+        <span aria-hidden="true">דיוק</span>
+        <span class="flex gap-0.5" aria-hidden="true">
+          {[1, 2, 3, 4, 5].map((step) => (
+            <span
+              class="h-1.5 w-2.5 rounded-[3px] border border-[#1A1A1A]/8"
+              style={`background-color: ${step <= mindShiftIntensity ? MIND_SHIFT_SCALE_HEX[step - 1] : MIND_SHIFT_INACTIVE_HEX}; opacity: ${step <= mindShiftIntensity ? 1 : 0.55};`}
+            />
+          ))}
+        </span>
+      </span>
+    ) : null}
+    {freshnessDate ? (
+      <time
+        class="inline-flex items-center rounded-full border border-[#e5e1dc] bg-[#faf9f7] px-2 py-1 text-[0.65rem] font-medium text-[#5a5652]"
+        datetime={freshnessDate}
+        title={`${freshnessLabel} ${freshnessDate}`}
+      >
+        {freshnessLabel} {freshnessDate}
+      </time>
+    ) : null}
+  </div>
+
+  <div class="mt-5 flex flex-1 flex-col">
+    <div class="flex items-start justify-between gap-3">
+      {isPremium ? (
+        <span class="inline-flex shrink-0 items-center gap-1 rounded-full border border-[color-mix(in_srgb,var(--nm-accent)_28%,transparent)] bg-[color-mix(in_srgb,var(--nm-accent)_6%,white)] px-2.5 py-1 text-[0.68rem] font-semibold text-[var(--nm-accent)]">
+          <span aria-hidden="true">נעול</span>
+          <span>Premium</span>
+        </span>
+      ) : null}
+      <h2 transition:name={`article-${transitionId}`} class="min-w-0 flex-1 text-[clamp(1.2rem,1.1rem+0.45vw,1.55rem)] font-semibold leading-[1.35] text-[var(--nm-fg)]">
+        {title}
+      </h2>
+    </div>
+
+    <p class="mt-3 text-sm leading-[1.75] text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
+      {description}
+    </p>
+
+    <div class="mt-5 flex flex-wrap justify-end gap-2 text-xs text-[color-mix(in_srgb,var(--nm-fg)_55%,var(--nm-bg))]">
+      {tagsCsv
+        .split(",")
+        .map((tag) => tag.trim())
+        .filter(Boolean)
+        .slice(0, 3)
+        .map((tag) => (
+          <span class="rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-3 py-1">{tag}</span>
+        ))}
+    </div>
+
+    <div class="mt-6 flex items-center justify-between gap-3">
+      <a
+        href={articleHref}
+        aria-label={`קריאה של המאמר: ${title}`}
+        class="inline-flex min-h-[44px] items-center rounded-full bg-[var(--nm-accent)] px-4 py-2 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]"
+      >
+        אני רוצה לדעת
+      </a>
+      <span class="text-sm font-semibold text-[var(--nm-accent)]">לפתוח את המנגנון</span>
+    </div>
+  </div>
+
+  <div
+    class="pointer-events-none absolute inset-x-0 bottom-0 h-[3px] bg-[#ebe8e4]"
+    dir="ltr"
+    role="progressbar"
+    aria-valuemin={0}
+    aria-valuemax={100}
+    aria-valuenow={readingBarPercent}
+    aria-label={`זמן קריאה משוער ${readingMinutes} דקות`}
+  >
+    <div
+      class="h-full rounded-e-sm bg-gradient-to-l from-[var(--nm-accent)] to-[color-mix(in_srgb,var(--nm-accent)_75%,#1a1a1a)] transition-[width] duration-500 ease-out"
+      style={`width: ${readingBarPercent}%`}
+    />
+  </div>
+</article>

@@ -1,0 +1,40 @@
+---
+/**
+ * מתג נקודת מבט - CSS בלבד (checkbox + peer). בלי letter-spacing על עברית.
+ */
+interface Props {
+  problem: string;
+  opposite: string;
+  labelProblem?: string;
+  labelOpposite?: string;
+}
+
+const { problem, opposite, labelProblem = "הבעיה", labelOpposite = "ההפך" } = Astro.props;
+const uid = `pt-${Math.random().toString(36).slice(2, 11)}`;
+const switchLabel = `${labelProblem} / ${labelOpposite}`;
+---
+
+<div class="nm-perspective-toggle my-8 rounded-[1.5rem] border border-[color-mix(in_srgb,var(--nm-fg-secondary)_16%,transparent)] bg-[var(--nm-bg-canvas)] p-6 text-right shadow-sm" dir="rtl">
+  <p class="text-sm font-semibold text-[var(--nm-fg-secondary)]">נקודת מבט</p>
+
+  <input type="checkbox" id={uid} class="peer sr-only" aria-label={switchLabel} />
+
+  <label
+    for={uid}
+    class="mt-4 inline-flex w-full max-w-md cursor-pointer select-none rounded-full border border-[color-mix(in_srgb,var(--nm-fg-secondary)_20%,transparent)] bg-[var(--nm-surface-muted)] p-1 [&_.t-problem]:bg-[color-mix(in_srgb,var(--nm-fg)_10%,var(--nm-bg-canvas))] [&_.t-problem]:text-[var(--nm-fg-secondary)] [&_.t-opposite]:text-[var(--nm-fg-secondary)]/48 peer-checked:[&_.t-problem]:bg-transparent peer-checked:[&_.t-problem]:text-[var(--nm-fg-secondary)]/45 peer-checked:[&_.t-opposite]:bg-[var(--nm-accent)] peer-checked:[&_.t-opposite]:text-[var(--nm-on-accent)] peer-checked:[&_.t-opposite]:shadow-[0_0_0_2px_color-mix(in_srgb,var(--nm-accent)_28%,transparent)]"
+  >
+    <span class="t-problem flex-1 rounded-full px-3 py-2 text-center text-sm font-semibold transition-colors">{labelProblem}</span>
+    <span class="t-opposite flex-1 rounded-full px-3 py-2 text-center text-sm font-semibold transition-colors">{labelOpposite}</span>
+  </label>
+
+  <p
+    class="mt-5 border-s-4 border-[color-mix(in_srgb,var(--nm-fg)_35%,var(--nm-bg-canvas))] ps-4 text-[clamp(1rem,0.95rem+0.25vw,1.12rem)] leading-[1.85] text-[var(--nm-fg)] peer-checked:hidden"
+  >
+    {problem}
+  </p>
+  <p
+    class="mt-5 hidden border-s-4 border-[var(--nm-accent)] ps-4 text-[clamp(1rem,0.95rem+0.25vw,1.12rem)] leading-[1.85] text-[var(--nm-fg)] peer-checked:block"
+  >
+    {opposite}
+  </p>
+</div>

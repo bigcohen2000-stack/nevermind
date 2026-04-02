@@ -153,13 +153,22 @@ const heroSubtitle = isExistingBuyer
 
         try {
           const res = await fetch(form.action, { method: "POST", body: fd });
-          if (res.ok) {
+          const payload = await res.json().catch(() => null);
+          if (res.ok && payload?.success === true) {
             form.reset();
             showStatus("השאלה נקלטה.");
             window.__nmHapticSuccess?.();
             window.__nmAnnounce?.("השאלה נקלטה");
           } else {
-            showStatus("השרת לא אישר קבלה. אפשר לנסות שוב או פשוט לשלוח לנו הודעה בוואטסאפ.");
+            const errorCode = String(payload?.error || "").toLowerCase();
+            const message = typeof payload?.message === "string" && payload.message.trim()
+              ? payload.message.trim()
+              : errorCode.includes("hcaptcha") || errorCode.includes("mandatory")
+                ? "צריך להשלים את האימות לפני השליחה."
+                : errorCode.includes("missing_form_access_key")
+                  ? "שרת הטפסים עדיין לא הוגדר בפרודקשן."
+                  : "השרת לא אישר קבלה. אפשר לנסות שוב או פשוט לשלוח לנו הודעה בוואטסאפ.";
+            showStatus(message);
           }
         } catch {
           showStatus("השרת לא אישר קבלה. אפשר לנסות שוב או פשוט לשלוח לנו הודעה בוואטסאפ.");
