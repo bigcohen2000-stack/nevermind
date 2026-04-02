@@ -1,79 +1,77 @@
-﻿function json(data, status = 200) {
-  return new Response(JSON.stringify(data), {
-    status,
-    headers: {
-      "content-type": "application/json; charset=utf-8",
-      "cache-control": "no-store",
-    },
-  });
-}
+﻿import { fetchClubAdminOverview, isDashboardAuthorized, json } from "../../_lib/club-admin.js";
 
-function isAuthorized(request, env) {
-  const url = new URL(request.url);
-  const isLocal = url.hostname === "127.0.0.1" || url.hostname === "localhost";
-  const skipAuth = env.CLUB_ADMIN_PROXY_SKIP_AUTH === "1";
-  return isLocal || skipAuth || Boolean(request.headers.get("Cf-Access-Jwt-Assertion"));
-}
-
-function makeIp(seed, index) {
-  return `185.12.${40 + ((seed + index * 7) % 120)}.${18 + index}`;
-}
-
-function severityFromAttempts(attempts) {
-  if (attempts >= 3) return "high";
-  if (attempts === 2) return "medium";
+function severityFromCounts(memberIpCount, passwordIpCount) {
+  const peak = Math.max(Number(memberIpCount) || 0, Number(passwordIpCount) || 0);
+  if (peak >= 3) return "high";
+  if (peak >= 2) return "medium";
   return "low";
 }
 
-const LABELS = [
-  "IP חדש",
-  "סיסמה זהה",
-  "ניסיון כניסה חריג",
-  "גישה מנתיב לא צפוי",
-  "קצב ניסיונות גבוה",
-];
+function noteForFlag(item) {
+  const memberCount = Number(item?.memberIpCount) || 0;
+  const passwordCount = Number(item?.passwordIpCount) || 0;
+  if (passwordCount >= 3) {
+    return "אותה סיסמה הופיעה מכמה כתובות רשת בחלון קצר";
+  }
+  if (memberCount >= 2) {
+    return "אותו חבר הופיע מכמה כתובות רשת קרובות בזמן";
+  }
+  return "נרשם דפוס שדורש בדיקה ידנית";
+}
+
+function attemptsForFlag(item) {
+  return Math.max(Number(item?.memberIpCount) || 1, Number(item?.passwordIpCount) || 1);
+}
 
 export async function onRequestGet(context) {
   const { request, env } = context;
-  if (!isAuthorized(request, env)) {
+  if (!isDashboardAuthorized(request, env)) {
     return json({ ok: false, error: "נדרש אימות Cloudflare Access" }, 401);
   }
 
-  const bucket = Math.floor(Date.now() / 12000);
-  const ips = [makeIp(bucket, 0), makeIp(bucket, 0), makeIp(bucket, 0), makeIp(bucket, 1), makeIp(bucket, 2), makeIp(bucket, 2)];
-  const attemptsByIp = new Map();
-
-  for (const ip of ips) {
-    attemptsByIp.set(ip, (attemptsByIp.get(ip) || 0) + 1);
+  const overview = await fetchClubAdminOverview(env);
+  if (!overview.ok || overview.payload?.ok !== true) {
+    return json({ ok: false, error: overview.error || "לא הצלחנו למשוך אירועי אבטחה" }, overview.status || 502);
   }
 
-  const events = ips.map((ip, index) => {
-    const attempts = attemptsByIp.get(ip) || 1;
-    const severity = severityFromAttempts(attempts);
-    const isAlarm = attempts >= 3;
-    const label = LABELS[(bucket + index) % LABELS.length];
-    return {
-      id: `${ip}-${index}`,
-      ip,
-      createdAt: new Date(Date.now() - index * 70000).toISOString(),
-      label,
-      note: isAlarm
-        ? "שלושה ניסיונות מאותו IP בתוך חלון קצר"
-        : attempts === 2
-          ? "שני ניסיונות קרובים שדורשים מעקב"
-          : "אירוע נמוך שמסומן לתצפית",
-      attempts,
-      severity,
-      isAlarm,
-    };
-  });
+  const fraudFlags = Array.isArray(overview.payload?.fraudFlags) ? overview.payload.fraudFlags : [];
+  const alarms = fraudFlags.slice(0, 5).map((item) => ({
+    phone: String(item?.phone || "ללא זיהוי"),
+    attempts: attemptsForFlag(item),
+    severity: severityFromCounts(item?.memberIpCount, item?.passwordIpCount),
+  }));
 
-  const alarms = [...attemptsByIp.entries()]
-    .filter(([, attempts]) => attempts >= 3)
-    .map(([ip, attempts]) => ({ ip, attempts, severity: severityFromAttempts(attempts) }));
+  const events = fraudFlags.length
+    ? fraudFlags.slice(0, 8).map((item, index) => {
+        const attempts = attemptsForFlag(item);
+        const severity = severityFromCounts(item?.memberIpCount, item?.passwordIpCount);
+        return {
+          id: `${item?.phone || "flag"}-${item?.flaggedAt || index}`,
+          phone: String(item?.phone || "ללא זיהוי"),
+          createdAt: String(item?.flaggedAt || new Date().toISOString()),
+          label: attempts >= 3 ? "דפוס גישה חריג" : "בדיקת גישה חוזרת",
+          note: noteForFlag(item),
+          attempts,
+          severity,
+          isAlarm: severity === "high",
+        };
+      })
+    : [
+        {
+          id: "quiet-window",
+          phone: "המערכת",
+          createdAt: new Date().toISOString(),
+          label: "אין Flag פתוח כרגע",
+          note: "לא זוהו דפוסים חריגים בנתוני המועדון הפעילים",
+          attempts: 0,
+          severity: "low",
+          isAlarm: false,
+        },
+      ];
 
   return json({
     ok: true,
+    source: "worker:club_activity",
     generatedAt: new Date().toISOString(),
     alarms,
     events,

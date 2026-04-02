@@ -1,28 +1,28 @@
-import servicesConfig from "../config/services.json";
+﻿import servicesConfig from "../config/services.json";
 import appConfig from "../config/appConfig.json";
 
 type ServicesConfig = typeof servicesConfig;
 export type PaymentMethod = ServicesConfig["payment_methods"][number];
-/** שלב במסלול. כולל social_proof אופציונלי ברמת השלב (מעבר לשירות בודד) */
+/** ׳©׳׳‘ ׳‘׳׳¡׳׳•׳. ׳›׳•׳׳ social_proof ׳׳•׳₪׳¦׳™׳•׳ ׳׳™ ׳‘׳¨׳׳× ׳”׳©׳׳‘ (׳׳¢׳‘׳¨ ׳׳©׳™׳¨׳•׳× ׳‘׳•׳“׳“) */
 export type ServiceStage = ServicesConfig["funnel_stages"][number] & {
   social_proof?: string | null;
 };
 
-/** זמינות מובנית (תאריך עדכון + מקומות). תאימות: גם `availability_note` מחרוזת */
+/** ׳–׳׳™׳ ׳•׳× ׳׳•׳‘׳ ׳™׳× (׳×׳׳¨׳™׳ ׳¢׳“׳›׳•׳ + ׳׳§׳•׳׳•׳×). ׳×׳׳™׳׳•׳×: ׳’׳ `availability_note` ׳׳—׳¨׳•׳–׳× */
 export type ServiceAvailability = {
   spots_left: number;
   updated_at?: string;
   label?: string;
 };
 
-/** הרחבת מחיר/אורך לשירות (טלפון, אולפן, מנוי) */
+/** ׳”׳¨׳—׳‘׳× ׳׳—׳™׳¨/׳׳•׳¨׳ ׳׳©׳™׳¨׳•׳× (׳˜׳׳₪׳•׳, ׳׳•׳׳₪׳, ׳׳ ׳•׳™) */
 export type ServiceExtension = {
   id: string;
   label: string;
   price: number;
   description: string;
   action_text: string;
-  /** אם true: מחיר מוצג = מחיר בסיס + price */
+  /** ׳׳ true: ׳׳—׳™׳¨ ׳׳•׳¦׳’ = ׳׳—׳™׳¨ ׳‘׳¡׳™׳¡ + price */
   price_additive?: boolean;
 };
 
@@ -40,16 +40,16 @@ export type StageService = ServiceStage["services"][number] & {
   whatsapp_template?: string | null;
   features?: Array<string | { text?: string; icon?: string }>;
   friendly_note?: string;
-  /** מה קורה בפועל (3), מתאים כש (2), לא מתאים כש (1) — כרטיס מחירון */
+  /** ׳׳” ׳§׳•׳¨׳” ׳‘׳₪׳•׳¢׳ (3), ׳׳×׳׳™׳ ׳›׳© (2), ׳׳ ׳׳×׳׳™׳ ׳›׳© (1) ג€” ׳›׳¨׳˜׳™׳¡ ׳׳—׳™׳¨׳•׳ */
   what_happens?: string[];
   fits_when?: string[];
   not_when?: string;
   extensions?: ServiceExtension[];
-  /** אם true: בוחרים תחילה הרחבה (בלי ברירת מחדל), ואז נפתחים מחיר וכפתורים — כמו שלבים בטופס */
+  /** ׳׳ true: ׳‘׳•׳—׳¨׳™׳ ׳×׳—׳™׳׳” ׳”׳¨׳—׳‘׳” (׳‘׳׳™ ׳‘׳¨׳™׳¨׳× ׳׳—׳“׳), ׳•׳׳– ׳ ׳₪׳×׳—׳™׳ ׳׳—׳™׳¨ ׳•׳›׳₪׳×׳•׳¨׳™׳ ג€” ׳›׳׳• ׳©׳׳‘׳™׳ ׳‘׳˜׳•׳₪׳¡ */
   extensions_gated?: boolean;
   update?: boolean;
   override_on_extension?: boolean;
-  /** שורת מחיר/משך (מחירון) */
+  /** ׳©׳•׳¨׳× ׳׳—׳™׳¨/׳׳©׳ (׳׳—׳™׳¨׳•׳) */
   price_note?: string;
   subtitle?: string;
 };
@@ -91,39 +91,39 @@ export type FlatService = StageService & {
   whatsapp_template?: string | null;
 };
 
-/** גילוי נאות ארוך. מקור: `trust_elements.disclaimer` ב־services.json */
+/** ׳’׳™׳׳•׳™ ׳ ׳׳•׳× ׳׳¨׳•׳. ׳׳§׳•׳¨: `trust_elements.disclaimer` ׳‘ײ¾services.json */
 export const disclaimerLong =
   (servicesConfig.trust_elements as Record<string, unknown>).disclaimer_full?.toString?.() ||
   (servicesConfig.trust_elements as Record<string, unknown>).disclaimer?.toString?.() ||
   "";
 
-/** שורה מתחת לכל כפתור פעולה בכרטיס שירות */
+/** ׳©׳•׳¨׳” ׳׳×׳—׳× ׳׳›׳ ׳›׳₪׳×׳•׳¨ ׳₪׳¢׳•׳׳” ׳‘׳›׳¨׳˜׳™׳¡ ׳©׳™׳¨׳•׳× */
 export const disclaimerShort =
   (servicesConfig.trust_elements as Record<string, unknown>).disclaimer_short?.toString?.() ||
-  "זהו הסבר פרספקטיבה אישית, לא שיפוט קליני.";
+  "׳–׳”׳• ׳”׳¡׳‘׳¨ ׳₪׳¨׳¡׳₪׳§׳˜׳™׳‘׳” ׳׳™׳©׳™׳×, ׳׳ ׳©׳™׳₪׳•׳˜ ׳§׳׳™׳ ׳™.";
 
-/** תבנית ברירת מחדל לוואטסאפ מדף שירותים (אם חסר `whatsapp_template` ב־JSON) */
+/** ׳×׳‘׳ ׳™׳× ׳‘׳¨׳™׳¨׳× ׳׳—׳“׳ ׳׳•׳•׳׳˜׳¡׳׳₪ ׳׳“׳£ ׳©׳™׳¨׳•׳×׳™׳ (׳׳ ׳—׳¡׳¨ `whatsapp_template` ׳‘ײ¾JSON) */
 export const defaultWhatsappServiceTemplate =
-  "שלום, הגעתי מדף השירותים ב-NeverMind.\n\nמתעניין ב: {title} ({price} ₪)\n\nהנושא שאני רוצה לפרק: ";
+  "׳©׳׳•׳, ׳”׳’׳¢׳×׳™ ׳׳“׳£ ׳”׳©׳™׳¨׳•׳×׳™׳ ׳‘-NeverMind.\n\n׳׳×׳¢׳ ׳™׳™׳ ׳‘: {title} ({price} ג‚×)\n\n׳”׳ ׳•׳©׳ ׳©׳׳ ׳™ ׳¨׳•׳¦׳” ׳׳₪׳¨׳§: ";
 
-/** מפת אייקונים לפיצ'רים */
+/** ׳׳₪׳× ׳׳™׳™׳§׳•׳ ׳™׳ ׳׳₪׳™׳¦'׳¨׳™׳ */
 export const featureIcons: Record<string, string> = {
-  default: "✓",
-  phone: "📱",
-  location: "📍",
-  privacy: "🔒",
-  time: "⏱",
-  group: "👥",
-  video: "🎥",
-  whatsapp: "💬",
-  content: "📖",
-  recurring: "🔄",
+  default: "ג“",
+  phone: "נ“±",
+  location: "נ“",
+  privacy: "נ”’",
+  time: "ג±",
+  group: "נ‘¥",
+  video: "נ¥",
+  whatsapp: "נ’¬",
+  content: "נ“–",
+  recurring: "נ”„",
 };
 
 export const servicesCurrency = servicesConfig.currency;
 export const servicesTaxLabel = servicesConfig.tax_label;
 
-/** מחיר ייחוס לתצוגה (לפני הנחת בוטיק מוצגת) — התשלום בפועל נשאר לפי price_full ב־JSON */
+/** ׳׳—׳™׳¨ ׳™׳™׳—׳•׳¡ ׳׳×׳¦׳•׳’׳” (׳׳₪׳ ׳™ ׳”׳ ׳—׳× ׳‘׳•׳˜׳™׳§ ׳׳•׳¦׳’׳×) ג€” ׳”׳×׳©׳׳•׳ ׳‘׳₪׳•׳¢׳ ׳ ׳©׳׳¨ ׳׳₪׳™ price_full ׳‘ײ¾JSON */
 export function getBoutiqueReferenceListPrice(chargePrice: number): number | null {
   const raw = (servicesConfig as Record<string, unknown>).boutique_display_discount_percent;
   const pct = typeof raw === "number" ? raw : typeof raw === "string" ? Number.parseFloat(raw) : 0;
@@ -131,7 +131,7 @@ export function getBoutiqueReferenceListPrice(chargePrice: number): number | nul
   return Math.round(chargePrice / (1 - pct / 100));
 }
 const DEFAULT_CONTENT_GAP_MESSAGE =
-  "חיפשתי בארכיון, וראיתי שעוד לא יצא לי להקליט או לכתוב משהו ספציפי על זה. זה דווקא מעניין, אם תרצה נוכל לדבר על זה רגע יחד. לפעמים ככה נולדים התכנים הכי טובים כאן, וזה נוגע גם לאחרים. אפשר גם באנונימיות מלאה, מה שנוח לך. מה דעתך?";
+  "׳—׳™׳₪׳©׳×׳™ ׳‘׳׳¨׳›׳™׳•׳, ׳•׳¨׳׳™׳×׳™ ׳©׳¢׳•׳“ ׳׳ ׳™׳¦׳ ׳׳™ ׳׳”׳§׳׳™׳˜ ׳׳• ׳׳›׳×׳•׳‘ ׳׳©׳”׳• ׳¡׳₪׳¦׳™׳₪׳™ ׳¢׳ ׳–׳”. ׳–׳” ׳“׳•׳•׳§׳ ׳׳¢׳ ׳™׳™׳, ׳׳ ׳×׳¨׳¦׳” ׳ ׳•׳›׳ ׳׳“׳‘׳¨ ׳¢׳ ׳–׳” ׳¨׳’׳¢ ׳™׳—׳“. ׳׳₪׳¢׳׳™׳ ׳›׳›׳” ׳ ׳•׳׳“׳™׳ ׳”׳×׳›׳ ׳™׳ ׳”׳›׳™ ׳˜׳•׳‘׳™׳ ׳›׳׳, ׳•׳–׳” ׳ ׳•׳’׳¢ ׳’׳ ׳׳׳—׳¨׳™׳. ׳׳₪׳©׳¨ ׳’׳ ׳‘׳׳ ׳•׳ ׳™׳׳™׳•׳× ׳׳׳׳”, ׳׳” ׳©׳ ׳•׳— ׳׳. ׳׳” ׳“׳¢׳×׳?";
 
 export const servicesContentGapMessage =
   (servicesConfig as Record<string, unknown>).content_gap_message?.toString?.()?.trim() ||
@@ -153,28 +153,28 @@ export type EngagementSectionsMap = {
 
 const defaultEngagementSections: EngagementSectionsMap = {
   studio: {
-    title: "אולפן פודקאסט",
-    body: "מגיעים לאולפן פודקאסט אמיתי ונוכחים לשיחה מרתקת על כל תחומי החיים. אפשר לדבר בלי להיות מצולמים - אנונימיות מלאה אם תרצה. אפשר גם לבקש עיוות קול. אם תרצה לשתף חבר שעובר את אותו הדבר, אותו חומר ויזואלי זמין גם בשבילו.",
+    title: "׳׳•׳׳₪׳ ׳₪׳•׳“׳§׳׳¡׳˜",
+    body: "׳׳’׳™׳¢׳™׳ ׳׳׳•׳׳₪׳ ׳₪׳•׳“׳§׳׳¡׳˜ ׳׳׳™׳×׳™ ׳•׳ ׳•׳›׳—׳™׳ ׳׳©׳™׳—׳” ׳׳¨׳×׳§׳× ׳¢׳ ׳›׳ ׳×׳—׳•׳׳™ ׳”׳—׳™׳™׳. ׳׳₪׳©׳¨ ׳׳“׳‘׳¨ ׳‘׳׳™ ׳׳”׳™׳•׳× ׳׳¦׳•׳׳׳™׳ - ׳׳ ׳•׳ ׳™׳׳™׳•׳× ׳׳׳׳” ׳׳ ׳×׳¨׳¦׳”. ׳׳₪׳©׳¨ ׳’׳ ׳׳‘׳§׳© ׳¢׳™׳•׳•׳× ׳§׳•׳. ׳׳ ׳×׳¨׳¦׳” ׳׳©׳×׳£ ׳—׳‘׳¨ ׳©׳¢׳•׳‘׳¨ ׳׳× ׳׳•׳×׳• ׳”׳“׳‘׳¨, ׳׳•׳×׳• ׳—׳•׳׳¨ ׳•׳™׳–׳•׳׳׳™ ׳–׳׳™׳ ׳’׳ ׳‘׳©׳‘׳™׳׳•.",
     ctaHref: "/services/#balcony-experience",
-    ctaLabel: "לפרטים על האולפן",
+    ctaLabel: "׳׳₪׳¨׳˜׳™׳ ׳¢׳ ׳”׳׳•׳׳₪׳",
   },
   talk: {
-    title: "שיחה של 20 דקות",
-    body: "בוא נמצא זמן שנוח לך ולי ונשוחח 20 דקות על מה שתרצה. אם תרצה לשמוע רעיונות חדשים, את דעתי על משהו ספציפי, או שאמפה איפה עוד אפשר לפתח ולחדד את החשיבה - זה בדיוק מה שאני כאן.",
+    title: "׳©׳™׳—׳” ׳©׳ 20 ׳“׳§׳•׳×",
+    body: "׳‘׳•׳ ׳ ׳׳¦׳ ׳–׳׳ ׳©׳ ׳•׳— ׳׳ ׳•׳׳™ ׳•׳ ׳©׳•׳—׳— 20 ׳“׳§׳•׳× ׳¢׳ ׳׳” ׳©׳×׳¨׳¦׳”. ׳׳ ׳×׳¨׳¦׳” ׳׳©׳׳•׳¢ ׳¨׳¢׳™׳•׳ ׳•׳× ׳—׳“׳©׳™׳, ׳׳× ׳“׳¢׳×׳™ ׳¢׳ ׳׳©׳”׳• ׳¡׳₪׳¦׳™׳₪׳™, ׳׳• ׳©׳׳׳₪׳” ׳׳™׳₪׳” ׳¢׳•׳“ ׳׳₪׳©׳¨ ׳׳₪׳×׳— ׳•׳׳—׳“׳“ ׳׳× ׳”׳—׳©׳™׳‘׳” - ׳–׳” ׳‘׳“׳™׳•׳§ ׳׳” ׳©׳׳ ׳™ ׳›׳׳.",
     ctaHref: "/services/#phone-perspective",
-    ctaLabel: "לקביעת שיחה",
+    ctaLabel: "׳׳§׳‘׳™׳¢׳× ׳©׳™׳—׳”",
   },
   archive: {
-    title: "ארכיון NeverMind",
-    body: "גישה לכל המאמרים והסרטונים באתר - כולל הפודקאסט המלא ויותר מ-12,000 שעות תוכן על כל נושאי החיים. פותחים נושאים מורכבים: דת, סמים, התמכרויות, סקס, זוגיות, פורנו ואהבה אמיתית.",
+    title: "׳׳¨׳›׳™׳•׳ NeverMind",
+    body: "׳’׳™׳©׳” ׳׳›׳ ׳”׳׳׳׳¨׳™׳ ׳•׳”׳¡׳¨׳˜׳•׳ ׳™׳ ׳‘׳׳×׳¨ - ׳›׳•׳׳ ׳”׳₪׳•׳“׳§׳׳¡׳˜ ׳”׳׳׳ ׳•׳™׳•׳×׳¨ ׳-12,000 ׳©׳¢׳•׳× ׳×׳•׳›׳ ׳¢׳ ׳›׳ ׳ ׳•׳©׳׳™ ׳”׳—׳™׳™׳. ׳₪׳•׳×׳—׳™׳ ׳ ׳•׳©׳׳™׳ ׳׳•׳¨׳›׳‘׳™׳: ׳“׳×, ׳¡׳׳™׳, ׳”׳×׳׳›׳¨׳•׳™׳•׳×, ׳¡׳§׳¡, ׳–׳•׳’׳™׳•׳×, ׳₪׳•׳¨׳ ׳• ׳•׳׳”׳‘׳” ׳׳׳™׳×׳™׳×.",
     ctaHref: "/services/#portal-access",
-    ctaLabel: "למנוי הארכיון",
+    ctaLabel: "׳׳׳ ׳•׳™ ׳”׳׳¨׳›׳™׳•׳",
   },
   philosophy: {
-    title: "איך זה עובד כאן",
-    body: "זה לא המלצה חמה. זו בדיקה של מה שכבר קיים, ופתיחה לאפשרויות חדשות אם תרצה.",
+    title: "׳׳™׳ ׳–׳” ׳¢׳•׳‘׳“ ׳›׳׳",
+    body: "׳–׳” ׳׳ ׳”׳׳׳¦׳” ׳—׳׳”. ׳–׳• ׳‘׳“׳™׳§׳” ׳©׳ ׳׳” ׳©׳›׳‘׳¨ ׳§׳™׳™׳, ׳•׳₪׳×׳™׳—׳” ׳׳׳₪׳©׳¨׳•׳™׳•׳× ׳—׳“׳©׳•׳× ׳׳ ׳×׳¨׳¦׳”.",
     ctaHref: "/services/",
-    ctaLabel: "למרחב הגילוי",
+    ctaLabel: "׳׳׳¨׳—׳‘ ׳”׳’׳™׳׳•׳™",
   },
 };
 
@@ -227,14 +227,14 @@ const defaultTopicLanding: ServicesTopicLandingConfig = {
   override_base_cta: false,
   override_on_extension: true,
   topic_header: {
-    label: "הנחה למנוי שנתי · לזמן מוגבל",
-    title: "ללמוד את מנגנון NeverMind",
+    label: "׳”׳ ׳—׳” ׳׳׳ ׳•׳™ ׳©׳ ׳×׳™ ֲ· ׳׳–׳׳ ׳׳•׳’׳‘׳",
+    title: "׳׳׳׳•׳“ ׳׳× ׳׳ ׳’׳ ׳•׳ NeverMind",
     subtitle:
-      "אם הגעת לכאן בגלל {topic}, יש סיכוי טוב שהתשובה כבר מחכה בארכיון. המנוי פותח לך גישה לכל החקירות, לכל התכנים, לכל השאלות, בלי הגבלה.",
+      "׳׳ ׳”׳’׳¢׳× ׳׳›׳׳ ׳‘׳’׳׳ {topic}, ׳™׳© ׳¡׳™׳›׳•׳™ ׳˜׳•׳‘ ׳©׳”׳×׳©׳•׳‘׳” ׳›׳‘׳¨ ׳׳—׳›׳” ׳‘׳׳¨׳›׳™׳•׳. ׳”׳׳ ׳•׳™ ׳₪׳•׳×׳— ׳׳ ׳’׳™׳©׳” ׳׳›׳ ׳”׳—׳§׳™׳¨׳•׳×, ׳׳›׳ ׳”׳×׳›׳ ׳™׳, ׳׳›׳ ׳”׳©׳׳׳•׳×, ׳‘׳׳™ ׳”׳’׳‘׳׳”.",
     cta_buttons: [
-      { text: "מנוי חודשי · 175 ₪", plan: "monthly", price: 175 },
-      { text: "מנוי שנתי · 1,850 ₪", plan: "yearly", price: 1850 },
-      { text: "מנוי לשנתיים · 3,450 ₪", plan: "two_years", price: 3450 },
+      { text: "׳׳ ׳•׳™ ׳—׳•׳“׳©׳™ ֲ· 175 ג‚×", plan: "monthly", price: 175 },
+      { text: "׳׳ ׳•׳™ ׳©׳ ׳×׳™ ֲ· 1,850 ג‚×", plan: "yearly", price: 1850 },
+      { text: "׳׳ ׳•׳™ ׳׳©׳ ׳×׳™׳™׳ ֲ· 3,450 ג‚×", plan: "two_years", price: 3450 },
     ],
   },
   pricing: { monthly: 175, yearly: 1850, two_years: 3450 },
@@ -276,13 +276,13 @@ export const servicesTopicLanding: ServicesTopicLandingConfig = (() => {
   };
 })();
 
-/** מילוי {topic} בכותרת משנה של כניסת topic */
+/** ׳׳™׳׳•׳™ {topic} ׳‘׳›׳•׳×׳¨׳× ׳׳©׳ ׳” ׳©׳ ׳›׳ ׳™׳¡׳× topic */
 export function formatTopicLandingSubtitle(template: string, topic: string): string {
-  const t = topic.trim() || "מה שחיפשת";
+  const t = topic.trim() || "׳׳” ׳©׳—׳™׳₪׳©׳×";
   return template.replace(/\{topic\}/g, t);
 }
 
-/** מחיר לתצוגה: מספר ממוספר + רווח לא שביר לפני ₪ */
+/** ׳׳—׳™׳¨ ׳׳×׳¦׳•׳’׳”: ׳׳¡׳₪׳¨ ׳׳׳•׳¡׳₪׳¨ + ׳¨׳•׳•׳— ׳׳ ׳©׳‘׳™׳¨ ׳׳₪׳ ׳™ ג‚× */
 export const formatMoney = (value: number) =>
   `${Math.round(value).toLocaleString("he-IL")}\u00A0${servicesCurrency}`;
 export const getNetPrice = (grossPrice: number, taxPercent: number) => Math.round(grossPrice / (1 + taxPercent / 100));
@@ -304,7 +304,7 @@ export const flattenVisibleServices = (): FlatService[] =>
 
 export const findServiceById = (id: string) => flattenVisibleServices().find((service) => service.id === id);
 
-/** מנקה רווחים כפולים, שורות ריקות ורעש לפני encodeURIComponent */
+/** ׳׳ ׳§׳” ׳¨׳•׳•׳—׳™׳ ׳›׳₪׳•׳׳™׳, ׳©׳•׳¨׳•׳× ׳¨׳™׳§׳•׳× ׳•׳¨׳¢׳© ׳׳₪׳ ׳™ encodeURIComponent */
 export function normalizeWhatsAppMessageBody(raw: string): string {
   const s = String(raw ?? "")
     .replace(/\r\n/g, "\n")
@@ -324,59 +324,59 @@ export const buildWhatsAppHref = (message: string) => {
   return `https://wa.me/${appConfig.contact.whatsAppNumber}?text=${encodeURIComponent(normalized)}`;
 };
 
-/** וואטסאפ בסוף מאמר: ניסוח שימור קצר + כותרת + קישור */
+/** ׳•׳•׳׳˜׳¡׳׳₪ ׳‘׳¡׳•׳£ ׳׳׳׳¨: ׳ ׳™׳¡׳•׳— ׳©׳™׳׳•׳¨ ׳§׳¦׳¨ + ׳›׳•׳×׳¨׳× + ׳§׳™׳©׳•׳¨ */
 export function buildRetentionArticleWhatsAppHref(articleTitle: string, articleUrl: string): string {
-  const t = String(articleTitle || "").trim() || "מאמר";
+  const t = String(articleTitle || "").trim() || "׳׳׳׳¨";
   const u = String(articleUrl || "").trim();
-  const body = u ? `אם זה הזיז משהו - בוא נדבר על זה\n\n${t}\n${u}` : `אם זה הזיז משהו - בוא נדבר על זה\n\n${t}`;
+  const body = u ? `׳׳ ׳–׳” ׳”׳–׳™׳– ׳׳©׳”׳• - ׳‘׳•׳ ׳ ׳“׳‘׳¨ ׳¢׳ ׳–׳”\n\n${t}\n${u}` : `׳׳ ׳–׳” ׳”׳–׳™׳– ׳׳©׳”׳• - ׳‘׳•׳ ׳ ׳“׳‘׳¨ ׳¢׳ ׳–׳”\n\n${t}`;
   return buildWhatsAppHref(body);
 }
 
-/** שאלה לפני התחלה. שם השירות משובץ בהודעה (מקודד ל־URL) */
+/** ׳©׳׳׳” ׳׳₪׳ ׳™ ׳”׳×׳—׳׳”. ׳©׳ ׳”׳©׳™׳¨׳•׳× ׳׳©׳•׳‘׳¥ ׳‘׳”׳•׳“׳¢׳” (׳׳§׳•׳“׳“ ׳ײ¾URL) */
 export function buildServicePreStartWhatsAppHref(serviceName: string): string {
-  const name = serviceName.trim() || "השירות";
+  const name = serviceName.trim() || "׳”׳©׳™׳¨׳•׳×";
   const preface = buildWhatsAppCrmPreface(name);
-  const message = `${preface}\n\nהיי השם לא משנה, אני קורא עכשיו על ${name} ומשהו שם סיקרן אותי. אפשר לשאול שאלה קטנה לפני שממשיכים?`;
+  const message = `${preface}\n\n׳”׳™׳™ ׳”׳©׳ ׳׳ ׳׳©׳ ׳”, ׳׳ ׳™ ׳§׳•׳¨׳ ׳¢׳›׳©׳™׳• ׳¢׳ ${name} ׳•׳׳©׳”׳• ׳©׳ ׳¡׳™׳§׳¨׳ ׳׳•׳×׳™. ׳׳₪׳©׳¨ ׳׳©׳׳•׳ ׳©׳׳׳” ׳§׳˜׳ ׳” ׳׳₪׳ ׳™ ׳©׳׳׳©׳™׳›׳™׳?`;
   return buildWhatsAppHref(message);
 }
 
-/** תאריך/שעה בעברית לשורת זמינות (מבוסס שעון הדפדפן / שרת לפי מחרוזת ISO) */
+/** ׳×׳׳¨׳™׳/׳©׳¢׳” ׳‘׳¢׳‘׳¨׳™׳× ׳׳©׳•׳¨׳× ׳–׳׳™׳ ׳•׳× (׳׳‘׳•׳¡׳¡ ׳©׳¢׳•׳ ׳”׳“׳₪׳“׳₪׳ / ׳©׳¨׳× ׳׳₪׳™ ׳׳—׳¨׳•׳–׳× ISO) */
 export function formatAvailabilityDateHebrew(isoString: string): string {
   const date = new Date(isoString);
   if (Number.isNaN(date.getTime())) return "";
-  const days = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
+  const days = ["׳¨׳׳©׳•׳", "׳©׳ ׳™", "׳©׳׳™׳©׳™", "׳¨׳‘׳™׳¢׳™", "׳—׳׳™׳©׳™", "׳©׳™׳©׳™", "׳©׳‘׳×"];
   const day = date.getDay();
-  const prefix = day === 6 ? 'מוצ"ש' : `יום ${days[day]}`;
+  const prefix = day === 6 ? '׳׳•׳¦"׳©' : `׳™׳•׳ ${days[day]}`;
   const hours = date.getHours().toString().padStart(2, "0");
   const minutes = date.getMinutes().toString().padStart(2, "0");
-  return `עודכן ${prefix} ${hours}:${minutes}`;
+  return `׳¢׳•׳“׳›׳ ${prefix} ${hours}:${minutes}`;
 }
 
-/** שורת זמינות מלאה לתצוגה (אובייקט או מחרוזת legacy) */
+/** ׳©׳•׳¨׳× ׳–׳׳™׳ ׳•׳× ׳׳׳׳” ׳׳×׳¦׳•׳’׳” (׳׳•׳‘׳™׳™׳§׳˜ ׳׳• ׳׳—׳¨׳•׳–׳× legacy) */
 export function formatAvailabilityLine(service: StageService | FlatService): string | null {
   const av = service.availability;
   if (av && typeof av.spots_left === "number" && typeof av.updated_at === "string" && av.updated_at.trim()) {
-    const label = (av.label?.trim() || "נותרו").trim();
+    const label = (av.label?.trim() || "׳ ׳•׳×׳¨׳•").trim();
     const n = av.spots_left;
-    const unit = n === 1 ? "מקום" : "מקומות";
+    const unit = n === 1 ? "׳׳§׳•׳" : "׳׳§׳•׳׳•׳×";
     const datePart = formatAvailabilityDateHebrew(av.updated_at.trim());
     if (!datePart) return `${label} ${n} ${unit}`;
-    return `${label} ${n} ${unit} · ${datePart}`;
+    return `${label} ${n} ${unit} ֲ· ${datePart}`;
   }
   const legacy = service.availability_note?.trim();
   return legacy || null;
 }
 
-/** תצוגת זמינות בפורמט חדש */
+/** ׳×׳¦׳•׳’׳× ׳–׳׳™׳ ׳•׳× ׳‘׳₪׳•׳¨׳׳˜ ׳—׳“׳© */
 export function formatAvailabilityLabel(spotsLeft: number, updatedAt: string): string {
   const date = new Date(updatedAt);
-  if (Number.isNaN(date.getTime())) return `נותרו ${spotsLeft} מקומות`;
-  const days = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
+  if (Number.isNaN(date.getTime())) return `׳ ׳•׳×׳¨׳• ${spotsLeft} ׳׳§׳•׳׳•׳×`;
+  const days = ["׳¨׳׳©׳•׳", "׳©׳ ׳™", "׳©׳׳™׳©׳™", "׳¨׳‘׳™׳¢׳™", "׳—׳׳™׳©׳™", "׳©׳™׳©׳™", "׳©׳‘׳×"];
   const day = days[date.getDay()];
-  const prefix = date.getDay() === 6 ? 'מוצ"ש' : `יום ${day}`;
+  const prefix = date.getDay() === 6 ? '׳׳•׳¦"׳©' : `׳™׳•׳ ${day}`;
   const hh = date.getHours().toString().padStart(2, "0");
   const mm = date.getMinutes().toString().padStart(2, "0");
-  return `נותרו ${spotsLeft} מקומות · עודכן ${prefix} ${hh}:${mm}`;
+  return `׳ ׳•׳×׳¨׳• ${spotsLeft} ׳׳§׳•׳׳•׳× ֲ· ׳¢׳•׳“׳›׳ ${prefix} ${hh}:${mm}`;
 }
 
 function applyWhatsappTemplate(
@@ -385,21 +385,21 @@ function applyWhatsappTemplate(
   extensionLabel?: string
 ): string {
   const price = Math.round(service.price_full).toLocaleString("he-IL");
-  const label = (extensionLabel ?? "").trim() || "בסיס";
+  const label = (extensionLabel ?? "").trim() || "׳‘׳¡׳™׳¡";
   return template
     .replace(/\{title\}/g, service.title)
     .replace(/\{price\}/g, price)
     .replace(/\{label\}/g, label);
 }
 
-/** מחיר אפקטיבי לפי הרחבה (מלא או תוספת על בסיס) */
+/** ׳׳—׳™׳¨ ׳׳₪׳§׳˜׳™׳‘׳™ ׳׳₪׳™ ׳”׳¨׳—׳‘׳” (׳׳׳ ׳׳• ׳×׳•׳¡׳₪׳× ׳¢׳ ׳‘׳¡׳™׳¡) */
 export function effectiveExtensionPrice(basePrice: number, ext: ServiceExtension | null | undefined): number {
   if (!ext) return basePrice;
   if (ext.price_additive === true) return basePrice + ext.price;
   return ext.price;
 }
 
-/** עותק שירות עם מחיר ו־CTA מותאמים לבחירת הרחבה */
+/** ׳¢׳•׳×׳§ ׳©׳™׳¨׳•׳× ׳¢׳ ׳׳—׳™׳¨ ׳•ײ¾CTA ׳׳•׳×׳׳׳™׳ ׳׳‘׳—׳™׳¨׳× ׳”׳¨׳—׳‘׳” */
 export function mergeServiceWithExtension(
   service: StageService | FlatService,
   ext: ServiceExtension | null
@@ -413,7 +413,7 @@ export function mergeServiceWithExtension(
   return base;
 }
 
-/** הודעת כפתור בואו נבדוק בוואטסאפ (מחיר ב־Ref פנימי בלבד) */
+/** ׳”׳•׳“׳¢׳× ׳›׳₪׳×׳•׳¨ ׳‘׳•׳׳• ׳ ׳‘׳“׳•׳§ ׳‘׳•׳•׳׳˜׳¡׳׳₪ (׳׳—׳™׳¨ ׳‘ײ¾Ref ׳₪׳ ׳™׳׳™ ׳‘׳׳‘׳“) */
 export function buildServiceProposalWhatsAppMessage(args: {
   serviceTitle: string;
   extensionLabel: string;
@@ -421,8 +421,8 @@ export function buildServiceProposalWhatsAppMessage(args: {
   priceGross: number;
   includeCrmPreface?: boolean;
 }): string {
-  const serviceName = (args.serviceTitle || "").trim() || "השירות";
-  const extensionName = (args.extensionLabel || "").trim() || "בסיס";
+  const serviceName = (args.serviceTitle || "").trim() || "׳”׳©׳™׳¨׳•׳×";
+  const extensionName = (args.extensionLabel || "").trim() || "׳‘׳¡׳™׳¡";
   const focusRaw = (args.userFocus ?? "").replace(/[\t ]+/g, " ").trim();
   const refN = Math.max(0, Math.round(Number(args.priceGross) || 0));
 
@@ -431,12 +431,12 @@ export function buildServiceProposalWhatsAppMessage(args: {
     chunks.push(buildWhatsAppCrmPreface(serviceName));
     chunks.push("");
   }
-  chunks.push(`שלום, ראיתי את האפשרות של ${serviceName} עם הרחבת ${extensionName}.`);
+  chunks.push(`׳©׳׳•׳, ׳¨׳׳™׳×׳™ ׳׳× ׳”׳׳₪׳©׳¨׳•׳× ׳©׳ ${serviceName} ׳¢׳ ׳”׳¨׳—׳‘׳× ${extensionName}.`);
   if (focusRaw.length > 0) {
     const focusSentence = /[.!?]$/.test(focusRaw) ? focusRaw : `${focusRaw}.`;
-    chunks.push(`אני רוצה להתמקד ב: ${focusSentence}`);
+    chunks.push(`׳׳ ׳™ ׳¨׳•׳¦׳” ׳׳”׳×׳׳§׳“ ׳‘: ${focusSentence}`);
   }
-  chunks.push("מתי נוכל להתקדם?");
+  chunks.push("׳׳×׳™ ׳ ׳•׳›׳ ׳׳”׳×׳§׳“׳?");
   chunks.push(`(Ref: NM-${refN})`);
 
   return normalizeWhatsAppMessageBody(chunks.join("\n"));
@@ -448,7 +448,7 @@ export function buildServiceProposalWhatsAppHref(
   userFocus?: string
 ): string {
   const merged = mergeServiceWithExtension(service, selectedExtension ?? null);
-  const extLabel = selectedExtension?.label?.trim() || "בסיס";
+  const extLabel = selectedExtension?.label?.trim() || "׳‘׳¡׳™׳¡";
   const message = buildServiceProposalWhatsAppMessage({
     serviceTitle: service.title,
     extensionLabel: extLabel,
@@ -459,7 +459,7 @@ export function buildServiceProposalWhatsAppHref(
   return buildWhatsAppHref(message);
 }
 
-/** קישור וואטסאפ לשירות. תבנית מה־JSON או ברירת מחדל, אחרת הודעה כללית */
+/** ׳§׳™׳©׳•׳¨ ׳•׳•׳׳˜׳¡׳׳₪ ׳׳©׳™׳¨׳•׳×. ׳×׳‘׳ ׳™׳× ׳׳”ײ¾JSON ׳׳• ׳‘׳¨׳™׳¨׳× ׳׳—׳“׳, ׳׳—׳¨׳× ׳”׳•׳“׳¢׳” ׳›׳׳׳™׳× */
 export function buildServiceWhatsAppHref(
   service: StageService | FlatService,
   selectedExtension?: ServiceExtension | null
@@ -469,8 +469,8 @@ export function buildServiceWhatsAppHref(
   if (raw) {
     return buildWhatsAppHref(applyWhatsappTemplate(raw, merged, selectedExtension?.label));
   }
-  const actionText = merged.action_text || `אני רוצה להתקדם עם ${service.title}`;
-  const defaultMessage = `שלום, אני רוצה להתקדם עם ${merged.title}. ראיתי את המסלול באתר במחיר ${formatMoney(merged.price_full)}. אפשר לבדוק יחד את הפרטים המלאים?`;
+  const actionText = merged.action_text || `׳׳ ׳™ ׳¨׳•׳¦׳” ׳׳”׳×׳§׳“׳ ׳¢׳ ${service.title}`;
+  const defaultMessage = `׳©׳׳•׳, ׳׳ ׳™ ׳¨׳•׳¦׳” ׳׳”׳×׳§׳“׳ ׳¢׳ ${merged.title}. ׳¨׳׳™׳×׳™ ׳׳× ׳”׳׳¡׳׳•׳ ׳‘׳׳×׳¨ ׳‘׳׳—׳™׳¨ ${formatMoney(merged.price_full)}. ׳׳₪׳©׳¨ ׳׳‘׳“׳•׳§ ׳™׳—׳“ ׳׳× ׳”׳₪׳¨׳˜׳™׳ ׳”׳׳׳׳™׳?`;
   return buildWhatsAppHref(
     actionText === (service.action_text || "") ? `${actionText}. ${defaultMessage}` : defaultMessage
   );
@@ -482,15 +482,15 @@ export function buildServiceActionWhatsAppHref(
 ): string {
   const merged = mergeServiceWithExtension(service, selectedExtension ?? null);
   const preface = buildWhatsAppCrmPreface(service.title);
-  const actionLine = merged.action_text?.trim() || `אני רוצה להתקדם עם ${service.title}`;
-  const paymentLine = "נתאם תשלום בתוך השיחה אחרי התאמה קצרה. בלי לינק אוטומטי בהודעה.";
+  const actionLine = merged.action_text?.trim() || `׳׳ ׳™ ׳¨׳•׳¦׳” ׳׳”׳×׳§׳“׳ ׳¢׳ ${service.title}`;
+  const paymentLine = "׳ ׳×׳׳ ׳×׳©׳׳•׳ ׳‘׳×׳•׳ ׳”׳©׳™׳—׳” ׳׳—׳¨׳™ ׳”׳×׳׳׳” ׳§׳¦׳¨׳”. ׳‘׳׳™ ׳׳™׳ ׳§ ׳׳•׳˜׳•׳׳˜׳™ ׳‘׳”׳•׳“׳¢׳”.";
   const variant =
-    selectedExtension?.label?.trim() ? `\nאופציה נבחרה: ${selectedExtension.label.trim()}` : "";
-  const body = `${actionLine}${variant}\nמחיר: ${formatMoney(merged.price_full)}\n${paymentLine}`;
+    selectedExtension?.label?.trim() ? `\n׳׳•׳₪׳¦׳™׳” ׳ ׳‘׳—׳¨׳”: ${selectedExtension.label.trim()}` : "";
+  const body = `${actionLine}${variant}\n׳׳—׳™׳¨: ${formatMoney(merged.price_full)}\n${paymentLine}`;
   return buildWhatsAppHref(`${preface}\n\n${body}`);
 }
 
-/** שיריון / התעניינות: פירוט חבילה ולינק תשלום רק בהקשר שיחה סגורה */
+/** ׳©׳™׳¨׳™׳•׳ / ׳”׳×׳¢׳ ׳™׳™׳ ׳•׳×: ׳₪׳™׳¨׳•׳˜ ׳—׳‘׳™׳׳” ׳•׳׳™׳ ׳§ ׳×׳©׳׳•׳ ׳¨׳§ ׳‘׳”׳§׳©׳¨ ׳©׳™׳—׳” ׳¡׳’׳•׳¨׳” */
 export function buildServiceReservationWhatsAppHref(
   service: StageService | FlatService,
   selectedExtension?: ServiceExtension | null
@@ -503,28 +503,28 @@ export function buildServiceReservationWhatsAppHref(
     : [];
   const includesLine =
     featureLines.length > 0
-      ? `מה זה כולל בפועל: ${featureLines.slice(0, 6).join(" · ")}`
+      ? `׳׳” ׳–׳” ׳›׳•׳׳ ׳‘׳₪׳•׳¢׳: ${featureLines.slice(0, 6).join(" ֲ· ")}`
       : service.subtitle?.trim()
-        ? `מה זה כולל בפועל: ${service.subtitle.trim()}`
+        ? `׳׳” ׳–׳” ׳›׳•׳׳ ׳‘׳₪׳•׳¢׳: ${service.subtitle.trim()}`
         : "";
-  const paymentLine = "תשלום: נתאם רק בתוך השיחה הזו אחרי התאמה קצרה.";
+  const paymentLine = "׳×׳©׳׳•׳: ׳ ׳×׳׳ ׳¨׳§ ׳‘׳×׳•׳ ׳”׳©׳™׳—׳” ׳”׳–׳• ׳׳—׳¨׳™ ׳”׳×׳׳׳” ׳§׳¦׳¨׳”.";
   const variantLine = selectedExtension?.label?.trim()
-    ? `אופציה: ${selectedExtension.label.trim()}`
+    ? `׳׳•׳₪׳¦׳™׳”: ${selectedExtension.label.trim()}`
     : "";
   const body = [
-    `היי, אני מתעניין ב${service.title} (${price}).`,
+    `׳”׳™׳™, ׳׳ ׳™ ׳׳×׳¢׳ ׳™׳™׳ ׳‘${service.title} (${price}).`,
     variantLine,
     includesLine,
     paymentLine,
     "",
-    "אשמח לדבר על זה כשיהיה לך זמן.",
+    "׳׳©׳׳— ׳׳“׳‘׳¨ ׳¢׳ ׳–׳” ׳›׳©׳™׳”׳™׳” ׳׳ ׳–׳׳.",
   ]
     .filter((line) => line.length > 0)
     .join("\n");
   return buildWhatsAppHref(`${preface}\n\n${body}`);
 }
 
-/** התראת עניין בשירות — ללא Web3Forms (חובת hCaptcha בצד הספק). אפשר לחבר כאן לוג או ערוץ אחר. */
+/** ׳”׳×׳¨׳׳× ׳¢׳ ׳™׳™׳ ׳‘׳©׳™׳¨׳•׳× ג€” ׳׳׳ Web3Forms (׳—׳•׳‘׳× hCaptcha ׳‘׳¦׳“ ׳”׳¡׳₪׳§). ׳׳₪׳©׳¨ ׳׳—׳‘׳¨ ׳›׳׳ ׳׳•׳’ ׳׳• ׳¢׳¨׳•׳¥ ׳׳—׳¨. */
 export async function notifyServiceInterest(_params: {
   serviceId: string;
   serviceTitle: string;
@@ -533,15 +533,15 @@ export async function notifyServiceInterest(_params: {
   void _params;
 }
 
-const WA_CRM_TAGLINE = "מחשבה אחת נקייה - ישר לוואטסאפ";
+const WA_CRM_TAGLINE = "׳׳—׳©׳‘׳” ׳׳—׳× ׳ ׳§׳™׳™׳” - ׳™׳©׳¨ ׳׳•׳•׳׳˜׳¡׳׳₪";
 
-/** שורת CRM לפרסור: מקור + טון קבוע */
+/** ׳©׳•׳¨׳× CRM ׳׳₪׳¨׳¡׳•׳¨: ׳׳§׳•׳¨ + ׳˜׳•׳ ׳§׳‘׳•׳¢ */
 export function buildWhatsAppCrmPreface(sourceTitle: string): string {
   const title = String(sourceTitle || "NeverMind").trim() || "NeverMind";
   return `[Lead | Source: ${title}]\n${WA_CRM_TAGLINE}`;
 }
 
-/** וואטסאפ: כניסה מ־/services/?topic= + בחירת תוכנית מנוי (מחיר ומזהה לשיחה) */
+/** ׳•׳•׳׳˜׳¡׳׳₪: ׳›׳ ׳™׳¡׳” ׳ײ¾/services/?topic= + ׳‘׳—׳™׳¨׳× ׳×׳•׳›׳ ׳™׳× ׳׳ ׳•׳™ (׳׳—׳™׳¨ ׳•׳׳–׳”׳” ׳׳©׳™׳—׳”) */
 export function buildTopicLandingPlanWhatsAppHref(args: {
   topic: string;
   plan: string;
@@ -549,24 +549,24 @@ export function buildTopicLandingPlanWhatsAppHref(args: {
   ctaLabel: string;
   paymentLink?: string;
 }): string {
-  const preface = buildWhatsAppCrmPreface("מנוי ארכיון NeverMind");
-  const topicLine = args.topic.trim() || "ללא ציון נושא";
+  const preface = buildWhatsAppCrmPreface("׳׳ ׳•׳™ ׳׳¨׳›׳™׳•׳ NeverMind");
+  const topicLine = args.topic.trim() || "׳׳׳ ׳¦׳™׳•׳ ׳ ׳•׳©׳";
   const money = formatMoney(args.price);
   const pay = args.paymentLink?.trim()
-    ? `לינק תשלום (אחרי אישור קצר בשיחה): ${args.paymentLink.trim()}`
-    : "מבקש לינק תשלום מותאם אחרי אישור קצר.";
-  const body = `הגעתי מ־/services/?topic עם נושא מהכניסה.\nנושא: ${topicLine}\nבחירה: ${args.ctaLabel}\nמזהה תוכנית: ${args.plan}\nמחיר מוצג: ${money}\n${pay}`;
+    ? `׳׳™׳ ׳§ ׳×׳©׳׳•׳ (׳׳—׳¨׳™ ׳׳™׳©׳•׳¨ ׳§׳¦׳¨ ׳‘׳©׳™׳—׳”): ${args.paymentLink.trim()}`
+    : "׳׳‘׳§׳© ׳׳™׳ ׳§ ׳×׳©׳׳•׳ ׳׳•׳×׳׳ ׳׳—׳¨׳™ ׳׳™׳©׳•׳¨ ׳§׳¦׳¨.";
+  const body = `׳”׳’׳¢׳×׳™ ׳ײ¾/services/?topic ׳¢׳ ׳ ׳•׳©׳ ׳׳”׳›׳ ׳™׳¡׳”.\n׳ ׳•׳©׳: ${topicLine}\n׳‘׳—׳™׳¨׳”: ${args.ctaLabel}\n׳׳–׳”׳” ׳×׳•׳›׳ ׳™׳×: ${args.plan}\n׳׳—׳™׳¨ ׳׳•׳¦׳’: ${money}\n${pay}`;
   return buildWhatsAppHref(`${preface}\n\n${body}`);
 }
 
-/** הודעת וואטסאפ אחידה לתיאום פגישה ממאמר */
+/** ׳”׳•׳“׳¢׳× ׳•׳•׳׳˜׳¡׳׳₪ ׳׳—׳™׳“׳” ׳׳×׳™׳׳•׳ ׳₪׳’׳™׳©׳” ׳׳׳׳׳¨ */
 export function buildArticleMeetingWhatsAppMessage(params: { title: string; slug: string }): string {
   const preface = buildWhatsAppCrmPreface(params.title);
-  const body = `היי, הגעתי מהמאמר "${params.title}" (${params.slug}) ואני רוצה לתאם פגישה.`;
+  const body = `׳”׳™׳™, ׳”׳’׳¢׳×׳™ ׳׳”׳׳׳׳¨ "${params.title}" (${params.slug}) ׳•׳׳ ׳™ ׳¨׳•׳¦׳” ׳׳×׳׳ ׳₪׳’׳™׳©׳”.`;
   return `${preface}\n\n${body}`;
 }
 
-/** טקסט ליד קונטקסטואלי לפי תגית ראשונה מה-frontmatter (או נושא/כותרת גיבוי) */
+/** ׳˜׳§׳¡׳˜ ׳׳™׳“ ׳§׳•׳ ׳˜׳§׳¡׳˜׳•׳׳׳™ ׳׳₪׳™ ׳×׳’׳™׳× ׳¨׳׳©׳•׳ ׳” ׳׳”-frontmatter (׳׳• ׳ ׳•׳©׳/׳›׳•׳×׳¨׳× ׳’׳™׳‘׳•׳™) */
 export const buildArticleContextLeadMessage = (opts: {
   tags?: string[];
   topic?: string;
@@ -580,19 +580,19 @@ export const buildArticleContextLeadMessage = (opts: {
   const sourceTitle = titleTrim || subjectLabel || "NeverMind";
   const preface = buildWhatsAppCrmPreface(sourceTitle);
   if (subjectLabel) {
-    return `${preface}\n\nהיי השם לא משנה, קראתי את המאמר בנושא ${subjectLabel} ורציתי להתייעץ...`;
+    return `${preface}\n\n׳”׳™׳™ ׳”׳©׳ ׳׳ ׳׳©׳ ׳”, ׳§׳¨׳׳×׳™ ׳׳× ׳”׳׳׳׳¨ ׳‘׳ ׳•׳©׳ ${subjectLabel} ׳•׳¨׳¦׳™׳×׳™ ׳׳”׳×׳™׳™׳¢׳¥...`;
   }
   if (titleTrim) {
-    return `${preface}\n\nהיי השם לא משנה, קראתי את המאמר "${titleTrim}" ורציתי להתייעץ...`;
+    return `${preface}\n\n׳”׳™׳™ ׳”׳©׳ ׳׳ ׳׳©׳ ׳”, ׳§׳¨׳׳×׳™ ׳׳× ׳”׳׳׳׳¨ "${titleTrim}" ׳•׳¨׳¦׳™׳×׳™ ׳׳”׳×׳™׳™׳¢׳¥...`;
   }
-  return `${preface}\n\nהיי השם לא משנה, קראתי מאמר באתר NeverMind ורציתי להתייעץ...`;
+  return `${preface}\n\n׳”׳™׳™ ׳”׳©׳ ׳׳ ׳׳©׳ ׳”, ׳§׳¨׳׳×׳™ ׳׳׳׳¨ ׳‘׳׳×׳¨ NeverMind ׳•׳¨׳¦׳™׳×׳™ ׳׳”׳×׳™׳™׳¢׳¥...`;
 };
 
 export const buildArticleContextWhatsAppHref = (
   opts: Parameters<typeof buildArticleContextLeadMessage>[0]
 ) => buildWhatsAppHref(buildArticleContextLeadMessage(opts));
 
-/** שורת הקשר קצרה בלי פתיח - לשילוב בהודעות ארוכות (מילוי שדות וכו׳) */
+/** ׳©׳•׳¨׳× ׳”׳§׳©׳¨ ׳§׳¦׳¨׳” ׳‘׳׳™ ׳₪׳×׳™׳— - ׳׳©׳™׳׳•׳‘ ׳‘׳”׳•׳“׳¢׳•׳× ׳׳¨׳•׳›׳•׳× (׳׳™׳׳•׳™ ׳©׳“׳•׳× ׳•׳›׳•׳³) */
 export const buildArticleReadContextLine = (
   opts: Parameters<typeof buildArticleContextLeadMessage>[0]
 ): string => {
@@ -601,13 +601,13 @@ export const buildArticleReadContextLine = (
   const topicTrim = (opts.topic ?? "").trim();
   const subjectLabel = topicTrim || firstFromTags;
   if (subjectLabel) {
-    return `קראתי את המאמר בנושא ${subjectLabel}.`;
+    return `׳§׳¨׳׳×׳™ ׳׳× ׳”׳׳׳׳¨ ׳‘׳ ׳•׳©׳ ${subjectLabel}.`;
   }
   const titleTrim = (opts.articleTitle ?? "").trim();
   if (titleTrim) {
-    return `קראתי את המאמר "${titleTrim}".`;
+    return `׳§׳¨׳׳×׳™ ׳׳× ׳”׳׳׳׳¨ "${titleTrim}".`;
   }
-  return "קראתי מאמר באתר NeverMind.";
+  return "׳§׳¨׳׳×׳™ ׳׳׳׳¨ ׳‘׳׳×׳¨ NeverMind.";
 };
 
 const HEBREW_TITLE_ONLY_REGEX = /^[\u0590-\u05FF\s\-.,'"!?()]+$/;
@@ -640,7 +640,7 @@ export function validateSlug(
     if (isHebrewOnlyTitle) {
       return {
         valid: false,
-        error: "כותרת בעברית מחייבת slug באנגלית לפני ייצוא",
+        error: "׳›׳•׳×׳¨׳× ׳‘׳¢׳‘׳¨׳™׳× ׳׳—׳™׳™׳‘׳× slug ׳‘׳׳ ׳’׳׳™׳× ׳׳₪׳ ׳™ ׳™׳™׳¦׳•׳",
       };
     }
     const suggested = slugifyTitle(trimmedTitle);
@@ -648,7 +648,7 @@ export function validateSlug(
       return {
         valid: false,
         error:
-          "הכותרת כוללת עברית - ה-Slug האוטומטי חלקי. נא להזין Slug ידני באנגלית שמתאר את נושא המאמר",
+          "׳”׳›׳•׳×׳¨׳× ׳›׳•׳׳׳× ׳¢׳‘׳¨׳™׳× - ׳”-Slug ׳”׳׳•׳˜׳•׳׳˜׳™ ׳—׳׳§׳™. ׳ ׳ ׳׳”׳–׳™׳ Slug ׳™׳“׳ ׳™ ׳‘׳׳ ׳’׳׳™׳× ׳©׳׳×׳׳¨ ׳׳× ׳ ׳•׳©׳ ׳”׳׳׳׳¨",
       };
     }
     return suggested ? { valid: true, suggested } : { valid: true };
@@ -657,7 +657,7 @@ export function validateSlug(
   if (!SAFE_SLUG_REGEX.test(trimmedSlug)) {
     return {
       valid: false,
-      error: "Slug חייב להכיל אותיות אנגליות קטנות, מספרים ומקפים בלבד",
+      error: "Slug ׳—׳™׳™׳‘ ׳׳”׳›׳™׳ ׳׳•׳×׳™׳•׳× ׳׳ ׳’׳׳™׳•׳× ׳§׳˜׳ ׳•׳×, ׳׳¡׳₪׳¨׳™׳ ׳•׳׳§׳₪׳™׳ ׳‘׳׳‘׳“",
     };
   }
 
@@ -665,7 +665,7 @@ export function validateSlug(
 }
 
 export const resolveServiceAction = (service: StageService | FlatService) => {
-  const actionText = service.payment_cta || service.action_text || `אני רוצה להתקדם עם ${service.title}`;
+  const actionText = service.payment_cta || service.action_text || `׳׳ ׳™ ׳¨׳•׳¦׳” ׳׳”׳×׳§׳“׳ ׳¢׳ ${service.title}`;
 
   if (service.payment_flow === "direct" && typeof service.payment_link === "string" && service.payment_link.trim()) {
     return {
@@ -715,3 +715,58 @@ export const resolveServiceAction = (service: StageService | FlatService) => {
     flow: service.payment_flow ?? "whatsapp",
   };
 };
+
+function fallbackServiceActionLabel(service: StageService | FlatService): string {
+  if (service.id === "portal-access") return "בקשה להצטרף";
+  if (service.id === "balcony-experience") return "שריון מקום";
+  return "קביעת שיחה";
+}
+
+function stripTrailingPriceFromActionLabel(value: string): string {
+  return String(value || "")
+    .replace(/\s+/g, " ")
+    .replace(/\s*\([^)]*\)\s*$/u, "")
+    .trim();
+}
+
+export function buildServiceDisplayActionLabel(
+  service: StageService | FlatService,
+  selectedExtension?: ServiceExtension | null
+): string {
+  const fallback = fallbackServiceActionLabel(service);
+  const raw = selectedExtension?.action_text?.trim() || service.payment_cta?.trim() || service.action_text?.trim() || "";
+  const cleaned = stripTrailingPriceFromActionLabel(raw);
+  return cleaned || fallback;
+}
+
+export function assertServicePricingConsistency(services: Array<StageService | FlatService>): void {
+  const issues: string[] = [];
+
+  services.forEach((service) => {
+    const variants: Array<ServiceExtension | null> = [null, ...(((service.extensions ?? []) as ServiceExtension[]) || [])];
+
+    variants.forEach((variant) => {
+      const merged = mergeServiceWithExtension(service, variant);
+      const reservation = decodeURIComponent(buildServiceReservationWhatsAppHref(service, variant));
+      const proposal = decodeURIComponent(buildServiceProposalWhatsAppHref(service, variant));
+      const localizedPrice = Math.round(merged.price_full).toLocaleString("he-IL");
+      const expectedRef = `NM-${Math.round(merged.price_full)}`;
+
+      if (!reservation.includes(localizedPrice)) {
+        issues.push(`${service.id}${variant ? `:${variant.id}` : ""} reservation_missing_price`);
+      }
+
+      if (!proposal.includes(expectedRef)) {
+        issues.push(`${service.id}${variant ? `:${variant.id}` : ""} proposal_missing_ref`);
+      }
+
+      if (variant?.price_additive === true && merged.price_full < service.price_full) {
+        issues.push(`${service.id}:${variant.id} additive_extension_lower_than_base`);
+      }
+    });
+  });
+
+  if (issues.length) {
+    throw new Error(`services_pricing_consistency_failed\n${issues.join("\n")}`);
+  }
+}

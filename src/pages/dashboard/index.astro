@@ -61,7 +61,7 @@ const overviewCards = [
         <div class="space-y-8">
           <section id="overview" class="space-y-4">
             <div class="overflow-hidden rounded-[32px] border-[0.5px] border-[rgba(26,26,26,0.1)] bg-[radial-gradient(circle_at_top_left,_rgba(212,43,43,0.16),_transparent_34%),linear-gradient(135deg,#ffffff_0%,#f4f2ed_100%)] p-6 shadow-[0_24px_70px_rgba(26,26,26,0.06)] dark:border-[rgba(250,250,248,0.12)] dark:bg-[radial-gradient(circle_at_top_left,_rgba(212,43,43,0.18),_transparent_30%),linear-gradient(135deg,rgba(255,255,255,0.06)_0%,rgba(255,255,255,0.02)_100%)]">
-              <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#D42B2B] dark:text-[#ff8a8a]">Dashboard</p>
+              <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#D42B2B] dark:text-[#ff8a8a]">דשבורד</p>
               <div class="mt-3 grid gap-5 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] lg:items-end">
                 <div class="space-y-3 text-right">
                   <h1 class="text-[clamp(2rem,1.55rem+1.6vw,3.2rem)] font-semibold leading-tight text-[#1A1A1A] dark:text-[#FAFAF8]">מצב האתר עכשיו</h1>
@@ -75,7 +75,7 @@ const overviewCards = [
                       summary="שכבת ההסבר מחוברת ישירות לפונקציות שמזינות את הנתונים, כדי שהתיעוד יישאר נאמן ללוגיקה ולא יהיה טקסט שיווקי מנותק."
                       details={[
                         "בריאות תוכן נקבעת מתוך updatedDate, pubDate, ימים מהעדכון ו־bounceRate יציב לפי slug.",
-                        "נתוני Cloudflare כרגע נמשכים דרך endpoints mock עם חוזה נתונים קבוע, כך שאפשר להחליף מקור בלי לשכתב את ה־UI.",
+                        "הדשבורד משלב נתוני תוכן מקומיים עם נתוני מועדון אמיתיים מה־worker, כך שהממשק נשאר נאמן למה שבאמת קורה במערכת.",
                       ]}
                     />
                   </div>
@@ -97,15 +97,15 @@ const overviewCards = [
             <section id="connections">
               <DashboardCard
                 eyebrow="מדדים ובקרה"
-                title="CF Live Connections"
-                description="שכבת mock קלה שמתנהגת כמו תצוגת Free Tier ומוכנה להחלפה לנתונים חיים."
-                sublabel="Fetching raw traffic and security flags via GraphQL Analytics API"
-                helpText="למה: הכרטיס נותן מבט מהיר על session, מדינה, מכשיר וסטטוס אימות. איך: endpoint מאומת יוצר bucket של 15 שניות ומחזיר חמישה חיבורים בפורמט קבוע, כדי שה־UI יישאר יציב גם לפני חיבור למקור חי."
-                mechanismTitle="מאחורי הקלעים של CF Live Connections"
-                mechanismSummary="functions/api/dashboard/live-connections.js מאשר בקשה לפי localhost, skip auth או Cf-Access-Jwt-Assertion, ואז מייצר feed יציב מתוך bucket זמן של 15 שניות."
+                title="תנועת חברים חיה"
+                description="נתוני חיבורים אמיתיים מתוך CLUB_ACTIVITY של המועדון, בלי שכבת דמה ובלי ניחוש."
+                sublabel="מקור: worker nm-club-auth דרך CLUB_ACTIVITY ופרוקסי השרת"
+                helpText="למה: הכרטיס מרכז חיבורים אמיתיים של חברי המועדון, כדי לראות מי פעיל, מאיזה נתיב, ובאיזה דפדפן. איך: השרת מושך את overview של המועדון, גוזר חלון פעילות של עשרים דקות, ומציג את החיבורים האחרונים בלי לייצר נתונים מדומים."
+                mechanismTitle="מאחורי הקלעים של תנועת החברים"
+                mechanismSummary="functions/api/dashboard/live-connections.js דורש גישת Access לדשבורד, מושך את /admin/overview מה־worker בעזרת מפתח שירות, וממיר recentLogins לטבלה קריאה."
                 mechanismDetails={[
-                  "חמש שורות נבנות כל פעם מחדש מתוך makeIp, רשימות מדינות, מכשירים וסטטוסי auth.",
-                  "ה־widget מושך את הנתונים מחדש כל 15 שניות ושומר על אותו מבנה שנרצה לחבר בהמשך ל־GraphQL Analytics API.",
+                  "המקור הוא recentLogins אמיתי שנשמר ב־CLUB_ACTIVITY אחרי כניסה של חבר.",
+                  "הסיכום העליון מחשב כמה חברים נראו בחלון של עשרים הדקות האחרונות, והרשימה עצמה מציגה את שמונת החיבורים האחרונים."
                 ]}
               >
                 <LiveConnectionsWidget client:load endpoint="/api/dashboard/live-connections" />
@@ -115,15 +115,15 @@ const overviewCards = [
             <section id="security-feed">
               <DashboardCard
                 eyebrow="מדדים ובקרה"
-                title="Live Security Feed"
-                description="אם מגיעים שלושה ניסיונות מאותו IP נוצרת אזעקה. הפיד רץ בצד לקוח ומתעדכן כל כמה שניות."
-                sublabel="Fetching raw traffic and security flags via GraphQL Analytics API"
-                helpText="למה: הכרטיס מבליט חריגות במקום לדרוש קריאת לוגים ידנית. איך: endpoint יוצר שישה אירועים, מקבץ ניסיונות לפי IP, ומסמן alarm רק כאשר אותו IP מגיע לשלושה ניסיונות בחלון קצר."
+                title="פיד אבטחה חי"
+                description="הפיד נבנה ישירות מתוך Fraud Flags של המועדון ומציג רק אירועים אמיתיים שדורשים בדיקה."
+                sublabel="מקור: worker nm-club-auth דרך CLUB_ACTIVITY ופרוקסי השרת"
+                helpText="למה: הכרטיס מבליט דפוסים חריגים בלי להיכנס ל־KV ידנית. איך: השרת מושך fraudFlags אמיתיים, גוזר חומרה לפי כמות כתובות רשת שחזרו על עצמן, ומסמן אזעקה רק כשהדפוס כבר ברור."
                 mechanismTitle="מאחורי הקלעים של פיד האבטחה"
-                mechanismSummary="functions/api/dashboard/security-feed.js משתמש ב־bucket של 12 שניות, יוצר רשימת IP חוזרת, סופר attempts לכל IP, וממיר את התוצאה ל־events ו־alarms."
+                mechanismSummary="functions/api/dashboard/security-feed.js מושך fraudFlags אמיתיים מה־worker, ממיר אותם ל־alarms ול־events, ושומר על תיאור עובדתי של מה שקרה."
                 mechanismDetails={[
-                  "severity מחושב לפי מספר ניסיונות: 1 נמוך, 2 בינוני, 3 ומעלה גבוה.",
-                  "ה־widget מושך את ה־feed כל 12 שניות, כך שהסימולציה מרגישה חיה אבל נשארת קלה מאוד."
+                  "החומרה נגזרת מכמות כתובות הרשת לחבר או לסיסמה: 1 נמוך, 2 בינוני, 3 ומעלה גבוה.",
+                  "אם אין Flags פתוחים, הפיד מחזיר שורת שקט אחת במקום להמציא אירועים."
                 ]}
               >
                 <LiveSecurityFeedWidget client:load endpoint="/api/dashboard/security-feed" />
@@ -134,7 +134,7 @@ const overviewCards = [
           <section id="content-health">
             <DashboardCard
               eyebrow="תוכן ומאמרים"
-              title="Content Health"
+              title="בריאות התוכן"
               description="ברירת צבע אדומה כאשר bounceRate גבוה מ־70 או כשעברו יותר מ־90 יום מהעדכון האחרון."
               helpText="למה: הכרטיס ממיין קודם את המקומות שדורשים החלטה מערכתית. איך: בריאות כל מאמר נבנית מתוך updatedDate או pubDate, חישוב ימים מהעדכון, ו־bounceRate יציב שנגזר מה־slug עם הטיית freshness."
               mechanismTitle="מאחורי הקלעים של חישוב הבריאות"
@@ -171,7 +171,7 @@ const overviewCards = [
           <section id="image-automation">
             <DashboardCard
               eyebrow="תוכן ומאמרים"
-              title="Image Automation"
+              title="זרימת תמונות"
               description="המרה מסודרת ל־webp, שם קובץ נקי, ונתיב אחיד ל־assets/images בלי תלות בכתיבה בזמן ריצה."
               helpText="למה: זו נקודת הכניסה לעריכת תמונות בלי תקלות שם קובץ, בלי פורמטים כפולים, ובלי חיפוש ידני אחרי assets. מה קורה אחר כך: הנתיב שחוזר מהסקריפט יכול להיכנס ישירות ל־content או ל־Generator."
             >
@@ -182,7 +182,7 @@ const overviewCards = [
           <section id="settings">
             <DashboardCard
               eyebrow="הגדרות מערכת"
-              title="Cloudflare Notes"
+              title="הגדרות קלאודפלייר"
               description="הקשחות שצריך להשלים בדשבורד של Cloudflare כדי לשמור על סביבת ניהול סגורה ונקייה מאינדוקס."
               helpText="למה: גם UI נקי צריך גבולות מערכת ברורים. איך: Access, noindex ו־Full strict הם השכבות ששומרות על הדשבורד פרטי, מאובטח ויציב."
             >
@@ -198,3 +198,5 @@ const overviewCards = [
     import "../../scripts/admin-dashboard.js";
   </script>
 </Layout>
+
+

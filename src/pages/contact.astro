@@ -51,7 +51,7 @@ const tel = appConfig.contact.phoneTel?.trim() || "";
         השמירה המקומית פועלת אוטומטית. גם אם תצא מהעמוד, מה שכתבת נשאר על המכשיר שלך.
       </p>
 
-      <form id="contact-form" data-nm-antispam class="space-y-4 rounded-3xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/85 p-6" action="https://api.web3forms.com/submit" method="POST">
+      <form id="contact-form" data-nm-antispam class="space-y-4 rounded-3xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/85 p-6" action="/api/forms/submit" method="POST">
         <input type="hidden" name="access_key" value={WEB3FORMS_ACCESS_KEY} />
         <input type="hidden" name="subject" value="פנייה מעמוד יצירת קשר | NeverMind" />
         <input type="hidden" name="page" value="contact" />
@@ -107,6 +107,8 @@ const tel = appConfig.contact.phoneTel?.trim() || "";
         return tokenInput instanceof HTMLInputElement ? tokenInput.value.trim() : "";
       };
 
+      const hasHcaptcha = () => Boolean(contactForm.querySelector("[data-nm-hcaptcha-wrap]"));
+
       const onSubmit = async (event) => {
         event.preventDefault();
         if (submitButton instanceof HTMLElement) {
@@ -128,15 +130,19 @@ const tel = appConfig.contact.phoneTel?.trim() || "";
         }
 
         const token = getHcaptchaToken();
-        if (!token) {
+        if (hasHcaptcha() && !token) {
           showStatus("נא להשלים את האימות לפני השליחה.");
           clearLoading();
           return;
         }
-        fd.set("h-captcha-response", token);
+        if (token) {
+          fd.set("h-captcha-response", token);
+        } else {
+          fd.delete("h-captcha-response");
+        }
 
         try {
-          const res = await fetch("https://api.web3forms.com/submit", { method: "POST", body: fd });
+          const res = await fetch(contactForm.action, { method: "POST", body: fd });
           const text = await res.text();
           if (res.ok) {
             contactForm.reset();

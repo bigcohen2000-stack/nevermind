@@ -1,14 +1,14 @@
 ﻿import { useEffect, useState } from "react";
 
 type Alarm = {
-  ip: string;
+  phone: string;
   attempts: number;
   severity: "low" | "medium" | "high";
 };
 
 type EventItem = {
   id: string;
-  ip: string;
+  phone: string;
   createdAt: string;
   label: string;
   note: string;
@@ -19,6 +19,7 @@ type EventItem = {
 
 type Payload = {
   ok: boolean;
+  source: string;
   generatedAt: string;
   alarms: Alarm[];
   events: EventItem[];
@@ -32,6 +33,12 @@ function severityClass(value: Alarm["severity"]): string {
   if (value === "high") return "border-[#D42B2B]/25 bg-[#D42B2B]/8 text-[#D42B2B]";
   if (value === "medium") return "border-amber-600/20 bg-amber-600/10 text-amber-800";
   return "border-black/10 bg-black/5 text-black/70";
+}
+
+function severityLabel(value: Alarm["severity"]): string {
+  if (value === "high") return "גבוה";
+  if (value === "medium") return "בינוני";
+  return "נמוך";
 }
 
 export default function LiveSecurityFeedWidget({ endpoint }: Props) {
@@ -72,8 +79,8 @@ export default function LiveSecurityFeedWidget({ endpoint }: Props) {
     <div className="space-y-4">
       <div className="flex flex-wrap gap-2">
         {(payload?.alarms ?? []).map((alarm) => (
-          <span key={alarm.ip} className={`rounded-full border px-3 py-1 text-xs font-semibold ${severityClass(alarm.severity)}`}>
-            {alarm.ip} · {alarm.attempts} ניסיונות
+          <span key={alarm.phone} className={`rounded-full border px-3 py-1 text-xs font-semibold ${severityClass(alarm.severity)}`}>
+            {alarm.phone} · {alarm.attempts} סימנים
           </span>
         ))}
         {payload?.alarms?.length === 0 ? (
@@ -94,12 +101,12 @@ export default function LiveSecurityFeedWidget({ endpoint }: Props) {
                   <p className="text-sm font-semibold text-[#1A1A1A]">{event.label}</p>
                   <p className="text-sm leading-6 text-black/62">{event.note}</p>
                   <p className="text-xs text-black/42">
-                    {event.ip} · {new Date(event.createdAt).toLocaleTimeString("he-IL")} · {event.attempts} ניסיונות
+                    {event.phone} · {new Date(event.createdAt).toLocaleTimeString("he-IL")} · {event.attempts} סימנים
                   </p>
                 </div>
                 <div className="flex flex-wrap justify-end gap-2">
                   <span className={`rounded-full border px-3 py-1 text-xs font-semibold ${severityClass(event.severity)}`}>
-                    {event.severity}
+                    {severityLabel(event.severity)}
                   </span>
                   <span
                     className={`rounded-full border px-3 py-1 text-xs font-semibold ${
@@ -108,7 +115,7 @@ export default function LiveSecurityFeedWidget({ endpoint }: Props) {
                         : "border-black/10 bg-black/5 text-black/65"
                     }`}
                   >
-                    {event.isAlarm ? "alarm" : "monitor"}
+                    {event.isAlarm ? "אזעקה" : "מעקב"}
                   </span>
                 </div>
               </div>

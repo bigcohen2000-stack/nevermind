@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+﻿import { useEffect, useMemo, useRef, useState } from "react";
 import type { FlatService, ServiceExtension } from "../lib/services";
 import {
+  buildServiceDisplayActionLabel,
   buildServicePreStartWhatsAppHref,
   buildServiceReservationWhatsAppHref,
   formatMoney,
@@ -39,7 +40,7 @@ function usePriceTicker(target: number, durationMs = 380) {
 
 type Props = {
   serviceJson: string;
-  /** full = כמו ServiceCard (מע״מ מפורט). compact = שורת מחיר קצרה */
+  /** full = ׳›׳׳• ServiceCard (׳׳¢׳´׳ ׳׳₪׳•׳¨׳˜). compact = ׳©׳•׳¨׳× ׳׳—׳™׳¨ ׳§׳¦׳¨׳” */
   layout?: "full" | "compact";
 };
 
@@ -89,13 +90,13 @@ export default function ServicePricingBlock({ serviceJson, layout = "full" }: Pr
       : baseAction.href
     : "#";
   const primaryExternal = showPricingAndActions ? (selectedExt ? true : baseAction.external) : false;
-  const primaryLabel = useMemo(() => {
-    if (!showPricingAndActions) return baseAction.label;
-    if (selectedExt && service.override_on_extension === true) {
-      return selectedExt.action_text;
-    }
-    return baseAction.label;
-  }, [showPricingAndActions, selectedExt, service.override_on_extension, baseAction.label]);
+  const primaryLabel = useMemo(
+    () =>
+      showPricingAndActions
+        ? buildServiceDisplayActionLabel(service, selectedExt)
+        : buildServiceDisplayActionLabel(service),
+    [showPricingAndActions, service, selectedExt]
+  );
 
   const preStartHref = buildServicePreStartWhatsAppHref(service.title);
   const reservationHref = showPricingAndActions
@@ -132,20 +133,20 @@ export default function ServicePricingBlock({ serviceJson, layout = "full" }: Pr
             />
           </div>
           <p className="text-xs font-semibold text-[var(--nm-fg)]">
-            שלב {currentStep} מתוך 2
-            {currentStep === 1 ? " · בחרו מה מתאים" : " · מחיר ופעולות"}
+            ׳©׳׳‘ {currentStep} ׳׳×׳•׳ 2
+            {currentStep === 1 ? " ֲ· ׳‘׳—׳¨׳• ׳׳” ׳׳×׳׳™׳" : " ֲ· ׳׳—׳™׳¨ ׳•׳₪׳¢׳•׳׳•׳×"}
           </p>
         </div>
       ) : null}
 
       <fieldset className="space-y-2 rounded-[1.25rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)]/50 p-4 text-right">
         <legend className="px-1 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--nm-accent)]">
-          {extensionsGated ? "מה נוח לכם עכשיו" : "בחירת אופציה"}
+          {extensionsGated ? "׳׳” ׳ ׳•׳— ׳׳›׳ ׳¢׳›׳©׳™׳•" : "׳‘׳—׳™׳¨׳× ׳׳•׳₪׳¦׳™׳”"}
         </legend>
         <p className="text-xs leading-relaxed text-[color-mix(in_srgb,var(--nm-fg)_58%,var(--nm-bg))]">
           {extensionsGated
-            ? "סמנו אפשרות אחת. אחרי הבחירה ניפתחו המחיר המדויק והכפתורים."
-            : "ברירת מחדל: מחיר בסיס וכפתור התשלום המקורי. בוחרים הרחבה המחיר והכיתוב מתעדכנים, וההודעה לוואטסאפ כוללת את האופציה."}
+            ? "׳¡׳׳ ׳• ׳׳₪׳©׳¨׳•׳× ׳׳—׳×. ׳׳—׳¨׳™ ׳”׳‘׳—׳™׳¨׳” ׳ ׳™׳₪׳×׳—׳• ׳”׳׳—׳™׳¨ ׳”׳׳“׳•׳™׳§ ׳•׳”׳›׳₪׳×׳•׳¨׳™׳."
+            : "׳‘׳¨׳™׳¨׳× ׳׳—׳“׳: ׳׳—׳™׳¨ ׳‘׳¡׳™׳¡ ׳•׳›׳₪׳×׳•׳¨ ׳”׳×׳©׳׳•׳ ׳”׳׳§׳•׳¨׳™. ׳‘׳•׳—׳¨׳™׳ ׳”׳¨׳—׳‘׳” ׳”׳׳—׳™׳¨ ׳•׳”׳›׳™׳×׳•׳‘ ׳׳×׳¢׳“׳›׳ ׳™׳, ׳•׳”׳”׳•׳“׳¢׳” ׳׳•׳•׳׳˜׳¡׳׳₪ ׳›׳•׳׳׳× ׳׳× ׳”׳׳•׳₪׳¦׳™׳”."}
         </p>
         <div className="flex flex-col gap-2">
           {!extensionsGated ? (
@@ -156,10 +157,10 @@ export default function ServicePricingBlock({ serviceJson, layout = "full" }: Pr
                 name={`nm-ext-${service.id}`}
                 checked={selectedId === null}
                 onChange={() => setSelectedId(null)}
-                aria-label={`בסיס, מחיר ${formatMoney(service.price_full)}`}
+                aria-label={`׳‘׳¡׳™׳¡, ׳׳—׳™׳¨ ${formatMoney(service.price_full)}`}
               />
               <span className="text-sm text-[var(--nm-fg)]">
-                <span className="font-semibold">בסיס</span>
+                <span className="font-semibold">׳‘׳¡׳™׳¡</span>
                 <span className="text-[color-mix(in_srgb,var(--nm-fg)_60%,var(--nm-bg))]">
                   {" "}
                   ({formatMoney(service.price_full)})
@@ -179,7 +180,7 @@ export default function ServicePricingBlock({ serviceJson, layout = "full" }: Pr
                   ? service.price_full
                   : service.price_full + ext.price
                 : ext.price;
-            const extAria = `${ext.label}, מחיר ${formatMoney(extGross)}`;
+            const extAria = `${ext.label}, ׳׳—׳™׳¨ ${formatMoney(extGross)}`;
             return (
             <label
               key={ext.id}
@@ -201,8 +202,8 @@ export default function ServicePricingBlock({ serviceJson, layout = "full" }: Pr
                   (
                   {ext.price_additive === true
                     ? ext.price === 0
-                      ? `${formatMoney(service.price_full)} (פרטים ומחיר סופי בוואטסאפ)`
-                      : `${formatMoney(service.price_full + ext.price)} (בסיס + ${ext.price.toLocaleString("he-IL")} ${"\u20AA"})`
+                      ? `${formatMoney(service.price_full)} (׳₪׳¨׳˜׳™׳ ׳•׳׳—׳™׳¨ ׳¡׳•׳₪׳™ ׳‘׳•׳•׳׳˜׳¡׳׳₪)`
+                      : `${formatMoney(service.price_full + ext.price)} (׳‘׳¡׳™׳¡ + ${ext.price.toLocaleString("he-IL")} ${"\u20AA"})`
                     : formatMoney(ext.price)}
                   )
                 </span>
@@ -222,14 +223,14 @@ export default function ServicePricingBlock({ serviceJson, layout = "full" }: Pr
         <>
           {isCompact ? (
             <p className="text-sm font-semibold text-[var(--nm-fg)]">
-              מחיר נבחר:{" "}
+              ׳׳—׳™׳¨ ׳ ׳‘׳—׳¨:{" "}
               <span data-nm-live-price="" className="tabular-nums">
                 {formatMoney(tickered)}
               </span>
             </p>
           ) : (
             <div className="text-right">
-              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">כולל מע״מ</p>
+              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">׳›׳•׳׳ ׳׳¢׳´׳</p>
               <p className="mt-2 text-4xl font-semibold tabular-nums text-[var(--nm-fg)]" data-nm-live-price="">
                 {formatMoney(tickered)}
               </p>
@@ -238,15 +239,16 @@ export default function ServicePricingBlock({ serviceJson, layout = "full" }: Pr
                   <span className="line-through decoration-[color-mix(in_srgb,var(--nm-fg)_35%,transparent)]">
                     {formatMoney(boutiqueRef)}
                   </span>
-                  <span className="ms-2">ייחוס לפני ערך בוטיק</span>
+                  <span className="ms-2">׳™׳™׳—׳•׳¡ ׳׳₪׳ ׳™ ׳¢׳¨׳ ׳‘׳•׳˜׳™׳§</span>
                 </p>
               ) : null}
               <p className="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_64%,var(--nm-bg))]">
-                {formatMoney(netPrice)} לפני מע״מ + {formatMoney(vatAmount)} מע״מ
+                {formatMoney(netPrice)} ׳׳₪׳ ׳™ ׳׳¢׳´׳ + {formatMoney(vatAmount)} ׳׳¢׳´׳
               </p>
             </div>
           )}
 
+          <p className="text-xs leading-relaxed text-[color-mix(in_srgb,var(--nm-fg)_55%,var(--nm-bg))]">המחיר, הכפתורים והודעת הוואטסאפ נבנים מאותה בחירה, כדי שלא יופיעו פערים בדרך.</p>
           <div className="flex flex-col gap-2 overflow-hidden rounded-[1.25rem] sm:flex-row sm:flex-wrap sm:items-stretch sm:justify-start sm:gap-2">
             <a
               href={primaryHref}
@@ -268,7 +270,7 @@ export default function ServicePricingBlock({ serviceJson, layout = "full" }: Pr
               rel="noreferrer"
               className="inline-flex min-h-[2.75rem] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_14%,transparent)] bg-[var(--nm-bg-canvas)] px-5 py-3 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-tint)]"
             >
-              שאלה לפני שמתחילים?
+              ׳©׳׳׳” ׳׳₪׳ ׳™ ׳©׳׳×׳—׳™׳׳™׳?
             </a>
             <a
               href={reservationHref}
@@ -276,15 +278,16 @@ export default function ServicePricingBlock({ serviceJson, layout = "full" }: Pr
               rel="noreferrer"
               className="inline-flex min-h-[2.75rem] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_14%,transparent)] px-5 py-3 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-tint)]"
             >
-              שיריון מקום (פרטים מלאים)
+              ׳©׳™׳¨׳™׳•׳ ׳׳§׳•׳ (׳₪׳¨׳˜׳™׳ ׳׳׳׳™׳)
             </a>
           </div>
         </>
       ) : (
         <p className="rounded-xl border border-dashed border-[color-mix(in_srgb,var(--nm-fg)_16%,transparent)] bg-white/50 px-4 py-3 text-center text-sm text-[color-mix(in_srgb,var(--nm-fg)_58%,var(--nm-bg))]">
-          בחרו אפשרות למעלה כדי לראות מחיר וכפתורי המשך.
+          ׳‘׳—׳¨׳• ׳׳₪׳©׳¨׳•׳× ׳׳׳¢׳׳” ׳›׳“׳™ ׳׳¨׳׳•׳× ׳׳—׳™׳¨ ׳•׳›׳₪׳×׳•׳¨׳™ ׳”׳׳©׳.
         </p>
       )}
     </div>
   );
 }
+

@@ -1,14 +1,16 @@
----
+﻿---
 import Layout from "../layouts/Layout.astro";
 import { glossaryConcepts } from "../data/glossary";
 import appConfig from "../config/appConfig.json";
 import {
-  servicesHero,
   servicesContentGapMessage,
   flattenVisibleServices,
-  resolveServiceAction,
   formatMoney,
   buildServiceReservationWhatsAppHref,
+  buildWhatsAppHref,
+  buildServiceDisplayActionLabel,
+  formatAvailabilityLine,
+  assertServicePricingConsistency,
 } from "../lib/services";
 import { ArchiveSearchFloatingInput } from "../components/ArchiveSearchFloatingInput";
 import { DirectLink } from "../components/ui/DirectLink";
@@ -18,45 +20,426 @@ import TopicQueryLandingBanner from "../components/TopicQueryLandingBanner";
 import PremiumClubGate from "../components/PremiumClubGate.astro";
 
 const services = flattenVisibleServices();
+assertServicePricingConsistency(services);
+
 const popularTags = glossaryConcepts.slice(0, 6).map((c) => ({
   label: c.title,
   searchQuery: (c.keywords && c.keywords[0]) || c.title,
 }));
 const waNumber = String(appConfig.contact.whatsAppNumber ?? "").replace(/\D/g, "");
+const joinClubHref = "/me/unlock/";
+const joinClubWaHref = buildWhatsAppHref(
+  "היי, הגעתי מדף השירותים. רוצה להבין איך מצטרפים ל-NeverMind ומה נפתח אחרי ההצטרפות."
+);
+
+const guideById = {
+  "phone-perspective": {
+    title: "שיחת פוקוס",
+    kicker: "סדר מהיר בלי להעמיס",
+    fit: "מתאים כשיש משהו שמטריד עכשיו וצריך לעשות סדר בלי לפתוח את כל החיים בבת אחת.",
+    receive: [
+      "פירוק מהיר של מה שמפעיל אותך עכשיו",
+      "הבדלה בין עובדה, פירוש ותגובה",
+      "כיוון ברור להמשך בלי רעש מסביב",
+    ],
+    icons: ["📞 טלפון", "🎥 וידאו", "🕒 20–60 דקות"],
+    primaryHref: "/book/",
+    primaryLabel: "קביעת שיחה",
+    trust: "לא צריך להגיע מוכן. מספיק להביא את מה שמציק עכשיו.",
+  },
+  "personal-clinic": {
+    title: "מפגש עומק",
+    kicker: "זמן ושקט למי שלא רוצה למהר",
+    fit: "מתאים כשיש שכבות עמוקות יותר, או כשמרגישים ששיחה קצרה לא תספיק כדי לראות מה באמת קורה.",
+    receive: [
+      "זמן ארוך יותר בלי לחץ זמן",
+      "מרחב שקט שמאפשר לראות מה יושב מתחת לסיפור",
+      "אפשרות להמשיך עד שמרגישים בהירות ולא רק הקלה רגעית",
+    ],
+    icons: ["📍 פרונטלי", "🚗 אפשר להגיע אליך", "🎧 אפשר להוסיף תיעוד"],
+    primaryHref: "/book/",
+    primaryLabel: "קביעת שיחה",
+    trust: "זה לא צריך להרגיש דרמטי. זה פשוט מרחב רגוע יותר לעבודה עמוקה.",
+  },
+  "balcony-experience": {
+    title: "נוכחות באולפן",
+    kicker: "לראות איך שאלות של אחרים נוגעות גם בך",
+    fit: "מתאים למי שרוצה לראות איך שאלות של אחרים משתקפות עליו, בלי להיות לבד מול הדבר שהוא בודק.",
+    receive: [
+      "נוכחות בשיחה חיה באולפן קטן ושקט",
+      "אפשר לראות איך מנגנונים חוזרים בין אנשים שונים",
+      "חוויה שמחברת בין הקשבה, קצב וקצת אומץ שקט",
+    ],
+    icons: ["🎙️ פודקאסט", "👥 קבוצה קטנה", "🕒 45–90 דקות"],
+    primaryHref: "/book/",
+    primaryLabel: "שריון מקום",
+    trust: "לא חייבים לדבר הרבה כדי להרגיש את הערך. לפעמים מספיק להיות שם.",
+  },
+  "portal-access": {
+    title: "מנוי ארכיון",
+    kicker: "לחקור לבד, בקצב שלך",
+    fit: "מתאים למי שרוצה לחקור לבד, לחזור לטקסטים בזמן שלו, ולהיכנס לעומק בלי לקבוע שיחה כל פעם מחדש.",
+    receive: [
+      "סרטון מלא בכל מאמר שנפתח למנויים",
+      "תכנים שלא נכון לפרסם בפומבי",
+      "גישה לקבוצה השקטה, לעץ שורש הבעיה ולספרייה האסורה",
+    ],
+    icons: ["📚 גישה מלאה", "🎬 סרטון בכל מאמר", "🔒 תכנים למנויים בלבד"],
+    primaryHref: "/me/unlock/",
+    primaryLabel: "בקשה להצטרף",
+    trust: "המנוי לא נועד לייצר לחץ. הוא פשוט פותח את כל מה שלא נכנס לעמוד פתוח רגיל.",
+  },
+} as const;
+
+const orderedIds = ["phone-perspective", "personal-clinic", "balcony-experience", "portal-access"];
+const featuredServices = orderedIds
+  .map((id) => {
+    const service = services.find((item) => item.id === id);
+    const guide = guideById[id as keyof typeof guideById];
+    if (!service || !guide) return null;
+    return {
+      ...guide,
+      service,
+      reservationHref: buildServiceReservationWhatsAppHref(service),
+      actionLabel: buildServiceDisplayActionLabel(service),
+      availabilityLine: formatAvailabilityLine(service),
+      priceLead:
+        id === "portal-access"
+          ? `${formatMoney(service.price_full)} לחודש`
+          : `מ-${formatMoney(service.price_full)}`,
+      hasExtensions: Array.isArray(service.extensions) && service.extensions.length > 0,
+    };
+  })
+  .filter(Boolean);
+
+const premiumFutureTags = [
+  "אלוהים",
+  "דת",
+  "הכל אחד",
+  "מיניות",
+  "אילומינטי",
+  "הדרכת הורים",
+  "פחדים עמוקים",
+  "זהות",
+  "משמעות",
+];
+
+const membersOnlyItems = [
+  "סרטונים מלאים",
+  "תכנים שלא מפורסמים בפומבי",
+  "גישה לקבוצה השקטה",
+  "גישה לעומק ולספרייה האסורה",
+  "גישה לעץ שורש הבעיה",
+  "גישה להקלטות ולפירוק מלא של מאמרים",
+];
+
+const trustCards = [
+  {
+    title: "למי זה מתאים",
+    body: "למי שמרגיש שיש רעש פנימי, למי שמחפש בהירות, ולמי שרוצה להבין מה מפעיל אותו בלי סיסמאות ובלי הצגות.",
+  },
+  {
+    title: "מה לא תמצא כאן",
+    body: "לא טיפול, לא מוטיבציה, לא הרגעה, ולא פתרונות מהירים. כן בדיקה אמיתית של מה שקורה בפנים.",
+  },
+  {
+    title: "למה יש מנוי",
+    body: "כדי לאפשר יצירה שקטה, עצמאית, בלי פרסומות, בלי רעש ובלי תלות בגופים חיצוניים.",
+  },
+  {
+    title: "יושרה פשוטה",
+    body: "אין הפתעות. אין מניפולציות. אין שיווק אגרסיבי. הפרטים שלכם נשארים רק אצלנו. אנחנו לא עושים איתם שום דבר אחר.",
+  },
+];
+
+const faqItems = [
+  {
+    question: "האם זה טיפול",
+    answer: "לא. זו בדיקה שקטה של מה קורה אצלך, דרך שיחה, הקשבה והפרדה בין מה שקרה לבין מה שנבנה סביבו.",
+  },
+  {
+    question: "האם זה אנונימי",
+    answer: "אפשר להתחיל בשיחה ישירה ופשוטה. אם צריך דיסקרטיות, מדברים על זה מראש ומתאימים את הדרך הנכונה.",
+  },
+  {
+    question: "האם יש התחייבות",
+    answer: "לא. אפשר להתחיל משיחה אחת, ממפגש אחד, או ממנוי חודשי, ולראות אם זה נכון לך.",
+  },
+  {
+    question: "האם אפשר לבטל",
+    answer: "כן. אם בחרת במנוי, אפשר לעצור אותו. אם בחרת בשיחה, מתאמים מראש מה נכון ואיך ממשיכים.",
+  },
+  {
+    question: "צריך רקע קודם כדי להבין את NeverMind",
+    answer: "לא. כל טקסט כאן נכתב כדי להיות מובן גם בלי רקע קודם. מתחילים ממה שמטריד עכשיו.",
+  },
+];
+
+const archivePreviewItems = [
+  {
+    title: "איך להבדיל בין עובדה לפירוש",
+    body: "המקום שבו רוב הבלבול מתחיל, והמקום שבו הסדר מתחיל לחזור.",
+    href: "/blog/איך-להבדיל-בין-עובדה-לפירוש/",
+  },
+  {
+    title: "מהו אגו באמת",
+    body: "לא הסבר פילוסופי כבד, אלא בדיקה פשוטה של מי מדבר בתוך הראש שלך.",
+    href: "/blog/מהו-אגו-באמת/",
+  },
+  {
+    title: "למה אני מרגיש לבד",
+    body: "שאלה שנראית אישית מאוד, אבל יושבת על מנגנון שאפשר לראות בעיניים נקיות.",
+    href: "/blog/למה-אני-מרגיש/",
+  },
+];
 ---
 
 <Layout
-  title="מרחב גילוי"
-  description="חיפוש בארכיון התכנים ודרכים להעמיק בשיחה, בלי אשף שלבים."
+  title="שירותים ומסלולים"
+  description="הדרכים שבהן אפשר לעבוד יחד ב-NeverMind: שיחת פוקוס, מפגש עומק, נוכחות באולפן ומנוי ארכיון. כל מסלול כתוב בפשטות, עם מחיר ברור ודרך המשך רגועה."
+  faqItems={faqItems}
+  breadcrumbCurrentLabel="שירותים"
 >
   <TopicQueryLandingBanner client:visible />
-  <section class="mx-auto max-w-7xl space-y-12 px-4 pb-28 pt-16 text-[var(--nm-fg)] md:pb-20 md:py-20">
-    <nav
-      aria-label="קפיצה לחלקי העמוד"
-      class="flex flex-wrap items-center justify-center gap-2 border-b border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] pb-6 text-sm font-semibold text-[var(--nm-accent)]"
-    >
-      <a href="#discovery-results" class="rounded-full px-3 py-1.5 hover:bg-[var(--nm-tint)]">גילוי</a>
-      <span class="text-[color-mix(in_srgb,var(--nm-fg)_30%,var(--nm-bg))]" aria-hidden="true">·</span>
-      <a href="#pricing" class="rounded-full px-3 py-1.5 hover:bg-[var(--nm-tint)]">מחירון</a>
-      <span class="text-[color-mix(in_srgb,var(--nm-fg)_30%,var(--nm-bg))]" aria-hidden="true">·</span>
-      <a href="/intake/" class="rounded-full px-3 py-1.5 hover:bg-[var(--nm-tint)]">לפני שיחה</a>
-    </nav>
 
+  <section class="mx-auto max-w-7xl space-y-14 px-4 pb-28 pt-14 text-[var(--nm-fg)] md:pb-24 md:pt-18">
     <ServicesPricingStickyBar client:idle />
 
-    <header class="space-y-8 text-center">
-      <h1 class="text-[clamp(2rem,1.5rem+2.2vw,3.5rem)] font-semibold leading-[1.08] tracking-tight">
-        {servicesHero.title}
-      </h1>
-      <p class="mx-auto max-w-2xl text-[clamp(1rem,0.95rem+0.25vw,1.15rem)] leading-8 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
-        {servicesHero.subtitle}
-      </p>
+    <header class="space-y-8 rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--nm-bg-canvas)_96%,white),color-mix(in_srgb,var(--nm-surface-muted)_76%,white))] px-6 py-8 text-center shadow-[0_20px_70px_color-mix(in_srgb,var(--nm-fg)_5%,transparent)] md:px-8 md:py-10">
+      <div class="space-y-4">
+        <p class="text-sm font-semibold tracking-[0.18em] text-[var(--nm-accent)]">שירותים</p>
+        <h1 class="text-[clamp(2.2rem,1.6rem+2.2vw,4rem)] font-semibold leading-[1.06] tracking-tight">
+          הדרכים שבהן אפשר לעבוד יחד
+        </h1>
+        <p class="mx-auto max-w-3xl text-[clamp(1rem,0.96rem+0.28vw,1.15rem)] leading-8 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+          אם משהו בפנים לא יושב, לא חייבים לנחש מה נכון לבחור. כאן רואים ארבע דרכים פשוטות להמשיך: שיחה קצרה, מפגש עומק, נוכחות באולפן, או מנוי ארכיון למי שרוצה לחקור לבד.
+        </p>
+      </div>
 
-      <div class="mx-auto grid max-w-5xl gap-6 text-right lg:grid-cols-[minmax(0,1fr)_minmax(16rem,22rem)] lg:items-start lg:gap-8">
-        <div class="space-y-3">
-          <p class="text-[clamp(1rem,0.95rem+0.3vw,1.12rem)] font-semibold leading-7 text-[var(--nm-fg)]">
-            יש משהו שמעסיק אותך? בוא נראה מה יש לנו בארכיון על זה.
+      <div class="flex flex-wrap items-center justify-center gap-3">
+        <a
+          href={joinClubHref}
+          class="inline-flex min-h-[52px] items-center justify-center rounded-full bg-[var(--nm-accent)] px-7 py-3 text-base font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]"
+        >
+          רוצה להצטרף ל-NeverMind
+        </a>
+        <a
+          href="#tracks"
+          class="inline-flex min-h-[52px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-7 py-3 text-base font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]"
+        >
+          מה מתאים לי עכשיו
+        </a>
+      </div>
+
+      <div class="grid gap-4 text-right md:grid-cols-[minmax(0,1fr)_minmax(16rem,20rem)]">
+        <div class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/88 p-5 shadow-[0_14px_36px_color-mix(in_srgb,var(--nm-fg)_4%,transparent)]">
+          <p class="text-base font-semibold text-[var(--nm-fg)]">כדאי להתקין את NeverMind כאפליקציה</p>
+          <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
+            גישה מהירה, בלי לחפש בדפדפן, ובלי הסחות בדרך. אם הדפדפן שלך תומך בזה, הצעת התקנה תיפתח מיד.
           </p>
+          <button
+            type="button"
+            id="services-install-trigger"
+            class="mt-4 inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-5 py-2.5 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]"
+          >
+            התקנה
+          </button>
+        </div>
+
+        <div class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/88 p-5 shadow-[0_14px_36px_color-mix(in_srgb,var(--nm-fg)_4%,transparent)]">
+          <p class="text-base font-semibold text-[var(--nm-fg)]">מה מקבלים כאן כבר מהתחלה</p>
+          <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
+            עמוד ברור, מחירים גלויים, כפתורים פשוטים, ודרך המשך שלא לוחצת עליך. גם אם עוד לא בחרת, כבר אפשר להבין מה נכון לבדוק קודם.
+          </p>
+          <p class="mt-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_60%,var(--nm-bg))]">
+            הפרטים שלכם נשארים רק אצלנו. אנחנו לא עושים איתם שום דבר אחר.
+          </p>
+        </div>
+      </div>
+    </header>
+
+    <section id="tracks" class="scroll-mt-28 space-y-6" tabindex="-1">
+      <div class="text-right">
+        <p class="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--nm-accent)]">ארבעה מסלולים</p>
+        <h2 class="mt-2 text-[clamp(1.6rem,1.35rem+1vw,2.5rem)] font-semibold">לא צריך לבחור לפי ניחוש</h2>
+        <p class="mt-3 max-w-3xl text-base leading-8 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">
+          כל כרטיס כאן עונה על שלוש שאלות פשוטות: למי זה מתאים, מה מקבלים, ואיך ממשיכים מכאן בלי בלבול.
+        </p>
+      </div>
+
+      <div class="grid gap-5 lg:grid-cols-2 xl:grid-cols-4">
+        {
+          featuredServices.map((item) => (
+            <article
+              id={item.service.id}
+              class="flex h-full flex-col rounded-[1.7rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 p-5 shadow-[0_16px_44px_color-mix(in_srgb,var(--nm-fg)_5%,transparent)] transition hover:border-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)] hover:shadow-[0_20px_54px_color-mix(in_srgb,var(--nm-fg)_7%,transparent)]"
+            >
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <p class="text-xs font-semibold tracking-[0.16em] text-[var(--nm-accent)]">{item.kicker}</p>
+                <span class="rounded-full bg-[var(--nm-tint)] px-3 py-1 text-sm font-semibold text-[var(--nm-fg)]">{item.priceLead}</span>
+              </div>
+
+              <h3 class="mt-3 text-2xl font-semibold text-[var(--nm-fg)]">{item.title}</h3>
+              <p class="mt-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">{item.fit}</p>
+
+              <div class="mt-4 flex flex-wrap gap-2 text-sm">
+                {item.icons.map((line) => (
+                  <span class="rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-3 py-1.5 text-[var(--nm-fg)]">{line}</span>
+                ))}
+              </div>
+
+              <div class="mt-5 space-y-3">
+                <div>
+                  <p class="text-sm font-semibold text-[var(--nm-fg)]">מה מקבלים</p>
+                  <ul class="mt-2 space-y-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">
+                    {item.receive.map((line) => (
+                      <li class="flex gap-2"><span aria-hidden="true" class="text-[var(--nm-accent)]">•</span><span>{line}</span></li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div class="rounded-[1.15rem] bg-[var(--nm-surface-muted)] px-4 py-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+                  <p class="font-semibold text-[var(--nm-fg)]">למה לבחור במסלול הזה</p>
+                  <p class="mt-1">{item.trust}</p>
+                </div>
+
+                {item.availabilityLine ? (
+                  <p class="text-xs leading-6 text-[color-mix(in_srgb,var(--nm-fg)_55%,var(--nm-bg))]">{item.availabilityLine}</p>
+                ) : null}
+                {item.service.price_note ? (
+                  <p class="text-xs leading-6 text-[color-mix(in_srgb,var(--nm-fg)_55%,var(--nm-bg))]">{item.service.price_note}</p>
+                ) : null}
+              </div>
+
+              {item.service.id === "portal-access" ? (
+                <div class="mt-5 rounded-[1.15rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[color-mix(in_srgb,var(--nm-bg-canvas)_94%,white)] px-4 py-4">
+                  <p class="text-sm font-semibold text-[var(--nm-fg)]">מה נפתח רק למנויים</p>
+                  <ul class="mt-2 space-y-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">
+                    {membersOnlyItems.map((line) => (
+                      <li class="flex gap-2"><span aria-hidden="true" class="text-[var(--nm-accent)]">•</span><span>{line}</span></li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
+
+              <div class="mt-auto pt-5">
+                <div class="flex flex-col gap-2">
+                  <a
+                    href={item.primaryHref}
+                    class="inline-flex min-h-[46px] items-center justify-center rounded-full bg-[var(--nm-inverse)] px-5 py-2.5 text-sm font-semibold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-inverse-hover)]"
+                  >
+                    {item.primaryLabel}
+                  </a>
+                  <a
+                    href={item.reservationHref}
+                    target="_blank"
+                    rel="noreferrer"
+                    class="inline-flex min-h-[46px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-5 py-2.5 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]"
+                  >
+                    {item.actionLabel}
+                  </a>
+                </div>
+              </div>
+            </article>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="grid gap-5 lg:grid-cols-[minmax(0,1.2fr)_minmax(18rem,0.8fr)]">
+      <div class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 p-6 shadow-[0_16px_44px_color-mix(in_srgb,var(--nm-fg)_5%,transparent)]">
+        <p class="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--nm-accent)]">מנוי והטבות</p>
+        <h2 class="mt-2 text-[clamp(1.5rem,1.3rem+0.8vw,2.3rem)] font-semibold">מה נפתח אחרי ההצטרפות</h2>
+        <div class="mt-4 grid gap-4 md:grid-cols-2">
+          <div>
+            <p class="text-sm font-semibold text-[var(--nm-fg)]">מה מקבלים</p>
+            <ul class="mt-2 space-y-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">
+              <li>סרטונים מלאים בכל מאמר</li>
+              <li>תכנים שלא ניתן לפרסם בפומבי</li>
+              <li>גישה לקבוצה השקטה</li>
+              <li>עדכונים שוטפים בלי רעש</li>
+            </ul>
+          </div>
+          <div>
+            <p class="text-sm font-semibold text-[var(--nm-fg)]">אחרי ההצטרפות</p>
+            <ul class="mt-2 space-y-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">
+              <li>נפתח לך אזור אישי מסודר</li>
+              <li>אפשר לשמור מאמרים ולעקוב אחרי הלמידה</li>
+              <li>הגישה נשמרת במקום אחד, בלי לחפש כל פעם מחדש</li>
+              <li>נכנסים לשכבות עמוקות יותר של האתר</li>
+            </ul>
+          </div>
+        </div>
+        <div class="mt-5 rounded-[1.2rem] bg-[var(--nm-surface-muted)] px-4 py-4 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+          <p class="font-semibold text-[var(--nm-fg)]">הקבוצה השקטה</p>
+          <p class="mt-1">מקום נקי, בלי רעש, בלי דיונים ובלי ויכוחים. רק תכנים, מחשבות והעמקה.</p>
+        </div>
+      </div>
+
+      <div class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 p-6 shadow-[0_16px_44px_color-mix(in_srgb,var(--nm-fg)_5%,transparent)]">
+        <p class="text-sm font-semibold text-[var(--nm-fg)]">בקרוב בפרימיום</p>
+        <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
+          יש כאן עולם שלם שעוד לא כולו פתוח בחוץ. אלו רק התגיות שמחכות בפנים.
+        </p>
+        <div class="mt-4 flex flex-wrap gap-2">
+          {premiumFutureTags.map((tag) => (
+            <span class="rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-3 py-1.5 text-sm text-[var(--nm-fg)]">{tag}</span>
+          ))}
+        </div>
+        <a
+          href={joinClubHref}
+          class="mt-6 inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-5 py-2.5 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]"
+        >
+          הצטרפות שקטה
+        </a>
+      </div>
+    </section>
+
+    <section class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--nm-bg-canvas)_96%,white),color-mix(in_srgb,var(--nm-surface-muted)_76%,white))] px-6 py-8 text-center shadow-[0_16px_44px_color-mix(in_srgb,var(--nm-fg)_4%,transparent)]">
+      <p class="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--nm-accent)]">הצטרפות</p>
+      <h2 class="mt-2 text-[clamp(1.5rem,1.3rem+0.8vw,2.2rem)] font-semibold">רוצה להצטרף</h2>
+      <p class="mx-auto mt-3 max-w-2xl text-base leading-8 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">
+        גישה לכל הסרטונים, לתכנים המלאים, לקבוצה השקטה, ולעוד שכבות שלא מתאימות לעמוד פתוח רגיל.
+      </p>
+      <div class="mt-5 flex flex-wrap items-center justify-center gap-3">
+        <a
+          href={joinClubHref}
+          class="inline-flex min-h-[48px] items-center justify-center rounded-full bg-[var(--nm-accent)] px-6 py-3 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]"
+        >
+          בקשה להצטרף
+        </a>
+        <a
+          href={joinClubWaHref}
+          target="_blank"
+          rel="noreferrer"
+          class="inline-flex min-h-[48px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-6 py-3 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]"
+        >
+          בוא נדבר בוואטסאפ
+        </a>
+      </div>
+    </section>
+
+    <section class="grid gap-5 lg:grid-cols-4">
+      {trustCards.map((card) => (
+        <article class="rounded-[1.5rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/88 p-5 shadow-[0_12px_34px_color-mix(in_srgb,var(--nm-fg)_4%,transparent)]">
+          <h2 class="text-lg font-semibold text-[var(--nm-fg)]">{card.title}</h2>
+          <p class="mt-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">{card.body}</p>
+        </article>
+      ))}
+    </section>
+
+    <section class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,22rem)] lg:items-start">
+      <div class="space-y-6 rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 p-6 shadow-[0_16px_44px_color-mix(in_srgb,var(--nm-fg)_5%,transparent)]">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--nm-accent)]">לא בטוח מה מתאים</p>
+          <h2 class="mt-2 text-[clamp(1.5rem,1.3rem+0.9vw,2.2rem)] font-semibold">אפשר להתחיל מגילוי שקט</h2>
+          <p class="mt-3 max-w-2xl text-base leading-8 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">
+            אם עוד לא ברור אם נכון לדבר, להעמיק, או להצטרף לארכיון, אפשר להתחיל מחיפוש פשוט ולראות אם כבר יש תשובה פתוחה באתר.
+          </p>
+        </div>
+
+        <div class="space-y-3">
+          <p class="text-base font-semibold text-[var(--nm-fg)]">יש משהו שמעסיק אותך עכשיו</p>
           <ArchiveSearchFloatingInput
             client:load
             id="discovery-search"
@@ -65,152 +448,145 @@ const waNumber = String(appConfig.contact.whatsAppNumber ?? "").replace(/\D/g, "
             className="shadow-[0_20px_50px_color-mix(in_srgb,var(--nm-fg)_5%,transparent)]"
           />
         </div>
-        <div
-          id="discovery-idle"
-          class="rounded-3xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[color-mix(in_srgb,var(--nm-bg-canvas)_94%,transparent)] px-5 py-6 text-right lg:px-6 lg:py-7"
-        >
-          <p class="text-base font-semibold text-[var(--nm-fg)]">בחר נושא וקבל כיוון</p>
-          <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
-            כאן יופיעו תוצאות מהארכיון. אפשר להתחיל מהחיפוש למעלה או ללחוץ על אחת התגיות למטה.
-          </p>
-        </div>
-      </div>
 
-      <div class="flex flex-wrap items-center justify-center gap-2">
-        <span class="w-full text-center text-sm text-[color-mix(in_srgb,var(--nm-fg)_45%,var(--nm-bg))] sm:w-auto">נושאים מהגלוסר:</span>
-        {
-          popularTags.map(({ label, searchQuery }) => (
+        <div class="flex flex-wrap items-center justify-start gap-2 text-sm">
+          {popularTags.map(({ label, searchQuery }) => (
             <button
               type="button"
               data-discovery-tag={searchQuery}
-              class="rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[color-mix(in_srgb,var(--nm-bg-canvas)_90%,transparent)] px-3 py-1.5 text-sm font-semibold text-[var(--nm-accent)] transition hover:border-[color-mix(in_srgb,var(--nm-accent)_24%,transparent)] hover:bg-[var(--nm-surface-muted)]"
+              class="rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[color-mix(in_srgb,var(--nm-bg-canvas)_90%,transparent)] px-3 py-1.5 font-semibold text-[var(--nm-accent)] transition hover:border-[color-mix(in_srgb,var(--nm-accent)_24%,transparent)] hover:bg-[var(--nm-surface-muted)]"
             >
               {label}
             </button>
-          ))
-        }
-      </div>
-    </header>
-
-    <div id="discovery-results" class="grid grid-cols-1 gap-12 lg:grid-cols-2">
-      <div class="space-y-6">
-        <div class="border-b border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] pb-3">
-          <h2 class="text-xs font-bold uppercase tracking-[0.2em] text-[color-mix(in_srgb,var(--nm-fg)_45%,var(--nm-bg))]">
-            מהארכיון
-          </h2>
+          ))}
         </div>
-        <p id="discovery-archive-status" class="hidden text-sm text-[color-mix(in_srgb,var(--nm-fg)_55%,var(--nm-bg))]"></p>
-        <div id="discovery-archive-list" class="space-y-3"></div>
-      </div>
-      <div
-        id="discovery-gap"
-        class="hidden rounded-3xl border-2 border-dashed border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-[color-mix(in_srgb,var(--nm-bg-canvas)_96%,transparent)] px-6 py-10 text-center"
-      >
-        <p id="discovery-gap-text" class="text-lg leading-8 text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))]"></p>
-        <a
-          id="discovery-gap-wa"
-          href={`https://wa.me/${waNumber}`}
-          class="mt-8 inline-flex min-h-[48px] items-center justify-center gap-2 rounded-full bg-[var(--nm-inverse)] px-8 py-3 text-sm font-semibold text-white transition hover:bg-[var(--nm-inverse-hover)]"
-        >
-          נדבר על זה בוואטסאפ
-        </a>
-    </div>
-  </div>
 
-    <div class="mx-auto max-w-3xl">
+        <div id="discovery-results" class="grid grid-cols-1 gap-8 lg:grid-cols-2">
+          <div class="space-y-5">
+            <div class="border-b border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] pb-3">
+              <h3 class="text-xs font-bold uppercase tracking-[0.2em] text-[color-mix(in_srgb,var(--nm-fg)_45%,var(--nm-bg))]">מהארכיון</h3>
+            </div>
+            <p id="discovery-archive-status" class="hidden text-sm text-[color-mix(in_srgb,var(--nm-fg)_55%,var(--nm-bg))]"></p>
+            <div id="discovery-archive-list" class="space-y-3"></div>
+          </div>
+          <div
+            id="discovery-gap"
+            class="hidden rounded-3xl border-2 border-dashed border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-[color-mix(in_srgb,var(--nm-bg-canvas)_96%,transparent)] px-6 py-10 text-center"
+          >
+            <p id="discovery-gap-text" class="text-lg leading-8 text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))]"></p>
+            <a
+              id="discovery-gap-wa"
+              href={`https://wa.me/${waNumber}`}
+              class="mt-8 inline-flex min-h-[48px] items-center justify-center gap-2 rounded-full bg-[var(--nm-inverse)] px-8 py-3 text-sm font-semibold text-white transition hover:bg-[var(--nm-inverse-hover)]"
+            >
+              בוא נדבר על זה בוואטסאפ
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="space-y-5">
+        <div
+          id="discovery-idle"
+          class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 px-5 py-6 text-right shadow-[0_12px_34px_color-mix(in_srgb,var(--nm-fg)_4%,transparent)]"
+        >
+          <p class="text-base font-semibold text-[var(--nm-fg)]">לא חייבים לבחור מיד</p>
+          <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
+            אפשר להתחיל ממאמר פתוח, משאלה בוואטסאפ, או מטופס קצר. העיקר לא להישאר לבד עם הניחוש.
+          </p>
+        </div>
+
+        <div class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 p-5 shadow-[0_12px_34px_color-mix(in_srgb,var(--nm-fg)_4%,transparent)]">
+          <p class="text-sm font-semibold text-[var(--nm-fg)]">טעימה מהתוכן</p>
+          <div class="mt-4 space-y-3">
+            {archivePreviewItems.map((item) => (
+              <a href={item.href} class="block rounded-[1.1rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] px-4 py-3 transition hover:border-[color-mix(in_srgb,var(--nm-accent)_20%,transparent)] hover:bg-[var(--nm-surface-muted)]">
+                <p class="text-sm font-semibold text-[var(--nm-fg)]">{item.title}</p>
+                <p class="mt-1 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_66%,var(--nm-bg))]">{item.body}</p>
+                <p class="mt-2 text-xs font-semibold text-[var(--nm-accent)]">המשך קריאה למנויים</p>
+              </a>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="mx-auto max-w-4xl space-y-5">
+      <div class="rounded-[1.7rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 p-6 text-right shadow-[0_16px_44px_color-mix(in_srgb,var(--nm-fg)_5%,transparent)]">
+        <p class="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--nm-accent)]">כבר יש לך גישה</p>
+        <h2 class="mt-2 text-[clamp(1.5rem,1.3rem+0.8vw,2.1rem)] font-semibold">כניסה לחברים</h2>
+        <p class="mt-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">
+          אם הסיסמה שלך כבר פעילה, אפשר להיכנס כאן בלי לחפש עמוד אחר. אם היא עוד לא פעילה, העמוד הזה עדיין עוזר להבין מה נפתח ומה מתאים לך עכשיו.
+        </p>
+      </div>
       <PremiumClubGate />
     </div>
 
-    <div id="pricing" class="scroll-mt-28 space-y-6" tabindex="-1">
-      <div class="border-b border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] pb-3">
-        <h2 class="text-xs font-bold uppercase tracking-[0.2em] text-[var(--nm-accent)]">
-          רוצה לפרק את זה יחד?
-        </h2>
-        <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
-          אלו הדרכים שבהן אנחנו יכולים לשבת על זה.
+    <section id="pricing" class="scroll-mt-28 space-y-6" tabindex="-1">
+      <div class="border-b border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] pb-3 text-right">
+        <h2 class="text-xs font-bold uppercase tracking-[0.2em] text-[var(--nm-accent)]">בחירה לפי מחיר ומסלול</h2>
+        <p class="mt-2 max-w-3xl text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
+          כאן רואים את המחיר המדויק של כל בחירה. אם יש הרחבה, המחיר, הכפתור והודעת הוואטסאפ מתעדכנים מאותו מקור נתונים.
         </p>
       </div>
       <div class="grid gap-4">
         {
-          services.map((service) => {
-            const action = resolveServiceAction(service);
-            const note = service.friendly_note?.trim() || service.subtitle || "";
-            const hasExt = Array.isArray(service.extensions) && service.extensions.length > 0;
-            const serviceJson = JSON.stringify(service);
-            return (
-              <div
-                id={service.id}
-                data-nm-service-card
-                class="group rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-6 shadow-[0_12px_32px_color-mix(in_srgb,var(--nm-fg)_4%,transparent)] transition hover:border-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)]"
-              >
-                <div class="flex flex-wrap items-start justify-between gap-3">
-                  <h3 class="text-lg font-semibold text-[var(--nm-fg)]">{service.title}</h3>
-                  {hasExt ? null : (
-                    <span class="text-sm font-semibold text-[color-mix(in_srgb,var(--nm-fg)_55%,var(--nm-bg))]">
-                      {formatMoney(service.price_full)}
-                    </span>
-                  )}
+          featuredServices.map((item) => (
+            <div
+              id={`${item.service.id}-pricing`}
+              data-nm-service-card
+              class="group rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-6 shadow-[0_12px_32px_color-mix(in_srgb,var(--nm-fg)_4%,transparent)] transition hover:border-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)]"
+            >
+              <div class="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <h3 class="text-lg font-semibold text-[var(--nm-fg)]">{item.title}</h3>
+                  <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">{item.fit}</p>
                 </div>
-                {note ? (
-                  <p class="mt-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">{note}</p>
-                ) : null}
-                {hasExt ? (
-                  <div class="mt-5">
-                    <ServicePricingBlock client:visible serviceJson={serviceJson} layout="compact" />
-                  </div>
-                ) : (
-                  <div class="mt-5 flex flex-wrap items-center justify-end gap-2">
-                    <a
-                      href={action.href}
-                      {...(action.external ? { target: "_blank", rel: "noreferrer" } : {})}
-                      class="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full bg-[var(--nm-accent)] px-4 py-2 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]"
-                    >
-                      {action.label}
-                    </a>
-                    <a
-                      href={buildServiceReservationWhatsAppHref(service)}
-                      target="_blank"
-                      rel="noreferrer"
-                      class="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-4 py-2 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-tint)]"
-                    >
-                      שיריון מקום
-                    </a>
-                  </div>
-                )}
+                <span class="text-sm font-semibold text-[color-mix(in_srgb,var(--nm-fg)_55%,var(--nm-bg))]">{item.priceLead}</span>
               </div>
-            );
-          })
+              {item.hasExtensions ? (
+                <div class="mt-5">
+                  <ServicePricingBlock client:visible serviceJson={JSON.stringify(item.service)} layout="compact" />
+                </div>
+              ) : (
+                <div class="mt-5 flex flex-wrap items-center justify-end gap-2">
+                  <a
+                    href={item.primaryHref}
+                    class="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full bg-[var(--nm-accent)] px-4 py-2 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]"
+                  >
+                    {item.primaryLabel}
+                  </a>
+                  <a
+                    href={item.reservationHref}
+                    target="_blank"
+                    rel="noreferrer"
+                    class="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-4 py-2 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-tint)]"
+                  >
+                    {item.actionLabel}
+                  </a>
+                </div>
+              )}
+            </div>
+          ))
         }
       </div>
-      <div class="rounded-[1.5rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-6 text-right">
-        <p class="text-sm font-semibold text-[var(--nm-fg)]">ממשיכים בלי סינון אוטומטי</p>
-        <p class="mt-2 text-sm leading-[var(--line-height-ui)] text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
-          בוחרים טופס התאמה, עמוד קביעה, או יצירת קשר ישירה.
-        </p>
-        <div class="mt-4 flex flex-wrap gap-2">
-          <a
-            href="/intake/"
-            class="inline-flex min-h-[44px] items-center justify-center rounded-full bg-[var(--nm-inverse)] px-5 py-2.5 text-sm font-semibold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-inverse-hover)]"
-          >
-            טופס לפני שיחה
-          </a>
-          <a
-            href="/book/"
-            class="inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-5 py-2.5 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]"
-          >
-            קביעת שיחה
-          </a>
-          <a
-            href="/contact/"
-            class="inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-5 py-2.5 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]"
-          >
-            יצירת קשר
-          </a>
-        </div>
-      </div>
-    </div>
+    </section>
   </section>
 
+    <section class="space-y-5 rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 p-6 shadow-[0_16px_44px_color-mix(in_srgb,var(--nm-fg)_5%,transparent)]">
+      <div class="text-right">
+        <p class="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--nm-accent)]">שאלות נפוצות</p>
+        <h2 class="mt-2 text-[clamp(1.5rem,1.3rem+0.8vw,2.1rem)] font-semibold">שאלות נפוצות לפני קביעת שיחה או הצטרפות</h2>
+      </div>
+      <div class="grid gap-3">
+        {faqItems.map((item) => (
+          <details class="rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] px-4 py-4 text-right">
+            <summary class="cursor-pointer list-none text-sm font-semibold text-[var(--nm-fg)] marker:hidden">{item.question}</summary>
+            <p class="mt-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">{item.answer}</p>
+          </details>
+        ))}
+      </div>
+    </section>
   <div class="mx-auto flex max-w-7xl justify-end px-4 pb-16" aria-label="פתיחת שיחה אחרי קריאה">
     <DirectLink
       client:idle
@@ -219,23 +595,6 @@ const waNumber = String(appConfig.contact.whatsAppNumber ?? "").replace(/\D/g, "
     />
   </div>
 
-  <section
-    class="mx-auto max-w-7xl border-t border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] px-4 pb-24 text-[var(--nm-fg)]"
-    aria-labelledby="services-next-step"
-  >
-    <h2 id="services-next-step" class="text-sm font-semibold uppercase tracking-[0.2em] text-[var(--nm-accent)]">
-      צעד הבא
-    </h2>
-    <p class="mt-4 max-w-3xl text-right text-[clamp(1.05rem,0.98rem+0.35vw,1.2rem)] font-medium leading-relaxed">
-      אחרי שמצאת נושא או מסלול: <a href="/intake/" class="text-[var(--nm-accent)] underline-offset-4 hover:underline">טופס לפני שיחה</a>
-      <span class="text-[color-mix(in_srgb,var(--nm-fg)_35%,var(--nm-bg))]"> · </span>
-      <a href="/book/" class="text-[var(--nm-accent)] underline-offset-4 hover:underline">קביעת שיחה</a>
-    </p>
-    <p class="mt-6 max-w-3xl text-right text-base leading-8 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
-      איזה חוסר התאמה בין עובדה לפירוש תרצה לבדוק קודם.
-    </p>
-  </section>
-
   <div
     id="services-discovery-config"
     data-content-gap-message={servicesContentGapMessage}
@@ -243,9 +602,21 @@ const waNumber = String(appConfig.contact.whatsAppNumber ?? "").replace(/\D/g, "
     hidden
   ></div>
 
+  <script is:inline>
+    document.addEventListener("astro:page-load", () => {
+      const trigger = document.getElementById("services-install-trigger");
+      if (!(trigger instanceof HTMLButtonElement)) return;
+      trigger.onclick = () => {
+        const hiddenAction = document.getElementById("nm-pwa-install-action");
+        if (hiddenAction instanceof HTMLButtonElement) {
+          hiddenAction.click();
+        }
+      };
+    });
+  </script>
+
   <script>
     import "../scripts/services-ui.js";
   </script>
 </Layout>
-
 

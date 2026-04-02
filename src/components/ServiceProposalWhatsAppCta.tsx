@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+﻿import { useMemo, useState } from "react";
 import type { FlatService, ServiceExtension } from "../lib/services";
 import { buildServiceProposalWhatsAppHref } from "../lib/services";
 
@@ -43,14 +43,14 @@ export default function ServiceProposalWhatsAppCta({ serviceJson, selectedExtens
   return (
     <div className="flex w-full min-w-0 flex-col gap-2 sm:max-w-md" dir="rtl">
       <label className="block text-right text-xs font-medium text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">
-        רוצים לציין במה להתמקד? (רשות)
+        רוצה לכתוב במה נכון להתמקד
         <textarea
           value={focus}
           onChange={(e) => setFocus(e.target.value)}
           rows={2}
           maxLength={800}
           className="mt-1 w-full resize-y rounded-xl border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-white/90 px-3 py-2 text-sm text-[var(--nm-fg)] placeholder:text-[color-mix(in_srgb,var(--nm-fg)_40%,var(--nm-bg))]"
-          placeholder="משפט או שניים. אפשר להשאיר ריק."
+          placeholder="משפט קצר יעזור לנו להתחיל מהמקום הנכון"
         />
       </label>
       <a
@@ -60,7 +60,7 @@ export default function ServiceProposalWhatsAppCta({ serviceJson, selectedExtens
         className={`${waProposalButtonClass} w-full shrink-0 self-stretch sm:w-auto sm:self-start`}
       >
         <WhatsAppGlyph className="size-[1.15rem] shrink-0" />
-        בואו נבדוק בוואטסאפ
+        בוא נדבר בוואטסאפ
       </a>
     </div>
   );

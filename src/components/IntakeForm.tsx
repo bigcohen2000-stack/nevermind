@@ -416,7 +416,7 @@ export default function IntakeForm() {
       fd.append("h-captcha-response", hcaptchaToken.trim());
     }
     try {
-      const res = await fetch("https://api.web3forms.com/submit", {
+      const res = await fetch("/api/forms/submit", {
         method: "POST",
         headers: { Accept: "application/json" },
         body: fd,

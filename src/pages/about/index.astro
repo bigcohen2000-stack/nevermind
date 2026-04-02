@@ -1,39 +1,250 @@
----
+﻿---
+import { getCollection } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
 import VideoPlayer from "../../components/VideoPlayer.astro";
 import {
   aboutExtraMethodFaq,
   aboutMethodFaq,
-  aboutPageFaqForSchema,
   aboutPracticalFaq,
 } from "../../data/about-method-faq";
 import {
   masterPhilosophyClosingQuestion,
   masterPhilosophyMetaDescription,
   masterPhilosophyParagraphs,
-  masterPhilosophySectionLabel,
 } from "../../data/master-philosophy";
+
+const joinHref = "/premium-access/";
+const quietJoinHref = "/premium-access/";
+
+const articleEntries = await getCollection("articles", ({ data }) => !data.draft);
+const previewArticles = [...articleEntries]
+  .sort((a, b) => {
+    const aTime = Date.parse((a.data.updatedDate ?? a.data.pubDate).toISOString());
+    const bTime = Date.parse((b.data.updatedDate ?? b.data.pubDate).toISOString());
+    return bTime - aTime;
+  })
+  .slice(0, 4)
+  .map((entry) => ({
+    slug: entry.slug,
+    title: entry.data.title,
+    excerpt: String(entry.data.description || "").trim(),
+  }));
+
+const joinBenefits = [
+  "סרטונים מלאים בכל מאמר",
+  "תכנים שלא ניתן לפרסם בפומבי",
+  "גישה לקבוצה השקטה",
+  "אפשרויות נוספות באתר",
+  "תכנים חדשים שנפתחים רק למנויים",
+  "עדכונים שוטפים בלי רעש",
+];
+
+const afterJoinSteps = [
+  "נפתח לך דשבורד אישי",
+  "אתה מקבל גישה לכל התכנים",
+  "אתה יכול לשמור מאמרים",
+  "אתה מקבל עדכונים שקטים",
+  "אתה נכנס לקבוצה השקטה",
+];
+
+const fitList = [
+  "למי שמרגיש שיש רעש פנימי",
+  "למי שמחפש בהירות",
+  "למי שרוצה להבין מה מפעיל אותו",
+  "למי שלא מחפש טיפול, אלא בדיקה אמיתית",
+];
+
+const notHereList = [
+  "לא טיפול",
+  "לא הרגעה",
+  "לא מוטיבציה",
+  "לא פתרונות מהירים",
+];
+
+const premiumTags = [
+  "אלוהים",
+  "דת",
+  "הכל אחד",
+  "אילומינטי",
+  "מיניות",
+  "הדרכת הורים",
+  "פחדים עמוקים",
+  "זהות",
+  "משמעות",
+];
+
+const preJoinFaq = [
+  {
+    question: "האם זה אנונימי",
+    answer: "כן. אפשר לקרוא, לבדוק, ולהצטרף בלי להיחשף מעבר למה שנדרש לפתיחת הגישה.",
+  },
+  {
+    question: "האם יש התחייבות",
+    answer: "לא. רואים מה מתאים לך ורק אז מחליטים אם להמשיך.",
+  },
+  {
+    question: "האם אפשר לבטל",
+    answer: "כן. אין כאן מלכודות ואין צעדים נסתרים.",
+  },
+  {
+    question: "האם צריך רקע קודם",
+    answer: "לא. נכנסים כמו שאתה ומתחילים ממה שיש עכשיו.",
+  },
+  {
+    question: "האם זה מתאים לכל גיל",
+    answer: "זה מתאים למי שמוכן לבדיקה שקטה ורוצה להסתכל פנימה בכנות.",
+  },
+];
+
+const faqForPage = [
+  ...preJoinFaq,
+  ...aboutMethodFaq,
+  ...aboutExtraMethodFaq,
+  ...aboutPracticalFaq,
+];
 ---
 
 <Layout
   title="מה זה NeverMind"
   description={masterPhilosophyMetaDescription}
-  faqItems={aboutPageFaqForSchema}
+  faqItems={faqForPage}
 >
   <div class="mx-auto max-w-6xl space-y-16 px-4 py-14 text-right text-[var(--nm-fg)] md:space-y-20">
-    <header class="space-y-5">
-      <p class="text-sm font-semibold text-[var(--nm-accent)]">מה זה NeverMind</p>
-      <h1 class="text-[clamp(2.1rem,1.6rem+2vw,3.5rem)] font-semibold leading-[1.15]">לא עוד תשובה מהירה. בדיקה של מה שמפעיל את השאלה.</h1>
+    <header class="about-hero-fade rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] bg-[var(--nm-bg-canvas)] px-6 py-20 text-center shadow-[0_20px_60px_rgba(26,26,26,0.04)] md:px-10 md:py-24">
+      <div class="mx-auto max-w-4xl space-y-5">
+        <p class="text-sm font-semibold tracking-[0.12em] text-[var(--nm-accent)]">מה זה NeverMind</p>
+        <h1 aria-label="NeverMind שיטה שמפרידה בין עובדה פירוש ותגובה" class="text-[clamp(3rem,2.2rem+3vw,4rem)] font-[350] leading-[1.08] tracking-[-0.04em] text-[#1A1A1A]">
+          NeverMind – דרך פשוטה שמפרידה בין עובדה, פירוש ותגובה, כדי שתראה את השקט שכבר יש בך.
+          <span class="sr-only">שיטה</span>
+        </h1>
+        <p class="mx-auto max-w-3xl text-[clamp(1rem,0.96rem+0.3vw,1.18rem)] leading-8 text-[color-mix(in_srgb,var(--nm-fg)_74%,var(--nm-bg))]">
+          מה הדבר שהכי קשה לך להפריד כרגע – העובדה, הפירוש או התגובה שלך?
+        </p>
+      </div>
     </header>
 
-    <section
-      class="space-y-4 rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-6 lg:p-8"
-      aria-labelledby="master-philosophy-heading"
-    >
-      <h2 id="master-philosophy-heading" class="text-sm font-semibold text-[var(--nm-accent)]">
-        {masterPhilosophySectionLabel}
+    <section class="rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 px-6 py-8 text-center shadow-[0_20px_60px_rgba(26,26,26,0.05)] md:px-10">
+      <div class="mx-auto max-w-3xl space-y-5">
+        <h2 class="text-[clamp(1.8rem,1.45rem+1vw,2.6rem)] font-semibold tracking-[-0.03em]">רוצה להצטרף</h2>
+        <p class="text-base leading-8 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+          גישה לכל הסרטונים, התכנים המלאים, והקבוצה השקטה.
+        </p>
+        <div class="flex flex-wrap items-center justify-center gap-3 pt-2">
+          <a href={joinHref} class="inline-flex min-h-[52px] items-center justify-center rounded-full bg-[var(--nm-inverse)] px-8 py-3 text-base font-semibold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-inverse-hover)]">
+            בקשה להצטרף
+          </a>
+          <a href={quietJoinHref} class="inline-flex min-h-[52px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_14%,transparent)] px-6 py-3 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]">
+            הצטרפות שקטה
+          </a>
+        </div>
+        <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_62%,var(--nm-bg))]">
+          אין הפתעות. אין מניפולציות. אין שיווק אגרסיבי. רק תוכן אמיתי.
+        </p>
+      </div>
+    </section>
+
+    <section class="grid gap-6 lg:grid-cols-[minmax(0,1.08fr)_minmax(0,0.92fr)]">
+      <article class="rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-6 lg:p-8">
+        <div class="space-y-4">
+          <p class="text-sm font-semibold text-[var(--nm-accent)]">מה נפתח אחרי הצטרפות</p>
+          <h2 class="text-[clamp(1.55rem,1.35rem+0.7vw,2.05rem)] font-semibold">מה מחכה לך בפנים</h2>
+          <p class="max-w-3xl text-base leading-8 text-[color-mix(in_srgb,var(--nm-fg)_74%,var(--nm-bg))]">
+            זה לא רעיון כללי. זה מרחב מסודר שנפתח צעד אחרי צעד, בלי רעש ובלי עומס.
+          </p>
+        </div>
+        <div class="mt-5 grid gap-3 sm:grid-cols-2">
+          {joinBenefits.map((item) => (
+            <div class="rounded-[1.35rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 px-4 py-4 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_76%,var(--nm-bg))]">
+              {item}
+            </div>
+          ))}
+        </div>
+      </article>
+
+      <article class="rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 p-6 shadow-[0_20px_60px_rgba(26,26,26,0.05)] lg:p-8">
+        <div class="space-y-4">
+          <p class="text-sm font-semibold text-[var(--nm-accent)]">כדאי להתקין את האפליקציה</p>
+          <h2 class="text-[clamp(1.45rem,1.3rem+0.6vw,1.95rem)] font-semibold">גישה מהירה, בלי דפדפן, בלי הסחות</h2>
+          <p class="text-base leading-8 text-[color-mix(in_srgb,var(--nm-fg)_74%,var(--nm-bg))]">
+            זה עובד כמו אפליקציה רגילה. נכנסים מהר, חוזרים בדיוק לאיפה שהיית, ונשארים קרובים לתוכן.
+          </p>
+          <div class="flex flex-wrap justify-end gap-3 pt-1">
+            <button id="about-install-app" type="button" class="inline-flex min-h-[48px] items-center justify-center rounded-full bg-[var(--nm-inverse)] px-6 py-3 text-sm font-semibold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-inverse-hover)]">
+              התקנה
+            </button>
+            <a href="/me/" class="inline-flex min-h-[48px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_14%,transparent)] px-5 py-3 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]">
+              מעבר לאזור האישי
+            </a>
+          </div>
+          <p id="about-install-help" class="min-h-[1.75rem] text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_62%,var(--nm-bg))]" aria-live="polite"></p>
+        </div>
+      </article>
+    </section>
+
+    <section class="grid gap-6 lg:grid-cols-2">
+      <article class="rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 p-6 shadow-[0_20px_60px_rgba(26,26,26,0.05)] lg:p-8">
+        <p class="text-sm font-semibold text-[var(--nm-accent)]">בכל מאמר יש סרטון</p>
+        <h2 class="mt-3 text-[clamp(1.45rem,1.3rem+0.6vw,1.95rem)] font-semibold">הסבר קצר, מדויק, שרואים בו את הדברים בזמן אמת</h2>
+        <p class="mt-3 text-base leading-8 text-[color-mix(in_srgb,var(--nm-fg)_74%,var(--nm-bg))]">
+          לא רק לקרוא. גם לראות, לשמוע, ולעקוב אחרי הדרך שבה הדברים נפתחים בפועל.
+        </p>
+      </article>
+
+      <article class="rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-6 lg:p-8">
+        <p class="text-sm font-semibold text-[var(--nm-accent)]">יש תכנים שלא יכולים להיות פומביים</p>
+        <h2 class="mt-3 text-[clamp(1.45rem,1.3rem+0.6vw,1.95rem)] font-semibold">נושאים רגישים, עמוקים, או כאלה שלא מתאימים לרשת פתוחה</h2>
+        <p class="mt-3 text-base leading-8 text-[color-mix(in_srgb,var(--nm-fg)_74%,var(--nm-bg))]">
+          הם זמינים רק למנויים. לא כי צריך לעשות מזה סוד, אלא כי לא כל דבר שייך למרחב פתוח ורועש.
+        </p>
+      </article>
+    </section>
+
+    <section class="rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-6 lg:p-8">
+      <div class="space-y-4">
+        <p class="text-sm font-semibold text-[var(--nm-accent)]">בקרוב בפרימיום</p>
+        <h2 class="text-[clamp(1.5rem,1.35rem+0.7vw,2rem)] font-semibold">יש כאן עולם שלם שנפתח בהדרגה</h2>
+        <p class="max-w-3xl text-base leading-8 text-[color-mix(in_srgb,var(--nm-fg)_74%,var(--nm-bg))]">
+          כאן רואים רק את הכיוון. בפנים נפתחים נושאים שלא מתאימים להצגה מלאה בחוץ.
+        </p>
+      </div>
+      <div class="mt-5 flex flex-wrap justify-end gap-3">
+        {premiumTags.map((tag) => (
+          <span class="inline-flex items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-white/90 px-4 py-2 text-sm font-medium text-[var(--nm-fg)]">
+            {tag}
+          </span>
+        ))}
+      </div>
+    </section>
+
+    <section class="grid gap-6 rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 p-6 shadow-[0_20px_60px_rgba(26,26,26,0.05)] lg:grid-cols-[minmax(0,1fr)_minmax(0,0.95fr)] lg:p-8">
+      <div class="space-y-4">
+        <p class="text-sm font-semibold text-[var(--nm-accent)]">הקבוצה השקטה</p>
+        <h2 class="text-[clamp(1.5rem,1.35rem+0.7vw,2rem)] font-semibold">מקום נקי, בלי רעש, בלי דיונים, בלי ויכוחים</h2>
+        <p class="text-base leading-8 text-[color-mix(in_srgb,var(--nm-fg)_74%,var(--nm-bg))]">
+          רק תכנים, מחשבות, והעמקה. מקום שמאפשר להישאר קרוב בלי להיבלע בעודף דעות.
+        </p>
+        <p class="text-base leading-8 text-[color-mix(in_srgb,var(--nm-fg)_74%,var(--nm-bg))]">
+          יש כאן גם סיבה פשוטה למה יש מנוי: כדי לאפשר יצירה שקטה, עצמאית, בלי פרסומות, בלי רעש, ובלי תלות בגופים חיצוניים.
+        </p>
+      </div>
+      <div class="rounded-[1.5rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-5">
+        <p class="text-sm font-semibold text-[var(--nm-accent)]">אחרי ההצטרפות</p>
+        <ol class="mt-4 space-y-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))]">
+          {afterJoinSteps.map((step, index) => (
+            <li class="flex items-start justify-end gap-3">
+              <span class="min-w-0 flex-1">{step}</span>
+              <span class="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--nm-accent)_10%,white)] text-xs font-semibold text-[var(--nm-accent)]">{index + 1}</span>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </section>
+
+    <section class="space-y-4 rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-6 lg:p-8" aria-labelledby="about-story-heading">
+      <h2 id="about-story-heading" class="text-sm font-semibold text-[var(--nm-accent)]">
+        מה קורה בפנים כשבודקים באמת
       </h2>
-      <div class="max-w-3xl space-y-4 text-base leading-[1.6] text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))]">
+      <div class="max-w-3xl space-y-4 text-base leading-8 text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))]">
         {masterPhilosophyParagraphs.map((para) => (
           <p>{para}</p>
         ))}
@@ -43,32 +254,29 @@ import {
 
     <section class="grid gap-6 rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 p-6 shadow-[0_20px_60px_rgba(26,26,26,0.05)] lg:grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)] lg:p-8">
       <div class="space-y-4">
-        <p class="text-sm font-semibold text-[var(--nm-accent)]">המנגנון</p>
-        <h2 class="text-[clamp(1.5rem,1.3rem+0.8vw,2rem)] font-semibold">מה האתר הזה עושה בפועל</h2>
-        <p class="text-[clamp(1rem,0.96rem+0.2vw,1.1rem)] leading-[1.6] text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))]">
-          הוא לא מנסה להרגיע כל רגש בנפרד. הוא בודק איך מחשבה אחת מייצרת את השרשרת: הנחה, תגובה, סימפטום.
-        </p>
-        <p class="text-[clamp(1rem,0.96rem+0.2vw,1.1rem)] leading-[1.6] text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))]">
-          כשהשרשרת נראית, קל יותר להבין מה שייך למציאות. קל יותר לראות מה נוסף מתוך פחד, הרגל, או דימוי עצמי.
+        <p class="text-sm font-semibold text-[var(--nm-accent)]">איך זה נראה בפועל</p>
+        <h2 class="text-[clamp(1.5rem,1.3rem+0.8vw,2rem)] font-semibold">שלושה חלקים פשוטים: עובדה, פירוש, תגובה</h2>
+        <p class="text-[clamp(1rem,0.96rem+0.2vw,1.1rem)] leading-8 text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))]">
+          מה קרה באמת, מה סיפרת לעצמך על זה, ואיך זה הזיז אותך מבפנים. כשמפרידים ביניהם, נהיה קל יותר לראות מה אמיתי ומה רק הרגל ישן.
         </p>
       </div>
 
       <div class="grid gap-3">
         <article class="rounded-[1.4rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-4">
           <h3 class="text-lg font-semibold">עובדה</h3>
-          <p class="mt-2 text-sm leading-[1.6] text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">מה קרה, בלי תוספת של משמעות.</p>
+          <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">מה קרה, בלי תוספת של משמעויות.</p>
         </article>
         <article class="rounded-[1.4rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-4">
           <h3 class="text-lg font-semibold">פירוש</h3>
-          <p class="mt-2 text-sm leading-[1.6] text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">מה המוח אומר שזה אומר עליך, על אחרים, או על העתיד.</p>
+          <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">מה אמרת לעצמך שזה אומר עליך, על אחרים, או על העתיד.</p>
         </article>
         <article class="rounded-[1.4rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-4">
-          <h3 class="text-lg font-semibold">פעולה</h3>
-          <p class="mt-2 text-sm leading-[1.6] text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">מה נשאר לעשות אחרי שהפירוש נבדק.</p>
+          <h3 class="text-lg font-semibold">תגובה</h3>
+          <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">מה הגוף והלב עשו אחרי שהפירוש נתפס כאמת.</p>
         </article>
       </div>
-      <p class="col-span-full text-[clamp(1rem,0.96rem+0.2vw,1.1rem)] leading-[1.6] text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))] lg:col-span-2">
-        איזה מהשלושה הכי קשה לך למלא בלי להוסיף מעבר לעובדה?
+      <p class="col-span-full text-[clamp(1rem,0.96rem+0.2vw,1.1rem)] leading-8 text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))] lg:col-span-2">
+        מה מבין השלושה הכי קשה לך לראות כרגע בלי להתערבב בו?
       </p>
     </section>
 
@@ -77,7 +285,7 @@ import {
         <figure class="mx-auto w-full max-w-sm overflow-hidden rounded-[1.5rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] shadow-[0_18px_48px_rgba(26,26,26,0.07)] lg:mx-0">
           <img
             src="/uploads/nevermind-yakir.webp"
-            alt="הקו שמחזיק את NeverMind"
+            alt="האדם שמוביל את NeverMind"
             width={640}
             height={800}
             class="aspect-[4/5] w-full object-cover"
@@ -88,36 +296,99 @@ import {
         <div class="space-y-4">
           <p class="text-sm font-semibold text-[var(--nm-accent)]">מאחורי האתר</p>
           <h2 class="text-[clamp(1.5rem,1.3rem+0.8vw,2rem)] font-semibold">השם לא משנה</h2>
-          <p class="text-sm leading-[1.6] text-[color-mix(in_srgb,var(--nm-fg)_74%,var(--nm-bg))]">
-            התוכן כאן נשען על אותו קו עבודה שמופיע בשיחות: לראות מה פועל בפנים בלי לקשט אותו.
+          <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_74%,var(--nm-bg))]">
+            התוכן כאן נשען על אותו קו בדיקה שמופיע גם בשיחות: לראות מה באמת קורה בפנים בלי לקשט אותו.
           </p>
-          <p class="text-sm leading-[1.6] text-[color-mix(in_srgb,var(--nm-fg)_74%,var(--nm-bg))]">
-            אם משהו כאן פוגש נקודה אמיתית, אפשר להמשיך דרך הספרייה, המילון, או שיחה קצרה.
-          </p>
-          <p class="text-sm leading-[1.6] text-[color-mix(in_srgb,var(--nm-fg)_74%,var(--nm-bg))]">
-            מה תבחר לקחת מהדף הזה לפני שתסגור אותו?
+          <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_74%,var(--nm-bg))]">
+            אם משהו כאן נוגע בנקודה אמיתית, אפשר להמשיך דרך הספרייה, דרך בקשה להצטרפות, או דרך שיחה קצרה.
           </p>
           <div class="flex flex-wrap justify-end gap-3 pt-2">
-            <a href="/library/" class="inline-flex min-h-[44px] scale-100 items-center rounded-full bg-[var(--nm-inverse)] px-5 py-2.5 text-xl font-bold text-[var(--nm-inverse-fg)] transition-all hover:scale-[1.02] hover:bg-[var(--nm-inverse-hover)]">בוא נבדוק</a>
-            <a href="/book/" class="inline-flex min-h-[44px] scale-100 items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-5 py-2.5 text-xl font-bold text-[var(--nm-fg)] transition-all hover:scale-[1.02] hover:bg-[var(--nm-surface-muted)]">יש לי שאלה</a>
+            <a href="/library/" class="inline-flex min-h-[44px] items-center rounded-full bg-[var(--nm-inverse)] px-5 py-2.5 text-base font-semibold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-inverse-hover)]">מעבר לספרייה</a>
+            <a href={joinHref} class="inline-flex min-h-[44px] items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-5 py-2.5 text-base font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]">בקשה להצטרף</a>
           </div>
         </div>
       </div>
     </section>
 
+    <section class="grid gap-6 lg:grid-cols-2">
+      <article class="rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 p-6 shadow-[0_20px_60px_rgba(26,26,26,0.05)] lg:p-8">
+        <p class="text-sm font-semibold text-[var(--nm-accent)]">למי NeverMind מתאים</p>
+        <ul class="mt-4 space-y-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))]">
+          {fitList.map((item) => (
+            <li class="rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3">{item}</li>
+          ))}
+        </ul>
+      </article>
+
+      <article class="rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-6 lg:p-8">
+        <p class="text-sm font-semibold text-[var(--nm-accent)]">מה לא תמצא כאן</p>
+        <ul class="mt-4 space-y-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))]">
+          {notHereList.map((item) => (
+            <li class="rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 px-4 py-3">{item}</li>
+          ))}
+        </ul>
+      </article>
+    </section>
+
     <section class="space-y-4">
-      <h2 class="text-[clamp(1.45rem,1.25rem+0.7vw,1.9rem)] font-semibold">וידאו קצר על המנגנון</h2>
-      <VideoPlayer youtubeId="lPSE9xQaNHw" title="איך NeverMind עובד" />
-      <p class="max-w-3xl text-sm leading-[1.6] text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
-        איזה שלב במנגנון הכי ברור לך אחרי הצפייה?
+      <h2 class="text-[clamp(1.45rem,1.25rem+0.7vw,1.9rem)] font-semibold">איך זה נראה בזמן אמת</h2>
+      <VideoPlayer youtubeId="lPSE9xQaNHw" title="איך NeverMind נראה בזמן אמת" />
+      <p class="max-w-3xl text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+        זה המקום לראות איך רעיון הופך לבדיקה ממשית, בלי לעגל פינות ובלי להסתתר מאחורי מילים גדולות.
       </p>
+    </section>
+
+    <section class="rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 p-6 shadow-[0_20px_60px_rgba(26,26,26,0.05)] lg:p-8">
+      <div class="space-y-4">
+        <p class="text-sm font-semibold text-[var(--nm-accent)]">טעימה מהתוכן</p>
+        <h2 class="text-[clamp(1.45rem,1.3rem+0.7vw,2rem)] font-semibold">כמה מאמרים פתוחים שמראים את הכיוון</h2>
+        <p class="max-w-3xl text-base leading-8 text-[color-mix(in_srgb,var(--nm-fg)_74%,var(--nm-bg))]">
+          אפשר להיכנס כבר עכשיו. אם תרצה להמשיך מעבר לזה, המשך הקריאה מחכה למנויים.
+        </p>
+      </div>
+      <div class="mt-5 grid gap-4 md:grid-cols-2">
+        {previewArticles.map((article) => (
+          <article class="rounded-[1.4rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-5">
+            <h3 class="text-lg font-semibold text-[var(--nm-fg)]">{article.title}</h3>
+            <p class="mt-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+              {article.excerpt || "הכיוון מתחיל כאן, וההמשך נפתח למנויים."}
+            </p>
+            <div class="mt-4 flex flex-wrap justify-end gap-3">
+              <a href={`/articles/${article.slug}/`} class="text-sm font-semibold text-[var(--nm-accent)] underline underline-offset-4">לקריאה פתוחה</a>
+              <span class="text-sm text-[color-mix(in_srgb,var(--nm-fg)_58%,var(--nm-bg))]">המשך קריאה למנויים</span>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section class="rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-6 lg:p-8">
+      <div class="space-y-4">
+        <p class="text-sm font-semibold text-[var(--nm-accent)]">שאלות נפוצות לפני הצטרפות</p>
+        <h2 class="text-[clamp(1.45rem,1.3rem+0.7vw,2rem)] font-semibold">כמה דברים שכדאי לדעת לפני שנכנסים</h2>
+      </div>
+      <div class="mt-5 space-y-3">
+        {preJoinFaq.map((item) => (
+          <details class="group rounded-[1.25rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white p-4 open:bg-[var(--nm-bg-canvas)] md:p-5">
+            <summary class="cursor-pointer list-none text-base font-semibold text-[var(--nm-fg)] marker:content-none [&::-webkit-details-marker]:hidden">
+              <span class="inline-flex w-full items-start justify-between gap-3">
+                <span class="min-w-0 flex-1 leading-snug">{item.question}</span>
+                <span class="mt-0.5 shrink-0 text-[var(--nm-accent)] transition group-open:rotate-180" aria-hidden="true">⌃</span>
+              </span>
+            </summary>
+            <p class="mt-4 border-t border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] pt-4 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))]">
+              {item.answer}
+            </p>
+          </details>
+        ))}
+      </div>
     </section>
 
     <section id="nm-about-faq" class="space-y-4">
       <div class="space-y-2">
-        <h2 class="text-[clamp(1.45rem,1.25rem+0.7vw,1.9rem)] font-semibold">שאלות שחוזרות על עצמן</h2>
-        <p class="max-w-3xl text-sm leading-[1.6] text-[color-mix(in_srgb,var(--nm-fg)_65%,var(--nm-bg))]">
-          אם חסר משהו, אפשר לעבור ל<a href="/contact/" class="font-semibold text-[var(--nm-accent)] underline-offset-2 transition-colors hover:underline">יצירת קשר</a>.
+        <h2 class="text-[clamp(1.45rem,1.25rem+0.7vw,1.9rem)] font-semibold">עוד שאלות שחוזרות על עצמן</h2>
+        <p class="max-w-3xl text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_65%,var(--nm-bg))]">
+          אם חסר משהו, אפשר לעבור ל<a href="/contact/" class="font-semibold text-[var(--nm-accent)] underline underline-offset-2 transition-colors hover:no-underline">יצירת קשר</a>.
         </p>
       </div>
 
@@ -130,15 +401,76 @@ import {
                 <span class="mt-0.5 shrink-0 text-[var(--nm-accent)] transition group-open:rotate-180" aria-hidden="true">⌃</span>
               </span>
             </summary>
-            <p class="mt-4 border-t border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] pt-4 text-sm leading-[1.6] text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))]">
+            <p class="mt-4 border-t border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] pt-4 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))]">
               {item.answer}
             </p>
           </details>
         ))}
       </div>
-      <p class="max-w-3xl text-sm leading-[1.6] text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
-        איזו שאלה עדיין דוחפת אותך אחרי שקראת את התשובות?
-      </p>
+    </section>
+
+    <section class="rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 px-6 py-8 text-center shadow-[0_20px_60px_rgba(26,26,26,0.05)] md:px-10">
+      <div class="mx-auto max-w-3xl space-y-5">
+        <h2 class="text-[clamp(1.8rem,1.45rem+1vw,2.5rem)] font-semibold tracking-[-0.03em]">אם זה מרגיש נכון, אפשר להיכנס בשקט</h2>
+        <p class="text-base leading-8 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+          בקשה להצטרף פותחת גישה לכל הסרטונים, לתכנים המלאים, ולעולם שלא נראה מבחוץ.
+        </p>
+        <div class="flex flex-wrap items-center justify-center gap-3 pt-2">
+          <a href={joinHref} class="inline-flex min-h-[52px] items-center justify-center rounded-full bg-[var(--nm-inverse)] px-8 py-3 text-base font-semibold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-inverse-hover)]">
+            בקשה להצטרף
+          </a>
+          <a href={quietJoinHref} class="inline-flex min-h-[52px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_14%,transparent)] px-6 py-3 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]">
+            הצטרפות שקטה
+          </a>
+        </div>
+      </div>
     </section>
   </div>
+
+  <style>
+    .about-hero-fade {
+      opacity: 0;
+      transform: translateY(18px);
+      animation: about-hero-fade-up 800ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    @keyframes about-hero-fade-up {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .about-hero-fade {
+        opacity: 1;
+        transform: none;
+        animation: none;
+      }
+    }
+  </style>
+
+  <script is:inline>
+    (() => {
+      const installButton = document.getElementById("about-install-app");
+      const helpLine = document.getElementById("about-install-help");
+
+      installButton?.addEventListener("click", () => {
+        const nativeInstallButton = document.getElementById("nm-pwa-install-action");
+        const nativeRoot = document.getElementById("nm-pwa-install-root");
+
+        if (nativeInstallButton instanceof HTMLButtonElement && nativeRoot instanceof HTMLElement && !nativeRoot.classList.contains("hidden")) {
+          nativeInstallButton.click();
+          if (helpLine instanceof HTMLElement) {
+            helpLine.textContent = "";
+          }
+          return;
+        }
+
+        if (helpLine instanceof HTMLElement) {
+          helpLine.textContent = "אם כפתור ההתקנה לא נפתח, אפשר לשמור את האתר למסך הבית דרך תפריט הדפדפן.";
+        }
+      });
+    })();
+  </script>
 </Layout>
