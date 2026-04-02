@@ -1,4 +1,4 @@
-﻿---
+---
 import {
   buildServicePreStartWhatsAppHref,
   disclaimerShort,
@@ -117,10 +117,10 @@ const serviceJson = JSON.stringify(service);
     ) : (
       <div class="space-y-5 rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-4">
         <div class="space-y-2">
-          <p class="text-xs font-semibold text-[var(--nm-accent)]">כולל מע״מ</p>
+          <p class="text-xs font-semibold text-[var(--nm-accent)]">כולל מע"מ</p>
           <p class="text-[clamp(2rem,1.6rem+0.9vw,2.65rem)] font-semibold leading-none text-[var(--nm-fg)]">{formatMoney(service.price_full)}</p>
           <p class="text-sm leading-[1.6] text-[color-mix(in_srgb,var(--nm-fg)_62%,var(--nm-bg))]">
-            {formatMoney(netPrice)} לפני מע״מ + {formatMoney(vatAmount)} מע״מ
+            {formatMoney(netPrice)} לפני מע"מ + {formatMoney(vatAmount)} מע"מ
           </p>
         </div>
 

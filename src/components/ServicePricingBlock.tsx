@@ -40,7 +40,7 @@ function usePriceTicker(target: number, durationMs = 380) {
 
 type Props = {
   serviceJson: string;
-  /** full = כמו ServiceCard (מע״מ מפורט). compact = שורת מחיר קצרה */
+  /** full = כמו ServiceCard (מע"מ מפורט). compact = שורת מחיר קצרה */
   layout?: "full" | "compact";
 };
 
@@ -230,7 +230,7 @@ export default function ServicePricingBlock({ serviceJson, layout = "full" }: Pr
             </p>
           ) : (
             <div className="text-right">
-              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">כולל מע״מ</p>
+              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">כולל מע"מ</p>
               <p className="mt-2 text-4xl font-semibold tabular-nums text-[var(--nm-fg)]" data-nm-live-price="">
                 {formatMoney(tickered)}
               </p>
@@ -243,7 +243,7 @@ export default function ServicePricingBlock({ serviceJson, layout = "full" }: Pr
                 </p>
               ) : null}
               <p className="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_64%,var(--nm-bg))]">
-                {formatMoney(netPrice)} לפני מע״מ + {formatMoney(vatAmount)} מע״מ
+                {formatMoney(netPrice)} לפני מע"מ + {formatMoney(vatAmount)} מע"מ
               </p>
             </div>
           )}

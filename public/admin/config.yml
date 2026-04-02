@@ -96,7 +96,7 @@ collections:
           - { label: מתחילים, value: beginner }
           - { label: מתקדמים, value: advanced }
           - { label: עומק, value: deep }
-      - label: עוצמת שינוי תפיסתי (1–5)
+      - label: עוצמת שינוי תפיסתי (1-5)
         name: mindShiftIntensity
         widget: number
         required: false
@@ -116,7 +116,7 @@ collections:
         name: imageAlt
         widget: string
         required: false
-        hint: "לא רק מה מופיע בפריים — מה הרעיון שהתמונה נושאת (למשל מראה שבורה כמטאפורה לפירוק האגו). עברית. חיזוק הקשר סמנטי לחיפוש."
+        hint: "לא רק מה מופיע בפריים - מה הרעיון שהתמונה נושאת (למשל מראה שבורה כמטאפורה לפירוק האגו). עברית. חיזוק הקשר סמנטי לחיפוש."
       - label: תמונה ראשית
         name: image
         widget: image

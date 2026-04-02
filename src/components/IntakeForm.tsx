@@ -4,7 +4,7 @@ import appConfig from "../config/appConfig.json";
 import { validateAntispamFields } from "../lib/form-antispam";
 import { HCAPTCHA_SITE_KEY } from "../lib/hcaptcha-public";
 import { pickIntakeHumanChallenge, type IntakeHumanChallenge } from "../lib/intake-human-check";
-import { WEB3FORMS_ACCESS_KEY } from "../lib/web3forms-access";
+import { WEB3FORMS_ACCESS_KEY, WEB3FORMS_ENABLED } from "../lib/web3forms-access";
 import { FloatingInput } from "./ui/FloatingInput";
 
 const WA_MAX_CHARS = 3600;
@@ -17,6 +17,7 @@ const waDigits = String((appConfig as { contact?: { whatsAppNumber?: string } })
   "",
 );
 const DRAFT_KEY = "nm-intake-draft-v1";
+const MAIL_DELIVERY_READY = WEB3FORMS_ENABLED;
 
 type ExpressionMode = "" | "write" | "select" | "both";
 
@@ -342,7 +343,7 @@ export default function IntakeForm() {
     ].filter(Boolean);
     let t = lines.join("\n");
     if (t.length > WA_MAX_CHARS) {
-      t = `${t.slice(0, WA_MAX_CHARS - 40)}\n\n[הודעה קוצרה — השלם בצ'אט]`;
+      t = `${t.slice(0, WA_MAX_CHARS - 40)}\n\n[הודעה קוצרה - השלם בצ'אט]`;
     }
     return t;
   };
@@ -386,6 +387,13 @@ export default function IntakeForm() {
     });
     if (!spam.ok) {
       setClientError(spam.userMessage);
+      return;
+    }
+
+    if (!MAIL_DELIVERY_READY) {
+      const message = "שליחה במייל ממתינה לחיבור שרת הטפסים. אפשר להמשיך בוואטסאפ.";
+      setClientError(message);
+      if (typeof window !== "undefined") window.__nmReportConnectivityIssue?.(message);
       return;
     }
 
@@ -446,6 +454,7 @@ export default function IntakeForm() {
           /* ignore */
         }
         setStatus("ok");
+        if (typeof window !== "undefined") window.__nmClearConnectivityIssue?.();
         window.__nmHapticSuccess?.();
         window.dispatchEvent(new CustomEvent("nm-analytics", { detail: { name: "intake_form_submit" } }));
         (window as unknown as { __nmAnnounce?: (m: string) => void }).__nmAnnounce?.("השאלה נקלטה");
@@ -455,11 +464,15 @@ export default function IntakeForm() {
           typeof apiJson.message === "string" && apiJson.message.trim().length > 0
             ? ` (${apiJson.message.trim()})`
             : "";
-        setClientError(`השרת לא אישר קבלה${hint}. אפשר לנסות שוב או לשלוח בוואטסאפ.`);
+        const message = `השרת לא אישר קבלה${hint}. אפשר לנסות שוב או לשלוח בוואטסאפ.`;
+        setClientError(message);
+        if (typeof window !== "undefined") window.__nmReportConnectivityIssue?.(message);
       }
     } catch {
       setStatus("idle");
-      setClientError("רשת או חסימה. אפשר לנסות שוב או לכתוב בוואטסאפ.");
+      const message = "רשת או חסימה. אפשר לנסות שוב או לכתוב בוואטסאפ.";
+      setClientError(message);
+      if (typeof window !== "undefined") window.__nmReportConnectivityIssue?.(message);
     }
   };
 
@@ -676,6 +689,7 @@ export default function IntakeForm() {
           }}
           dir="rtl"
           autoComplete="tel"
+          inputMode="numeric"
         />
       </section>
 

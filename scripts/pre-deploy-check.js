@@ -29,7 +29,7 @@ async function checkDrafts() {
 
   for (const file of mdxFiles) {
     const content = await readFile(join(ARTICLES_DIR, file), "utf-8");
-    const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---/);
+    const frontmatterMatch = content.match(/^---\r?\n([\s\S]*?)\r?\n---/);
 
     if (!frontmatterMatch) {
       console.error(`❌ ${file}: אין frontmatter תקין!`);

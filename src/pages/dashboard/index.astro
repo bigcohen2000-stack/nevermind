@@ -11,6 +11,7 @@ import LiveConnectionsWidget from "../../components/dashboard/LiveConnectionsWid
 import LiveSecurityFeedWidget from "../../components/dashboard/LiveSecurityFeedWidget";
 import MechanismCard from "../../components/dashboard/MechanismCard.astro";
 import SystemSettingsPanel from "../../components/dashboard/SystemSettingsPanel.astro";
+import SystemHealthWidget from "../../components/dashboard/SystemHealthWidget";
 import Layout from "../../layouts/Layout.astro";
 import {
   buildDashboardContentHealth,
@@ -48,6 +49,33 @@ const overviewCards = [
     helper: "תוכן שמחזיק טוב כרגע",
   },
 ];
+
+const managerQuickLinks = [
+  {
+    title: "חיפוש חבר מהיר",
+    description: "קפיצה ישירה לאזור ניהול החברים, איתור לפי טלפון וציר פעילות בלי לפתוח מסך נוסף.",
+    href: "#access",
+    cta: "לעבור לניהול חברים",
+  },
+  {
+    title: "תצוגת חבר",
+    description: "בדיקה מהירה של מה שחבר פעיל רואה בפועל, בלי לצאת מהדשבורד ובלי לשנות סשן אמיתי.",
+    href: "/me/",
+    cta: "לפתוח תצוגת חבר",
+  },
+  {
+    title: "תצוגת טרום חיבור",
+    description: "בדיקה של מסך האורח וההצטרפות לפני שחבר נכנס עם טלפון וסיסמה.",
+    href: "/me/unlock/",
+    cta: "לפתוח תצוגת אורח",
+  },
+  {
+    title: "סטטוס פריסה",
+    description: "מעבר מהיר לדוח הבריאות כדי לראות אם Pages, Worker, טפסים וקישורים מסונכרנים.",
+    href: "#system-health",
+    cta: "לבדוק פריסה",
+  },
+];
 ---
 
 <Layout title={pageTitle} description={pageDescription} noIndex={true}>
@@ -66,8 +94,13 @@ const overviewCards = [
                 <div class="space-y-3 text-right">
                   <h1 class="text-[clamp(2rem,1.55rem+1.6vw,3.2rem)] font-semibold leading-tight text-[#1A1A1A] dark:text-[#FAFAF8]">מצב האתר עכשיו</h1>
                   <p class="max-w-3xl text-sm leading-7 text-[#1A1A1A]/62 dark:text-[#FAFAF8]/64">
-                    דשבורד פנימי מאחורי הקלעים עם חיפוש מהיר, בקרה על חיבורים, פיד אבטחה, בריאות תוכן וזרימת עבודה קלה לתמונות.
+                    דשבורד פנימי למנהל בלבד, עם חיפוש מהיר, בקרה על חיבורים, פיד אבטחה, בריאות תוכן וזרימת עבודה קצרה לבדיקת מנויים, פריסה ומערכת.
                   </p>
+                  <div class="flex flex-wrap gap-2 pt-1 text-xs">
+                    <span class="inline-flex items-center rounded-full border-[0.5px] border-[rgba(212,43,43,0.18)] bg-[rgba(212,43,43,0.08)] px-3 py-1 font-medium text-[#D42B2B] dark:border-[rgba(212,43,43,0.22)] dark:bg-[rgba(212,43,43,0.12)] dark:text-[#ff8a8a]">מנהל בלבד</span>
+                    <span class="inline-flex items-center rounded-full border-[0.5px] border-[rgba(26,26,26,0.1)] bg-white/70 px-3 py-1 font-medium text-[#1A1A1A]/72 dark:border-[rgba(250,250,248,0.12)] dark:bg-[rgba(255,255,255,0.05)] dark:text-[#FAFAF8]/72">Cloudflare Access: bigcohen2000@gmail.com</span>
+                    <span class="inline-flex items-center rounded-full border-[0.5px] border-[rgba(26,26,26,0.1)] bg-white/70 px-3 py-1 font-medium text-[#1A1A1A]/72 dark:border-[rgba(250,250,248,0.12)] dark:bg-[rgba(255,255,255,0.05)] dark:text-[#FAFAF8]/72">החבר לא רואה את המסך הזה</span>
+                  </div>
                   <div class="flex flex-wrap items-center justify-between gap-3">
                     <HelpText text="למה: כל אזור מסביר מה הוא מודד, איך הנתון מחושב, ומה יקרה אחרי פעולה. כך אפשר לעבוד מהר בלי לנחש מה עומד מאחורי כל כרטיס." />
                     <MechanismCard
@@ -90,6 +123,26 @@ const overviewCards = [
                   ))}
                 </div>
               </div>
+            </div>
+          </section>
+
+          <section id="manager-actions" class="grid gap-6 xl:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]">
+            <div class="rounded-[32px] border-[0.5px] border-[rgba(26,26,26,0.1)] bg-white/84 p-5 shadow-[0_24px_70px_rgba(26,26,26,0.05)] dark:border-[rgba(250,250,248,0.12)] dark:bg-[rgba(255,255,255,0.05)]">
+              <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#D42B2B] dark:text-[#ff8a8a]">מנהל בלבד</p>
+              <h2 class="mt-2 text-2xl font-semibold text-[#1A1A1A] dark:text-[#FAFAF8]">גישה סגורה, עבודה מהירה</h2>
+              <p class="mt-3 text-sm leading-7 text-[#1A1A1A]/64 dark:text-[#FAFAF8]/64">
+                העמוד הזה מיועד רק לניהול הראשי. חברי המועדון לא רואים אותו. כאן מחפשים חברים, פותחים גישה, בודקים תצוגת חבר ומוודאים שאין פער בין האתר, ה־worker והנתונים החיים.
+              </p>
+              <HelpText text="מה חשוב עכשיו: להגן ב־Cloudflare Access על /admin/* ועל /dashboard/*, ולוודא שגם /api/dashboard/* ו־/api/club-admin/* סגורים לאותו מייל." />
+            </div>
+            <div class="grid gap-4 sm:grid-cols-2">
+              {managerQuickLinks.map((item) => (
+                <article class="rounded-[24px] border-[0.5px] border-[rgba(26,26,26,0.1)] bg-white/84 p-4 shadow-[0_18px_50px_rgba(26,26,26,0.05)] dark:border-[rgba(250,250,248,0.12)] dark:bg-[rgba(255,255,255,0.05)]">
+                  <h3 class="text-base font-semibold text-[#1A1A1A] dark:text-[#FAFAF8]">{item.title}</h3>
+                  <p class="mt-2 text-sm leading-7 text-[#1A1A1A]/64 dark:text-[#FAFAF8]/64">{item.description}</p>
+                  <a href={item.href} class="mt-4 inline-flex items-center rounded-full border-[0.5px] border-[rgba(26,26,26,0.1)] bg-[#FAFAF8] px-4 py-2 text-sm font-semibold text-[#1A1A1A] transition hover:border-[rgba(212,43,43,0.22)] hover:text-[#D42B2B] dark:border-[rgba(250,250,248,0.12)] dark:bg-[rgba(255,255,255,0.05)] dark:text-[#FAFAF8]">{item.cta}</a>
+                </article>
+              ))}
             </div>
           </section>
 
@@ -161,7 +214,7 @@ const overviewCards = [
             <div class="rounded-[32px] border-[0.5px] border-[rgba(26,26,26,0.1)] bg-white/84 p-5 shadow-[0_24px_70px_rgba(26,26,26,0.05)] dark:border-[rgba(250,250,248,0.12)] dark:bg-[rgba(255,255,255,0.05)]">
               <div class="mb-4 space-y-2">
                 <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#D42B2B] dark:text-[#ff8a8a]">ניהול גישה</p>
-                <h2 class="text-2xl font-semibold text-[#1A1A1A] dark:text-[#FAFAF8]">Club Admin</h2>
+                <h2 class="text-2xl font-semibold text-[#1A1A1A] dark:text-[#FAFAF8]">ניהול חברים</h2>
                 <HelpText text="למה: אזור הגישה נשאר תפעולי גם בזמן ריפקטור. איך: ה־panel הקיים ממשיך לעבוד מול worker ו־proxy, והדשבורד החדש עוטף אותו עם שפה ברורה יותר מבלי לשנות את פעולות הליבה." />
               </div>
               <ClubAdminPanel />
@@ -176,6 +229,23 @@ const overviewCards = [
               helpText="למה: זו נקודת הכניסה לעריכת תמונות בלי תקלות שם קובץ, בלי פורמטים כפולים, ובלי חיפוש ידני אחרי assets. מה קורה אחר כך: הנתיב שחוזר מהסקריפט יכול להיכנס ישירות ל־content או ל־Generator."
             >
               <ImageAutomationGuide />
+            </DashboardCard>
+          </section>
+
+          <section id="system-health">
+            <DashboardCard
+              eyebrow="הגדרות מערכת"
+              title="בריאות מערכת"
+              description="מצב חיבורי ה-worker, טפסי המייל, אימות ה-hCaptcha, דוח build אחרון וקריאות הטקסטים."
+              helpText="למה: זו נקודת בקרה אחת על מה שנשבר בשקט. איך: בדיקות runtime מגיעות מ-Pages Functions בזמן אמת, ודוח build סטטי מציג מצב קישורים פנימיים וקריאות מאמרים מהבנייה האחרונה."
+              mechanismTitle="מאחורי הקלעים של בדיקות הבריאות"
+              mechanismSummary="/api/dashboard/system-health בודק חיבור worker וסודות סביבה, ו-/admin-build-report.json נבנה אוטומטית לפני ואחרי build כדי לשמור דוח קריאות וקישורים פנימיים."
+              mechanismDetails={[
+                "ה-runtime health בודק Web3Forms, hCaptcha, Cloudflare Analytics וחיבור ה-worker.",
+                "דוח ה-build שומר קריאות ממוצעת של כל המאמרים, מספר עמודי HTML, וסטטוס בדיקת קישורים פנימיים."
+              ]}
+            >
+              <SystemHealthWidget client:load endpoint="/api/dashboard/system-health" buildReportHref="/admin-build-report.json" />
             </DashboardCard>
           </section>
 

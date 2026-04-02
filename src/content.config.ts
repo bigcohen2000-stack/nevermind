@@ -42,6 +42,8 @@ const articles = defineCollection({
   schema: z.object({
     title: z.string(),
     description: z.string(),
+    simpleSummary: z.string().optional(),
+    quickTakeaways: z.array(z.string()).max(3).optional(),
     originalInsight: z.string().optional(),
     bottomLine: z.string().optional(),
     pubDate: pubDateSchema,
@@ -67,7 +69,7 @@ const articles = defineCollection({
     draft: z.boolean().default(false),
     workflowStatus: z.enum(["writing", "review", "ready", "published"]).optional(),
     difficultyLevel: z.enum(["beginner", "advanced", "deep"]).optional(),
-    /** עוצמת שינוי תפיסתי לתצוגה (1–5) */
+    /** עוצמת שינוי תפיסתי לתצוגה (1-5) */
     mindShiftIntensity: z.coerce.number().int().min(1).max(5).optional(),
     /** alt לתמונה: תמונה גלויה + הקשר קונספטואלי (חיזוק סמנטי ל-SEO, לא רק תיאור פיקסלים) */
     imageAlt: z.string().optional(),

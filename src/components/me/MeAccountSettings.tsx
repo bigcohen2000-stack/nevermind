@@ -90,11 +90,11 @@ export default function MeAccountSettings() {
             </div>
             <div>
               <dt className="font-semibold text-[var(--nm-fg)]">טלפון</dt>
-              <dd>{session?.phone ?? "—"}</dd>
+              <dd>{session?.phone ?? "-"}</dd>
             </div>
             <div>
               <dt className="font-semibold text-[var(--nm-fg)]">תוקף חברות</dt>
-              <dd>{session?.expiresAt ? new Date(session.expiresAt).toLocaleDateString("he-IL") : "—"}</dd>
+              <dd>{session?.expiresAt ? new Date(session.expiresAt).toLocaleDateString("he-IL") : "-"}</dd>
             </div>
             <div>
               <dt className="font-semibold text-[var(--nm-fg)]">IP במכשיר (ציבורי)</dt>
@@ -122,7 +122,7 @@ export default function MeAccountSettings() {
               </div>
               <div>
                 <dt className="font-semibold text-[var(--nm-fg)]">טביעת IP אחרונה (מקוצרת)</dt>
-                <dd>{progress.lastIpPrefix ?? "—"}</dd>
+                <dd>{progress.lastIpPrefix ?? "-"}</dd>
               </div>
             </dl>
           ) : (

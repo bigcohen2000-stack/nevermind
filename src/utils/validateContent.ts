@@ -16,7 +16,7 @@ function normalizePhraseList(phrases: readonly string[]): string[] {
  * ברירת מחדל: אותה רשימה כמו ב־validateAndClassify (ROBOTIC_BLOCKLIST).
  *
  * @param content טקסט מלא לבדיקה (למשל קובץ MDX גולמי)
- * @param phrases רשימה מותאמת אישית (למשל בדיקות CI); אם לא מועברת — משתמשים ב־contentValidator
+ * @param phrases רשימה מותאמת אישית (למשל בדיקות CI); אם לא מועברת - משתמשים ב־contentValidator
  */
 export function validateContent(content: string, phrases?: readonly string[]): ContentValidationResult {
   if (phrases !== undefined) {

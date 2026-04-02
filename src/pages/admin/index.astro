@@ -12,8 +12,8 @@ import homeCanvas from "../../config/homeCanvas.json";
 import clarityPathsFile from "../../config/clarityPaths.json";
 import { flattenVisibleServices } from "../../lib/services";
 
-const pageTitle = "מרכז השליטה של NeverMind";
-const pageDescription = "מרכז תפעולי פרוטו לניהול מאמרים, שירותים, קונפיגורציה וכל יצירה של NeverMind.";
+const pageTitle = "׳³ֲ׳³ֲ¨׳³ג€÷׳³ג€“ ׳³ג€׳³ֲ©׳³ֲ׳³ג„¢׳³ֻ׳³ג€ ׳³ֲ©׳³ֲ NeverMind";
+const pageDescription = "׳³ֲ׳³ֲ¨׳³ג€÷׳³ג€“ ׳³ֳ—׳³ג‚×׳³ֲ¢׳³ג€¢׳³ֲ׳³ג„¢ ׳³ג‚×׳³ֲ¨׳³ג€¢׳³ֻ׳³ג€¢ ׳³ֲ׳³ֲ ׳³ג„¢׳³ג€׳³ג€¢׳³ֲ ׳³ֲ׳³ֲ׳³ֲ׳³ֲ¨׳³ג„¢׳³ֲ, ׳³ֲ©׳³ג„¢׳³ֲ¨׳³ג€¢׳³ֳ—׳³ג„¢׳³ֲ, ׳³ֲ§׳³ג€¢׳³ֲ ׳³ג‚×׳³ג„¢׳³ג€™׳³ג€¢׳³ֲ¨׳³ֲ¦׳³ג„¢׳³ג€ ׳³ג€¢׳³ג€÷׳³ֲ ׳³ג„¢׳³ֲ¦׳³ג„¢׳³ֲ¨׳³ג€ ׳³ֲ©׳³ֲ NeverMind.";
 const githubArticleBase = `https://github.com/${appConfig.github.owner}/${appConfig.github.repo}/blob/${appConfig.github.branch}/${appConfig.github.articlesPath}/`;
 const formatDate = new Intl.DateTimeFormat("he-IL", {
   year: "numeric",
@@ -23,19 +23,19 @@ const formatDate = new Intl.DateTimeFormat("he-IL", {
 
 const workflowConfig = {
   writing: {
-    label: "בכתיבה",
+    label: "׳³ג€˜׳³ג€÷׳³ֳ—׳³ג„¢׳³ג€˜׳³ג€",
     tone: "bg-[var(--nm-tint)] text-[var(--nm-fg)] border-[color-mix(in_srgb,var(--nm-accent)_20%,transparent)]",
   },
   review: {
-    label: "לבדיקה",
+    label: "׳³ֲ׳³ג€˜׳³ג€׳³ג„¢׳³ֲ§׳³ג€",
     tone: "bg-[var(--nm-surface-muted)] text-[var(--nm-fg)] border-[color-mix(in_srgb,var(--nm-fg)_14%,transparent)]",
   },
   ready: {
-    label: "מוכן לפרסום",
+    label: "׳³ֲ׳³ג€¢׳³ג€÷׳³ֲ ׳³ֲ׳³ג‚×׳³ֲ¨׳³ֲ¡׳³ג€¢׳³ֲ",
     tone: "bg-[var(--nm-tint-strong)] text-[var(--nm-fg)] border-[color-mix(in_srgb,var(--nm-accent)_26%,transparent)]",
   },
   published: {
-    label: "פורסם",
+    label: "׳³ג‚×׳³ג€¢׳³ֲ¨׳³ֲ¡׳³ֲ",
     tone: "bg-[var(--nm-inverse)] text-[var(--nm-inverse-fg)] border-[color-mix(in_srgb,var(--nm-fg)_22%,transparent)]",
   },
 } as const;
@@ -44,15 +44,15 @@ type WorkflowKey = keyof typeof workflowConfig;
 
 const difficultyConfig = {
   beginner: {
-    label: "מתחילים",
+    label: "׳³ֲ׳³ֳ—׳³ג€”׳³ג„¢׳³ֲ׳³ג„¢׳³ֲ",
     tone: "bg-[var(--nm-tint)] text-[var(--nm-fg)] border-[color-mix(in_srgb,var(--nm-accent)_18%,transparent)]",
   },
   advanced: {
-    label: "מתקדמים",
+    label: "׳³ֲ׳³ֳ—׳³ֲ§׳³ג€׳³ֲ׳³ג„¢׳³ֲ",
     tone: "bg-[var(--nm-tint-strong)] text-[var(--nm-fg)] border-[color-mix(in_srgb,var(--nm-accent)_26%,transparent)]",
   },
   deep: {
-    label: "חקירה עמוקה",
+    label: "׳³ג€”׳³ֲ§׳³ג„¢׳³ֲ¨׳³ג€ ׳³ֲ¢׳³ֲ׳³ג€¢׳³ֲ§׳³ג€",
     tone: "bg-[var(--nm-inverse)] text-[var(--nm-inverse-fg)] border-[color-mix(in_srgb,var(--nm-fg)_22%,transparent)]",
   },
 } as const;
@@ -93,11 +93,11 @@ const articles = (await getCollection("articles"))
       workflowTone: workflowMeta.tone,
       difficulty: difficultyMeta.label,
       difficultyTone: difficultyMeta.tone,
-      status: article.data.draft ? "טיוטה" : "באוויר",
+      status: article.data.draft ? "׳³ֻ׳³ג„¢׳³ג€¢׳³ֻ׳³ג€" : "׳³ג€˜׳³ֲ׳³ג€¢׳³ג€¢׳³ג„¢׳³ֲ¨",
       statusTone: article.data.draft
         ? "bg-[var(--nm-tint)] text-[var(--nm-accent)] border-[color-mix(in_srgb,var(--nm-accent)_14%,transparent)]"
         : "bg-[var(--nm-tint)] text-[var(--nm-fg)] border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)]",
-      premium: article.data.isPremium ? "כן" : "לא",
+      premium: article.data.isPremium ? "׳³ג€÷׳³ֲ" : "׳³ֲ׳³ֲ",
       premiumTone: article.data.isPremium
         ? "bg-[var(--nm-inverse)] text-[var(--nm-inverse-fg)] border-[color-mix(in_srgb,var(--nm-fg)_22%,transparent)]"
         : "bg-[var(--nm-bg-canvas)] text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))] border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)]",
@@ -111,96 +111,176 @@ const articles = (await getCollection("articles"))
 
 const quickActions = [
   {
-    title: "Club Admin",
-    description: "כניסת ניהול, בדיקת כניסות אחרונות, flags, ואיפוס סיסמה במקום אחד.",
+    title: "׳ ׳™׳”׳•׳ ׳—׳‘׳¨׳™׳",
+    description: "׳³ג€÷׳³ֲ ׳³ג„¢׳³ֲ¡׳³ֳ— ׳³ֲ ׳³ג„¢׳³ג€׳³ג€¢׳³ֲ, ׳³ג€˜׳³ג€׳³ג„¢׳³ֲ§׳³ֳ— ׳³ג€÷׳³ֲ ׳³ג„¢׳³ֲ¡׳³ג€¢׳³ֳ— ׳³ֲ׳³ג€”׳³ֲ¨׳³ג€¢׳³ֲ ׳³ג€¢׳³ֳ—, flags, ׳³ג€¢׳³ֲ׳³ג„¢׳³ג‚×׳³ג€¢׳³ֲ¡ ׳³ֲ¡׳³ג„¢׳³ֲ¡׳³ֲ׳³ג€ ׳³ג€˜׳³ֲ׳³ֲ§׳³ג€¢׳³ֲ ׳³ֲ׳³ג€”׳³ג€.",
     href: "/dashboard/",
-    cta: "לפתוח את ניהול המועדון",
+    cta: "׳³ֲ׳³ג‚×׳³ֳ—׳³ג€¢׳³ג€” ׳³ֲ׳³ֳ— ׳³ֲ ׳³ג„¢׳³ג€׳³ג€¢׳³ֲ ׳³ג€׳³ֲ׳³ג€¢׳³ֲ¢׳³ג€׳³ג€¢׳³ֲ",
   },
   {
-    title: "מאמר חדש",
-    description: "מחולל prompt, sandbox ל־MDX, autofix וייצוא לקובץ לפני commit.",
+    title: "׳³ֲ׳³ֲ׳³ֲ׳³ֲ¨ ׳³ג€”׳³ג€׳³ֲ©",
+    description: "׳³ֲ׳³ג€”׳³ג€¢׳³ֲ׳³ֲ prompt, sandbox ׳³ֲ׳²ֲ¾MDX, autofix ׳³ג€¢׳³ג„¢׳³ג„¢׳³ֲ¦׳³ג€¢׳³ֲ ׳³ֲ׳³ֲ§׳³ג€¢׳³ג€˜׳³ֲ¥ ׳³ֲ׳³ג‚×׳³ֲ ׳³ג„¢ commit.",
     href: "/admin/generator/",
-    cta: "לפתוח את המחולל",
+    cta: "׳³ֲ׳³ג‚×׳³ֳ—׳³ג€¢׳³ג€” ׳³ֲ׳³ֳ— ׳³ג€׳³ֲ׳³ג€”׳³ג€¢׳³ֲ׳³ֲ",
   },
   {
-    title: "Content Health",
-    description: "ציון בריאות לכל מאמר לפי Insight, עדכוני SEO ויחס רכיבי QA.",
+    title: "׳‘׳¨׳™׳׳•׳× ׳×׳•׳›׳",
+    description: "׳³ֲ¦׳³ג„¢׳³ג€¢׳³ֲ ׳³ג€˜׳³ֲ¨׳³ג„¢׳³ֲ׳³ג€¢׳³ֳ— ׳³ֲ׳³ג€÷׳³ֲ ׳³ֲ׳³ֲ׳³ֲ׳³ֲ¨ ׳³ֲ׳³ג‚×׳³ג„¢ Insight, ׳³ֲ¢׳³ג€׳³ג€÷׳³ג€¢׳³ֲ ׳³ג„¢ SEO ׳³ג€¢׳³ג„¢׳³ג€”׳³ֲ¡ ׳³ֲ¨׳³ג€÷׳³ג„¢׳³ג€˜׳³ג„¢ QA.",
     href: "/dashboard/",
-    cta: "לפתוח את הדשבורד",
+    cta: "׳³ֲ׳³ג‚×׳³ֳ—׳³ג€¢׳³ג€” ׳³ֲ׳³ֳ— ׳³ג€׳³ג€׳³ֲ©׳³ג€˜׳³ג€¢׳³ֲ¨׳³ג€",
   },
   {
-    title: "עמוד השירותים",
-    description: "מסלולים לפי שלבים, כפתורי וואטסאפ או חשבונית, ותמחור ברור.",
+    title: "׳³ֲ¢׳³ֲ׳³ג€¢׳³ג€ ׳³ג€׳³ֲ©׳³ג„¢׳³ֲ¨׳³ג€¢׳³ֳ—׳³ג„¢׳³ֲ",
+    description: "׳³ֲ׳³ֲ¡׳³ֲ׳³ג€¢׳³ֲ׳³ג„¢׳³ֲ ׳³ֲ׳³ג‚×׳³ג„¢ ׳³ֲ©׳³ֲ׳³ג€˜׳³ג„¢׳³ֲ, ׳³ג€÷׳³ג‚×׳³ֳ—׳³ג€¢׳³ֲ¨׳³ג„¢ ׳³ג€¢׳³ג€¢׳³ֲ׳³ֻ׳³ֲ¡׳³ֲ׳³ג‚× ׳³ֲ׳³ג€¢ ׳³ג€”׳³ֲ©׳³ג€˜׳³ג€¢׳³ֲ ׳³ג„¢׳³ֳ—, ׳³ג€¢׳³ֳ—׳³ֲ׳³ג€”׳³ג€¢׳³ֲ¨ ׳³ג€˜׳³ֲ¨׳³ג€¢׳³ֲ¨.",
     href: "/services/",
-    cta: "לבדוק את העמוד",
+    cta: "׳³ֲ׳³ג€˜׳³ג€׳³ג€¢׳³ֲ§ ׳³ֲ׳³ֳ— ׳³ג€׳³ֲ¢׳³ֲ׳³ג€¢׳³ג€",
   },
   {
-    title: "טופס intake",
-    description: "הכרות לפני שיחה: כתיבה, סימון או שניים, עם הערות בדרך לפני בחירה.",
+    title: "׳³ֻ׳³ג€¢׳³ג‚×׳³ֲ¡ intake",
+    description: "׳³ג€׳³ג€÷׳³ֲ¨׳³ג€¢׳³ֳ— ׳³ֲ׳³ג‚×׳³ֲ ׳³ג„¢ ׳³ֲ©׳³ג„¢׳³ג€”׳³ג€: ׳³ג€÷׳³ֳ—׳³ג„¢׳³ג€˜׳³ג€, ׳³ֲ¡׳³ג„¢׳³ֲ׳³ג€¢׳³ֲ ׳³ֲ׳³ג€¢ ׳³ֲ©׳³ֲ ׳³ג„¢׳³ג„¢׳³ֲ, ׳³ֲ¢׳³ֲ ׳³ג€׳³ֲ¢׳³ֲ¨׳³ג€¢׳³ֳ— ׳³ג€˜׳³ג€׳³ֲ¨׳³ֲ ׳³ֲ׳³ג‚×׳³ֲ ׳³ג„¢ ׳³ג€˜׳³ג€”׳³ג„¢׳³ֲ¨׳³ג€.",
     href: "/intake/",
-    cta: "לפתוח את הטופס",
+    cta: "׳³ֲ׳³ג‚×׳³ֳ—׳³ג€¢׳³ג€” ׳³ֲ׳³ֳ— ׳³ג€׳³ֻ׳³ג€¢׳³ג‚×׳³ֲ¡",
   },
   {
-    title: "מחולל פרדוקסים",
-    description: "כלי מהיר ליצירת 20 פרדוקסים חדים לסטוריז, הוקים וכותרות משנות.",
+    title: "׳³ֲ׳³ג€”׳³ג€¢׳³ֲ׳³ֲ ׳³ג‚×׳³ֲ¨׳³ג€׳³ג€¢׳³ֲ§׳³ֲ¡׳³ג„¢׳³ֲ",
+    description: "׳³ג€÷׳³ֲ׳³ג„¢ ׳³ֲ׳³ג€׳³ג„¢׳³ֲ¨ ׳³ֲ׳³ג„¢׳³ֲ¦׳³ג„¢׳³ֲ¨׳³ֳ— 20 ׳³ג‚×׳³ֲ¨׳³ג€׳³ג€¢׳³ֲ§׳³ֲ¡׳³ג„¢׳³ֲ ׳³ג€”׳³ג€׳³ג„¢׳³ֲ ׳³ֲ׳³ֲ¡׳³ֻ׳³ג€¢׳³ֲ¨׳³ג„¢׳³ג€“, ׳³ג€׳³ג€¢׳³ֲ§׳³ג„¢׳³ֲ ׳³ג€¢׳³ג€÷׳³ג€¢׳³ֳ—׳³ֲ¨׳³ג€¢׳³ֳ— ׳³ֲ׳³ֲ©׳³ֲ ׳³ג€¢׳³ֳ—.",
     href: "/admin/paradoxes/",
-    cta: "לייצר פרדוקסים",
+    cta: "׳³ֲ׳³ג„¢׳³ג„¢׳³ֲ¦׳³ֲ¨ ׳³ג‚×׳³ֲ¨׳³ג€׳³ג€¢׳³ֲ§׳³ֲ¡׳³ג„¢׳³ֲ",
   },
   {
-    title: "עץ שורש הבעיה",
-    description: "אינפוגרפיקה אינטראקטיבית שמפרקת בעיה גלויה לשורשים תודעתיים עמוקים יותר.",
+    title: "׳³ֲ¢׳³ֲ¥ ׳³ֲ©׳³ג€¢׳³ֲ¨׳³ֲ© ׳³ג€׳³ג€˜׳³ֲ¢׳³ג„¢׳³ג€",
+    description: "׳³ֲ׳³ג„¢׳³ֲ ׳³ג‚×׳³ג€¢׳³ג€™׳³ֲ¨׳³ג‚×׳³ג„¢׳³ֲ§׳³ג€ ׳³ֲ׳³ג„¢׳³ֲ ׳³ֻ׳³ֲ¨׳³ֲ׳³ֲ§׳³ֻ׳³ג„¢׳³ג€˜׳³ג„¢׳³ֳ— ׳³ֲ©׳³ֲ׳³ג‚×׳³ֲ¨׳³ֲ§׳³ֳ— ׳³ג€˜׳³ֲ¢׳³ג„¢׳³ג€ ׳³ג€™׳³ֲ׳³ג€¢׳³ג„¢׳³ג€ ׳³ֲ׳³ֲ©׳³ג€¢׳³ֲ¨׳³ֲ©׳³ג„¢׳³ֲ ׳³ֳ—׳³ג€¢׳³ג€׳³ֲ¢׳³ֳ—׳³ג„¢׳³ג„¢׳³ֲ ׳³ֲ¢׳³ֲ׳³ג€¢׳³ֲ§׳³ג„¢׳³ֲ ׳³ג„¢׳³ג€¢׳³ֳ—׳³ֲ¨.",
     href: "/root-problem-tree/",
-    cta: "לפתוח את המפה",
+    cta: "׳³ֲ׳³ג‚×׳³ֳ—׳³ג€¢׳³ג€” ׳³ֲ׳³ֳ— ׳³ג€׳³ֲ׳³ג‚×׳³ג€",
   },
   {
-    title: "הספרייה האסורה",
-    description: "ריכוז המאמרים ששוברים פרות קדושות ויוצרים curiosity gap חזק יותר.",
+    title: "׳³ג€׳³ֲ¡׳³ג‚×׳³ֲ¨׳³ג„¢׳³ג„¢׳³ג€ ׳³ג€׳³ֲ׳³ֲ¡׳³ג€¢׳³ֲ¨׳³ג€",
+    description: "׳³ֲ¨׳³ג„¢׳³ג€÷׳³ג€¢׳³ג€“ ׳³ג€׳³ֲ׳³ֲ׳³ֲ׳³ֲ¨׳³ג„¢׳³ֲ ׳³ֲ©׳³ֲ©׳³ג€¢׳³ג€˜׳³ֲ¨׳³ג„¢׳³ֲ ׳³ג‚×׳³ֲ¨׳³ג€¢׳³ֳ— ׳³ֲ§׳³ג€׳³ג€¢׳³ֲ©׳³ג€¢׳³ֳ— ׳³ג€¢׳³ג„¢׳³ג€¢׳³ֲ¦׳³ֲ¨׳³ג„¢׳³ֲ curiosity gap ׳³ג€”׳³ג€“׳³ֲ§ ׳³ג„¢׳³ג€¢׳³ֳ—׳³ֲ¨.",
     href: "/forbidden-library/",
-    cta: "להיכנס לספרייה",
+    cta: "׳³ֲ׳³ג€׳³ג„¢׳³ג€÷׳³ֲ ׳³ֲ¡ ׳³ֲ׳³ֲ¡׳³ג‚×׳³ֲ¨׳³ג„¢׳³ג„¢׳³ג€",
+  },
+];
+
+const controlCenterCards = [
+  {
+    title: "׳³ֲ׳³ֲ¨׳³ג€÷׳³ג€“ ׳³ג€׳³ֲ ׳³ג„¢׳³ג€׳³ג€¢׳³ֲ",
+    description: "׳³ג€÷׳³ֲ׳³ֲ ׳³ֲ ׳³ג€÷׳³ֲ ׳³ֲ¡׳³ג„¢׳³ֲ ׳³ֲ׳³ג€÷׳³ֲ׳³ג„¢ ׳³ג€׳³ֲ׳³ֲ׳³ֲ¡׳³ֻ׳³ֲ¨: ׳³ֳ—׳³ג€¢׳³ג€÷׳³ֲ, ׳³ֲ׳³ג€”׳³ג€¢׳³ֲ׳³ֲ ׳³ֲ׳³ֲ׳³ֲ׳³ֲ¨׳³ג„¢׳³ֲ, ׳³ֲ§׳³ג€¢׳³ֲ ׳³ג‚×׳³ג„¢׳³ג€™׳³ג€¢׳³ֲ¨׳³ֲ¦׳³ג„¢׳³ג€ ׳³ג€¢׳³ֲ׳³ֲ¦׳³ג€˜ ׳³ג€׳³ֲ׳³ֲ¢׳³ֲ¨׳³ג€÷׳³ֳ—.",
+    href: "/admin/",
+    cta: "׳³ֲ׳³ג€׳³ג„¢׳³ֲ©׳³ֲ׳³ֲ¨ ׳³ג€˜׳³ֲ׳³ֲ¡׳³ֲ ׳³ג€׳³ג€“׳³ג€",
+  },
+  {
+    title: "׳³ֲ ׳³ג„¢׳³ג€׳³ג€¢׳³ֲ ׳³ג€”׳³ג€˜׳³ֲ¨׳³ג„¢׳³ֲ",
+    description: "׳³ג€”׳³ג„¢׳³ג‚×׳³ג€¢׳³ֲ© ׳³ֲ׳³ג‚×׳³ג„¢ ׳³ֻ׳³ֲ׳³ג‚×׳³ג€¢׳³ֲ, ׳³ֲ׳³ג„¢׳³ג‚×׳³ג€¢׳³ֲ¡ ׳³ֲ¡׳³ג„¢׳³ֲ¡׳³ֲ׳³ג€, flags ׳³ג€¢׳³ֲ¦׳³ג„¢׳³ֲ¨ ׳³ג‚×׳³ֲ¢׳³ג„¢׳³ֲ׳³ג€¢׳³ֳ— ׳³ֲ©׳³ֲ ׳³ג€”׳³ג€˜׳³ֲ¨׳³ג„¢׳³ֲ ׳³ג‚×׳³ֲ¢׳³ג„¢׳³ֲ׳³ג„¢׳³ֲ.",
+    href: "/dashboard/",
+    cta: "׳³ֲ׳³ֲ¢׳³ג€˜׳³ג€¢׳³ֲ¨ ׳³ֲ׳³ג€׳³ֲ©׳³ג€˜׳³ג€¢׳³ֲ¨׳³ג€ ׳³ג€׳³ג€”׳³ג€˜׳³ֲ¨׳³ג„¢׳³ֲ",
+  },
+  {
+    title: "׳³ֳ—׳³ֲ¦׳³ג€¢׳³ג€™׳³ֳ— ׳³ג€”׳³ג€˜׳³ֲ¨ ׳³ג‚×׳³ֲ¢׳³ג„¢׳³ֲ",
+    description: "׳³ג€˜׳³ג€׳³ג„¢׳³ֲ§׳³ג€ ׳³ֲ׳³ג€׳³ג„¢׳³ֲ¨׳³ג€ ׳³ֲ©׳³ֲ ׳³ג€׳³ֲ׳³ג€“׳³ג€¢׳³ֲ¨ ׳³ג€׳³ֲ׳³ג„¢׳³ֲ©׳³ג„¢ ׳³ג€¢׳³ג€׳³ֲ׳³ֲ¡׳³ג€÷׳³ג„¢׳³ֲ ׳³ֲ©׳³ג€”׳³ג€˜׳³ֲ¨ ׳³ֲ¨׳³ג€¢׳³ֲ׳³ג€ ׳³ֲ׳³ג€”׳³ֲ¨׳³ג„¢ ׳³ג€÷׳³ֲ ׳³ג„¢׳³ֲ¡׳³ג€.",
+    href: "/me/",
+    cta: "׳³ֲ׳³ג‚×׳³ֳ—׳³ג€¢׳³ג€” ׳³ג€÷׳³ֳ—׳³ֲ¦׳³ג€¢׳³ג€™׳³ֳ— ׳³ג€”׳³ג€˜׳³ֲ¨",
+  },
+  {
+    title: "׳³ֳ—׳³ֲ¦׳³ג€¢׳³ג€™׳³ֳ— ׳³ֻ׳³ֲ¨׳³ג€¢׳³ֲ ׳³ג€”׳³ג„¢׳³ג€˜׳³ג€¢׳³ֲ¨",
+    description: "׳³ג€˜׳³ג€׳³ג„¢׳³ֲ§׳³ג€ ׳³ֲ©׳³ֲ ׳³ג€”׳³ג€¢׳³ג€¢׳³ג„¢׳³ג„¢׳³ֳ— ׳³ֲ׳³ג€¢׳³ֲ¨׳³ג€”, unlock, ׳³ג€¢׳³ג€׳³ֲ¦׳³ֲ¢׳³ֳ— ׳³ג€׳³ג€׳³ֲ¦׳³ֻ׳³ֲ¨׳³ג‚×׳³ג€¢׳³ֳ— ׳³ֲ׳³ג‚×׳³ֲ ׳³ג„¢ ׳³ֲ©׳³ג„¢׳³ֲ© ׳³ג€™׳³ג„¢׳³ֲ©׳³ג€ ׳³ג‚×׳³ֲ¢׳³ג„¢׳³ֲ׳³ג€.",
+    href: "/me/unlock/",
+    cta: "׳³ֲ׳³ג‚×׳³ֳ—׳³ג€¢׳³ג€” ׳³ג€÷׳³ֳ—׳³ֲ¦׳³ג€¢׳³ג€™׳³ֳ— ׳³ֲ׳³ג€¢׳³ֲ¨׳³ג€”",
+  },
+  {
+    title: "׳³ֲ׳³ג„¢׳³ג‚×׳³ג€¢׳³ֲ¡ ׳³ֲ׳³ֲ©׳³ֳ—׳³ֲ׳³ֲ© ׳³ֲ ׳³ג„¢׳³ֲ¡׳³ג„¢׳³ג€¢׳³ֲ",
+    description: "׳³ֲ§׳³ג„¢׳³ֲ¦׳³ג€¢׳³ֲ¨ ׳³ג€׳³ֲ¨׳³ֲ ׳³ֲ׳³ֲ׳³ֲ¡׳³ֲ ׳³ֲ©׳³ג€˜׳³ג€¢ ׳³ֲ׳³ֲ׳³ֳ—׳³ֲ¨׳³ג„¢׳³ֲ ׳³ג€”׳³ג€˜׳³ֲ¨ ׳³ֲ׳³ג‚×׳³ג„¢ ׳³ֻ׳³ֲ׳³ג‚×׳³ג€¢׳³ֲ, ׳³ֻ׳³ג€¢׳³ֲ¢׳³ֲ ׳³ג„¢׳³ֲ ׳³ג‚×׳³ֲ¢׳³ג„¢׳³ֲ׳³ג€¢׳³ֳ—, ׳³ג€¢׳³ֲ׳³ֲ׳³ג‚×׳³ֲ¡׳³ג„¢׳³ֲ ׳³ֲ¡׳³ג„¢׳³ֲ¡׳³ֲ׳³ג€ ׳³ג€˜׳³ֲ׳³ג„¢ ׳³ֲ׳³ג€”׳³ג‚×׳³ֲ© ׳³ג„¢׳³ג€׳³ֲ ׳³ג„¢׳³ֳ—.",
+    href: "/dashboard/#access",
+    cta: "׳³ֲ׳³ֲ¢׳³ג€˜׳³ג€¢׳³ֲ¨ ׳³ֲ׳³ֲ׳³ג„¢׳³ג‚×׳³ג€¢׳³ֲ¡ ׳³ֲ׳³ג€׳³ג„¢׳³ֲ¨",
   },
 ];
 
 const visibleServices = flattenVisibleServices();
 const stats = {
   totalArticles: articles.length,
-  drafts: articles.filter((article) => article.status === "טיוטה").length,
-  live: articles.filter((article) => article.status === "באוויר").length,
+  drafts: articles.filter((article) => article.status === "׳³ֻ׳³ג„¢׳³ג€¢׳³ֻ׳³ג€").length,
+  live: articles.filter((article) => article.status === "׳³ג€˜׳³ֲ׳³ג€¢׳³ג€¢׳³ג„¢׳³ֲ¨").length,
   writing: articles.filter((article) => article.workflowKey === "writing").length,
   review: articles.filter((article) => article.workflowKey === "review").length,
   ready: articles.filter((article) => article.workflowKey === "ready").length,
   published: articles.filter((article) => article.workflowKey === "published").length,
   activeServices: visibleServices.length,
   featuredServices: visibleServices.filter((service) => Array.isArray(service.badges) && service.badges.length > 0).length,
-  homeCanvasTrend: homeCanvas.showTrendGraph ? "מופעל" : "כבוי",
+  homeCanvasTrend: homeCanvas.showTrendGraph ? "׳³ֲ׳³ג€¢׳³ג‚×׳³ֲ¢׳³ֲ" : "׳³ג€÷׳³ג€˜׳³ג€¢׳³ג„¢",
   clarityJourneys: Array.isArray(clarityPathsFile.paths) ? clarityPathsFile.paths.length : 0,
 };
 
 const topPriority =
   stats.ready > 0
-    ? `${stats.ready} מאמרים מוכנים לפרסום.`
+    ? `${stats.ready} ׳³ֲ׳³ֲ׳³ֲ׳³ֲ¨׳³ג„¢׳³ֲ ׳³ֲ׳³ג€¢׳³ג€÷׳³ֲ ׳³ג„¢׳³ֲ ׳³ֲ׳³ג‚×׳³ֲ¨׳³ֲ¡׳³ג€¢׳³ֲ.`
     : stats.review > 0
-      ? `${stats.review} מאמרים מחכים לבדיקה.`
-      : "אין צוואר בקבוק כרגע. אפשר לעבור ליצירה או לשיפור השירותים.";
+      ? `${stats.review} ׳³ֲ׳³ֲ׳³ֲ׳³ֲ¨׳³ג„¢׳³ֲ ׳³ֲ׳³ג€”׳³ג€÷׳³ג„¢׳³ֲ ׳³ֲ׳³ג€˜׳³ג€׳³ג„¢׳³ֲ§׳³ג€.`
+      : "׳³ֲ׳³ג„¢׳³ֲ ׳³ֲ¦׳³ג€¢׳³ג€¢׳³ֲ׳³ֲ¨ ׳³ג€˜׳³ֲ§׳³ג€˜׳³ג€¢׳³ֲ§ ׳³ג€÷׳³ֲ¨׳³ג€™׳³ֲ¢. ׳³ֲ׳³ג‚×׳³ֲ©׳³ֲ¨ ׳³ֲ׳³ֲ¢׳³ג€˜׳³ג€¢׳³ֲ¨ ׳³ֲ׳³ג„¢׳³ֲ¦׳³ג„¢׳³ֲ¨׳³ג€ ׳³ֲ׳³ג€¢ ׳³ֲ׳³ֲ©׳³ג„¢׳³ג‚×׳³ג€¢׳³ֲ¨ ׳³ג€׳³ֲ©׳³ג„¢׳³ֲ¨׳³ג€¢׳³ֳ—׳³ג„¢׳³ֲ.";
 ---
 
 <Layout title={pageTitle} description={pageDescription} noIndex={true}>
   <section class="mx-auto max-w-7xl space-y-10 px-4 pb-12 text-[var(--nm-fg)]">
     <header class="grid gap-6 rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/82 p-6 shadow-[0_30px_90px_rgba(26,26,26,0.08)] backdrop-blur-md lg:grid-cols-[minmax(0,1fr)_20rem]">
       <div class="space-y-5 text-right">
-        <p class="text-sm font-semibold uppercase tracking-[0.26em] text-[var(--nm-accent)]">Creator Dashboard</p>
-        <h1 class="text-[clamp(2.4rem,1.8rem+2vw,4rem)] font-semibold leading-[1.05]">מרכז השליטה של התוכן והמערכת</h1>
+        <p class="text-sm font-semibold uppercase tracking-[0.26em] text-[var(--nm-accent)]">׳׳ ׳”׳ ׳‘׳׳‘׳“</p>
+        <h1 class="text-[clamp(2.4rem,1.8rem+2vw,4rem)] font-semibold leading-[1.05]">׳³ֲ׳³ֲ¨׳³ג€÷׳³ג€“ ׳³ג€׳³ֲ©׳³ֲ׳³ג„¢׳³ֻ׳³ג€ ׳³ֲ©׳³ֲ ׳³ג€׳³ֳ—׳³ג€¢׳³ג€÷׳³ֲ ׳³ג€¢׳³ג€׳³ֲ׳³ֲ¢׳³ֲ¨׳³ג€÷׳³ֳ—</h1>
         <p class="max-w-3xl text-[clamp(1rem,0.94rem+0.3vw,1.15rem)] leading-8 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">
-          זה הקוקפיט התפעולי שלך. מכאן רואים מה נכתב, מה תקוע, מה מוכן לפרסום, ואילו מנגנונים באתר פעילים כרגע. לא CMS כללי, אלא סביבת עבודה שמתאימה ל־NeverMind.
+          ׳³ג€“׳³ג€ ׳³ג€׳³ֲ§׳³ג€¢׳³ֲ§׳³ג‚×׳³ג„¢׳³ֻ ׳³ג€׳³ֳ—׳³ג‚×׳³ֲ¢׳³ג€¢׳³ֲ׳³ג„¢ ׳³ֲ©׳³ֲ׳³ֲ. ׳³ֲ׳³ג€÷׳³ֲ׳³ֲ ׳³ֲ¨׳³ג€¢׳³ֲ׳³ג„¢׳³ֲ ׳³ֲ׳³ג€ ׳³ֲ ׳³ג€÷׳³ֳ—׳³ג€˜, ׳³ֲ׳³ג€ ׳³ֳ—׳³ֲ§׳³ג€¢׳³ֲ¢, ׳³ֲ׳³ג€ ׳³ֲ׳³ג€¢׳³ג€÷׳³ֲ ׳³ֲ׳³ג‚×׳³ֲ¨׳³ֲ¡׳³ג€¢׳³ֲ, ׳³ג€¢׳³ֲ׳³ג„¢׳³ֲ׳³ג€¢ ׳³ֲ׳³ֲ ׳³ג€™׳³ֲ ׳³ג€¢׳³ֲ ׳³ג„¢׳³ֲ ׳³ג€˜׳³ֲ׳³ֳ—׳³ֲ¨ ׳³ג‚×׳³ֲ¢׳³ג„¢׳³ֲ׳³ג„¢׳³ֲ ׳³ג€÷׳³ֲ¨׳³ג€™׳³ֲ¢. ׳³ֲ׳³ֲ CMS ׳³ג€÷׳³ֲ׳³ֲ׳³ג„¢, ׳³ֲ׳³ֲ׳³ֲ ׳³ֲ¡׳³ג€˜׳³ג„¢׳³ג€˜׳³ֳ— ׳³ֲ¢׳³ג€˜׳³ג€¢׳³ג€׳³ג€ ׳³ֲ©׳³ֲ׳³ֳ—׳³ֲ׳³ג„¢׳³ֲ׳³ג€ ׳³ֲ׳²ֲ¾NeverMind.
         </p>
       </div>
       <div class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-accent)_18%,transparent)] bg-[var(--nm-tint)] p-5 text-right">
-        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">תעדוף להיום</p>
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">׳³ֳ—׳³ֲ¢׳³ג€׳³ג€¢׳³ֲ£ ׳³ֲ׳³ג€׳³ג„¢׳³ג€¢׳³ֲ</p>
         <p class="mt-3 text-lg font-semibold text-[var(--nm-fg)]">{topPriority}</p>
         <p class="mt-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_64%,var(--nm-bg))]">
-          אם אתה רק מתחיל סבב עבודה חדש, המסלול הנכון הוא: מחולל מאמרים, בדיקת QA, ואז קפיצה לטבלת התוכן כדי לקדם את הסטטוס.
+          ׳³ֲ׳³ֲ ׳³ֲ׳³ֳ—׳³ג€ ׳³ֲ¨׳³ֲ§ ׳³ֲ׳³ֳ—׳³ג€”׳³ג„¢׳³ֲ ׳³ֲ¡׳³ג€˜׳³ג€˜ ׳³ֲ¢׳³ג€˜׳³ג€¢׳³ג€׳³ג€ ׳³ג€”׳³ג€׳³ֲ©, ׳³ג€׳³ֲ׳³ֲ¡׳³ֲ׳³ג€¢׳³ֲ ׳³ג€׳³ֲ ׳³ג€÷׳³ג€¢׳³ֲ ׳³ג€׳³ג€¢׳³ֲ: ׳³ֲ׳³ג€”׳³ג€¢׳³ֲ׳³ֲ ׳³ֲ׳³ֲ׳³ֲ׳³ֲ¨׳³ג„¢׳³ֲ, ׳³ג€˜׳³ג€׳³ג„¢׳³ֲ§׳³ֳ— QA, ׳³ג€¢׳³ֲ׳³ג€“ ׳³ֲ§׳³ג‚×׳³ג„¢׳³ֲ¦׳³ג€ ׳³ֲ׳³ֻ׳³ג€˜׳³ֲ׳³ֳ— ׳³ג€׳³ֳ—׳³ג€¢׳³ג€÷׳³ֲ ׳³ג€÷׳³ג€׳³ג„¢ ׳³ֲ׳³ֲ§׳³ג€׳³ֲ ׳³ֲ׳³ֳ— ׳³ג€׳³ֲ¡׳³ֻ׳³ֻ׳³ג€¢׳³ֲ¡.
         </p>
       </div>
     </header>
+
+    <section class="grid gap-4 lg:grid-cols-[minmax(0,1.12fr)_minmax(0,0.88fr)]">
+      <article class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-accent)_18%,transparent)] bg-[var(--nm-tint)] p-5 text-right shadow-[0_24px_70px_rgba(26,26,26,0.06)]">
+        <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--nm-accent)]">מנהל בלבד</p>
+        <h2 class="mt-3 text-2xl font-semibold text-[var(--nm-fg)]">שער הכניסה לניהול הראשי</h2>
+        <p class="mt-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+          העמוד הזה מיועד רק לך. מכאן עוברים למחולל התוכן, לניהול החברים, לבדיקת תצוגת חבר ולבדיקת מצב הפריסה. החבר הרגיל לא רואה את המסך הזה.
+        </p>
+        <p class="mt-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
+          מומלץ לנעול את <strong>/admin/*</strong> ואת <strong>/dashboard/*</strong> ב־Cloudflare Access למייל <strong>bigcohen2000@gmail.com</strong> בלבד.
+        </p>
+      </article>
+
+      <article class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/82 p-5 text-right shadow-[0_24px_70px_rgba(26,26,26,0.06)]">
+        <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--nm-accent)]">מעבר מהיר</p>
+        <h2 class="mt-3 text-2xl font-semibold text-[var(--nm-fg)]">חיפוש חבר וסטטוס פריסה</h2>
+        <form action="/dashboard/" method="get" class="mt-4 space-y-3">
+          <label class="block space-y-2" for="admin-quick-member-search">
+            <span class="text-sm font-semibold text-[var(--nm-fg)]">חיפוש מהיר לפי טלפון</span>
+            <input id="admin-quick-member-search" name="phone" type="tel" inputmode="numeric" pattern="[0-9]*" autocomplete="tel" placeholder="0500000000" class="min-h-[44px] w-full rounded-[1rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-white px-4 py-3 text-sm text-[var(--nm-fg)] outline-none transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nm-accent)]" />
+          </label>
+          <div class="flex flex-wrap justify-end gap-2">
+            <button type="submit" class="inline-flex min-h-[44px] items-center justify-center rounded-full bg-[var(--nm-inverse)] px-4 py-2 text-sm font-semibold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-inverse-hover)]">לעבור לחבר</button>
+            <a href="/dashboard/#system-health" class="inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-4 py-2 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]">לבדוק פריסה</a>
+          </div>
+        </form>
+      </article>
+    </section>
+
+    <section id="control-center" class="space-y-4 rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/82 p-6 shadow-[0_24px_70px_rgba(26,26,26,0.06)]">
+      <div class="space-y-2 text-right">
+        <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--nm-accent)]">׳’׳™׳©׳” ׳׳”׳™׳¨׳”</p>
+        <h2 class="text-2xl font-semibold text-[var(--nm-fg)]">׳³ֲ׳³ֲ¢׳³ג€˜׳³ֲ¨ ׳³ֲ׳³ג€׳³ג„¢׳³ֲ¨ ׳³ג€˜׳³ג„¢׳³ֲ ׳³ֲ ׳³ג„¢׳³ג€׳³ג€¢׳³ֲ ׳³ֲ׳³ֳ—׳³ֲ¦׳³ג€¢׳³ג€™׳³ֳ— ׳³ג€”׳³ג€˜׳³ֲ¨</h2>
+        <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_66%,var(--nm-bg))]">
+          ׳³ג€“׳³ג€ ׳³ֲ׳³ג€“׳³ג€¢׳³ֲ¨ ׳³ג€׳³ֲ¢׳³ג€˜׳³ג€¢׳³ג€׳³ג€ ׳³ג€׳³ֲ§׳³ֲ¦׳³ֲ¨ ׳³ֲ©׳³ֲ׳³ֲ. ׳³ֲ׳³ג„¢׳³ֲ ׳³ֲ¦׳³ג€¢׳³ֲ¨׳³ֲ ׳³ֲ׳³ג€“׳³ג€÷׳³ג€¢׳³ֲ¨ ׳³ג€÷׳³ֳ—׳³ג€¢׳³ג€˜׳³ג€¢׳³ֳ— ׳³ֲ׳³ג€¢ ׳³ֲ׳³ג€”׳³ג‚×׳³ֲ© ׳³ֲ׳³ֲ¡׳³ֲ ׳³ֲ׳³ג€”׳³ֲ¨ ׳³ג€˜׳³ג€÷׳³ֲ ׳³ג‚×׳³ֲ¢׳³ֲ ׳³ֲ©׳³ֲ¨׳³ג€¢׳³ֲ¦׳³ג„¢׳³ֲ ׳³ֲ׳³ג€˜׳³ג€׳³ג€¢׳³ֲ§ ׳³ֲ׳³ג€ ׳³ֲ¨׳³ג€¢׳³ֲ׳³ג€ ׳³ֲ׳³ֲ ׳³ג€׳³ֲ, ׳³ֲ׳³ג€ ׳³ֲ¨׳³ג€¢׳³ֲ׳³ג€ ׳³ג€”׳³ג€˜׳³ֲ¨, ׳³ג€¢׳³ֲ׳³ג„¢׳³ג‚×׳³ג€ ׳³ֲ׳³ֲ׳³ג‚×׳³ֲ¡׳³ג„¢׳³ֲ ׳³ג€™׳³ג„¢׳³ֲ©׳³ג€.
+        </p>
+      </div>
+      <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+        {controlCenterCards.map((item) => (
+          <article class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-4 text-right">
+            <h3 class="text-lg font-semibold text-[var(--nm-fg)]">{item.title}</h3>
+            <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_66%,var(--nm-bg))]">{item.description}</p>
+            <a href={item.href} class="mt-4 inline-flex items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white px-4 py-2 text-sm font-semibold text-[var(--nm-fg)] transition hover:border-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)] hover:text-[var(--nm-accent)]">{item.cta}</a>
+          </article>
+        ))}
+      </div>
+    </section>
 
     <section class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
       {quickActions.map((item) => (
@@ -213,14 +293,14 @@ const topPriority =
     </section>
 
     <section class="grid gap-4 md:grid-cols-4 xl:grid-cols-8">
-      <article class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-5 text-right"><p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">מאמרים</p><p class="mt-3 text-3xl font-semibold text-[var(--nm-fg)]">{stats.totalArticles}</p></article>
-      <article class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-5 text-right"><p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">טיוטות</p><p class="mt-3 text-3xl font-semibold text-[var(--nm-fg)]">{stats.drafts}</p></article>
-      <article class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-5 text-right"><p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">באוויר</p><p class="mt-3 text-3xl font-semibold text-[var(--nm-fg)]">{stats.live}</p></article>
-      <article class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-5 text-right"><p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">בכתיבה</p><p class="mt-3 text-3xl font-semibold text-[var(--nm-fg)]">{stats.writing}</p></article>
-      <article class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-5 text-right"><p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">לבדיקה</p><p class="mt-3 text-3xl font-semibold text-[var(--nm-fg)]">{stats.review}</p></article>
-      <article class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-5 text-right"><p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">מוכן לפרסום</p><p class="mt-3 text-3xl font-semibold text-[var(--nm-fg)]">{stats.ready}</p></article>
-      <article class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-5 text-right"><p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">פורסם</p><p class="mt-3 text-3xl font-semibold text-[var(--nm-fg)]">{stats.published}</p></article>
-      <article class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-5 text-right"><p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">שירותים פעילים</p><p class="mt-3 text-3xl font-semibold text-[var(--nm-fg)]">{stats.activeServices}</p></article>
+      <article class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-5 text-right"><p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">׳³ֲ׳³ֲ׳³ֲ׳³ֲ¨׳³ג„¢׳³ֲ</p><p class="mt-3 text-3xl font-semibold text-[var(--nm-fg)]">{stats.totalArticles}</p></article>
+      <article class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-5 text-right"><p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">׳³ֻ׳³ג„¢׳³ג€¢׳³ֻ׳³ג€¢׳³ֳ—</p><p class="mt-3 text-3xl font-semibold text-[var(--nm-fg)]">{stats.drafts}</p></article>
+      <article class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-5 text-right"><p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">׳³ג€˜׳³ֲ׳³ג€¢׳³ג€¢׳³ג„¢׳³ֲ¨</p><p class="mt-3 text-3xl font-semibold text-[var(--nm-fg)]">{stats.live}</p></article>
+      <article class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-5 text-right"><p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">׳³ג€˜׳³ג€÷׳³ֳ—׳³ג„¢׳³ג€˜׳³ג€</p><p class="mt-3 text-3xl font-semibold text-[var(--nm-fg)]">{stats.writing}</p></article>
+      <article class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-5 text-right"><p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">׳³ֲ׳³ג€˜׳³ג€׳³ג„¢׳³ֲ§׳³ג€</p><p class="mt-3 text-3xl font-semibold text-[var(--nm-fg)]">{stats.review}</p></article>
+      <article class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-5 text-right"><p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">׳³ֲ׳³ג€¢׳³ג€÷׳³ֲ ׳³ֲ׳³ג‚×׳³ֲ¨׳³ֲ¡׳³ג€¢׳³ֲ</p><p class="mt-3 text-3xl font-semibold text-[var(--nm-fg)]">{stats.ready}</p></article>
+      <article class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-5 text-right"><p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">׳³ג‚×׳³ג€¢׳³ֲ¨׳³ֲ¡׳³ֲ</p><p class="mt-3 text-3xl font-semibold text-[var(--nm-fg)]">{stats.published}</p></article>
+      <article class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-5 text-right"><p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">׳³ֲ©׳³ג„¢׳³ֲ¨׳³ג€¢׳³ֳ—׳³ג„¢׳³ֲ ׳³ג‚×׳³ֲ¢׳³ג„¢׳³ֲ׳³ג„¢׳³ֲ</p><p class="mt-3 text-3xl font-semibold text-[var(--nm-fg)]">{stats.activeServices}</p></article>
     </section>
 
     <section id="content-queue">
@@ -239,32 +319,32 @@ const topPriority =
 
     <section class="grid gap-4 md:grid-cols-2">
       <article class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/82 p-5 shadow-[0_24px_70px_rgba(26,26,26,0.06)] text-right">
-        <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--nm-accent)]">System State</p>
-        <h2 class="mt-3 text-2xl font-semibold text-[var(--nm-fg)]">מודולים גלובליים</h2>
+        <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--nm-accent)]">׳׳¦׳‘ ׳׳¢׳¨׳›׳×</p>
+        <h2 class="mt-3 text-2xl font-semibold text-[var(--nm-fg)]">׳³ֲ׳³ג€¢׳³ג€׳³ג€¢׳³ֲ׳³ג„¢׳³ֲ ׳³ג€™׳³ֲ׳³ג€¢׳³ג€˜׳³ֲ׳³ג„¢׳³ג„¢׳³ֲ</h2>
         <ul class="mt-5 space-y-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
-          <li class="rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3">Whisper Banner: <strong>{siteSettings.whisperBanner.enabled ? "מופעל" : "כבוי"}</strong></li>
-          <li class="rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3">Premium Vault: <strong>{siteSettings.premiumVault.enabled ? "מופעל" : "כבוי"}</strong></li>
-          <li class="rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3">Logic Canvas / TrendGraph: <strong>{stats.homeCanvasTrend}</strong></li>
-          <li class="rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3">Clarity Journeys: <strong>{stats.clarityJourneys} מסלולים</strong></li>
+          <li class="rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3">׳‘׳׳ ׳¨ ׳₪׳™׳×׳•׳—: <strong>{siteSettings.whisperBanner.enabled ? "׳³ֲ׳³ג€¢׳³ג‚×׳³ֲ¢׳³ֲ" : "׳³ג€÷׳³ג€˜׳³ג€¢׳³ג„¢"}</strong></li>
+          <li class="rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3">׳›׳¡׳₪׳× ׳₪׳¨׳™׳׳™׳•׳: <strong>{siteSettings.premiumVault.enabled ? "׳³ֲ׳³ג€¢׳³ג‚×׳³ֲ¢׳³ֲ" : "׳³ג€÷׳³ג€˜׳³ג€¢׳³ג„¢"}</strong></li>
+          <li class="rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3">׳§׳ ׳‘׳¡ ׳•׳׳’׳׳× ׳׳—׳©׳‘׳”: <strong>{stats.homeCanvasTrend}</strong></li>
+          <li class="rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3">׳׳¡׳׳•׳׳™ ׳‘׳”׳™׳¨׳•׳×: <strong>{stats.clarityJourneys} ׳³ֲ׳³ֲ¡׳³ֲ׳³ג€¢׳³ֲ׳³ג„¢׳³ֲ</strong></li>
         </ul>
       </article>
 
       <article class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/82 p-5 shadow-[0_24px_70px_rgba(26,26,26,0.06)] text-right">
-        <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--nm-accent)]">זרימת עבודה מעודכנת</p>
-        <h2 class="mt-3 text-2xl font-semibold text-[var(--nm-fg)]">מה עושים מכאן</h2>
+        <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--nm-accent)]">׳³ג€“׳³ֲ¨׳³ג„¢׳³ֲ׳³ֳ— ׳³ֲ¢׳³ג€˜׳³ג€¢׳³ג€׳³ג€ ׳³ֲ׳³ֲ¢׳³ג€¢׳³ג€׳³ג€÷׳³ֲ ׳³ֳ—</p>
+        <h2 class="mt-3 text-2xl font-semibold text-[var(--nm-fg)]">׳³ֲ׳³ג€ ׳³ֲ¢׳³ג€¢׳³ֲ©׳³ג„¢׳³ֲ ׳³ֲ׳³ג€÷׳³ֲ׳³ֲ</h2>
         <ol class="mt-5 space-y-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
           <li class="rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3">
-            יוצרים טיוטה חדשה ומייצרים תוכן מהמחולל.
-            <a href="/admin/generator/" class="ms-2 font-semibold text-[var(--nm-accent)] underline-offset-4 hover:underline">פתח מחולל</a>
+            ׳³ג„¢׳³ג€¢׳³ֲ¦׳³ֲ¨׳³ג„¢׳³ֲ ׳³ֻ׳³ג„¢׳³ג€¢׳³ֻ׳³ג€ ׳³ג€”׳³ג€׳³ֲ©׳³ג€ ׳³ג€¢׳³ֲ׳³ג„¢׳³ג„¢׳³ֲ¦׳³ֲ¨׳³ג„¢׳³ֲ ׳³ֳ—׳³ג€¢׳³ג€÷׳³ֲ ׳³ֲ׳³ג€׳³ֲ׳³ג€”׳³ג€¢׳³ֲ׳³ֲ.
+            <a href="/admin/generator/" class="ms-2 font-semibold text-[var(--nm-accent)] underline-offset-4 hover:underline">׳³ג‚×׳³ֳ—׳³ג€” ׳³ֲ׳³ג€”׳³ג€¢׳³ֲ׳³ֲ</a>
           </li>
           <li class="rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3">
-            מקדמים מאמרים דרך התור לפי סטטוס: בכתיבה, לבדיקה, מוכן לפרסום, פורסם.
-            <a href="#content-queue" class="ms-2 font-semibold text-[var(--nm-accent)] underline-offset-4 hover:underline">לתור המאמרים</a>
+            ׳³ֲ׳³ֲ§׳³ג€׳³ֲ׳³ג„¢׳³ֲ ׳³ֲ׳³ֲ׳³ֲ׳³ֲ¨׳³ג„¢׳³ֲ ׳³ג€׳³ֲ¨׳³ֲ ׳³ג€׳³ֳ—׳³ג€¢׳³ֲ¨ ׳³ֲ׳³ג‚×׳³ג„¢ ׳³ֲ¡׳³ֻ׳³ֻ׳³ג€¢׳³ֲ¡: ׳³ג€˜׳³ג€÷׳³ֳ—׳³ג„¢׳³ג€˜׳³ג€, ׳³ֲ׳³ג€˜׳³ג€׳³ג„¢׳³ֲ§׳³ג€, ׳³ֲ׳³ג€¢׳³ג€÷׳³ֲ ׳³ֲ׳³ג‚×׳³ֲ¨׳³ֲ¡׳³ג€¢׳³ֲ, ׳³ג‚×׳³ג€¢׳³ֲ¨׳³ֲ¡׳³ֲ.
+            <a href="#content-queue" class="ms-2 font-semibold text-[var(--nm-accent)] underline-offset-4 hover:underline">׳³ֲ׳³ֳ—׳³ג€¢׳³ֲ¨ ׳³ג€׳³ֲ׳³ֲ׳³ֲ׳³ֲ¨׳³ג„¢׳³ֲ</a>
           </li>
           <li class="rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3">
-            לפני push בודקים שירותים, הגדרות כלליות, קנבס ומסלולים.
-            <a href="#services-config" class="ms-2 font-semibold text-[var(--nm-accent)] underline-offset-4 hover:underline">שירותים וקונפיג</a>
-            <a href="#canvas-paths" class="ms-2 font-semibold text-[var(--nm-accent)] underline-offset-4 hover:underline">קנבס ומסלולים</a>
+            ׳³ֲ׳³ג‚×׳³ֲ ׳³ג„¢ push ׳³ג€˜׳³ג€¢׳³ג€׳³ֲ§׳³ג„¢׳³ֲ ׳³ֲ©׳³ג„¢׳³ֲ¨׳³ג€¢׳³ֳ—׳³ג„¢׳³ֲ, ׳³ג€׳³ג€™׳³ג€׳³ֲ¨׳³ג€¢׳³ֳ— ׳³ג€÷׳³ֲ׳³ֲ׳³ג„¢׳³ג€¢׳³ֳ—, ׳³ֲ§׳³ֲ ׳³ג€˜׳³ֲ¡ ׳³ג€¢׳³ֲ׳³ֲ¡׳³ֲ׳³ג€¢׳³ֲ׳³ג„¢׳³ֲ.
+            <a href="#services-config" class="ms-2 font-semibold text-[var(--nm-accent)] underline-offset-4 hover:underline">׳³ֲ©׳³ג„¢׳³ֲ¨׳³ג€¢׳³ֳ—׳³ג„¢׳³ֲ ׳³ג€¢׳³ֲ§׳³ג€¢׳³ֲ ׳³ג‚×׳³ג„¢׳³ג€™</a>
+            <a href="#canvas-paths" class="ms-2 font-semibold text-[var(--nm-accent)] underline-offset-4 hover:underline">׳³ֲ§׳³ֲ ׳³ג€˜׳³ֲ¡ ׳³ג€¢׳³ֲ׳³ֲ¡׳³ֲ׳³ג€¢׳³ֲ׳³ג„¢׳³ֲ</a>
           </li>
         </ol>
       </article>

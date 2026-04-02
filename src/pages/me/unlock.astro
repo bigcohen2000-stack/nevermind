@@ -146,10 +146,10 @@ const offerSchema = {
 ---
 
 <Layout
-  title="ברוך הבא ל-NeverMind – גם בלי קוד"
+  title="ברוך הבא ל-NeverMind - גם בלי קוד"
   description="מועדון NeverMind חינם + חיבור פעיל. גם בלי קוד, אתה כבר בבית: מאמרים, חשיבה צלולה, שיטת ההיפוכים ושיחה ישירה בוואטסאפ."
   faqItems={faqItems}
-  breadcrumbCurrentLabel="ברוך הבא ל-NeverMind – גם בלי קוד"
+  breadcrumbCurrentLabel="ברוך הבא ל-NeverMind - גם בלי קוד"
 >
   <script type="application/ld+json" set:html={jsonLdForInlineScript(personSchema)} />
   <script type="application/ld+json" set:html={jsonLdForInlineScript(offerSchema)} />
@@ -166,7 +166,7 @@ const offerSchema = {
         <div class="space-y-4">
           <p class="text-sm font-semibold tracking-[0.16em] text-[rgba(26,26,26,0.46)]">אזור אישי</p>
           <h1 class="max-w-3xl text-[clamp(2.4rem,1.9rem+2.5vw,4.8rem)] font-semibold leading-[1.02] tracking-[-0.04em]">
-            ברוך הבא ל-NeverMind – גם בלי קוד
+            ברוך הבא ל-NeverMind - גם בלי קוד
           </h1>
           <p class="max-w-2xl text-[1.06rem] leading-8 text-[rgba(26,26,26,0.72)]">
             גם אם הקוד לא נפתח, הדלת כאן נשארת פתוחה. אתה כבר בבית, זה עדיין חינם בשבילך, וכאן כבר מרגישים את השקט.
@@ -219,6 +219,23 @@ const offerSchema = {
         </div>
       </div>
     </header>
+
+    <section data-unlock-preview-root class="hidden mt-6 rounded-[1.6rem] border border-[rgba(212,43,43,0.18)] bg-[rgba(212,43,43,0.06)] px-5 py-4 shadow-[0_16px_36px_rgba(212,43,43,0.08)]">
+      <div class="flex flex-wrap items-start justify-between gap-4 text-right">
+        <div class="space-y-3">
+          <div class="space-y-1">
+            <p class="text-xs font-semibold tracking-[0.18em] text-[#D42B2B]">תצוגת טרום חיבור</p>
+            <h2 data-unlock-preview-title class="text-lg font-semibold text-[#1A1A1A]">כך נראה המסך לפני כניסה</h2>
+            <p data-unlock-preview-copy class="max-w-3xl text-sm leading-8 text-[rgba(26,26,26,0.72)]">הבדיקה הזאת פתוחה מתוך הניהול בלבד, כדי לראות איך עמוד הטרום־חיבור מרגיש לפני שיש גישה פעילה מהמכשיר.</p>
+          </div>
+          <div class="flex flex-wrap justify-end gap-2 text-xs">
+            <span data-unlock-preview-status class="rounded-full border border-[rgba(212,43,43,0.2)] bg-white/82 px-3 py-1.5 font-semibold text-[#1A1A1A]">טוען מצב</span>
+            <span data-unlock-preview-meta class="rounded-full border border-[rgba(26,26,26,0.1)] bg-white/76 px-3 py-1.5 text-[rgba(26,26,26,0.68)]">הטלפון יופיע כאן</span>
+          </div>
+        </div>
+        <a href="/me/unlock/" class="inline-flex min-h-[44px] items-center rounded-full border border-[rgba(26,26,26,0.12)] bg-white px-4 py-2 text-sm font-semibold text-[#1A1A1A] transition hover:bg-[rgba(255,255,255,0.84)]">לצאת מתצוגה</a>
+      </div>
+    </section>
 
     <section class="mt-6 grid gap-4 md:grid-cols-4">
       {[
@@ -722,7 +739,19 @@ const offerSchema = {
         }
       };
 
-      const renderLiveCounter = (activeNow, mood) => {
+      const renderLiveCounter = (activeNow, mood, available = true) => {
+        if (!available) {
+          if (liveCounterCount instanceof HTMLElement) {
+            liveCounterCount.textContent = "--";
+          }
+          if (liveCounterCopy instanceof HTMLElement) {
+            liveCounterCopy.textContent = "הספירה החיה תופעל כשהחיבור לאנליטיקס יושלם.";
+          }
+          if (liveCounterNote instanceof HTMLElement) {
+            liveCounterNote.textContent = "בינתיים אפשר להישאר כאן בשקט בלי מספר מומצא.";
+          }
+          return;
+        }
         const safeCount = Math.max(1, Number(activeNow) || 1);
         if (liveCounterCount instanceof HTMLElement) {
           liveCounterCount.textContent = String(safeCount);
@@ -780,12 +809,16 @@ const offerSchema = {
           });
           const payload = await response.json().catch(() => null);
           if (!response.ok || !payload?.ok) {
-            renderLiveCounter(1, "יש כאן שקט זמין");
+            renderLiveCounter(null, "הספירה החיה ממתינה לחיבור", false);
             return;
           }
-          renderLiveCounter(payload.activeNow, payload.mood);
+          if (payload.available === false) {
+            renderLiveCounter(null, payload.mood, false);
+            return;
+          }
+          renderLiveCounter(payload.activeNow, payload.mood, true);
         } catch {
-          renderLiveCounter(1, "יש כאן שקט זמין");
+          renderLiveCounter(null, "הספירה החיה ממתינה לחיבור", false);
         }
       };
 
@@ -883,6 +916,10 @@ const offerSchema = {
         void refreshPulse();
       });
     })();
+  </script>
+
+  <script>
+    import "../../scripts/unlock-preview.js";
   </script>
 </Layout>
 

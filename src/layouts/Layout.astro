@@ -79,7 +79,7 @@ const trimMetaDescription = (value: string) => {
   if (normalized.length <= 155) return normalized;
   return `${normalized.slice(0, 152).trimEnd()}...`;
 };
-/** מטא ברירת מחדל: מילות מפתח SEO + בלי משפטי «ש…» */
+/** מטא ברירת מחדל: מילות מפתח SEO + בלי משפטי "ש…" */
 const siteDescription = trimMetaDescription(
   "מרכז חקירה: שקט נפשי, חשיבה צלולה, אמת אובייקטיבית, הבנה מושלמת של עובדה מול סיפור. איך להפסיק לסבול מתוך בלבול. NeverMind."
 );
@@ -433,7 +433,7 @@ const podcastSessionProductsSchema = [
   {
     "@context": "https://schema.org",
     "@type": "Product",
-    name: "סשן אולפן פודקאסט — עד חצי שעה",
+    name: "סשן אולפן פודקאסט - עד חצי שעה",
     description: "הקלטה באולפן פודקאסט, עד 30 דקות.",
     brand: { "@type": "Brand", name: siteTitle },
     sku: "nm-podcast-30",
@@ -450,7 +450,7 @@ const podcastSessionProductsSchema = [
   {
     "@context": "https://schema.org",
     "@type": "Product",
-    name: "סשן אולפן פודקאסט — עד שעה",
+    name: "סשן אולפן פודקאסט - עד שעה",
     description: "הקלטה באולפן פודקאסט, עד 60 דקות.",
     brand: { "@type": "Brand", name: siteTitle },
     sku: "nm-podcast-60",
@@ -618,7 +618,7 @@ const socialLinks = [
               </span>
             </a>
 
-            <div class="nm-nav-shell col-span-2 row-start-2 min-w-0 md:col-span-1 md:col-start-2 md:row-start-1 md:justify-self-stretch">
+            <div class="nm-nav-shell col-span-2 row-start-3 min-w-0 md:col-span-1 md:col-start-2 md:row-start-1 md:justify-self-stretch">
               <div class="nm-nav-pill overflow-x-auto nm-nav-scroll-hide">
                 <ul class="flex w-max min-w-full flex-nowrap items-stretch justify-center gap-0.5 px-0.5 py-0.5 sm:gap-1" role="list">
                   {intentNavItems.map((item) => {
@@ -644,7 +644,7 @@ const socialLinks = [
               </div>
             </div>
 
-            <div class="nm-header-actions col-start-2 row-start-1 flex shrink-0 items-center justify-end gap-2 md:col-start-3 md:row-start-1">
+            <div class="nm-header-actions col-span-2 row-start-2 flex min-w-0 flex-wrap items-center justify-end gap-2 md:col-span-1 md:col-start-3 md:row-start-1 md:min-w-max md:flex-nowrap">
               <a
                 href="/services/"
                 data-astro-prefetch
@@ -658,7 +658,8 @@ const socialLinks = [
                 aria-label="פתיחת מאמר אקראי מהארכיון"
                 class="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full bg-[var(--nm-accent)] px-3.5 py-2 text-sm font-medium text-[var(--nm-on-accent)] transition-colors duration-200 [transition-timing-function:ease] hover:bg-[var(--nm-accent-hover)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-red)] sm:px-4"
               >
-                תפתיעו אותי
+                <span class="sm:hidden">מאמר</span>
+                <span class="hidden sm:inline">תפתיעו אותי</span>
               </button>
               <button
                 id="search-trigger"
@@ -677,7 +678,8 @@ const socialLinks = [
                 data-nm-auth-login
                 class="inline-flex min-h-[44px] items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-white/92 px-3.5 py-2 text-sm font-semibold text-[var(--nm-fg)] no-underline transition hover:border-[color-mix(in_srgb,var(--nm-accent)_28%,transparent)] hover:text-[var(--nm-accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-red)]"
               >
-                כניסה או הרשמה
+                <span class="sm:hidden">כניסה</span>
+                <span class="hidden sm:inline">כניסה או הרשמה</span>
               </a>
               <a
                 href="/me/"
@@ -1887,6 +1889,107 @@ const socialLinks = [
           navigator.serviceWorker.register("/sw.js", { scope: "/" }).catch(function () {});
         });
       }
+    </script>
+      <script is:inline>
+      (() => {
+        if (window.__nmConnectivityBooted) return;
+        window.__nmConnectivityBooted = true;
+
+        let timer = null;
+        let root = null;
+
+        const ensureUi = () => {
+          if (root) return root;
+          const style = document.createElement("style");
+          style.id = "nm-connectivity-style";
+          style.textContent = `
+            .nm-connectivity-banner {
+              position: fixed;
+              left: 50%;
+              bottom: 1rem;
+              transform: translateX(-50%) translateY(10px);
+              z-index: 90;
+              display: inline-flex;
+              align-items: center;
+              gap: 0.65rem;
+              min-height: 46px;
+              max-width: min(32rem, calc(100vw - 1.5rem));
+              padding: 0.7rem 1rem;
+              border-radius: 999px;
+              border: 0.5px solid rgba(26, 26, 26, 0.1);
+              background: rgba(250, 250, 248, 0.96);
+              color: #1A1A1A;
+              box-shadow: 0 16px 40px rgba(26, 26, 26, 0.12);
+              backdrop-filter: blur(16px);
+              opacity: 0;
+              pointer-events: none;
+              transition: opacity 180ms ease, transform 180ms ease;
+            }
+            .nm-connectivity-banner.is-visible {
+              opacity: 1;
+              transform: translateX(-50%) translateY(0);
+            }
+            .nm-connectivity-dot {
+              width: 0.6rem;
+              height: 0.6rem;
+              border-radius: 999px;
+              flex: 0 0 auto;
+              background: #D42B2B;
+              box-shadow: 0 0 0 6px rgba(212, 43, 43, 0.08);
+            }
+            .nm-connectivity-banner[data-kind="online"] .nm-connectivity-dot {
+              background: #4B6055;
+              box-shadow: 0 0 0 6px rgba(75, 96, 85, 0.08);
+            }
+            .nm-connectivity-copy {
+              font-size: 0.84rem;
+              line-height: 1.55;
+            }
+          `;
+          document.head.appendChild(style);
+
+          root = document.createElement("div");
+          root.className = "nm-connectivity-banner";
+          root.setAttribute("role", "status");
+          root.setAttribute("aria-live", "polite");
+          root.innerHTML = '<span class="nm-connectivity-dot" aria-hidden="true"></span><span class="nm-connectivity-copy"></span>';
+          document.body.appendChild(root);
+          return root;
+        };
+
+        const show = (message, kind = "issue", timeout = kind === "online" ? 2200 : 4200) => {
+          const el = ensureUi();
+          const copy = el.querySelector(".nm-connectivity-copy");
+          if (copy) copy.textContent = String(message || "");
+          el.dataset.kind = kind;
+          el.classList.add("is-visible");
+          window.clearTimeout(timer);
+          if (timeout > 0) {
+            timer = window.setTimeout(() => {
+              el.classList.remove("is-visible");
+            }, timeout);
+          }
+        };
+
+        window.__nmReportConnectivityIssue = (message) => {
+          show(message || "יש עיכוב קטן בחיבור. אפשר לנסות שוב בעוד רגע.", "issue", 4200);
+        };
+        window.__nmClearConnectivityIssue = () => {
+          if (root) root.classList.remove("is-visible");
+          window.clearTimeout(timer);
+        };
+
+        const syncOnlineState = () => {
+          if (navigator.onLine === false) {
+            show("נראה שהחיבור לרשת התנתק. אפשר להמשיך לקרוא, ונחזור כשיש חיבור.", "issue", 0);
+            return;
+          }
+          show("החיבור חזר. אפשר להמשיך כרגיל.", "online", 2200);
+        };
+
+        window.addEventListener("offline", syncOnlineState);
+        window.addEventListener("online", syncOnlineState);
+      })();
     </script>
   </body>
 </html>

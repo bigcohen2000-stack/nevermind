@@ -45,6 +45,13 @@ const publishedLabel = frontmatter.pubDate
       year: "numeric",
     })
   : "";
+const lastUpdatedLabel = frontmatter.updatedDate
+  ? new Date(frontmatter.updatedDate).toLocaleDateString("he-IL", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    })
+  : publishedLabel;
 const mdxComponents = {
   ClarityAnalogy,
   ConceptCallout,
@@ -65,6 +72,12 @@ const videoSummaryPointsArticle = Array.isArray(frontmatter.videoSummaryPoints)
   ? frontmatter.videoSummaryPoints
   : [];
 const hasQuestionForSchema = Boolean(String(frontmatter.questionForSchema ?? "").trim());
+const articleSimpleSummary = typeof frontmatter.simpleSummary === "string" && frontmatter.simpleSummary.trim()
+  ? frontmatter.simpleSummary.trim()
+  : frontmatter.description;
+const articleQuickTakeaways = Array.isArray(frontmatter.quickTakeaways)
+  ? frontmatter.quickTakeaways.map((item) => String(item).trim()).filter(Boolean).slice(0, 3)
+  : [];
 ---
 
 <Layout
@@ -83,17 +96,58 @@ const hasQuestionForSchema = Boolean(String(frontmatter.questionForSchema ?? "")
       <p class="mt-4 max-w-3xl text-[clamp(1rem,0.96rem+0.22vw,1.08rem)] leading-[1.8] text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">
         {frontmatter.description}
       </p>
-      <p class="mt-3 text-sm font-medium text-[color-mix(in_srgb,var(--nm-fg)_58%,var(--nm-bg))]">
-        בערך {readingMinutesArticle} דקות קריאה (משוער לפי אורך הטקסט)
-      </p>
-      {
-        publishedLabel ? (
-          <p class="mt-4 text-sm text-[color-mix(in_srgb,var(--nm-fg)_50%,var(--nm-bg))]">
-            עודכן במערכת ב-{publishedLabel}
-          </p>
-        ) : null
-      }
+
+      <div class="mt-5 flex flex-wrap items-center justify-between gap-3 text-sm text-[color-mix(in_srgb,var(--nm-fg)_58%,var(--nm-bg))]">
+        <div class="flex flex-wrap items-center gap-3">
+          <span>בערך {readingMinutesArticle} דקות קריאה</span>
+          <span class="text-[color-mix(in_srgb,var(--nm-fg)_26%,transparent)]">•</span>
+          <span>עודכן לאחרונה ב-{lastUpdatedLabel}</span>
+        </div>
+        <a href="/articles/" class="inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] px-4 py-2 font-semibold text-[var(--nm-fg)] transition hover:border-[color-mix(in_srgb,var(--nm-accent)_18%,transparent)] hover:bg-[var(--nm-surface-muted)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nm-accent)]">
+          חזרה לכל המאמרים
+        </a>
+      </div>
     </header>
+
+    <section class="mt-5 grid gap-4 rounded-[1.75rem] border border-[color-mix(in_srgb,var(--nm-accent)_14%,transparent)] bg-[linear-gradient(135deg,rgba(250,250,248,0.98),rgba(244,241,237,0.94))] px-5 py-5 shadow-[0_14px_32px_rgba(26,26,26,0.03)] md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
+      <div class="space-y-2">
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">האתר בהרצה</p>
+        <h2 class="text-xl font-semibold text-[var(--nm-fg)]">ראית טעות, קישור שבור או משפט שלא יושב נכון</h2>
+        <p class="max-w-2xl text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
+          אפשר לשלוח תיקון קצר מתוך העמוד הזה. אם תסמן טקסט לפני הלחיצה, הוא ייכנס אוטומטית לדיווח. זה עוזר לנו לדייק את האתר בזמן הפיתוח בלי להכביד על הקריאה.
+        </p>
+      </div>
+      <div class="flex flex-col items-stretch gap-2 md:min-w-[15rem]">
+        <button
+          type="button"
+          data-open-integrity-report
+          data-integrity-context="article"
+          class="inline-flex min-h-[48px] items-center justify-center rounded-full bg-[rgba(212,43,43,0.08)] px-5 py-2.5 text-sm font-semibold text-[var(--nm-accent)] transition hover:bg-[rgba(212,43,43,0.12)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nm-accent)]"
+        >
+          שליחת תיקון לעמוד הזה
+        </button>
+        <p class="text-xs leading-6 text-[color-mix(in_srgb,var(--nm-fg)_56%,var(--nm-bg))]">הדיווח נשמר אצלנו ונשאר פתוח גם למי שרק בודק את האתר.</p>
+      </div>
+    </section>
+
+    {articleSimpleSummary || articleQuickTakeaways.length ? (
+      <section class="mt-5 rounded-[1.75rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/88 px-5 py-5 shadow-[0_14px_28px_rgba(26,26,26,0.03)]">
+        <div class="space-y-2">
+          <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">&#1489;&#1508;&#1513;&#1496;&#1493;&#1514;</p>
+          <h2 class="text-xl font-semibold text-[var(--nm-fg)]">&#1502;&#1492; &#1499;&#1491;&#1488;&#1497; &#1500;&#1492;&#1489;&#1497;&#1503; &#1500;&#1508;&#1504;&#1497; &#1513;&#1504;&#1499;&#1504;&#1505;&#1497;&#1501; &#1500;&#1506;&#1493;&#1502;&#1511;</h2>
+          <p class="max-w-3xl text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
+            {articleSimpleSummary}
+          </p>
+        </div>
+        {articleQuickTakeaways.length ? (
+          <ul class="mt-4 grid gap-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))] md:grid-cols-3">
+            {articleQuickTakeaways.map((item) => (
+              <li class="rounded-[1.1rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] px-4 py-3">{item}</li>
+            ))}
+          </ul>
+        ) : null}
+      </section>
+    ) : null}
 
     {
       youtubeIdArticle ? (
@@ -111,6 +165,28 @@ const hasQuestionForSchema = Boolean(String(frontmatter.questionForSchema ?? "")
         <Content components={mdxComponents} />
       </ArticleLayout>
     </div>
+
+    <section class="mt-8 grid gap-4 rounded-[1.75rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/80 px-5 py-5 shadow-[0_14px_28px_rgba(26,26,26,0.03)] md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
+      <div class="space-y-2">
+        <h2 class="text-lg font-semibold text-[var(--nm-fg)]">האתר עדיין בשלבי למידה</h2>
+        <p class="max-w-2xl text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_66%,var(--nm-bg))]">
+          האתר פותח ועוצב על ידי AI כפרויקט מחקר והנאה, ולכן הוא עדיין בשלבי למידה. נשמח לעזרה שלכם באיתור שגיאות כתיב, ניסוחים כבדים או קישורים שבורים. אפשר לפתוח את חלון הדיווח בלחיצה כאן.
+        </p>
+      </div>
+      <div class="flex flex-wrap justify-end gap-3">
+        <button
+          type="button"
+          data-open-integrity-report
+          data-integrity-context="article-footer"
+          class="inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] px-4 py-2 text-sm font-semibold text-[var(--nm-fg)] transition hover:border-[color-mix(in_srgb,var(--nm-accent)_18%,transparent)] hover:text-[var(--nm-accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nm-accent)]"
+        >
+          יש לי תיקון או הערה
+        </button>
+        <a href="/articles/" class="inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] px-4 py-2 text-sm font-semibold text-[var(--nm-fg)] transition hover:border-[color-mix(in_srgb,var(--nm-accent)_18%,transparent)] hover:bg-[var(--nm-surface-muted)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nm-accent)]">
+          לעוד מאמרים
+        </a>
+      </div>
+    </section>
 
     {
       frontmatter.isPremium ? (
@@ -149,24 +225,32 @@ const hasQuestionForSchema = Boolean(String(frontmatter.questionForSchema ?? "")
 <style>
   .nm-article-shell :global(.nm-article .content) {
     display: grid;
-    gap: 1.25rem;
+    gap: 1.35rem;
   }
 
   .nm-article-shell :global(.nm-article h2),
   .nm-article-shell :global(.nm-article h3) {
     color: var(--nm-fg);
-    line-height: 1.4;
+    line-height: 1.45;
+    scroll-margin-top: 8rem;
   }
 
   .nm-article-shell :global(.nm-article p),
   .nm-article-shell :global(.nm-article li) {
-    line-height: 1.8;
-    color: color-mix(in srgb, var(--nm-fg) 80%, var(--nm-bg));
+    line-height: 1.95;
+    color: color-mix(in srgb, var(--nm-fg) 82%, var(--nm-bg));
   }
 
   .nm-article-shell :global(.nm-article ul),
   .nm-article-shell :global(.nm-article ol) {
     padding-inline: 1.2rem;
+  }
+
+  .nm-article-shell :global(.nm-article blockquote) {
+    margin: 1.4rem 0;
+    border-inline-start: 3px solid color-mix(in srgb, var(--nm-accent) 24%, transparent);
+    padding-inline: 1rem;
+    color: color-mix(in srgb, var(--nm-fg) 74%, var(--nm-bg));
   }
 
   .nm-article-shell :global(.nm-article img) {
@@ -175,5 +259,4 @@ const hasQuestionForSchema = Boolean(String(frontmatter.questionForSchema ?? "")
     border-radius: 1.25rem;
   }
 </style>
-
 

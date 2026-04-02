@@ -40,12 +40,12 @@ export type StageService = ServiceStage["services"][number] & {
   whatsapp_template?: string | null;
   features?: Array<string | { text?: string; icon?: string }>;
   friendly_note?: string;
-  /** מה קורה בפועל (3), מתאים כש (2), לא מתאים כש (1) — כרטיס מחירון */
+  /** מה קורה בפועל (3), מתאים כש (2), לא מתאים כש (1) - כרטיס מחירון */
   what_happens?: string[];
   fits_when?: string[];
   not_when?: string;
   extensions?: ServiceExtension[];
-  /** אם true: בוחרים תחילה הרחבה (בלי ברירת מחדל), ואז נפתחים מחיר וכפתורים — כמו שלבים בטופס */
+  /** אם true: בוחרים תחילה הרחבה (בלי ברירת מחדל), ואז נפתחים מחיר וכפתורים - כמו שלבים בטופס */
   extensions_gated?: boolean;
   update?: boolean;
   override_on_extension?: boolean;
@@ -108,22 +108,22 @@ export const defaultWhatsappServiceTemplate =
 
 /** מפת אייקונים לפיצ'רים */
 export const featureIcons: Record<string, string> = {
-  default: "ג“",
-  phone: "נ“±",
-  location: "נ“",
-  privacy: "נ”’",
-  time: "ג±",
-  group: "נ‘¥",
-  video: "נ¥",
-  whatsapp: "נ’¬",
-  content: "נ“–",
-  recurring: "נ”„",
+  default: "•",
+  phone: "📞",
+  location: "📍",
+  privacy: "🔒",
+  time: "⏱",
+  group: "👥",
+  video: "🎥",
+  whatsapp: "💬",
+  content: "📚",
+  recurring: "🔁",
 };
 
 export const servicesCurrency = servicesConfig.currency;
 export const servicesTaxLabel = servicesConfig.tax_label;
 
-/** מחיר ייחוס לתצוגה (לפני הנחת בוטיק מוצגת) — התשלום בפועל נשאר לפי price_full ב־JSON */
+/** מחיר ייחוס לתצוגה (לפני הנחת בוטיק מוצגת) - התשלום בפועל נשאר לפי price_full ב־JSON */
 export function getBoutiqueReferenceListPrice(chargePrice: number): number | null {
   const raw = (servicesConfig as Record<string, unknown>).boutique_display_discount_percent;
   const pct = typeof raw === "number" ? raw : typeof raw === "string" ? Number.parseFloat(raw) : 0;
@@ -524,7 +524,7 @@ export function buildServiceReservationWhatsAppHref(
   return buildWhatsAppHref(`${preface}\n\n${body}`);
 }
 
-/** התראת עניין בשירות — ללא Web3Forms (חובת hCaptcha בצד הספק). אפשר לחבר כאן לוג או ערוץ אחר. */
+/** התראת עניין בשירות - ללא Web3Forms (חובת hCaptcha בצד הספק). אפשר לחבר כאן לוג או ערוץ אחר. */
 export async function notifyServiceInterest(_params: {
   serviceId: string;
   serviceTitle: string;
@@ -592,7 +592,7 @@ export const buildArticleContextWhatsAppHref = (
   opts: Parameters<typeof buildArticleContextLeadMessage>[0]
 ) => buildWhatsAppHref(buildArticleContextLeadMessage(opts));
 
-/** שורת הקשר קצרה בלי פתיח - לשילוב בהודעות ארוכות (מילוי שדות וכו׳) */
+/** שורת הקשר קצרה בלי פתיח - לשילוב בהודעות ארוכות (מילוי שדות וכו') */
 export const buildArticleReadContextLine = (
   opts: Parameters<typeof buildArticleContextLeadMessage>[0]
 ): string => {

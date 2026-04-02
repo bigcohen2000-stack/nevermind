@@ -9,5 +9,5 @@ export const MIND_SHIFT_SCALE_HEX = [
   "#0F172A",
 ] as const;
 
-/** סגמנט כבוי — נייטרלי, לא מתחרה בסקאלה */
+/** סגמנט כבוי - נייטרלי, לא מתחרה בסקאלה */
 export const MIND_SHIFT_INACTIVE_HEX = "#e8e7e5";

@@ -1,0 +1,87 @@
+{
+  "generatedAt": "2026-04-02T19:17:58.500Z",
+  "stage": "postbuild",
+  "readability": {
+    "articleCount": 21,
+    "averageScore": 98,
+    "clearCount": 21,
+    "goodCount": 0,
+    "denseCount": 0,
+    "hardest": [
+      {
+        "slug": "what-is-success",
+        "title": "מהי הצלחה? 🎯",
+        "href": "/articles/what-is-success/",
+        "score": 97,
+        "label": "צלול",
+        "words": 148,
+        "sentences": 16,
+        "avgSentence": 9.3,
+        "longRatio": 2
+      },
+      {
+        "slug": "conscious-vs-subconscious-myth",
+        "title": "מודע ותת-מודע: האם באמת יש הבדל? 🧠",
+        "href": "/articles/conscious-vs-subconscious-myth/",
+        "score": 98,
+        "label": "צלול",
+        "words": 155,
+        "sentences": 13,
+        "avgSentence": 11.9,
+        "longRatio": 0.6
+      },
+      {
+        "slug": "fear-vs-story-kids",
+        "title": "פחד או סיפור? (הסבר לילדים) 🎈",
+        "href": "/articles/fear-vs-story-kids/",
+        "score": 98,
+        "label": "צלול",
+        "words": 118,
+        "sentences": 13,
+        "avgSentence": 9.1,
+        "longRatio": 0.8
+      },
+      {
+        "slug": "feeling-alone",
+        "title": "מה אם אני מרגיש לבד? 🌑",
+        "href": "/articles/feeling-alone/",
+        "score": 98,
+        "label": "צלול",
+        "words": 119,
+        "sentences": 14,
+        "avgSentence": 8.5,
+        "longRatio": 0
+      },
+      {
+        "slug": "free-will-mechanics",
+        "title": "בחירה חופשית: האם אנחנו באמת מחליטים? 🎲",
+        "href": "/articles/free-will-mechanics/",
+        "score": 98,
+        "label": "צלול",
+        "words": 138,
+        "sentences": 11,
+        "avgSentence": 12.5,
+        "longRatio": 0.7
+      },
+      {
+        "slug": "good-and-evil",
+        "title": "טוב ורע: האם הם באמת נפרדים",
+        "href": "/articles/good-and-evil/",
+        "score": 98,
+        "label": "צלול",
+        "words": 132,
+        "sentences": 12,
+        "avgSentence": 11,
+        "longRatio": 0.8
+      }
+    ]
+  },
+  "build": {
+    "htmlPages": 140,
+    "rssReady": true,
+    "internalLinks": {
+      "ok": true,
+      "checkedAt": "2026-04-02T19:17:58.514Z"
+    }
+  }
+}

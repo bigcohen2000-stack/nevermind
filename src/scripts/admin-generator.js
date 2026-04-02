@@ -35,7 +35,7 @@ export function extractYoutubeId(raw) {
 
 function sanitizeTagsFromCsv(raw) {
   const parts = String(raw || "")
-    .split(/[,״]/)
+    .split(/[,"]/)
     .map((t) => t.trim())
     .filter(Boolean);
   const out = [];
@@ -109,7 +109,7 @@ function runBlockingChecks(data) {
   }
 
   const tagParts = tagsClean
-    .split(/[,״]/)
+    .split(/[,"]/)
     .map((tag) => tag.trim())
     .filter(Boolean);
 
@@ -272,12 +272,12 @@ function validateExternalMdx(raw) {
   return { errors, warnings, slug, body: parsed.body };
 }
 
-/** טיוטת MDX להורדה מקומית — בלי מודל חיצוני */
+/** טיוטת MDX להורדה מקומית - בלי מודל חיצוני */
 function buildMdxStub(data) {
   const today = new Date().toISOString().slice(0, 10);
   const slug = data.slug.trim() || "draft-article";
   const tagParts = data.tags
-    .split(/[,״]/)
+    .split(/[,"]/)
     .map((tag) => tag.trim())
     .filter(Boolean);
   const tagsYaml = tagParts.map((t) => `"${yq(t)}"`).join(", ");
@@ -416,7 +416,7 @@ function setupArticleWizard() {
     paintTagChips = () => {
       const selected = new Set(
         sanitizeTagsFromCsv(fieldTrim("wiz-tags"))
-          .split(/[,״]/)
+          .split(/[,"]/)
           .map((t) => t.trim())
           .filter(Boolean),
       );
@@ -441,7 +441,7 @@ function setupArticleWizard() {
         const tag = btn.dataset.tag || "";
         const selected = new Set(
           sanitizeTagsFromCsv(fieldTrim("wiz-tags"))
-            .split(/[,״]/)
+            .split(/[,"]/)
             .map((t) => t.trim())
             .filter(Boolean),
         );
@@ -625,7 +625,7 @@ Required frontmatter keys (all must be present with non-empty values where noted
 - originalInsight: same core as the article spine - ${data.aha || "[fill]"}
 - difficultyLevel: one of beginner | advanced | deep - use ${data.difficultyLevel}
 - mindShiftIntensity: integer 1-5 - use ${data.mindShiftIntensity}
-- imageAlt: Hebrew. Describe the CONCEPT the hero image stands for, not only pixels. Pattern: [brief visible scene] — [semantic role for the article]. Example shape: "אדם עומד מול מראה שבורה — ייצוג ויזואלי לפירוק האגו". Search engines use this for topical/philosophical context; keep concrete + interpretive in one line. Wizard draft: ${data.imageAlt || "[fill]"}
+- imageAlt: Hebrew. Describe the CONCEPT the hero image stands for, not only pixels. Pattern: [brief visible scene] - [semantic role for the article]. Example shape: "אדם עומד מול מראה שבורה - ייצוג ויזואלי לפירוק האגו". Search engines use this for topical/philosophical context; keep concrete + interpretive in one line. Wizard draft: ${data.imageAlt || "[fill]"}
 - slug: REQUIRED, English only, kebab-case, aligned with title - ${data.slug || "[Slug]"}
 - tags: array; ONLY these exact Hebrew strings (comma-separated canonical list): ${canonicalTagsCsv}
 - image: default hero path ${defaultImagePath} unless a different asset is explicitly intended
@@ -742,7 +742,7 @@ Follow the brand identity: zero fluff, focus on thought-shifts, NeverMind voice 
       return;
     }
     const text = out instanceof HTMLTextAreaElement ? out.value.trim() : "";
-    body.textContent = text || "(ריק — לחץ קודם על לזקק למאמר)";
+    body.textContent = text || "(ריק - לחץ קודם על לזקק למאמר)";
     dialog.showModal();
   };
 

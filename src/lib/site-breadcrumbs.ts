@@ -76,7 +76,7 @@ function labelForSegment(seg: string): string {
 
 /**
  * בונה שרשרת פירורי לחם מנתיב הדף.
- * @param currentPageTitle כותרת אנושית לסגמנט האחרון (מאמר, מושג, מסלול וכו׳)
+ * @param currentPageTitle כותרת אנושית לסגמנט האחרון (מאמר, מושג, מסלול וכו')
  */
 export function buildSiteBreadcrumbTrail(
   pathname: string,

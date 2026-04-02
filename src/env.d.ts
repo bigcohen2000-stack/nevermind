@@ -1,4 +1,4 @@
-/// <reference types="astro/client" />
+﻿/// <reference types="astro/client" />
 
 interface ImportMetaEnv {
   /** true = קריאות ניהול ל-/api/club-admin (פרוקסי Pages + Cloudflare Access), בלי JWT בדפדפן */
@@ -56,6 +56,16 @@ interface Window {
   __nmSearchPageLoadBound?: boolean;
   __nmSearchPageCleanup?: () => void;
   __nmServicesDiscoveryCleanup?: () => void;
+  __nmIntegrityBooted?: boolean;
+  __nmIntegrityOnRoute?: () => void;
+  __nmOpenIntegrityReporter?: (overrides?: {
+    selection?: string;
+    note?: string;
+    title?: string;
+    url?: string;
+  }) => void;
+  __nmReportConnectivityIssue?: (message: string) => void;
+  __nmClearConnectivityIssue?: () => void;
   nmTrackEvent?: (name: string, params?: Record<string, unknown>) => void;
   dataLayer?: unknown[];
   gtag?: (...args: unknown[]) => void;
@@ -76,3 +86,4 @@ declare namespace astroHTML.JSX {
     };
   }
 }
+

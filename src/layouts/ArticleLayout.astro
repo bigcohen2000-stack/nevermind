@@ -1,7 +1,6 @@
----
+﻿---
 interface Props {
   frontmatter: {
-    title?: string;
     inversionQuestion?: string;
     finalQuestion?: string;
   };
@@ -13,21 +12,19 @@ const finalQuestion = String(frontmatter?.finalQuestion || "").trim();
 ---
 
 <article class="nm-article">
-  <h1>{frontmatter?.title}</h1>
-
   <div class="content">
     <slot />
   </div>
 
   {inversionQuestion ? (
-    <section class="inversion-method">
+    <section class="inversion-method" aria-label="שאלת היפוך">
       <h2>שאלו את ההפך</h2>
       <p>{inversionQuestion}</p>
     </section>
   ) : null}
 
   {finalQuestion ? (
-    <footer class="reflection">
+    <footer class="reflection" aria-label="שאלת סיום">
       <p class="question">{finalQuestion}</p>
     </footer>
   ) : null}
@@ -37,21 +34,39 @@ const finalQuestion = String(frontmatter?.finalQuestion || "").trim();
   .nm-article {
     max-width: 700px;
     margin: 0 auto;
-    line-height: 1.6;
     direction: rtl;
     font-family: "Assistant Variable", "Heebo", system-ui, sans-serif;
   }
 
+  .content {
+    display: grid;
+    gap: 1.35rem;
+  }
+
   .inversion-method {
+    margin: 2.5rem 0 0;
+    border-radius: 1.5rem;
+    border: 0.5px solid color-mix(in srgb, var(--color-accent) 16%, transparent);
     background: #f3f1ed;
-    padding: 1.5rem;
-    border-inline-start: 4px solid var(--color-accent);
-    margin: 2rem 0;
+    padding: 1.35rem 1.4rem;
+  }
+
+  .inversion-method h2 {
+    margin: 0 0 0.55rem;
+    font-size: 1.1rem;
+    line-height: 1.4;
+  }
+
+  .inversion-method p,
+  .question {
+    margin: 0;
+    line-height: 1.9;
   }
 
   .reflection {
-    border-top: 1px solid #1a1a1a;
-    padding-top: 1rem;
+    margin-top: 2rem;
+    border-top: 0.5px solid color-mix(in srgb, #1a1a1a 12%, transparent);
+    padding-top: 1.15rem;
   }
 
   .question {

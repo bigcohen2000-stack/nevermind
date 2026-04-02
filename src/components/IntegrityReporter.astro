@@ -1,5 +1,5 @@
 ﻿---
-const reportEndpoint = "/api/forms/submit";
+const reportEndpoint = "/api/site/integrity-report";
 const pulseEndpoint = "/api/site/pulse";
 const whatsAppDigits = String(Astro.props.whatsAppNumber ?? "").replace(/\D/g, "");
 ---
@@ -7,7 +7,7 @@ const whatsAppDigits = String(Astro.props.whatsAppNumber ?? "").replace(/\D/g, "
 <script is:inline define:vars={{ reportEndpoint, pulseEndpoint, whatsAppDigits }}>
   (() => {
     const config = {
-      reportEndpoint: typeof reportEndpoint === "string" ? reportEndpoint : "/api/forms/submit",
+      reportEndpoint: typeof reportEndpoint === "string" ? reportEndpoint : "/api/site/integrity-report",
       pulseEndpoint: typeof pulseEndpoint === "string" ? pulseEndpoint : "/api/site/pulse",
       whatsAppDigits: typeof whatsAppDigits === "string" ? whatsAppDigits : "",
     };
@@ -24,12 +24,13 @@ const whatsAppDigits = String(Astro.props.whatsAppNumber ?? "").replace(/\D/g, "
       lastFocused: null,
       lastSelection: "",
       ui: null,
-      ready: false,
     };
 
-    const BRAND_THANKS = "תודה. אתה עוזר לנו לראות את האמת בצורה ברורה יותר. האתר נבנה בסיוע בינה מלאכותית על ידי יקיר כהן, והדיוק שלך עוזר לכולם.";
+    const BRAND_THANKS =
+      "תודה. אתה עוזר לנו לראות את האמת בצורה ברורה יותר. האתר נבנה בסיוע בינה מלאכותית על ידי יקיר כהן, והדיוק שלך עוזר לכולם.";
 
     const shouldSkipPath = () => /^\/(admin|dashboard|api)(\/|$)/.test(window.location.pathname || "");
+    const isArticlePath = () => /^\/articles\/.+/.test(window.location.pathname || "");
 
     const readSelection = () => {
       try {
@@ -40,9 +41,17 @@ const whatsAppDigits = String(Astro.props.whatsAppNumber ?? "").replace(/\D/g, "
       }
     };
 
+    const readPageTitle = () => {
+      const heading = document.querySelector("main h1, article h1, h1");
+      const title = String(heading?.textContent || document.title || "").replace(/\s+/g, " ").trim();
+      return title.slice(0, 180);
+    };
+
     const readContext = () => ({
       url: window.location.href,
-      selection: readSelection(),
+      path: window.location.pathname,
+      title: readPageTitle(),
+      selection: readSelection() || state.lastSelection || "",
       note: state.ui?.note instanceof HTMLTextAreaElement ? state.ui.note.value.trim() : "",
     });
 
@@ -95,7 +104,7 @@ const whatsAppDigits = String(Astro.props.whatsAppNumber ?? "").replace(/\D/g, "
         }
         .nm-integrity-pulse {
           min-height: 2.5rem;
-          max-width: min(18rem, calc(100vw - 2rem));
+          max-width: min(19rem, calc(100vw - 2rem));
           border-radius: 999px;
           border: 0.5px solid rgba(26, 26, 26, 0.1);
           background: rgba(250, 250, 248, 0.96);
@@ -116,21 +125,25 @@ const whatsAppDigits = String(Astro.props.whatsAppNumber ?? "").replace(/\D/g, "
           font-weight: 600;
         }
         .nm-integrity-button {
-          width: 48px;
-          height: 48px;
+          width: auto;
+          min-height: 48px;
+          min-width: 11rem;
+          max-width: min(18rem, calc(100vw - 2rem));
           border-radius: 999px;
           border: 0.5px solid rgba(26, 26, 26, 0.12);
-          background: #FAFAF8;
+          background: rgba(250, 250, 248, 0.98);
           color: #1A1A1A;
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          font-size: 0.82rem;
+          padding: 0.75rem 1rem;
+          font-size: 0.88rem;
           font-weight: 600;
+          white-space: nowrap;
           box-shadow: 0 14px 36px rgba(26, 26, 26, 0.12);
           opacity: 0;
           transform: translateY(10px);
-          transition: opacity 220ms ease, transform 220ms ease, border-color 220ms ease;
+          transition: opacity 220ms ease, transform 220ms ease, border-color 220ms ease, color 220ms ease;
         }
         .nm-integrity-button.is-visible {
           opacity: 1;
@@ -139,6 +152,7 @@ const whatsAppDigits = String(Astro.props.whatsAppNumber ?? "").replace(/\D/g, "
         .nm-integrity-button:hover,
         .nm-integrity-button:focus-visible {
           border-color: rgba(212, 43, 43, 0.2);
+          color: #D42B2B;
           outline: none;
         }
         .nm-integrity-overlay {
@@ -271,6 +285,11 @@ const whatsAppDigits = String(Astro.props.whatsAppNumber ?? "").replace(/\D/g, "
             border-radius: 1.35rem;
             padding: 0.95rem;
           }
+          .nm-integrity-button {
+            max-width: calc(100vw - 1.5rem);
+            min-width: 0;
+            font-size: 0.82rem;
+          }
           .nm-integrity-pulse {
             max-width: calc(100vw - 1.5rem);
           }
@@ -300,8 +319,8 @@ const whatsAppDigits = String(Astro.props.whatsAppNumber ?? "").replace(/\D/g, "
       const button = document.createElement("button");
       button.type = "button";
       button.className = "nm-integrity-button";
-      button.textContent = "דיוק";
-      button.setAttribute("aria-label", "דיווח על טעות בטקסט");
+      button.textContent = "תיקון או הערה";
+      button.setAttribute("aria-label", "שליחת תיקון או הערה על העמוד");
 
       const toast = document.createElement("div");
       toast.className = "nm-integrity-toast";
@@ -313,8 +332,8 @@ const whatsAppDigits = String(Astro.props.whatsAppNumber ?? "").replace(/\D/g, "
         <section class="nm-integrity-panel" role="dialog" aria-modal="true" aria-labelledby="nm-integrity-title">
           <div style="display:grid;gap:1rem;">
             <header style="display:grid;gap:0.4rem;">
-              <h2 id="nm-integrity-title">דיווח על טעות בטקסט</h2>
-              <p class="nm-integrity-copy">אם משהו לא יושב נכון, אפשר לשלוח לנו את הקישור ואת הקטע שסומן. כך הדיוק של האתר נשמר שקט וברור.</p>
+              <h2 id="nm-integrity-title">יש משהו שדורש תיקון</h2>
+              <p class="nm-integrity-copy">האתר עדיין בשלבי פיתוח. אפשר לשלוח מכאן תיקון, ניסוח חלופי או קישור בעייתי. אם סימנת טקסט לפני הלחיצה, הוא יופיע כאן אוטומטית.</p>
             </header>
 
             <div class="nm-integrity-field">
@@ -328,19 +347,19 @@ const whatsAppDigits = String(Astro.props.whatsAppNumber ?? "").replace(/\D/g, "
             </div>
 
             <label class="nm-integrity-field">
-              <span class="nm-integrity-field-label">מה נכון יותר, אם תרצה לכתוב</span>
-              <textarea class="nm-integrity-note" data-integrity-note placeholder="אפשר לכתוב תיקון קצר או הקשר"></textarea>
+              <span class="nm-integrity-field-label">מה כדאי לתקן, אם תרצה לכתוב</span>
+              <textarea class="nm-integrity-note" data-integrity-note placeholder="אפשר לכתוב תיקון קצר, הקשר או ניסוח מדויק יותר"></textarea>
             </label>
 
             <div class="nm-integrity-actions">
               <button type="button" class="nm-integrity-action" data-kind="primary" data-integrity-wa>שלח בוואטסאפ</button>
-              <button type="button" class="nm-integrity-action" data-integrity-email>שלח במייל</button>
+              <button type="button" class="nm-integrity-action" data-integrity-email>שלח לאתר</button>
               <button type="button" class="nm-integrity-close" data-integrity-close>סגור</button>
             </div>
 
             <p class="nm-integrity-status" data-integrity-status>${BRAND_THANKS}</p>
             <div class="nm-integrity-thanks" data-integrity-thanks>
-              <p style="margin:0;">תודה על הדיווח ❤️ פתחנו לך גישה זמנית לארכיון העומק.</p>
+              <p style="margin:0;">תודה על הדיווח. פתחנו לך גישה זמנית לארכיון העומק.</p>
               <div style="display:flex;justify-content:flex-end;padding-top:0.65rem;">
                 <a class="nm-integrity-deep-link" href="/forbidden-library/">פתח את ארכיון העומק</a>
               </div>
@@ -386,6 +405,16 @@ const whatsAppDigits = String(Astro.props.whatsAppNumber ?? "").replace(/\D/g, "
           closeModal();
         }
       });
+      document.addEventListener("click", (event) => {
+        const target = event.target;
+        if (!(target instanceof Element)) return;
+        const trigger = target.closest("[data-open-integrity-report]");
+        if (!(trigger instanceof HTMLElement)) return;
+        event.preventDefault();
+        const selection = String(trigger.getAttribute("data-integrity-selection") || "").trim() || readSelection() || state.lastSelection || "";
+        const note = String(trigger.getAttribute("data-integrity-note") || "").trim();
+        openModal({ selection, note });
+      });
 
       return state.ui;
     };
@@ -410,19 +439,22 @@ const whatsAppDigits = String(Astro.props.whatsAppNumber ?? "").replace(/\D/g, "
       }, 3200);
     };
 
-    const updateModalContext = () => {
+    const updateModalContext = (overrides = {}) => {
       const ui = ensureUi();
-      const context = readContext();
+      const context = { ...readContext(), ...overrides };
       ui.url.textContent = context.url;
       ui.selection.textContent = context.selection || "לא סומן קטע. אפשר גם לפתוח את החלון בלי סימון.";
-      state.lastSelection = context.selection;
+      if (ui.note instanceof HTMLTextAreaElement) {
+        ui.note.value = typeof context.note === "string" ? context.note : ui.note.value;
+      }
+      state.lastSelection = String(context.selection || "").trim();
     };
 
-    const openModal = () => {
+    const openModal = (overrides = {}) => {
       if (shouldSkipPath()) return;
       const ui = ensureUi();
       state.lastFocused = document.activeElement;
-      updateModalContext();
+      updateModalContext(overrides);
       ui.overlay.classList.add("is-open");
       ui.thanks.classList.remove("is-visible");
       ui.note?.focus();
@@ -436,12 +468,20 @@ const whatsAppDigits = String(Astro.props.whatsAppNumber ?? "").replace(/\D/g, "
       }
     };
 
+    window.__nmOpenIntegrityReporter = (options = {}) => {
+      const selection = typeof options.selection === "string" ? options.selection.trim().slice(0, 400) : readSelection() || state.lastSelection || "";
+      const note = typeof options.note === "string" ? options.note.trim().slice(0, 1200) : "";
+      openModal({ selection, note });
+    };
+
     const buildMessage = () => {
-      const { url, selection, note } = readContext();
+      const { url, title, selection, note } = readContext();
+      const titleLine = title ? `כותרת: ${title}` : "";
       const selectionLine = selection ? `הקטע שסומן: ${selection}` : "לא סומן קטע";
       const noteLine = note ? `הערה: ${note}` : "";
       return [
         "היי, מצאתי משהו שכדאי לבדוק ב-NeverMind.",
+        titleLine,
         `עמוד: ${url}`,
         selectionLine,
         noteLine,
@@ -476,13 +516,17 @@ const whatsAppDigits = String(Astro.props.whatsAppNumber ?? "").replace(/\D/g, "
 
     const sendViaEmail = async () => {
       const ui = ensureUi();
+      const context = readContext();
       const message = buildMessage();
       const form = new FormData();
       form.set("subject", "דיווח דיוק מהאתר");
       form.set("from_name", "דיווח דיוק");
       form.set("message", `${message}\n\n${BRAND_THANKS}`);
-      form.set("page_url", window.location.href);
-      form.set("selected_text", readContext().selection || "");
+      form.set("page_url", context.url);
+      form.set("page_path", context.path || "");
+      form.set("page_title", context.title || "");
+      form.set("selected_text", context.selection || "");
+      form.set("note", context.note || "");
       form.set("botcheck", "");
 
       const emailButton = ui.email;
@@ -497,12 +541,17 @@ const whatsAppDigits = String(Astro.props.whatsAppNumber ?? "").replace(/\D/g, "
         });
         const payload = await response.json().catch(() => null);
         if (!response.ok || payload?.ok !== true) {
+          const message = typeof payload?.message === "string" && payload.message.trim() ? payload.message.trim() : "לא הצלחנו לשלוח את הדיווח כרגע.";
+          window.__nmReportConnectivityIssue?.(message);
           throw new Error("submit_failed");
         }
-        markThanks("email");
+        window.__nmClearConnectivityIssue?.();
+        markThanks("site");
         closeModal();
       } catch {
-        showToast("לא הצלחנו לשלוח את הדיווח כרגע.");
+        const message = "לא הצלחנו לשלוח את הדיווח כרגע.";
+        showToast(message);
+        window.__nmReportConnectivityIssue?.(message);
       } finally {
         if (emailButton instanceof HTMLButtonElement) {
           emailButton.disabled = false;
@@ -522,11 +571,15 @@ const whatsAppDigits = String(Astro.props.whatsAppNumber ?? "").replace(/\D/g, "
           cache: "no-store",
         });
         const payload = await response.json().catch(() => null);
-        if (!response.ok || !payload?.ok) {
+        if (!response.ok || !payload?.ok || payload?.available === false) {
           ui.pulse.classList.remove("is-visible");
           return;
         }
         const activeNow = Number(payload.activeNow) || 0;
+        if (!Number.isFinite(activeNow) || activeNow <= 0) {
+          ui.pulse.classList.remove("is-visible");
+          return;
+        }
         const recentRequests = Number(payload.recentRequests) || 0;
         ui.pulseBody.textContent = `${activeNow} · ${payload.mood || "תנועה חיה"}`;
         ui.pulse.title = `לפי ${recentRequests} בקשות ב-${payload.windowMinutes || 3} הדקות האחרונות`;
@@ -538,11 +591,12 @@ const whatsAppDigits = String(Astro.props.whatsAppNumber ?? "").replace(/\D/g, "
 
     const scheduleReveal = () => {
       window.clearTimeout(state.revealTimer);
+      const delay = isArticlePath() ? 1400 : 8000;
       state.revealTimer = window.setTimeout(() => {
         if (!readSelection()) {
           setButtonVisible(true);
         }
-      }, 8000);
+      }, delay);
     };
 
     const onSelectionChange = () => {
@@ -551,13 +605,14 @@ const whatsAppDigits = String(Astro.props.whatsAppNumber ?? "").replace(/\D/g, "
         state.lastSelection = selection;
         setButtonVisible(true);
         if (state.ui?.overlay?.classList.contains("is-open")) {
-          updateModalContext();
+          updateModalContext({ selection });
         }
       }
     };
 
     const onRoute = () => {
       const ui = ensureUi();
+      state.lastSelection = "";
       ui.root.hidden = shouldSkipPath();
       if (shouldSkipPath()) {
         closeModal();
@@ -568,6 +623,7 @@ const whatsAppDigits = String(Astro.props.whatsAppNumber ?? "").replace(/\D/g, "
       if (ui.note instanceof HTMLTextAreaElement) {
         ui.note.value = "";
       }
+      setButtonVisible(isArticlePath());
       scheduleReveal();
       void refreshPulse();
     };

@@ -126,6 +126,8 @@ html[data-nm-a11y-links="on"] a[href]:focus-visible {
 
 html {
   scroll-behavior: smooth;
+  max-width: 100%;
+  overflow-x: clip;
 }
 
 html[lang="he"] {
@@ -135,6 +137,8 @@ html[lang="he"] {
 
 body {
   font-family: "Heebo", "Assistant Variable", system-ui, -apple-system, "Segoe UI", sans-serif;
+  max-width: 100%;
+  overflow-x: clip;
   font-size: var(--nm-text-body);
   line-height: var(--line-height-ui);
   letter-spacing: 0;
@@ -298,7 +302,7 @@ body {
     transform: translateX(100%);
   }
 }
-/* Skeleton (חיפוש גילוי וכו׳) */
+/* Skeleton (חיפוש גילוי וכו') */
 .nm-skeleton-line {
   height: 0.85rem;
   background: linear-gradient(
@@ -548,7 +552,7 @@ body[data-whisper-banner-state="hidden"] {
 }
 
 body[data-whisper-banner-state="shown"] {
-  --nm-nav-top: 4.5rem;
+  --nm-nav-top: 6rem;
 }
 
 body.is-focus-mode [data-nav],
@@ -578,6 +582,16 @@ main article :where(p) {
 
 main article :where(p + p) {
   margin-block-start: clamp(2rem, 4.5vw, 3.75rem);
+}
+
+@media (max-width: 640px) {
+  .nm-header-actions {
+    justify-content: flex-start;
+  }
+
+  .nm-header-services-link {
+    display: none !important;
+  }
 }
 
 @media (max-width: 640px) {

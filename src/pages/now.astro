@@ -5,12 +5,14 @@ import FormAntispamFields from "../components/FormAntispamFields.astro";
 import Web3FormsHcaptcha from "../components/Web3FormsHcaptcha.astro";
 import SubscribeBanner from "../components/SubscribeBanner.astro";
 import { FloatingInput } from "../components/ui/FloatingInput";
-import { WEB3FORMS_ACCESS_KEY } from "../lib/web3forms-access";
+import { WEB3FORMS_ACCESS_KEY, WEB3FORMS_ENABLED } from "../lib/web3forms-access";
 
 const whatsappGroupUrl = "https://chat.whatsapp.com/C5M4j0ZCUPa3D3A4zCrCrL";
 const allArticles = await getCollection("articles", ({ data }) => data.draft !== true);
 const sortedArticles = allArticles.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 const carouselPool = [...sortedArticles].sort(() => Math.random() - 0.5).slice(0, 12);
+
+const formsEnabled = WEB3FORMS_ENABLED;
 
 const siteUpdates = [
   { label: "קביעת שיחה", href: "/book/" },
@@ -86,10 +88,11 @@ const siteUpdates = [
       <FloatingInput client:load id="email" name="email" label="אימייל" type="email" required dir="rtl" />
       <FloatingInput client:load id="message" name="message" label="מה אתה רוצה לבדוק" multiline rows={4} required dir="rtl" />
       <Web3FormsHcaptcha idSuffix="now" />
-      <button type="submit" class="w-full rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white px-6 py-4 text-xl font-bold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]">
+      <button type="submit" disabled={!formsEnabled} aria-disabled={!formsEnabled} class="w-full rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white px-6 py-4 text-xl font-bold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)] disabled:cursor-not-allowed disabled:opacity-55">
         לשלוח
       </button>
       <p data-form-status aria-live="polite" class="text-center text-[clamp(0.85rem,0.8rem+0.2vw,1rem)] text-[color-mix(in_srgb,var(--nm-fg)_60%,var(--nm-bg))] opacity-0 transition-opacity duration-300"></p>
+      {!formsEnabled ? <p class="text-center text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_64%,var(--nm-bg))]">שליחה במייל ממתינה לחיבור שרת הטפסים. אפשר להמשיך לוואטסאפ או ליצירת קשר.</p> : null}
     </form>
   </section>
 
@@ -158,6 +161,10 @@ const siteUpdates = [
       };
 
       const hasHcaptcha = () => Boolean(contactForm.querySelector("[data-nm-hcaptcha-wrap]"));
+      const hasAccessKey = () => {
+        const accessKey = contactForm.querySelector('input[name="access_key"]');
+        return accessKey instanceof HTMLInputElement && accessKey.value.trim().length > 0;
+      };
 
       const onSubmit = async (event) => {
         event.preventDefault();
@@ -166,6 +173,13 @@ const siteUpdates = [
         }
 
         const formData = new FormData(form);
+        if (!hasAccessKey()) {
+          const message = "שליחה במייל ממתינה לחיבור שרת הטפסים. אפשר להמשיך לוואטסאפ או ליצירת קשר.";
+          showStatus(message);
+          window.__nmReportConnectivityIssue?.(message);
+          clearLoading();
+          return;
+        }
         const msg = String(formData.get("message") || "").trim();
         const read = window.__nmReadAntispamFromForm;
         const validate = window.__nmValidateAntispamFields;
@@ -197,6 +211,7 @@ const siteUpdates = [
           if (response.ok && payload?.success === true) {
             form.reset();
             showStatus("השאלה נקלטה. נחזור אליך בהקדם.");
+            window.__nmClearConnectivityIssue?.();
             window.__nmHapticSuccess?.();
             window.__nmAnnounce?.("השאלה נקלטה");
           } else {
@@ -209,9 +224,12 @@ const siteUpdates = [
                   ? "שרת הטפסים עדיין לא הוגדר בפרודקשן."
                   : "השרת לא אישר קבלה. אפשר לנסות שוב או פשוט לשלוח לנו הודעה בוואטסאפ.";
             showStatus(message);
+            window.__nmReportConnectivityIssue?.(message);
           }
         } catch {
-          showStatus("השרת לא אישר קבלה. אפשר לנסות שוב או פשוט לשלוח לנו הודעה בוואטסאפ.");
+          const message = "השרת לא אישר קבלה. אפשר לנסות שוב או פשוט לשלוח לנו הודעה בוואטסאפ.";
+          showStatus(message);
+          window.__nmReportConnectivityIssue?.(message);
         } finally {
           clearLoading();
         }

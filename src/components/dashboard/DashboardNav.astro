@@ -1,31 +1,35 @@
-﻿---
+---
 const sections = [
   {
-    group: "מצב האתר",
+    group: "מנהל בלבד",
     items: [
-      { href: "#overview", label: "סקירה", note: "המצב עכשיו" },
-      { href: "#connections", label: "חיבורים חיים", note: "Cloudflare mock" },
-      { href: "#security-feed", label: "פיד אבטחה", note: "ניסיונות חריגים" },
+      { href: "#overview", label: "סקירה", note: "מצב האתר" },
+      { href: "#manager-actions", label: "פעולות מהירות", note: "מנויים ופריסה" },
+      { href: "#connections", label: "חיבורים חיים", note: "נתוני מועדון" },
     ],
   },
   {
     group: "ניהול ותוכן",
     items: [
+      { href: "#security-feed", label: "פיד אבטחה", note: "אירועים חריגים" },
       { href: "#content-health", label: "בריאות תוכן", note: "מאמרים לעדכון" },
-      { href: "#access", label: "ניהול גישה", note: "Club Admin" },
-      { href: "#image-automation", label: "אוטומציית תמונות", note: "webp ונתיבים" },
+      { href: "#access", label: "ניהול חברים", note: "גישה וסיסמאות" },
     ],
   },
   {
     group: "מערכת",
-    items: [{ href: "#settings", label: "הגדרות", note: "Access, noindex, SSL" }],
+    items: [
+      { href: "#image-automation", label: "זרימת תמונות", note: "נתיבים קיימים" },
+      { href: "#system-health", label: "בריאות מערכת", note: "טפסים וקישורים" },
+      { href: "#settings", label: "Cloudflare", note: "Access ו־SSL" },
+    ],
   },
 ];
 ---
 
 <aside class="hidden lg:block">
   <div class="sticky top-32 rounded-[28px] border border-black/8 bg-white/78 p-4 shadow-[0_18px_50px_rgba(26,26,26,0.05)] backdrop-blur-sm">
-    <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#D42B2B]">Dashboard</p>
+    <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#D42B2B]">ניווט</p>
     <nav class="mt-4 space-y-5" aria-label="ניווט פנימי">
       {sections.map((section) => (
         <div class="space-y-2">

@@ -4,6 +4,9 @@ compatibility_date = "2026-03-30"
 
 [vars]
 ALLOWED_ORIGINS = "https://www.nevermind.co.il,https://nevermind.co.il,http://localhost:4321"
+CF_ZONE_ID = "df2b2cbcdc170bc1cb4ccd6c51ade726"
+NM_CLUB_AUTH_BASE_URL = "https://club.nevermind.co.il"
+PUBLIC_CLUB_ADMIN_VIA_PROXY = "true"
 
 [[kv_namespaces]]
 binding = "CLUB_MEMBERS"
@@ -14,3 +17,12 @@ preview_id = "5170449ba2b94f97b29195f60a04dc9c"
 binding = "CLUB_ACTIVITY"
 id = "df7d6cf6806d42aca851ad4c17acb986"
 preview_id = "df7d6cf6806d42aca851ad4c17acb986"
+
+[[routes]]
+pattern = "club.nevermind.co.il/*"
+zone_name = "nevermind.co.il"
+
+[[routes]]
+pattern = "club.nevermind.co.il"
+zone_name = "nevermind.co.il"
+custom_domain = true

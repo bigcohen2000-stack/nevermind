@@ -21,7 +21,7 @@ export const CORE_REDIRECTS = {
 
 
 
-  // אנליטיקס — ייבוא אוטומטי (CORE)
+  // אנליטיקס - ייבוא אוטומטי (CORE)
   // GA4: עדיפות גבוהה 10+ צפיות
   "/שיטת-nevermind-שכל-שמרגיש-רגש-שחושב/": "/method/", // 34 צפיות // high priority
   "/מי-אני/": "/about/", // 27 צפיות // high priority
@@ -94,7 +94,7 @@ export const BLOG_REDIRECTS = {
 
 
 
-  // אנליטיקס — ייבוא אוטומטי (BLOG)
+  // אנליטיקס - ייבוא אוטומטי (BLOG)
   // GA4: עדיפות גבוהה 10+ צפיות
   "/mahu-ego/": "/blog/mahu-ego/", // 12 צפיות // high priority
   // GA4: מתחת ל-10 צפיות
@@ -132,9 +132,9 @@ export const BLOG_REDIRECTS = {
 
 /** SEO CONSTANTS (From Yoast settings) */
 export const SEO = {
-  siteName: "NeverMind — כלים מעשיים לשיפור החיים",
+  siteName: "NeverMind - כלים מעשיים לשיפור החיים",
   defaultTitleTemplate: "%%title%%",
-  defaultDescription: "NeverMind — חקירה זוגית ואישית %%sep%% %%title%%",
+  defaultDescription: "NeverMind - חקירה זוגית ואישית %%sep%% %%title%%",
   defaultImage: "https://www.nevermind.co.il/og.jpg",
   googleVerify: "M2ujWgqETy_44tp8wSVOKsZ0PyQVfpu-zy4MCN5-Tm0",
 } as const;

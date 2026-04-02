@@ -4,11 +4,11 @@ const GA4_URL = "https://www.google-analytics.com/mp/collect";
 
 export type PremiumUnlockAnalyticsInput = {
   articleSlug: string;
-  /** ערך עוגיית הסשן לפרימיום — ליצירת client_id יציב ללא gtag */
+  /** ערך עוגיית הסשן לפרימיום - ליצירת client_id יציב ללא gtag */
   premiumSessionCookie: string | undefined;
   /** מזהה מ־_ga בדפדפן (אופציונלי) */
   gaClientIdParam: string | null | undefined;
-  /** יחס גלילה 0–1 בזמן הבקשה (קורלציה ל־30% הראשונים) */
+  /** יחס גלילה 0-1 בזמן הבקשה (קורלציה ל־30% הראשונים) */
   scrollRatio: number | null | undefined;
   referer: string | null | undefined;
 };
@@ -43,7 +43,7 @@ function clampScrollRatio(v: number | null | undefined): number | undefined {
 /**
  * דיווח שרתי על פתיחת תוכן פרימיום (אחרי אימות מלא).
  * GA4 MP: דורש GA4_MEASUREMENT_ID + GA4_API_SECRET.
- * Webhook: אופציונלי — ANALYTICS_PREMIUM_WEBHOOK_URL.
+ * Webhook: אופציונלי - ANALYTICS_PREMIUM_WEBHOOK_URL.
  */
 export async function reportPremiumArticleUnlocked(input: PremiumUnlockAnalyticsInput): Promise<void> {
   const clientId = resolveClientId(input);

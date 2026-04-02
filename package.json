@@ -12,9 +12,9 @@
     "update:migration-analytics": "node scripts/update-migration-from-analytics.mjs",
     "sync:redirects": "node scripts/update-migration-from-analytics.mjs --sync-redirects-only",
     "check:titles": "node scripts/check-page-titles.mjs",
-    "prebuild": "npm run validate && node scripts/generate-article-paths.mjs",
+    "prebuild": "npm run validate && node scripts/generate-article-paths.mjs && node scripts/generate-admin-build-report.mjs --stage=prebuild",
     "build": "astro build",
-    "postbuild": "node scripts/generate-rss.mjs && node scripts/check-internal-links.mjs && node scripts/postbuild-article-seo-check.mjs",
+    "postbuild": "node scripts/generate-rss.mjs && node scripts/check-internal-links.mjs && node scripts/generate-admin-build-report.mjs --stage=postbuild && node scripts/postbuild-article-seo-check.mjs",
     "preview": "astro preview",
     "check": "astro check",
     "image:import": "node scripts/import-dashboard-image.mjs",
@@ -24,7 +24,10 @@
     "verify:prod-env": "node scripts/verify-production-env.mjs",
     "copy:audit": "node scripts/copy-audit-forbidden.mjs",
     "deploy": "npm run pre-deploy && npm run build",
-    "deploy:cloudflare": "npm run pre-deploy && npm run build && wrangler pages deploy dist"
+    "deploy:cloudflare": "npm run pre-deploy && npm run build && wrangler pages deploy dist --project-name nevermind",
+    "report:admin-health": "node scripts/generate-admin-build-report.mjs --stage=manual",
+    "deploy:worker": "npm run pre-deploy && wrangler deploy --config workers/club-auth/wrangler.toml",
+    "deploy:all": "npm run pre-deploy && npm run build && wrangler pages deploy dist --project-name nevermind && wrangler deploy --config workers/club-auth/wrangler.toml"
   },
   "dependencies": {
     "@astrojs/cloudflare": "^12.6.13",

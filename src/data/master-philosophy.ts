@@ -20,6 +20,6 @@ export const masterPhilosophyParagraphs: readonly string[] = [
 export const masterPhilosophyClosingQuestion =
   "איזה סיפור המוח דבק היום על העובדה הכי קטנה אצלך?";
 
-/** תיאור מטא קצר (מכני, בלי «שיטה» ו«עזרה») */
+/** תיאור מטא קצר (מכני, בלי "שיטה" ו"עזרה") */
 export const masterPhilosophyMetaDescription =
   "NeverMind מפריד נתון גולמי מסיפור מודבק במוח.";

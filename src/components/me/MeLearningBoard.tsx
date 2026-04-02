@@ -105,7 +105,7 @@ export default function MeLearningBoard({ articles, totalPublished }: Props) {
       </div>
 
       <div className="flex flex-wrap items-end justify-end gap-3 rounded-[1.4rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-4">
-        <label className="flex min-w-[10rem] flex-col gap-1 text-sm font-semibold text-[var(--nm-fg)]">
+        <label className="flex w-full min-w-0 flex-col gap-1 text-sm font-semibold text-[var(--nm-fg)] sm:min-w-[10rem]">
           נושא (חיפוש בתג)
           <input
             type="search"
@@ -116,7 +116,7 @@ export default function MeLearningBoard({ articles, totalPublished }: Props) {
             autoComplete="off"
           />
         </label>
-        <label className="flex min-w-[10rem] flex-col gap-1 text-sm font-semibold text-[var(--nm-fg)]">
+        <label className="flex w-full min-w-0 flex-col gap-1 text-sm font-semibold text-[var(--nm-fg)] sm:min-w-[10rem]">
           רמה
           <select
             value={level}
@@ -129,7 +129,7 @@ export default function MeLearningBoard({ articles, totalPublished }: Props) {
             <option value="deep">מתקדם</option>
           </select>
         </label>
-        <label className="flex min-w-[10rem] flex-col gap-1 text-sm font-semibold text-[var(--nm-fg)]">
+        <label className="flex w-full min-w-0 flex-col gap-1 text-sm font-semibold text-[var(--nm-fg)] sm:min-w-[10rem]">
           תגית
           <select value={tag} onChange={(e) => setTag(e.target.value)} className="min-h-[44px] rounded-[1rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-white px-3 py-2 text-[var(--nm-fg)]">
             <option value="">הכל</option>

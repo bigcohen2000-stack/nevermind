@@ -2,7 +2,7 @@ export const ADMIN_STORAGE_KEY = "nm_admin_session";
 
 const webhookUrl = (import.meta.env.PUBLIC_NM_CLUB_WEBHOOK_URL ?? "").trim();
 
-/** ניהול דרך פרוקסי Pages + Cloudflare Access — בלי JWT בדפדפן */
+/** ניהול דרך פרוקסי Pages + Cloudflare Access - בלי JWT בדפדפן */
 export function isClubAdminViaProxy() {
   return String(import.meta.env.PUBLIC_CLUB_ADMIN_VIA_PROXY ?? "").trim() === "true";
 }

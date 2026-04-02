@@ -68,6 +68,37 @@ type DeepPageBeacon = {
   ipHash: string;
 };
 
+type IntegrityReportEntry = {
+  pageUrl: string;
+  pagePath: string;
+  pageTitle?: string;
+  selectedText?: string;
+  note?: string;
+  message?: string;
+  reportedAt: string;
+  reporterFingerprint: string;
+  reporterAgent?: string;
+};
+
+type AdminMemberSummary = {
+  phone: string;
+  memberName: string;
+  status: "active" | "paused" | "blocked";
+  expiresAt: string;
+  lastLoginAt: string;
+  lastIpFingerprint: string;
+  isActive: boolean;
+  flaggedAt?: string;
+};
+
+type AdminMemberTimelineItem = {
+  id: string;
+  kind: "login" | "flag" | "membership";
+  at: string;
+  title: string;
+  detail: string;
+};
+
 type MemberProgressStored = {
   articlesRead: string[];
   secondsRead: number;
@@ -102,6 +133,8 @@ const KV_LIST_LIMIT = 1000;
 const CLUB_MEMBER_DEFAULT_EXPIRES_DAYS = 365;
 const DEEP_PAGE_VIEWS_KEY = "deep:page_views";
 const MAX_DEEP_PAGE_VIEWS = 200;
+const INTEGRITY_REPORTS_KEY = "feedback:integrity_reports";
+const MAX_INTEGRITY_REPORTS = 120;
 const PROGRESS_TOKEN_MAX_MS = 30 * 24 * 60 * 60 * 1000;
 
 async function checkRateLimit(
@@ -354,6 +387,14 @@ export default {
       return handleAdminOverview(request, env, corsHeaders);
     }
 
+    if (request.method === "GET" && url.pathname === "/admin/member") {
+      return handleAdminMemberDetail(request, env, corsHeaders);
+    }
+
+    if (request.method === "POST" && url.pathname === "/admin/integrity-report") {
+      return handleAdminIntegrityReport(request, env, corsHeaders);
+    }
+
     if (request.method === "POST" && url.pathname === "/admin/reset-password") {
       return handleAdminResetPassword(request, env, corsHeaders);
     }
@@ -559,11 +600,13 @@ async function handleAdminOverview(request: Request, env: Env, headers: Headers)
   const auth = await requireAdminAuth(request, env, headers);
   if (auth instanceof Response) return auth;
 
-  const [memberKeys, recentLogins, fraudFlags, deepRawList] = await Promise.all([
+  const [memberKeys, memberSummaries, recentLogins, fraudFlags, deepRawList, integrityReportsRaw] = await Promise.all([
     listKvKeys(env.CLUB_MEMBERS, "member:"),
+    readMemberSummaries(env.CLUB_MEMBERS),
     readRecentLogins(env.CLUB_ACTIVITY),
     readFraudFlags(env.CLUB_ACTIVITY),
     readDeepPageBeaconList(env.CLUB_ACTIVITY),
+    readIntegrityReports(env.CLUB_ACTIVITY),
   ]);
 
   const pageViewBeacons = deepRawList
@@ -575,6 +618,10 @@ async function handleAdminOverview(request: Request, env: Env, headers: Headers)
       ipFingerprint: entry.ipHash.slice(0, 8),
     }));
 
+  const integrityReports = integrityReportsRaw
+    .sort((left, right) => Date.parse(right.reportedAt) - Date.parse(left.reportedAt))
+    .slice(0, 48);
+
   return json(
     {
       ok: true,
@@ -584,10 +631,14 @@ async function handleAdminOverview(request: Request, env: Env, headers: Headers)
         flaggedMembers: fraudFlags.length,
         lastFlaggedAt: fraudFlags[0]?.flaggedAt ?? "",
         pageViewBeacons: deepRawList.length,
+        integrityReports: integrityReportsRaw.length,
+        lastIntegrityAt: integrityReports[0]?.reportedAt ?? "",
       },
+      members: memberSummaries,
       recentLogins,
       fraudFlags,
       pageViewBeacons,
+      integrityReports,
     },
     200,
     headers
@@ -936,6 +987,76 @@ async function readRecentLogins(namespace: KVNamespace): Promise<Array<Record<st
     }));
 }
 
+async function readMemberSummaries(namespace: KVNamespace): Promise<AdminMemberSummary[]> {
+  const keys = await listKvKeys(namespace, "member:");
+  const members = await Promise.all(keys.map((key) => namespace.get<StoredMember>(key, "json")));
+
+  return members
+    .filter((entry): entry is StoredMember => Boolean(entry && typeof entry.phone === "string"))
+    .map((entry) => {
+      const expiresAt = String(entry.expiresAt ?? "").trim();
+      const lastLoginAt = String(entry.lastLoginAt ?? "").trim();
+      const status = String(entry.status ?? "active") as AdminMemberSummary["status"];
+      const isActive = Boolean(expiresAt) && !isExpired(expiresAt) && status === "active";
+      return {
+        phone: String(entry.phone ?? "").trim(),
+        memberName: String(entry.memberName ?? "חבר").trim() || "חבר",
+        status,
+        expiresAt,
+        lastLoginAt,
+        lastIpFingerprint: String(entry.lastIpHash ?? "").slice(0, 8),
+        isActive,
+        flaggedAt: String(entry.flaggedAt ?? "").trim() || undefined,
+      } satisfies AdminMemberSummary;
+    })
+    .sort((left, right) => {
+      const leftLast = Date.parse(left.lastLoginAt || left.expiresAt || "1970-01-01T00:00:00.000Z");
+      const rightLast = Date.parse(right.lastLoginAt || right.expiresAt || "1970-01-01T00:00:00.000Z");
+      return rightLast - leftLast;
+    })
+    .slice(0, 160);
+}
+
+function buildMemberTimeline(member: StoredMember, activity: ActivityEntry[]): AdminMemberTimelineItem[] {
+  const items: AdminMemberTimelineItem[] = [];
+  const expiresAt = String(member.expiresAt ?? "").trim();
+  const status = String(member.status ?? "active").trim() || "active";
+
+  if (expiresAt) {
+    items.push({
+      id: `membership:${expiresAt}`,
+      kind: "membership",
+      at: expiresAt,
+      title: status === "active" ? "חברות פעילה" : "חברות דורשת בדיקה",
+      detail: status === "active" ? `הגישה פתוחה עד ${expiresAt}` : `סטטוס נוכחי: ${status}`,
+    });
+  }
+
+  if (member.flaggedAt) {
+    items.push({
+      id: `flag:${member.flaggedAt}`,
+      kind: "flag",
+      at: member.flaggedAt,
+      title: "נפתח Flag",
+      detail: "זוהה דפוס כניסה שדורש בדיקה ידנית.",
+    });
+  }
+
+  for (const entry of activity) {
+    items.push({
+      id: `login:${entry.seenAt}:${entry.ipHash}`,
+      kind: "login",
+      at: entry.seenAt,
+      title: "כניסה של חבר",
+      detail: `${entry.path || "/"} • ${entry.userAgent || "דפדפן לא זוהה"}`,
+    });
+  }
+
+  return items
+    .sort((left, right) => Date.parse(right.at) - Date.parse(left.at))
+    .slice(0, 12);
+}
+
 async function readFraudFlags(namespace: KVNamespace): Promise<FraudFlagEntry[]> {
   const keys = await listKvKeys(namespace, "flag:");
   const entries = await Promise.all(keys.map((key) => namespace.get<FraudFlagEntry>(key, "json")));
@@ -956,6 +1077,126 @@ async function readDeepPageBeaconList(namespace: KVNamespace): Promise<DeepPageB
       typeof entry.seenAt === "string" &&
       typeof entry.ipHash === "string"
   );
+}
+
+async function readIntegrityReports(namespace: KVNamespace): Promise<IntegrityReportEntry[]> {
+  const raw = await namespace.get<IntegrityReportEntry[]>(INTEGRITY_REPORTS_KEY, "json");
+  if (!Array.isArray(raw)) return [];
+  return raw.filter(
+    (entry) =>
+      entry &&
+      typeof entry.pageUrl === "string" &&
+      typeof entry.pagePath === "string" &&
+      typeof entry.reportedAt === "string" &&
+      typeof entry.reporterFingerprint === "string"
+  );
+}
+
+async function handleAdminMemberDetail(request: Request, env: Env, headers: Headers): Promise<Response> {
+  const auth = await requireAdminAuth(request, env, headers);
+  if (auth instanceof Response) return auth;
+
+  const url = new URL(request.url);
+  const phone = normalizePhone(url.searchParams.get("phone") ?? "");
+  if (!phone) {
+    return json({ ok: false, error: "צריך טלפון לחיפוש." }, 400, headers);
+  }
+
+  const member = await env.CLUB_MEMBERS.get<StoredMember>(`member:${phone}`, "json");
+  if (!member || typeof member.phone !== "string") {
+    return json({ ok: false, error: "לא מצאנו חבר עם הטלפון הזה." }, 404, headers);
+  }
+
+  const [activity, fraudFlags] = await Promise.all([
+    readActivity(env.CLUB_ACTIVITY, `activity:member:${phone}`),
+    readFraudFlags(env.CLUB_ACTIVITY),
+  ]);
+  const relevantFlags = fraudFlags.filter((entry) => entry.phone === phone).slice(0, 4);
+  const timeline = buildMemberTimeline(member, activity);
+
+  return json(
+    {
+      ok: true,
+      member: {
+        phone,
+        memberName: String(member.memberName ?? "חבר").trim() || "חבר",
+        status: String(member.status ?? "active").trim() || "active",
+        expiresAt: String(member.expiresAt ?? "").trim(),
+        lastLoginAt: String(member.lastLoginAt ?? "").trim(),
+        lastIpFingerprint: String(member.lastIpHash ?? "").slice(0, 8),
+        flaggedAt: String(member.flaggedAt ?? "").trim(),
+      },
+      recentActivity: activity
+        .sort((left, right) => Date.parse(right.seenAt) - Date.parse(left.seenAt))
+        .slice(0, 12)
+        .map((entry) => ({
+          seenAt: entry.seenAt,
+          path: entry.path,
+          userAgent: entry.userAgent,
+          ipFingerprint: entry.ipHash.slice(0, 8),
+        })),
+      fraudFlags: relevantFlags,
+      timeline,
+    },
+    200,
+    headers
+  );
+}
+
+async function handleAdminIntegrityReport(request: Request, env: Env, headers: Headers): Promise<Response> {
+  const auth = await requireAdminAuth(request, env, headers);
+  if (auth instanceof Response) return auth;
+
+  let payload:
+    | {
+        pageUrl?: string;
+        pagePath?: string;
+        pageTitle?: string;
+        selectedText?: string;
+        note?: string;
+        message?: string;
+      }
+    | null = null;
+  try {
+    payload = (await request.json()) as typeof payload;
+  } catch {
+    return json({ ok: false, error: "הבקשה לא נקראה כמו שצריך." }, 400, headers);
+  }
+
+  const pageUrl = String(payload?.pageUrl ?? "").trim().slice(0, 500);
+  const pagePath = String(payload?.pagePath ?? "").trim().slice(0, 240);
+  const pageTitle = String(payload?.pageTitle ?? "").trim().slice(0, 180);
+  const selectedText = String(payload?.selectedText ?? "").trim().slice(0, 500);
+  const note = String(payload?.note ?? "").trim().slice(0, 1600);
+  const message = String(payload?.message ?? "").trim().slice(0, 3200);
+
+  if (!pageUrl && !pagePath) {
+    return json({ ok: false, error: "חסר קישור לעמוד." }, 400, headers);
+  }
+
+  const ip = readClientIp(request);
+  const ipHash = await sha256Hex(`${env.CLUB_IP_PEPPER}:${ip}`);
+  const nowIso = new Date().toISOString();
+  const entry: IntegrityReportEntry = {
+    pageUrl: pageUrl || pagePath,
+    pagePath: pagePath || "/",
+    pageTitle,
+    selectedText,
+    note,
+    message,
+    reportedAt: nowIso,
+    reporterFingerprint: ipHash.slice(0, 12),
+    reporterAgent: String(request.headers.get("user-agent") ?? "").trim().slice(0, 180),
+  };
+
+  const existing = await readIntegrityReports(env.CLUB_ACTIVITY);
+  const next = [entry, ...existing]
+    .sort((left, right) => Date.parse(right.reportedAt) - Date.parse(left.reportedAt))
+    .slice(0, MAX_INTEGRITY_REPORTS);
+
+  await env.CLUB_ACTIVITY.put(INTEGRITY_REPORTS_KEY, JSON.stringify(next));
+
+  return json({ ok: true, reportedAt: nowIso }, 200, headers);
 }
 
 async function handleClubPageBeacon(request: Request, env: Env, headers: Headers): Promise<Response> {

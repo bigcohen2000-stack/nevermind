@@ -1,4 +1,4 @@
-/* NeverMind: Service Worker בסיסי — ניווט: רשת קודם, בלי רשת עמוד offline */
+/* NeverMind: Service Worker בסיסי - ניווט: רשת קודם, בלי רשת עמוד offline */
 const CACHE_NAME = "nevermind-v1";
 const OFFLINE = "/offline.html";
 const PRECACHE_URLS = ["/manifest.webmanifest", OFFLINE];
