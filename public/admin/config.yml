@@ -1,4 +1,4 @@
-﻿backend:
+backend:
   name: github
   repo: bigcohen2000-stack/nevermind
   branch: main
@@ -24,8 +24,8 @@ editor:
 
 collections:
   - name: articles
-    label: ׳׳׳׳¨׳™׳
-    label_singular: ׳׳׳׳¨
+    label: מאמרים
+    label_singular: מאמר
     folder: src/content/articles
     create: true
     delete: true
@@ -39,64 +39,64 @@ collections:
       - updatedDate
       - title
     view_filters:
-      - label: ׳˜׳™׳•׳˜׳•׳×
+      - label: טיוטות
         field: draft
         pattern: true
-      - label: ׳׳•׳›׳ ׳׳₪׳¨׳¡׳•׳
+      - label: מוכן לפרסום
         field: draft
         pattern: false
     fields:
-      - label: ׳›׳•׳×׳¨׳×
+      - label: כותרת
         name: title
         widget: string
-      - label: ׳×׳™׳׳•׳¨ ׳§׳¦׳¨
+      - label: תיאור קצר
         name: description
         widget: text
-      - label: ׳×׳׳¨׳™׳ ׳₪׳¨׳¡׳•׳
+      - label: תאריך פרסום
         name: pubDate
         widget: datetime
         required: true
         format: "YYYY-MM-DD"
         date_format: "YYYY-MM-DD"
         time_format: false
-      - label: ׳×׳׳¨׳™׳ ׳¢׳“׳›׳•׳
+      - label: תאריך עדכון
         name: updatedDate
         widget: datetime
         required: false
         format: "YYYY-MM-DD"
         date_format: "YYYY-MM-DD"
         time_format: false
-      - label: ׳׳—׳‘׳¨
+      - label: מחבר
         name: author
         widget: string
-        default: "׳”׳©׳ ׳׳ ׳׳©׳ ׳”"
-      - label: ׳×׳’׳™׳•׳×
+        default: "השם לא משנה"
+      - label: תגיות
         name: tags
         widget: select
         multiple: true
         options:
-          - ׳—׳•׳₪׳©
-          - ׳׳›׳ ׳™׳§׳× ׳׳—׳©׳‘׳”
-          - ׳”׳¢׳¦׳׳™
-          - ׳‘׳”׳™׳¨׳•׳×
-          - ׳‘׳—׳™׳¨׳”
-          - ׳–׳•׳’׳™׳•׳×
-          - ׳׳©׳₪׳—׳” ׳•׳—׳™׳ ׳•׳
-          - ׳₪׳™׳׳•׳¡׳•׳₪׳™׳” ׳•׳—׳‘׳¨׳”
-          - ׳×׳•׳“׳¢׳” ׳•׳¨׳¦׳•׳
-          - ׳—׳©׳™׳‘׳” ׳‘׳™׳§׳•׳¨׳×׳™׳×
-          - ׳©׳׳׳•׳× ׳’׳“׳•׳׳•׳×
-          - ׳¨׳’׳©׳•׳×
-          - ׳ ׳™׳¡׳•׳™׳™ ׳׳—׳©׳‘׳”
-      - label: ׳¨׳׳× ׳¢׳•׳׳§ (MDX)
+          - חופש
+          - מכניקת מחשבה
+          - העצמי
+          - בהירות
+          - בחירה
+          - זוגיות
+          - משפחה וחינוך
+          - פילוסופיה וחברה
+          - תודעה ורצון
+          - חשיבה ביקורתית
+          - שאלות גדולות
+          - רגשות
+          - ניסויי מחשבה
+      - label: רמת עומק (MDX)
         name: difficultyLevel
         widget: select
         required: false
         options:
-          - { label: ׳׳×׳—׳™׳׳™׳, value: beginner }
-          - { label: ׳׳×׳§׳“׳׳™׳, value: advanced }
-          - { label: ׳¢׳•׳׳§, value: deep }
-      - label: ׳¢׳•׳¦׳׳× ׳©׳™׳ ׳•׳™ ׳×׳₪׳™׳¡׳×׳™ (1ג€“5)
+          - { label: מתחילים, value: beginner }
+          - { label: מתקדמים, value: advanced }
+          - { label: עומק, value: deep }
+      - label: עוצמת שינוי תפיסתי (1–5)
         name: mindShiftIntensity
         widget: number
         required: false
@@ -104,20 +104,20 @@ collections:
         min: 1
         max: 5
         step: 1
-      - label: ׳×׳•׳‘׳ ׳× ׳׳™׳‘׳” (originalInsight)
+      - label: תובנת ליבה (originalInsight)
         name: originalInsight
         widget: text
         required: false
-      - label: ׳©׳׳׳” ׳׳¡׳›׳׳× TruthBlock / SEO (questionForSchema)
+      - label: שאלה לסכמת TruthBlock / SEO (questionForSchema)
         name: questionForSchema
         widget: string
         required: false
-      - label: ׳×׳™׳׳•׳¨ ׳§׳•׳ ׳¡׳₪׳˜ ׳׳×׳׳•׳ ׳” (imageAlt)
+      - label: תיאור קונספט לתמונה (imageAlt)
         name: imageAlt
         widget: string
         required: false
-        hint: "׳׳ ׳¨׳§ ׳׳” ׳׳•׳₪׳™׳¢ ׳‘׳₪׳¨׳™׳™׳ ג€” ׳׳” ׳”׳¨׳¢׳™׳•׳ ׳©׳”׳×׳׳•׳ ׳” ׳ ׳•׳©׳׳× (׳׳׳©׳ ׳׳¨׳׳” ׳©׳‘׳•׳¨׳” ׳›׳׳˜׳׳₪׳•׳¨׳” ׳׳₪׳™׳¨׳•׳§ ׳”׳׳’׳•). ׳¢׳‘׳¨׳™׳×. ׳—׳™׳–׳•׳§ ׳”׳§׳©׳¨ ׳¡׳׳ ׳˜׳™ ׳׳—׳™׳₪׳•׳©."
-      - label: ׳×׳׳•׳ ׳” ׳¨׳׳©׳™׳×
+        hint: "לא רק מה מופיע בפריים — מה הרעיון שהתמונה נושאת (למשל מראה שבורה כמטאפורה לפירוק האגו). עברית. חיזוק הקשר סמנטי לחיפוש."
+      - label: תמונה ראשית
         name: image
         widget: image
         required: false
@@ -125,48 +125,48 @@ collections:
         media_library:
           config:
             multiple: false
-      - label: ׳›׳×׳•׳‘׳× ׳§׳ ׳•׳ ׳™׳×
+      - label: כתובת קנונית
         name: canonicalUrl
         widget: string
         required: false
-      - label: ׳׳™׳׳•׳× ׳׳₪׳×׳—
+      - label: מילות מפתח
         name: keywords
         widget: string
         required: false
-      - label: ׳§׳™׳©׳•׳¨ ׳׳׳•׳“׳™׳•
+      - label: קישור לאודיו
         name: audioUrl
         widget: string
         required: false
-      - label: ׳׳–׳”׳” ׳™׳•׳˜׳™׳•׳‘
+      - label: מזהה יוטיוב
         name: youtubeId
         widget: string
         required: false
-      - label: ׳§׳™׳©׳•׳¨ ׳-Tally
+      - label: קישור ל-Tally
         name: tallyUrl
         widget: string
         required: false
-      - label: ׳×׳•׳›׳ ׳₪׳¨׳™׳׳™׳•׳
+      - label: תוכן פרימיום
         name: isPremium
         widget: boolean
         default: false
-      - label: ׳˜׳™׳•׳˜׳”
+      - label: טיוטה
         name: draft
         widget: boolean
         default: true
-      - label: ׳©׳׳׳•׳× ׳ ׳₪׳•׳¦׳•׳×
+      - label: שאלות נפוצות
         name: faq
         widget: list
         required: false
         collapsed: true
         summary: "{{fields.question}}"
         fields:
-          - label: ׳©׳׳׳”
+          - label: שאלה
             name: question
             widget: string
-          - label: ׳×׳©׳•׳‘׳”
+          - label: תשובה
             name: answer
             widget: text
-      - label: ׳×׳•׳›׳ ׳”׳׳׳׳¨
+      - label: תוכן המאמר
         name: body
         widget: markdown
         modes:

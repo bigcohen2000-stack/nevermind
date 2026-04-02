@@ -1,5 +1,3 @@
-const FALLBACK_WEB3FORMS_ACCESS_KEY = "94b32b6c-7590-4ac6-b8b4-1bc73dd2e5c8";
-
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
     status,
@@ -11,21 +9,21 @@ function json(data, status = 200) {
 }
 
 function resolveAccessKey(env) {
-  return String(env.WEB3FORMS_ACCESS_KEY ?? env.PUBLIC_WEB3FORMS_ACCESS_KEY ?? FALLBACK_WEB3FORMS_ACCESS_KEY).trim();
+  return String(env.WEB3FORMS_ACCESS_KEY ?? env.PUBLIC_WEB3FORMS_ACCESS_KEY ?? "").trim();
 }
 
 export async function onRequestPost(context) {
   const { request, env } = context;
   const accessKey = resolveAccessKey(env);
   if (!accessKey) {
-    return json({ ok: false, error: "missing_form_access_key" }, 503);
+    return json({ ok: false, success: false, error: "missing_form_access_key", message: "שרת הטפסים עדיין לא הוגדר בפריסה." }, 503);
   }
 
   let incoming;
   try {
     incoming = await request.formData();
   } catch {
-    return json({ ok: false, error: "invalid_form_body" }, 400);
+    return json({ ok: false, success: false, error: "invalid_form_body", message: "גוף הטופס לא הגיע בפורמט תקין." }, 400);
   }
 
   const outbound = new FormData();
@@ -67,15 +65,17 @@ export async function onRequestPost(context) {
       return json(
         {
           ok: false,
+          success: false,
           error: typeof payload?.message === "string" && payload.message.trim() ? payload.message.trim() : "form_submit_failed",
+          message: "שרת הטפסים לא אישר קבלה כרגע.",
           providerStatus: response.status,
         },
         response.ok ? 502 : response.status,
       );
     }
 
-    return json({ ok: true, message: "accepted" }, 200);
+    return json({ ok: true, success: true, message: "accepted" }, 200);
   } catch {
-    return json({ ok: false, error: "form_provider_unreachable" }, 502);
+    return json({ ok: false, success: false, error: "form_provider_unreachable", message: "שרת השליחה לא זמין כרגע." }, 502);
   }
 }
