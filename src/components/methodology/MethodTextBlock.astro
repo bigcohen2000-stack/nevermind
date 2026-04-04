@@ -1,0 +1,14 @@
+---
+interface Props {
+  text: string;
+  icon?: string;
+  class?: string;
+}
+
+const { text, icon = "💡", class: className = "" } = Astro.props;
+---
+
+<div class={`flex items-start gap-3 ${className}`}>
+  <span class="text-lg" aria-hidden="true">{icon}</span>
+  <p class="text-base leading-8 text-[color-mix(in_srgb,var(--nm-fg)_74%,var(--nm-bg))]">{text}</p>
+</div>

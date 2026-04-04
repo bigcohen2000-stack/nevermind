@@ -12,6 +12,13 @@ import rehypeGlossaryPreviews from "./src/plugins/rehype-glossary-previews";
 import { premiumMdxStripPlugin } from "./src/vite-plugins/premium-mdx-strip";
 
 const articlesDir = path.resolve("src/content/articles");
+const viteCacheBase =
+  process.env.LOCALAPPDATA ??
+  process.env.TEMP ??
+  process.env.TMP ??
+  process.env.TMPDIR ??
+  path.resolve(".astro");
+const viteCacheDir = path.resolve(viteCacheBase, "nevermind-vite");
 
 /** lastmod לפי frontmatter (updatedDate או pubDate) למסלולי /articles/... */
 function articlePathToLastmod(): Map<string, string> {
@@ -141,6 +148,7 @@ export default defineConfig({
     }),
   ],
   vite: {
+    cacheDir: viteCacheDir,
     plugins: [tailwindcss() as any, premiumMdxStripPlugin() as any],
     build: {
       minify: "esbuild",

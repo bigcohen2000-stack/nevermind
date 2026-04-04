@@ -67,6 +67,11 @@ const articles = defineCollection({
     tallyUrl: z.string().url().optional(),
     isPremium: z.boolean().default(false),
     draft: z.boolean().default(false),
+    audience: z.string().optional(),
+    difficulty: z.enum(["beginner", "intermediate", "advanced"]).optional(),
+    intendedAudience: z.string().optional(),
+    readTime: z.number().optional(),
+    isPublic: z.boolean().default(true),
     workflowStatus: z.enum(["writing", "review", "ready", "published"]).optional(),
     difficultyLevel: z.enum(["beginner", "advanced", "deep"]).optional(),
     /** עוצמת שינוי תפיסתי לתצוגה (1-5) */

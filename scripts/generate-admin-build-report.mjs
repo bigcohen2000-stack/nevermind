@@ -28,7 +28,7 @@ function clamp(value, min, max) {
 function estimateReadability(text) {
   const normalized = stripMdx(text);
   const words = normalized.split(/\s+/).filter(Boolean);
-  const sentences = normalized.split(/[.!?]+/).map((part) => part.trim()).filter(Boolean);
+  const sentences = normalized.split(/[.\u0021?]+/).map((part) => part.trim()).filter(Boolean);
   const longWords = words.filter((word) => word.length >= 9).length;
   const avgSentence = sentences.length ? words.length / sentences.length : words.length;
   const longRatio = words.length ? longWords / words.length : 0;

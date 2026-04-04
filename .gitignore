@@ -4,6 +4,7 @@ node_modules/
 # Build / Astro
 dist/
 .astro/
+*.tsbuildinfo
 
 # Local env & secrets (never commit)
 .env
@@ -14,8 +15,15 @@ dist/
 .DS_Store
 Thumbs.db
 *.log
+.codex-check.log
 
-# Portable tooling (local only — not for Git / CI)
+# Local temp files
+tmp-*
+
+# Cloudflare local state
+.wrangler/
+
+# Portable tooling (local only - not for Git / CI)
 tools/
 
 # Optional caches

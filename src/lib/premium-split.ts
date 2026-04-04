@@ -2,7 +2,7 @@
  * פיצול גוף MDX לפרימיום: מרקר HTML או יחס שורות (~30% ציבורי).
  */
 export function normalizeCutoffMarker(marker: string): string {
-  return (marker || "[[premium-break]]").replace(/<!--|-->/g, "").trim();
+  return (marker || "[[premium-break]]").replace(/<\u0021--|-->/g, "").trim();
 }
 
 export function splitPremiumRawBody(
@@ -10,7 +10,7 @@ export function splitPremiumRawBody(
   cutoffMarker: string
 ): { publicPart: string; lockedPart: string } {
   const normalizedMarker = normalizeCutoffMarker(cutoffMarker);
-  const needle = normalizedMarker.startsWith("[[") ? normalizedMarker : `<!--${normalizedMarker}-->`;
+  const needle = normalizedMarker.startsWith("[[") ? normalizedMarker : `<\u0021--${normalizedMarker}-->`;
   const i = body.indexOf(needle);
   if (i !== -1) {
     return {

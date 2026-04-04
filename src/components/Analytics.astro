@@ -1,77 +1,73 @@
----
-const gaId = (import.meta.env.PUBLIC_GA_MEASUREMENT_ID ?? "").trim();
----
+<script is:inline>
+  (() => {
+    const pending = [];
+    let canTrack = false;
 
-{
-  gaId ? (
-    <script is:inline define:vars={{ gaId }}>
-      (function () {
-        const pending = [];
-        let loaded = false;
+    const getDataLayer = () => {
+      window.dataLayer = window.dataLayer || [];
+      return window.dataLayer;
+    };
 
-        window.addEventListener("nm-analytics", function (e) {
-          const d = e && e.detail;
-          if (!d || !d.name) return;
-          if (typeof window.nmTrackEvent === "function") {
-            window.nmTrackEvent(d.name, d.params || {});
-          } else {
-            pending.push(d);
-          }
-        });
+    const pushEvent = (name, params = {}) => {
+      if (!name) return;
+      getDataLayer().push({ event: name, ...params });
+    };
 
-        function inject() {
-          if (loaded) return;
-          loaded = true;
-          const s = document.createElement("script");
-          s.async = true;
-          s.src = "https://www.googletagmanager.com/gtag/js?id=" + encodeURIComponent(gaId);
-          document.head.appendChild(s);
-          window.dataLayer = window.dataLayer || [];
-          function gtag() {
-            window.dataLayer.push(arguments);
-          }
-          window.gtag = gtag;
-          gtag("js", new Date());
-          gtag("config", gaId, { anonymize_ip: true });
+    const flush = () => {
+      if (!canTrack) return;
+      while (pending.length > 0) {
+        const next = pending.shift();
+        if (!next) continue;
+        pushEvent(next.name, next.params || {});
+      }
+    };
 
-          window.nmTrackEvent = function (name, params) {
-            if (typeof gtag !== "function") return;
-            gtag("event", name, params || {});
-          };
+    const track = (name, params = {}) => {
+      if (!name) return;
+      if (!canTrack) {
+        pending.push({ name, params });
+        return;
+      }
+      pushEvent(name, params);
+    };
 
-          while (pending.length) {
-            const d = pending.shift();
-            window.nmTrackEvent(d.name, d.params || {});
-          }
+    const syncConsent = () => {
+      try {
+        canTrack = localStorage.getItem("nm-cookie-consent") === "accepted";
+      } catch {
+        canTrack = false;
+      }
+      flush();
+    };
 
-          document.addEventListener("click", function (ev) {
-            const t = ev.target;
-            if (!(t instanceof Element)) return;
-            const a = t.closest("a[href]");
-            if (!a || !(a instanceof HTMLAnchorElement)) return;
-            const href = a.getAttribute("href") || "";
-            if (href.includes("tally.so")) {
-              window.nmTrackEvent("book_session_click", { link_url: href });
-            }
-            if (a.hasAttribute("download") || /\.pdf($|[?#])/i.test(href)) {
-              window.nmTrackEvent("digital_file_click", { link_url: href });
-            }
-          });
-        }
+    window.nmTrackEvent = track;
 
-        function onConsent() {
-          try {
-            if (localStorage.getItem("nm-cookie-consent") !== "accepted") return;
-          } catch {
-            return;
-          }
-          inject();
-        }
+    window.addEventListener("nm-analytics", (event) => {
+      const detail = event && event.detail;
+      if (!detail || !detail.name) return;
+      track(detail.name, detail.params || {});
+    });
 
-        window.addEventListener("nm-cookie-accepted", inject);
-        document.addEventListener("astro:page-load", onConsent);
-        onConsent();
-      })();
-    </script>
-  ) : null
-}
+    document.addEventListener("click", (event) => {
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+      const anchor = target.closest("a[href]");
+      if (!(anchor instanceof HTMLAnchorElement)) return;
+      const href = anchor.getAttribute("href") || "";
+      if (href.includes("tally.so")) {
+        track("book_session_click", { link_url: href });
+      }
+      if (anchor.hasAttribute("download") || /\.pdf($|[?#])/i.test(href)) {
+        track("digital_file_click", { link_url: href });
+      }
+    });
+
+    window.addEventListener("nm-cookie-accepted", () => {
+      canTrack = true;
+      flush();
+    });
+
+    document.addEventListener("astro:page-load", syncConsent);
+    syncConsent();
+  })();
+</script>

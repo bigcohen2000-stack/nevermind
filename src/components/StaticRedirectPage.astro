@@ -3,24 +3,80 @@ interface Props {
   to: string;
   title?: string;
   message?: string;
+  ctaLabel?: string;
 }
 
 const {
   to,
-  title = "Redirecting...",
-  message = "This page has moved.",
+  title = "מעביר לעמוד החדש",
+  message = "העמוד עבר לכתובת חדשה",
+  ctaLabel = "להמשך",
 } = Astro.props;
 
 const destination = typeof to === "string" && to.trim() ? to.trim() : "/";
 ---
 <!doctype html>
-<html lang="en">
+<html lang="he" dir="rtl">
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta http-equiv="refresh" content={`0;url=${destination}`} />
     <meta name="robots" content="noindex, nofollow" />
     <link rel="canonical" href={destination} />
     <title>{title}</title>
+    <style is:inline>
+      :root {
+        color-scheme: dark;
+        --nm-redirect-bg: #1a1a1a;
+        --nm-redirect-surface: color-mix(in srgb, #fafaf8 6%, #1a1a1a);
+        --nm-redirect-fg: #fafaf8;
+        --nm-redirect-muted: color-mix(in srgb, #fafaf8 68%, #1a1a1a);
+        --nm-redirect-accent: #2563eb;
+      }
+
+      html,
+      body {
+        min-height: 100%;
+      }
+
+      body {
+        margin: 0;
+        display: grid;
+        place-items: center;
+        padding: 1.5rem;
+        background: var(--nm-redirect-bg);
+        color: var(--nm-redirect-fg);
+        font-family: "Heebo", "Assistant Variable", system-ui, sans-serif;
+      }
+
+      main {
+        width: min(100%, 32rem);
+        border: 1px solid color-mix(in srgb, var(--nm-redirect-fg) 12%, transparent);
+        border-radius: 1.5rem;
+        background: var(--nm-redirect-surface);
+        padding: 1.5rem;
+        text-align: right;
+        box-shadow: 0 24px 64px color-mix(in srgb, #000 28%, transparent);
+      }
+
+      p {
+        margin: 0 0 1rem;
+        line-height: 1.8;
+        color: var(--nm-redirect-muted);
+      }
+
+      a {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 3rem;
+        padding: 0 1.25rem;
+        border-radius: 999px;
+        background: var(--nm-redirect-accent);
+        color: var(--nm-redirect-fg);
+        text-decoration: none;
+      }
+    </style>
     <script is:inline define:vars={{ destination }}>
       if (typeof window !== "undefined") {
         window.location.replace(destination);
@@ -29,7 +85,8 @@ const destination = typeof to === "string" && to.trim() ? to.trim() : "/";
   </head>
   <body>
     <main>
-      <p>{message} <a href={destination}>Continue</a>.</p>
+      <p>{message}</p>
+      <a href={destination}>{ctaLabel}</a>
     </main>
   </body>
 </html>

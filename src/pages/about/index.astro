@@ -2,16 +2,25 @@
 import { getCollection } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
 import VideoPlayer from "../../components/VideoPlayer.astro";
+import MethodCard from "../../components/methodology/MethodCard.astro";
+import MethodFaq from "../../components/methodology/MethodFaq.astro";
+import MethodTextBlock from "../../components/methodology/MethodTextBlock.astro";
 import {
   aboutExtraMethodFaq,
   aboutMethodFaq,
   aboutPracticalFaq,
-} from "../../data/about-method-faq";
-import {
   masterPhilosophyClosingQuestion,
   masterPhilosophyMetaDescription,
   masterPhilosophyParagraphs,
-} from "../../data/master-philosophy";
+} from "../../data/methodology/content";
+import {
+  joinBenefits,
+  afterJoinSteps,
+  fitList,
+  notHereList,
+  premiumTags,
+  preJoinFaq,
+} from "../../data/methodology/metadata";
 
 const joinHref = "/premium-access/";
 const quietJoinHref = "/premium-access/";
@@ -30,72 +39,6 @@ const previewArticles = [...articleEntries]
     excerpt: String(entry.data.description || "").trim(),
   }));
 
-const joinBenefits = [
-  "סרטונים מלאים בכל מאמר",
-  "תכנים שלא ניתן לפרסם בפומבי",
-  "גישה לקבוצה השקטה",
-  "אפשרויות נוספות באתר",
-  "תכנים חדשים שנפתחים רק למנויים",
-  "עדכונים שוטפים בלי רעש",
-];
-
-const afterJoinSteps = [
-  "נפתח לך דשבורד אישי",
-  "אתה מקבל גישה לכל התכנים",
-  "אתה יכול לשמור מאמרים",
-  "אתה מקבל עדכונים שקטים",
-  "אתה נכנס לקבוצה השקטה",
-];
-
-const fitList = [
-  "למי שמרגיש שיש רעש פנימי",
-  "למי שמחפש בהירות",
-  "למי שרוצה להבין מה מפעיל אותו",
-  "למי שלא מחפש טיפול, אלא בדיקה אמיתית",
-];
-
-const notHereList = [
-  "לא טיפול",
-  "לא הרגעה",
-  "לא מוטיבציה",
-  "לא פתרונות מהירים",
-];
-
-const premiumTags = [
-  "אלוהים",
-  "דת",
-  "הכל אחד",
-  "אילומינטי",
-  "מיניות",
-  "הדרכת הורים",
-  "פחדים עמוקים",
-  "זהות",
-  "משמעות",
-];
-
-const preJoinFaq = [
-  {
-    question: "האם זה אנונימי",
-    answer: "כן. אפשר לקרוא, לבדוק, ולהצטרף בלי להיחשף מעבר למה שנדרש לפתיחת הגישה.",
-  },
-  {
-    question: "האם יש התחייבות",
-    answer: "לא. רואים מה מתאים לך ורק אז מחליטים אם להמשיך.",
-  },
-  {
-    question: "האם אפשר לבטל",
-    answer: "כן. אין כאן מלכודות ואין צעדים נסתרים.",
-  },
-  {
-    question: "האם צריך רקע קודם",
-    answer: "לא. נכנסים כמו שאתה ומתחילים ממה שיש עכשיו.",
-  },
-  {
-    question: "האם זה מתאים לכל גיל",
-    answer: "זה מתאים למי שמוכן לבדיקה שקטה ורוצה להסתכל פנימה בכנות.",
-  },
-];
-
 const faqForPage = [
   ...preJoinFaq,
   ...aboutMethodFaq,
@@ -109,11 +52,11 @@ const faqForPage = [
   description={masterPhilosophyMetaDescription}
   faqItems={faqForPage}
 >
-  <div class="mx-auto max-w-6xl space-y-16 px-4 py-14 text-right text-[var(--nm-fg)] md:space-y-20">
-    <header class="about-hero-fade rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] bg-[var(--nm-bg-canvas)] px-6 py-20 text-center shadow-[0_20px_60px_rgba(26,26,26,0.04)] md:px-10 md:py-24">
+  <div class="mx-auto max-w-6xl space-y-16 px-4 py-14 text-right text-[var(--nm-fg)] md:space-y-20" role="main">
+    <header class="about-hero-fade rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] bg-[var(--nm-bg-canvas)] px-6 py-20 text-center shadow-[0_20px_60px_rgba(26,26,26,0.04)] md:px-10 md:py-24" aria-labelledby="hero-heading">
       <div class="mx-auto max-w-4xl space-y-5">
         <p class="text-sm font-semibold tracking-[0.12em] text-[var(--nm-accent)]">מה זה NeverMind</p>
-        <h1 aria-label="NeverMind שיטה שמפרידה בין עובדה פירוש ותגובה" class="text-[clamp(3rem,2.2rem+3vw,4rem)] font-[350] leading-[1.08] tracking-[-0.04em] text-[#1A1A1A]">
+        <h1 id="hero-heading" aria-label="NeverMind שיטה שמפרידה בין עובדה פירוש ותגובה" class="text-[clamp(3rem,2.2rem+3vw,4rem)] font-[350] leading-[1.08] tracking-[-0.04em] text-[#1A1A1A]">
           NeverMind - דרך פשוטה שמפרידה בין עובדה, פירוש ותגובה, כדי שתראה את השקט שכבר יש בך.
           <span class="sr-only">שיטה</span>
         </h1>
@@ -123,9 +66,9 @@ const faqForPage = [
       </div>
     </header>
 
-    <section class="rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 px-6 py-8 text-center shadow-[0_20px_60px_rgba(26,26,26,0.05)] md:px-10">
+    <section class="rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 px-6 py-8 text-center shadow-[0_20px_60px_rgba(26,26,26,0.05)] md:px-10" aria-labelledby="join-heading">
       <div class="mx-auto max-w-3xl space-y-5">
-        <h2 class="text-[clamp(1.8rem,1.45rem+1vw,2.6rem)] font-semibold tracking-[-0.03em]">רוצה להצטרף</h2>
+        <h2 id="join-heading" class="text-[clamp(1.8rem,1.45rem+1vw,2.6rem)] font-semibold tracking-[-0.03em]">רוצה להצטרף</h2>
         <p class="text-base leading-8 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
           גישה לכל הסרטונים, התכנים המלאים, והקבוצה השקטה.
         </p>
@@ -185,17 +128,13 @@ const faqForPage = [
       <article class="rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 p-6 shadow-[0_20px_60px_rgba(26,26,26,0.05)] lg:p-8">
         <p class="text-sm font-semibold text-[var(--nm-accent)]">בכל מאמר יש סרטון</p>
         <h2 class="mt-3 text-[clamp(1.45rem,1.3rem+0.6vw,1.95rem)] font-semibold">הסבר קצר, מדויק, שרואים בו את הדברים בזמן אמת</h2>
-        <p class="mt-3 text-base leading-8 text-[color-mix(in_srgb,var(--nm-fg)_74%,var(--nm-bg))]">
-          לא רק לקרוא. גם לראות, לשמוע, ולעקוב אחרי הדרך שבה הדברים נפתחים בפועל.
-        </p>
+        <MethodTextBlock text="לא רק לקרוא. גם לראות, לשמוע, ולעקוב אחרי הדרך שבה הדברים נפתחים בפועל." icon="🎥" />
       </article>
 
       <article class="rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-6 lg:p-8">
         <p class="text-sm font-semibold text-[var(--nm-accent)]">יש תכנים שלא יכולים להיות פומביים</p>
         <h2 class="mt-3 text-[clamp(1.45rem,1.3rem+0.6vw,1.95rem)] font-semibold">נושאים רגישים, עמוקים, או כאלה שלא מתאימים לרשת פתוחה</h2>
-        <p class="mt-3 text-base leading-8 text-[color-mix(in_srgb,var(--nm-fg)_74%,var(--nm-bg))]">
-          הם זמינים רק למנויים. לא כי צריך לעשות מזה סוד, אלא כי לא כל דבר שייך למרחב פתוח ורועש.
-        </p>
+        <MethodTextBlock text="הם זמינים רק למנויים. לא כי צריך לעשות מזה סוד, אלא כי לא כל דבר שייך למרחב פתוח ורועש." icon="🔒" />
       </article>
     </section>
 
@@ -203,9 +142,7 @@ const faqForPage = [
       <div class="space-y-4">
         <p class="text-sm font-semibold text-[var(--nm-accent)]">בקרוב בפרימיום</p>
         <h2 class="text-[clamp(1.5rem,1.35rem+0.7vw,2rem)] font-semibold">יש כאן עולם שלם שנפתח בהדרגה</h2>
-        <p class="max-w-3xl text-base leading-8 text-[color-mix(in_srgb,var(--nm-fg)_74%,var(--nm-bg))]">
-          כאן רואים רק את הכיוון. בפנים נפתחים נושאים שלא מתאימים להצגה מלאה בחוץ.
-        </p>
+        <MethodTextBlock text="כאן רואים רק את הכיוון. בפנים נפתחים נושאים שלא מתאימים להצגה מלאה בחוץ." icon="🌟" />
       </div>
       <div class="mt-5 flex flex-wrap justify-end gap-3">
         {premiumTags.map((tag) => (
@@ -296,12 +233,8 @@ const faqForPage = [
         <div class="space-y-4">
           <p class="text-sm font-semibold text-[var(--nm-accent)]">מאחורי האתר</p>
           <h2 class="text-[clamp(1.5rem,1.3rem+0.8vw,2rem)] font-semibold">השם לא משנה</h2>
-          <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_74%,var(--nm-bg))]">
-            התוכן כאן נשען על אותו קו בדיקה שמופיע גם בשיחות: לראות מה באמת קורה בפנים בלי לקשט אותו.
-          </p>
-          <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_74%,var(--nm-bg))]">
-            אם משהו כאן נוגע בנקודה אמיתית, אפשר להמשיך דרך הספרייה, דרך בקשה להצטרפות, או דרך שיחה קצרה.
-          </p>
+          <MethodTextBlock text="התוכן כאן נשען על אותו קו בדיקה שמופיע גם בשיחות: לראות מה באמת קורה בפנים בלי לקשט אותו." icon="🔍" />
+          <MethodTextBlock text="אם משהו כאן נוגע בנקודה אמיתית, אפשר להמשיך דרך הספרייה, דרך בקשה להצטרפות, או דרך שיחה קצרה." icon="📞" />
           <div class="flex flex-wrap justify-end gap-3 pt-2">
             <a href="/library/" class="inline-flex min-h-[44px] items-center rounded-full bg-[var(--nm-inverse)] px-5 py-2.5 text-base font-semibold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-inverse-hover)]">מעבר לספרייה</a>
             <a href={joinHref} class="inline-flex min-h-[44px] items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-5 py-2.5 text-base font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]">בקשה להצטרף</a>
@@ -311,23 +244,8 @@ const faqForPage = [
     </section>
 
     <section class="grid gap-6 lg:grid-cols-2">
-      <article class="rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 p-6 shadow-[0_20px_60px_rgba(26,26,26,0.05)] lg:p-8">
-        <p class="text-sm font-semibold text-[var(--nm-accent)]">למי NeverMind מתאים</p>
-        <ul class="mt-4 space-y-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))]">
-          {fitList.map((item) => (
-            <li class="rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3">{item}</li>
-          ))}
-        </ul>
-      </article>
-
-      <article class="rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-6 lg:p-8">
-        <p class="text-sm font-semibold text-[var(--nm-accent)]">מה לא תמצא כאן</p>
-        <ul class="mt-4 space-y-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))]">
-          {notHereList.map((item) => (
-            <li class="rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 px-4 py-3">{item}</li>
-          ))}
-        </ul>
-      </article>
+      <MethodCard title="למי NeverMind מתאים" items={fitList} />
+      <MethodCard title="מה לא תמצא כאן" items={notHereList} />
     </section>
 
     <section class="space-y-4">
@@ -367,21 +285,7 @@ const faqForPage = [
         <p class="text-sm font-semibold text-[var(--nm-accent)]">שאלות נפוצות לפני הצטרפות</p>
         <h2 class="text-[clamp(1.45rem,1.3rem+0.7vw,2rem)] font-semibold">כמה דברים שכדאי לדעת לפני שנכנסים</h2>
       </div>
-      <div class="mt-5 space-y-3">
-        {preJoinFaq.map((item) => (
-          <details class="group rounded-[1.25rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white p-4 open:bg-[var(--nm-bg-canvas)] md:p-5">
-            <summary class="cursor-pointer list-none text-base font-semibold text-[var(--nm-fg)] marker:content-none [&::-webkit-details-marker]:hidden">
-              <span class="inline-flex w-full items-start justify-between gap-3">
-                <span class="min-w-0 flex-1 leading-snug">{item.question}</span>
-                <span class="mt-0.5 shrink-0 text-[var(--nm-accent)] transition group-open:rotate-180" aria-hidden="true">⌃</span>
-              </span>
-            </summary>
-            <p class="mt-4 border-t border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] pt-4 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))]">
-              {item.answer}
-            </p>
-          </details>
-        ))}
-      </div>
+      <MethodFaq faqs={preJoinFaq} class="mt-5" />
     </section>
 
     <section id="nm-about-faq" class="space-y-4">
@@ -392,21 +296,7 @@ const faqForPage = [
         </p>
       </div>
 
-      <div class="space-y-3">
-        {[...aboutMethodFaq, ...aboutExtraMethodFaq, ...aboutPracticalFaq].map((item) => (
-          <details class="group rounded-[1.25rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white p-4 open:bg-[var(--nm-bg-canvas)] md:p-5">
-            <summary class="cursor-pointer list-none text-base font-semibold text-[var(--nm-fg)] marker:content-none [&::-webkit-details-marker]:hidden">
-              <span class="inline-flex w-full items-start justify-between gap-3">
-                <span class="min-w-0 flex-1 leading-snug">{item.question}</span>
-                <span class="mt-0.5 shrink-0 text-[var(--nm-accent)] transition group-open:rotate-180" aria-hidden="true">⌃</span>
-              </span>
-            </summary>
-            <p class="mt-4 border-t border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] pt-4 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))]">
-              {item.answer}
-            </p>
-          </details>
-        ))}
-      </div>
+      <MethodFaq faqs={[...aboutMethodFaq, ...aboutExtraMethodFaq, ...aboutPracticalFaq]} />
     </section>
 
     <section class="rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 px-6 py-8 text-center shadow-[0_20px_60px_rgba(26,26,26,0.05)] md:px-10">

@@ -28,6 +28,7 @@ const whatsAppDigits = String(Astro.props.whatsAppNumber ?? "").replace(/\D/g, "
 
     const BRAND_THANKS =
       "תודה. אתה עוזר לנו לראות את האמת בצורה ברורה יותר. האתר נבנה בסיוע בינה מלאכותית על ידי יקיר כהן, והדיוק שלך עוזר לכולם.";
+    const floatingPromptEnabled = false;
 
     const shouldSkipPath = () => /^\/(admin|dashboard|api)(\/|$)/.test(window.location.pathname || "");
     const isArticlePath = () => /^\/articles\/.+/.test(window.location.pathname || "");
@@ -309,7 +310,7 @@ const whatsAppDigits = String(Astro.props.whatsAppNumber ?? "").replace(/\D/g, "
 
       const root = document.createElement("div");
       root.className = "nm-integrity-root";
-      root.hidden = true;
+      root.hidden = false;
 
       const pulse = document.createElement("div");
       pulse.className = "nm-integrity-pulse";
@@ -368,7 +369,11 @@ const whatsAppDigits = String(Astro.props.whatsAppNumber ?? "").replace(/\D/g, "
         </section>
       `;
 
-      root.append(pulse, button, toast);
+      if (floatingPromptEnabled) {
+        root.append(pulse, button, toast);
+      } else {
+        root.append(toast);
+      }
       document.body.append(root, overlay);
 
       state.ui = {
@@ -389,7 +394,9 @@ const whatsAppDigits = String(Astro.props.whatsAppNumber ?? "").replace(/\D/g, "
         wa: overlay.querySelector("[data-integrity-wa]"),
       };
 
-      button.addEventListener("click", () => openModal());
+      if (floatingPromptEnabled) {
+        button.addEventListener("click", () => openModal());
+      }
       overlay.addEventListener("click", (event) => {
         if (event.target === overlay) closeModal();
       });
@@ -420,6 +427,7 @@ const whatsAppDigits = String(Astro.props.whatsAppNumber ?? "").replace(/\D/g, "
     };
 
     const setButtonVisible = (visible) => {
+      if (!floatingPromptEnabled) return;
       const ui = ensureUi();
       ui.root.hidden = shouldSkipPath();
       if (shouldSkipPath()) {
@@ -560,6 +568,7 @@ const whatsAppDigits = String(Astro.props.whatsAppNumber ?? "").replace(/\D/g, "
     };
 
     const refreshPulse = async () => {
+      if (!floatingPromptEnabled) return;
       const ui = ensureUi();
       if (shouldSkipPath()) {
         ui.pulse.classList.remove("is-visible");
@@ -590,6 +599,7 @@ const whatsAppDigits = String(Astro.props.whatsAppNumber ?? "").replace(/\D/g, "
     };
 
     const scheduleReveal = () => {
+      if (!floatingPromptEnabled) return;
       window.clearTimeout(state.revealTimer);
       const delay = isArticlePath() ? 1400 : 8000;
       state.revealTimer = window.setTimeout(() => {
@@ -603,7 +613,9 @@ const whatsAppDigits = String(Astro.props.whatsAppNumber ?? "").replace(/\D/g, "
       const selection = readSelection();
       if (selection) {
         state.lastSelection = selection;
-        setButtonVisible(true);
+        if (floatingPromptEnabled) {
+          setButtonVisible(true);
+        }
         if (state.ui?.overlay?.classList.contains("is-open")) {
           updateModalContext({ selection });
         }
@@ -616,16 +628,20 @@ const whatsAppDigits = String(Astro.props.whatsAppNumber ?? "").replace(/\D/g, "
       ui.root.hidden = shouldSkipPath();
       if (shouldSkipPath()) {
         closeModal();
-        ui.pulse.classList.remove("is-visible");
-        ui.button.classList.remove("is-visible");
+        if (floatingPromptEnabled) {
+          ui.pulse.classList.remove("is-visible");
+          ui.button.classList.remove("is-visible");
+        }
         return;
       }
       if (ui.note instanceof HTMLTextAreaElement) {
         ui.note.value = "";
       }
-      setButtonVisible(isArticlePath());
-      scheduleReveal();
-      void refreshPulse();
+      if (floatingPromptEnabled) {
+        setButtonVisible(isArticlePath());
+        scheduleReveal();
+        void refreshPulse();
+      }
     };
 
     window.__nmIntegrityOnRoute = onRoute;

@@ -21,7 +21,7 @@ const {
   articleSlug = "",
   meetingIntent = false,
   variant = "fab",
-  label = "מחשבה אחת נקייה - ישר לוואטסאפ",
+  label = "מחשבה אחת נקייה, ישר לוואטסאפ",
 } = Astro.props;
 
 const slugTrim = String(articleSlug ?? "").trim();
@@ -58,11 +58,12 @@ const prefillEncoded = encodeURIComponent(leadMessage);
       href={hrefWithText}
       target="_blank"
       rel="noreferrer"
-      aria-label="מחשבה אחת נקייה - ישר לוואטסאפ"
-      title="מחשבה אחת נקייה - ישר לוואטסאפ"
-      class="fixed bottom-[4.75rem] left-5 z-40 flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-[var(--nm-bg-canvas)]/95 shadow-sm backdrop-blur-md md:hidden opacity-0 pointer-events-none transition-none"
+      aria-label="מחשבה אחת נקייה, ישר לוואטסאפ"
+      title="מחשבה אחת נקייה, ישר לוואטסאפ"
+      class="fixed z-40 flex h-12 w-12 min-h-[48px] min-w-[48px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-accent)_24%,transparent)] bg-[var(--nm-inverse)] text-[var(--nm-on-accent)] shadow-[0_16px_40px_rgba(26,26,26,0.2)] backdrop-blur-md md:hidden opacity-0 pointer-events-none transition-none"
+      style="bottom: max(4.75rem, calc(env(safe-area-inset-bottom) + 1rem)); right: 1rem;"
     >
-      <span class="block h-2.5 w-2.5 rounded-full bg-[var(--nm-accent)]" aria-hidden="true" />
+      <span class="block h-2.5 w-2.5 rounded-full bg-[var(--nm-on-accent)]" aria-hidden="true" />
     </a>
   )
 }
@@ -99,7 +100,7 @@ const prefillEncoded = encodeURIComponent(leadMessage);
         if (!message) {
           const rawTitle = document.title ? document.title.split("|")[0].trim() : "NeverMind";
           const pageTitle = rawTitle || "NeverMind";
-          message = `[Lead | Source: ${pageTitle}]\nמחשבה אחת נקייה - ישר לוואטסאפ`;
+          message = `[Lead | Source: ${pageTitle}]\nמחשבה אחת נקייה, ישר לוואטסאפ`;
         }
         const encoded = encodeURIComponent(message);
         whatsappButton.setAttribute("href", `${base}?text=${encoded}`);

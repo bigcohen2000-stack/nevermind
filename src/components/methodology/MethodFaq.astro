@@ -1,0 +1,26 @@
+---
+import type { FaqPair } from "../../data/methodology/content";
+
+interface Props {
+  faqs: FaqPair[];
+  class?: string;
+}
+
+const { faqs, class: className = "" } = Astro.props;
+---
+
+<div class={`space-y-3 ${className}`}>
+  {faqs.map((item) => (
+    <details class="group rounded-[1.25rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white p-4 open:bg-[var(--nm-bg-canvas)] md:p-5">
+      <summary class="cursor-pointer list-none text-base font-semibold text-[var(--nm-fg)] marker:content-none [&::-webkit-details-marker]:hidden">
+        <span class="inline-flex w-full items-start justify-between gap-3">
+          <span class="min-w-0 flex-1 leading-snug">{item.question}</span>
+          <span class="mt-0.5 shrink-0 text-[var(--nm-accent)] transition group-open:rotate-180" aria-hidden="true">⌃</span>
+        </span>
+      </summary>
+      <p class="mt-4 border-t border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] pt-4 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))]">
+        {item.answer}
+      </p>
+    </details>
+  ))}
+</div>

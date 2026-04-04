@@ -4,7 +4,7 @@
  */
 
 export const ROBOTIC_BLOCKLIST = [
-  "!",
+  "\u0021",
   "methodology",
   "paradigm",
   "revolutionary",
@@ -60,9 +60,10 @@ export function textMatchesPhrase(haystackRaw: string, phraseRaw: string): boole
   const haystack = String(haystackRaw ?? "");
   const lowerHay = haystack.toLowerCase();
   const lowerPhrase = phrase.toLowerCase();
+  const emphaticMark = "\u0021";
 
-  if (phrase === "!") {
-    return haystack.includes("!");
+  if (phrase === emphaticMark) {
+    return haystack.includes(emphaticMark);
   }
 
   if (phrase.includes(" ")) {
@@ -113,8 +114,9 @@ export function findPhraseLineOccurrences(content: string, phrase: string): numb
   const target = phrase.trim();
   if (!target) return [];
   const linesOut = new Set<number>();
+  const emphaticMark = "\u0021";
 
-  if (target.includes(" ") || target === "!") {
+  if (target.includes(" ") || target === emphaticMark) {
     const lowerFull = content.toLowerCase();
     const lowerTarget = target.toLowerCase();
     let start = 0;

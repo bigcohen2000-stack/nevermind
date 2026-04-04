@@ -19,7 +19,7 @@ const safeSrc = String(src ?? "").trim();
         <audio
           class="nm-audio-player__el sr-only"
           preload="metadata"
-          controlsList="nodownload"
+          controlslist="nodownload"
           data-nm-audio-el
         >
           <source src={safeSrc} type="audio/mpeg" />
@@ -54,29 +54,31 @@ const safeSrc = String(src ?? "").trim();
 }
 
 <script>
-  function formatTime(sec) {
+  function formatTime(sec: number) {
     if (!Number.isFinite(sec) || sec < 0) return "0:00";
     const m = Math.floor(sec / 60);
     const s = Math.floor(sec % 60);
     return `${m}:${s.toString().padStart(2, "0")}`;
   }
 
-  function bindAudioPlayer(root) {
+  function bindAudioPlayer(root: Element) {
     if (!(root instanceof HTMLElement)) return;
-    const audio = root.querySelector("[data-nm-audio-el]");
-    const btn = root.querySelector("[data-nm-audio-toggle]");
-    const progress = root.querySelector("[data-nm-audio-progress]");
-    const timeEl = root.querySelector("[data-nm-audio-time]");
-    const bar = root.querySelector("[data-nm-audio-bar-wrap]");
-    const iconPlay = root.querySelector("[data-nm-audio-icon-play]");
-    const iconPause = root.querySelector("[data-nm-audio-icon-pause]");
-    if (!(audio instanceof HTMLAudioElement) || !(btn instanceof HTMLButtonElement)) return;
-    if (btn.dataset.nmAudioBound === "1") return;
-    btn.dataset.nmAudioBound = "1";
+    const audio = root.querySelector<HTMLAudioElement>("[data-nm-audio-el]");
+    const btn = root.querySelector<HTMLButtonElement>("[data-nm-audio-toggle]");
+    const progress = root.querySelector<HTMLElement>("[data-nm-audio-progress]");
+    const timeEl = root.querySelector<HTMLElement>("[data-nm-audio-time]");
+    const bar = root.querySelector<HTMLElement>("[data-nm-audio-bar-wrap]");
+    const iconPlay = root.querySelector<HTMLElement>("[data-nm-audio-icon-play]");
+    const iconPause = root.querySelector<HTMLElement>("[data-nm-audio-icon-pause]");
+    if (!audio || !btn) return;
+    const audioEl = audio;
+    const btnEl = btn;
+    if (btnEl.dataset.nmAudioBound === "1") return;
+    btnEl.dataset.nmAudioBound = "1";
 
     function syncTime() {
-      const d = audio.duration;
-      const t = audio.currentTime;
+      const d = audioEl.duration;
+      const t = audioEl.currentTime;
       if (progress instanceof HTMLElement) {
         const pct = Number.isFinite(d) && d > 0 ? (t / d) * 100 : 0;
         progress.style.width = `${pct}%`;
@@ -86,40 +88,40 @@ const safeSrc = String(src ?? "").trim();
       }
     }
 
-    function setPlaying(p) {
+    function setPlaying(p: boolean) {
       if (iconPlay) iconPlay.classList.toggle("hidden", p);
       if (iconPause) iconPause.classList.toggle("hidden", !p);
-      btn.setAttribute("aria-pressed", p ? "true" : "false");
+      btnEl.setAttribute("aria-pressed", p ? "true" : "false");
     }
 
-    btn.addEventListener("click", () => {
-      if (audio.paused) {
-        audio.play().catch(() => {});
+    btnEl.addEventListener("click", () => {
+      if (audioEl.paused) {
+        audioEl.play().catch(() => {});
       } else {
-        audio.pause();
+        audioEl.pause();
       }
     });
 
-    audio.addEventListener("play", () => setPlaying(true));
-    audio.addEventListener("pause", () => setPlaying(false));
-    audio.addEventListener("timeupdate", syncTime);
-    audio.addEventListener("loadedmetadata", syncTime);
+    audioEl.addEventListener("play", () => setPlaying(true));
+    audioEl.addEventListener("pause", () => setPlaying(false));
+    audioEl.addEventListener("timeupdate", syncTime);
+    audioEl.addEventListener("loadedmetadata", syncTime);
 
     if (bar instanceof HTMLElement) {
       bar.addEventListener(
         "click",
         (e) => {
-          const d = audio.duration;
+          const d = audioEl.duration;
           if (!Number.isFinite(d) || d <= 0) return;
           const rect = bar.getBoundingClientRect();
           const ratio = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
-          audio.currentTime = ratio * d;
+          audioEl.currentTime = ratio * d;
         },
         { passive: true }
       );
     }
 
-    setPlaying(!audio.paused);
+    setPlaying(!audioEl.paused);
     syncTime();
   }
 

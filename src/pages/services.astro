@@ -110,7 +110,7 @@ const featuredServices = orderedIds
       hasExtensions: Array.isArray(service.extensions) && service.extensions.length > 0,
     };
   })
-  .filter(Boolean);
+  .filter((item): item is NonNullable<typeof item> => item !== null);
 
 const premiumFutureTags = [
   "אלוהים",
@@ -619,4 +619,3 @@ const archivePreviewItems = [
     import "../scripts/services-ui.js";
   </script>
 </Layout>
-

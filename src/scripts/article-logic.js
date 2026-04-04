@@ -255,7 +255,7 @@ function setupArticlePage() {
 
       try {
         await navigator.clipboard.writeText(payload);
-        showToast(usePlain ? "הועתק" : "התובנה הועתקה, אפשר להדביק בוואטסאפ!");
+        showToast(usePlain ? "הועתק" : "התובנה הועתקה, אפשר להדביק בוואטסאפ");
       } catch {
         window.prompt("העתק תובנה", payload);
       }

@@ -79,6 +79,7 @@ const trimMetaDescription = (value: string) => {
   if (normalized.length <= 155) return normalized;
   return `${normalized.slice(0, 152).trimEnd()}...`;
 };
+const gtmContainerId = "GTM-TL2FM3SD";
 /** מטא ברירת מחדל: מילות מפתח SEO + בלי משפטי "ש…" */
 const siteDescription = trimMetaDescription(
   "מרכז חקירה: שקט נפשי, חשיבה צלולה, אמת אובייקטיבית, הבנה מושלמת של עובדה מול סיפור. איך להפסיק לסבול מתוך בלבול. NeverMind."
@@ -161,6 +162,11 @@ const websiteSchema = {
   name: siteTitle,
   url: siteUrl,
   inLanguage: "he-IL",
+  potentialAction: {
+    "@type": "SearchAction",
+    target: new URL("archive/?q={search_term_string}", siteUrlSlash).toString(),
+    "query-input": "required name=search_term_string",
+  },
   publisher: {
     "@type": "Organization",
     name: siteTitle,
@@ -489,6 +495,18 @@ const socialLinks = [
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script is:inline define:vars={{ gtmContainerId }}>
+      (function (w, d, s, l, i) {
+        w[l] = w[l] || [];
+        w[l].push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
+        var f = d.getElementsByTagName(s)[0];
+        var j = d.createElement(s);
+        var dl = l != "dataLayer" ? "&l=" + l : "";
+        j.async = true;
+        j.src = "https://www.googletagmanager.com/gtm.js?id=" + i + dl;
+        f.parentNode.insertBefore(j, f);
+      })(window, document, "script", "dataLayer", gtmContainerId);
+    </script>
     <title>{pageTitle}</title>
     <meta name="description" content={pageDescription} />
     <meta name="keywords" content={seoKeywords} />
@@ -548,6 +566,14 @@ const socialLinks = [
     data-staging={stagingEnabled ? "true" : "false"}
     class={`min-h-screen overflow-x-hidden bg-[var(--nm-bg)] text-[var(--nm-fg)] antialiased selection:bg-[color-mix(in_srgb,var(--nm-accent)_18%,var(--nm-bg))] selection:text-[var(--nm-fg)]`}
   >
+    <noscript>
+      <iframe
+        src={`https://www.googletagmanager.com/ns.html?id=${gtmContainerId}`}
+        height="0"
+        width="0"
+        style="display:none;visibility:hidden"
+      ></iframe>
+    </noscript>
     <div id="nm-route-progress" aria-hidden="true"></div>
     <a
       href={skipToContentHref}
@@ -603,6 +629,7 @@ const socialLinks = [
                 width="36"
                 height="36"
                 class="h-9 w-9 shrink-0 object-contain"
+                loading="eager"
                 fetchpriority="high"
                 decoding="async"
               />
@@ -884,7 +911,7 @@ const socialLinks = [
       id="nm-back-to-top"
       data-scroll-top
       hidden
-      class="inline-flex fixed bottom-5 left-5 z-[46] h-11 w-11 items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_14%,transparent)] bg-[var(--nm-bg-canvas)] text-lg font-light leading-none text-[var(--nm-fg)] shadow-[0_6px_20px_color-mix(in_srgb,var(--nm-fg)_8%,transparent)] transition-colors hover:border-[color-mix(in_srgb,var(--nm-accent)_30%,transparent)] hover:text-[var(--nm-accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nm-accent)] md:bottom-6 md:left-6"
+      class="inline-flex fixed bottom-5 right-5 z-[46] h-11 w-11 items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_14%,transparent)] bg-[var(--nm-bg-canvas)] text-lg font-light leading-none text-[var(--nm-fg)] shadow-[0_6px_20px_color-mix(in_srgb,var(--nm-fg)_8%,transparent)] transition-colors hover:border-[color-mix(in_srgb,var(--nm-accent)_30%,transparent)] hover:text-[var(--nm-accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nm-accent)] md:bottom-6 md:right-6"
       aria-label="חזרה לראש העמוד"
       aria-hidden="true"
     >
@@ -949,7 +976,7 @@ const socialLinks = [
           if (pNorm === "/about" || pNorm.startsWith("/about/")) return "חזור להבנה";
           if (pNorm.startsWith("/topics/")) return "חזור לנושא";
           if (pNorm.startsWith("/glossary")) return "חזור להגדרות מחדש";
-          if (pNorm.startsWith("/services") || pNorm.startsWith("/intake")) return "חזור ללוח הלמידה";
+          if (pNorm.startsWith("/services") || pNorm.startsWith("/intake")) return "חזור לשירותים";
           if (pNorm.startsWith("/questions")) return "חזור לשאלות";
           if (pNorm === "/now" || pNorm.startsWith("/now/")) return "חזור למה המצב עכשיו";
           return "חזור לאן שבאת";

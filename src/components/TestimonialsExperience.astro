@@ -51,7 +51,6 @@ function plainQuote(q: QuoteItem): string {
     </div>
   </header>
 
-  <!-- מובייל: קרוסלה אופקית, משפט למסך. dir=ltr על המסלול כדי לייצב snap/scrollLeft מול overflow-x בדף -->
   <div class="relative w-full min-w-0 sm:hidden">
     <div
       class="nm-testimonials-carousel nm-testimonials-carousel--mobile flex w-full min-w-0 touch-pan-x snap-x snap-mandatory overflow-x-auto overscroll-x-contain scroll-smooth [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
@@ -258,25 +257,26 @@ function plainQuote(q: QuoteItem): string {
   function initTestimonialsCarousel() {
     const root = document.querySelector("[data-nm-testimonials-carousel]");
     if (!(root instanceof HTMLElement)) return;
-    if (root.dataset.nmCarouselInit === "1") return;
+    const carouselRoot: HTMLElement = root;
+    if (carouselRoot.dataset.nmCarouselInit === "1") return;
 
-    const slides = [...root.querySelectorAll("[data-nm-testimonial-slide]")];
-    const hint = document.querySelector("[data-nm-swipe-hint]");
+    const slides = [...carouselRoot.querySelectorAll<HTMLElement>("[data-nm-testimonial-slide]")];
+    const hint = document.querySelector<HTMLElement>("[data-nm-swipe-hint]");
     if (!slides.length) return;
 
-    root.dataset.nmCarouselInit = "1";
+    carouselRoot.dataset.nmCarouselInit = "1";
 
     function scrollCarouselToStart() {
       try {
-        root.scrollTo({ left: 0, top: 0, behavior: "auto" });
+        carouselRoot.scrollTo({ left: 0, top: 0, behavior: "auto" });
       } catch {
-        root.scrollLeft = 0;
+        carouselRoot.scrollLeft = 0;
       }
       requestAnimationFrame(() => {
         try {
-          root.scrollTo({ left: 0, top: 0, behavior: "auto" });
+          carouselRoot.scrollTo({ left: 0, top: 0, behavior: "auto" });
         } catch {
-          root.scrollLeft = 0;
+          carouselRoot.scrollLeft = 0;
         }
       });
     }
@@ -287,7 +287,7 @@ function plainQuote(q: QuoteItem): string {
     let lastIdx = -1;
 
     function pickActiveIndex() {
-      const rect = root.getBoundingClientRect();
+      const rect = carouselRoot.getBoundingClientRect();
       const mid = rect.left + rect.width / 2;
       let best = 0;
       let bestDist = Infinity;
@@ -303,7 +303,7 @@ function plainQuote(q: QuoteItem): string {
       return best;
     }
 
-    function applySlideState(idx) {
+    function applySlideState(idx: number) {
       slides.forEach((s, i) => {
         s.setAttribute("aria-hidden", i === idx ? "false" : "true");
       });
@@ -322,12 +322,12 @@ function plainQuote(q: QuoteItem): string {
       () => {
         applySlideState(pickActiveIndex());
       },
-      { root, threshold: [0, 0.25, 0.5, 0.75, 1] }
+      { root: carouselRoot, threshold: [0, 0.25, 0.5, 0.75, 1] }
     );
 
     slides.forEach((s) => observer.observe(s));
 
-    root.addEventListener(
+    carouselRoot.addEventListener(
       "scroll",
       () => {
         applySlideState(pickActiveIndex());
@@ -336,18 +336,18 @@ function plainQuote(q: QuoteItem): string {
     );
 
     if ("onscrollend" in window) {
-      root.addEventListener("scrollend", () => applySlideState(pickActiveIndex()));
+      carouselRoot.addEventListener("scrollend", () => applySlideState(pickActiveIndex()));
     }
 
     applySlideState(0);
 
-    root.addEventListener("keydown", (e) => {
+    carouselRoot.addEventListener("keydown", (e) => {
       if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
       e.preventDefault();
-      const w = root.clientWidth;
-      const rtl = getComputedStyle(root).direction === "rtl";
+      const w = carouselRoot.clientWidth;
+      const rtl = getComputedStyle(carouselRoot).direction === "rtl";
       const goNext = rtl ? e.key === "ArrowLeft" : e.key === "ArrowRight";
-      root.scrollBy({ left: goNext ? w : -w, behavior: reduceMotion ? "auto" : "smooth" });
+      carouselRoot.scrollBy({ left: goNext ? w : -w, behavior: reduceMotion ? "auto" : "smooth" });
     });
   }
 
@@ -357,9 +357,9 @@ function plainQuote(q: QuoteItem): string {
   }
 
   bootTestimonials();
-  const w = window;
-  if (!w["__nmTestimonialsNav"]) {
-    w["__nmTestimonialsNav"] = true;
+  const w = window as Window & { __nmTestimonialsNav?: boolean };
+  if (!w.__nmTestimonialsNav) {
+    w.__nmTestimonialsNav = true;
     document.addEventListener("astro:page-load", bootTestimonials);
     document.addEventListener("astro:after-swap", bootTestimonials);
   }

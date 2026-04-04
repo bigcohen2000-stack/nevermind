@@ -3,6 +3,7 @@ import { getCollection } from "astro:content";
 import Layout from "../layouts/Layout.astro";
 import HomeContact from "../components/home/HomeContact.astro";
 import MinimalAudioPlayer from "../components/MinimalAudioPlayer.astro";
+import MethodTextBlock from "../components/methodology/MethodTextBlock.astro";
 import appConfig from "../config/appConfig.json";
 import { buildWhatsAppHref } from "../lib/services";
 import { jsonLdForInlineScript } from "../lib/json-ld-inline";
@@ -152,12 +153,9 @@ const emailAddress = String((appConfig.contact as { email?: string }).email ?? "
         <h1 class="text-[clamp(2.2rem,1.75rem+2vw,4.3rem)] font-semibold leading-[1.08] text-[var(--nm-fg)]">
           NeverMind - שיטה שמפרידה בין עובדה, פירוש ותגובה.
         </h1>
-        <p class="max-w-3xl text-[clamp(1rem,0.96rem+0.28vw,1.18rem)] leading-8 text-[color-mix(in_srgb,var(--nm-fg)_74%,var(--nm-bg))]">
-          כדי לראות מה באמת מפעיל אותך, בלי רעש ובלי דרמה.
-        </p>
-        <p class="max-w-3xl text-base leading-8 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
-          האתר בנוי לקריאה איטית, לבדיקה שקטה, ולחזרה למציאות עם קצת יותר סדר בראש.
-        </p>
+        <MethodTextBlock text="כדי לראות מה באמת מפעיל אותך, בלי רעש ובלי דרמה." icon="🔍" />
+        <MethodTextBlock text="האתר בנוי לקריאה איטית, לבדיקה שקטה, ולחזרה למציאות עם קצת יותר סדר בראש." icon="📖" />
+        <MethodTextBlock text="נסה חינם – בלי התחייבות. גישה מיידית לתכנים ולקהילה." icon="🎁" />
 
         <div class="flex flex-wrap justify-end gap-3 pt-1">
           <a

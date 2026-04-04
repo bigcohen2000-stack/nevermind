@@ -1,26 +1,25 @@
 @import "tailwindcss";
 
 /**
- * פלטת NeverMind / השם לא משנה. בוטיק, ללא Dark Mode.
- * רקע, טקסט, דגש מותג (#0F172A) (+ נגזרות mix).
+ * פלטת NeverMind / השם לא משנה.
+ * רקע כהה, טקסט בהיר, דגש כחול.
  */
 :root {
-  color-scheme: light;
+  color-scheme: dark;
 
-  /* מקור האמת: #1A1A1A טקסט, #FAFAF8 משטח, #0F172A דגש מותג */
-  --color-text-primary: #1a1a1a;
-  --color-surface-page: #fafaf8;
-  --color-surface-canvas: #fafaf8;
+  /* מקור האמת: #FAFAF8 טקסט, #1A1A1A משטח, כחול לדגש */
+  --color-text-primary: #fafaf8;
+  --color-surface-page: #1a1a1a;
+  --color-surface-canvas: color-mix(in srgb, #fafaf8 3%, #1a1a1a);
   --color-text-secondary: color-mix(in srgb, var(--color-text-primary) 72%, var(--color-surface-page));
-  --color-surface-muted: color-mix(in srgb, var(--color-text-primary) 4%, var(--color-surface-page));
-  --color-accent: #0f172a;
-  --color-accent-hover: color-mix(in srgb, var(--color-accent) 88%, #ffffff);
+  --color-surface-muted: color-mix(in srgb, var(--color-text-primary) 7%, var(--color-surface-page));
+  --color-accent: #2563eb;
+  --color-accent-hover: color-mix(in srgb, var(--color-accent) 84%, #60a5fa);
   --color-on-accent: #fafaf8;
-  /* כפתורים כהים / בלוקי ניגוד: שחור מותג על רקע בהיר */
-  --color-inverse-bg: #1a1a1a;
-  --color-inverse-bg-hover: color-mix(in srgb, var(--color-inverse-bg) 85%, var(--color-accent));
+  --color-inverse-bg: #2563eb;
+  --color-inverse-bg-hover: color-mix(in srgb, var(--color-inverse-bg) 88%, #60a5fa);
   --color-inverse-fg: #fafaf8;
-  --color-code-bg: #1a1a1a;
+  --color-code-bg: #111827;
   --color-code-fg: #fafaf8;
 
   --nm-fg: var(--color-text-primary);
@@ -42,8 +41,18 @@
   --nm-tint-hover: color-mix(in srgb, var(--nm-accent) 14%, var(--nm-bg-canvas));
   --nm-tint-strong: color-mix(in srgb, var(--nm-accent) 20%, var(--nm-bg-canvas));
 
-  --nm-grid: color-mix(in srgb, var(--color-text-primary) 6%, transparent);
+  --nm-grid: color-mix(in srgb, var(--color-text-primary) 8%, transparent);
+  --nm-grid-step: 2rem;
   --nm-nav-top: 1.5rem;
+  --nm-space-1: 0.5rem;
+  --nm-space-2: 1rem;
+  --nm-space-3: 1.5rem;
+  --nm-space-4: 2rem;
+  --nm-radius-card: 1.5rem;
+  --nm-radius-control: 1rem;
+  --nm-radius-pill: 999px;
+  --nm-motion-duration: 180ms;
+  --nm-touch-target: 48px;
   /* באנר "בהרצה" בראש כל עמוד (Layout) */
   --nm-staging-banner-height: 3.5rem;
 
@@ -58,11 +67,11 @@
   --nm-text-body: clamp(1rem, 0.96rem + 0.22vw, 1.125rem);
   --nm-text-lead: clamp(1.05rem, 0.98rem + 0.35vw, 1.25rem);
   --nm-text-display: clamp(2rem, 1.55rem + 2vw, 3.25rem);
-  --transition-fast: 0.2s ease;
-  --transition-medium: 0.3s ease;
+  --transition-fast: var(--nm-motion-duration) ease;
+  --transition-medium: 240ms ease;
   --nm-feedback-press-scale: 0.98;
 
-  --color-valid: #16a34a;
+  --color-valid: #4ade80;
   --color-mark-highlight: color-mix(in srgb, var(--color-accent) 22%, var(--color-surface-page));
 }
 
@@ -76,10 +85,10 @@ html[data-nm-a11y-font="xl"] body {
 
 /* נגישות: ניגודיות גבוהה */
 html[data-nm-a11y-contrast="high"] {
-  --nm-fg: #1a1a1a;
-  --nm-fg-secondary: #1a1a1a;
-  --nm-bg: #fafaf8;
-  --nm-bg-canvas: #fafaf8;
+  --nm-fg: #fff;
+  --nm-fg-secondary: #fff;
+  --nm-bg: #000;
+  --nm-bg-canvas: #000;
   --nm-surface-muted: color-mix(in srgb, var(--nm-fg) 8%, var(--nm-bg));
   --nm-grid: color-mix(in srgb, var(--nm-fg) 12%, transparent);
 }
@@ -128,6 +137,8 @@ html {
   scroll-behavior: smooth;
   max-width: 100%;
   overflow-x: clip;
+  scrollbar-gutter: stable both-edges;
+  background-color: var(--nm-bg);
 }
 
 html[lang="he"] {
@@ -139,6 +150,8 @@ body {
   font-family: "Heebo", "Assistant Variable", system-ui, -apple-system, "Segoe UI", sans-serif;
   max-width: 100%;
   overflow-x: clip;
+  direction: rtl;
+  text-align: right;
   font-size: var(--nm-text-body);
   line-height: var(--line-height-ui);
   letter-spacing: 0;
@@ -149,6 +162,20 @@ body {
   transition:
     background-color var(--transition-fast),
     color var(--transition-fast);
+}
+
+:where([class*="bg-white"], [class*="bg-[#FAFAF8]"]) {
+  background-color: color-mix(in srgb, var(--nm-bg-canvas) 94%, transparent);
+  color: var(--nm-fg);
+}
+
+:where([class*="text-[#1A1A1A]"], [class*="text-[var(--color-black)]"]) {
+  color: var(--nm-fg);
+}
+
+:where(input, textarea, select) {
+  background-color: color-mix(in srgb, var(--nm-bg-canvas) 96%, transparent);
+  color: var(--nm-fg);
 }
 
 /* מיקוד מקלדת אחיד */
@@ -196,6 +223,8 @@ body {
     a[href][class*="rounded"],
     a[href][data-nm-pressable]
   ) {
+  min-height: var(--nm-touch-target);
+  border-radius: var(--nm-radius-pill);
   transition:
     transform var(--transition-fast),
     background-color var(--transition-fast),
@@ -227,6 +256,14 @@ body {
     a[href][data-nm-pressable]
   ):focus-visible {
   box-shadow: 0 0 0 4px color-mix(in srgb, var(--nm-accent) 18%, transparent);
+}
+
+:where(article, section, aside, form)[class*="rounded"] {
+  border-radius: var(--nm-radius-card);
+}
+
+:where(input, textarea, select):not([type="checkbox"]):not([type="radio"]) {
+  border-radius: var(--nm-radius-control);
 }
 
 :where(button, [role="button"], a.inline-flex, a.inline-block)[data-nm-loading="true"] {
@@ -508,14 +545,14 @@ textarea,
 input[type="button"],
 input[type="submit"],
 input[type="reset"] {
-  min-height: 44px;
+  min-height: var(--nm-touch-target);
 }
 
 button,
 [role="button"],
 a.inline-flex,
 a[aria-label] {
-  min-width: 44px;
+  min-width: var(--nm-touch-target);
 }
 
 @media (max-width: 767px) {
@@ -569,7 +606,7 @@ body::before {
   background-image:
     linear-gradient(var(--nm-grid) 0.5px, transparent 0.5px),
     linear-gradient(90deg, var(--nm-grid) 0.5px, transparent 0.5px);
-  background-size: 36px 36px;
+  background-size: var(--nm-grid-step) var(--nm-grid-step);
   opacity: 0.3;
   pointer-events: none;
   z-index: 0;

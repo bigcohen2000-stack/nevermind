@@ -32,7 +32,7 @@ async function checkDrafts() {
     const frontmatterMatch = content.match(/^---\r?\n([\s\S]*?)\r?\n---/);
 
     if (!frontmatterMatch) {
-      console.error(`❌ ${file}: אין frontmatter תקין!`);
+      console.error(`${file}: אין frontmatter תקין.`);
       hasErrors = true;
       continue;
     }
@@ -66,7 +66,7 @@ async function checkDrafts() {
   console.log("=".repeat(50) + "\n");
 
   if (hasErrors) {
-    console.error("❌ נמצאו שגיאות קריטיות! הדיפלוי נעצר.");
+    console.error("נמצאו שגיאות קריטיות. הדיפלוי נעצר.");
     process.exit(1);
   }
 

@@ -1,0 +1,137 @@
+---
+/**
+ * AdminLoginPanel.astro
+ * PWA-ready admin login with role-based access
+ */
+
+interface Props {
+  onLoginSuccess?: string;
+}
+
+---
+
+<div id="nm-admin-login" data-admin-login class="min-h-screen flex items-center justify-center bg-gradient-to-br from-[var(--nm-bg)] to-[var(--nm-surface-muted)] px-4">
+  <div class="w-full max-w-md">
+    <div class="mb-8 text-center">
+      <div class="inline-flex h-16 w-16 items-center justify-center rounded-full bg-[var(--nm-accent)] text-2xl font-bold text-[var(--nm-inverse-fg)]">
+        🔐
+      </div>
+      <h1 class="mt-4 text-2xl font-semibold text-[var(--nm-fg)]">Admin Panel</h1>
+      <p class="mt-2 text-sm text-[color-mix(in_srgb,var(--nm-fg)_65%,var(--nm-bg))]">
+        כניסה למערכת הניהול של NeverMind
+      </p>
+    </div>
+
+    <div class="mb-6 rounded-lg border border-[color-mix(in_srgb,var(--nm-accent)_30%,transparent)] bg-[var(--nm-tint)] p-4">
+      <p class="text-xs font-semibold text-[var(--nm-accent)]">Demo Credentials (לפיתוח בלבד):</p>
+      <ul class="mt-2 space-y-1 text-xs text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+        <li>📊 <code class="font-mono">viewer / view123</code> - קריאה בלבד</li>
+        <li>✏️ <code class="font-mono">editor / edit456</code> - עריכה</li>
+        <li>👑 <code class="font-mono">admin / admin789</code> - מנהל</li>
+      </ul>
+    </div>
+
+    <form id="login-form" class="space-y-4 rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 p-6 shadow-lg backdrop-blur-md" novalidate>
+      <div>
+        <label for="username" class="block text-sm font-semibold text-[var(--nm-fg)]">
+          שם משתמש
+        </label>
+        <input
+          id="username"
+          name="username"
+          type="text"
+          required
+          autocomplete="username"
+          class="mt-2 w-full rounded-lg border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-white px-4 py-3 text-[var(--nm-fg)] placeholder-[color-mix(in_srgb,var(--nm-fg)_40%,transparent)] transition focus:border-[var(--nm-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--nm-accent)]/20"
+          placeholder="viewer, editor או admin"
+        />
+      </div>
+
+      <div>
+        <label for="password" class="block text-sm font-semibold text-[var(--nm-fg)]">
+          סיסמה
+        </label>
+        <input
+          id="password"
+          name="password"
+          type="password"
+          required
+          autocomplete="current-password"
+          class="mt-2 w-full rounded-lg border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-white px-4 py-3 text-[var(--nm-fg)] placeholder-[color-mix(in_srgb,var(--nm-fg)_40%,transparent)] transition focus:border-[var(--nm-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--nm-accent)]/20"
+          placeholder="סיסמתך"
+        />
+      </div>
+
+      <div id="login-error" class="hidden rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700" role="alert" aria-live="polite"></div>
+
+      <div id="login-loading" class="hidden rounded-lg bg-blue-50 px-3 py-2 text-sm text-blue-700 flex items-center gap-2" role="status">
+        <span class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-blue-300 border-t-blue-700"></span>
+        <span>דקה אחת...</span>
+      </div>
+
+      <button
+        type="submit"
+        class="w-full rounded-lg bg-[var(--nm-accent)] px-4 py-3 font-semibold text-[var(--nm-inverse-fg)] shadow-md transition hover:bg-[color-mix(in_srgb,var(--nm-accent)_88%,#ffffff)] disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-[var(--nm-accent)]/50"
+      >
+        כניסה
+      </button>
+    </form>
+
+    <p class="mt-6 text-center text-xs text-[color-mix(in_srgb,var(--nm-fg)_50%,var(--nm-bg))]">
+      🔒 הנתונים שלך מוצפנים ובטוחים
+    </p>
+  </div>
+</div>
+
+<script>
+  import { AdminAuth } from "../../lib/admin-auth";
+
+  document.addEventListener("astro:page-load", () => {
+    const existingUser = AdminAuth.getCurrentUser();
+    if (existingUser) {
+      window.location.href = "/admin/";
+      return;
+    }
+
+    const form = document.getElementById("login-form");
+    const errorDiv = document.getElementById("login-error");
+    const loadingDiv = document.getElementById("login-loading");
+
+    if (!form || !(form instanceof HTMLFormElement)) return;
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const usernameInput = form.elements.namedItem("username");
+      const passwordInput = form.elements.namedItem("password");
+      const username = usernameInput instanceof HTMLInputElement ? usernameInput.value : "";
+      const password = passwordInput instanceof HTMLInputElement ? passwordInput.value : "";
+
+      if (errorDiv) errorDiv.classList.add("hidden");
+      if (loadingDiv) loadingDiv.classList.remove("hidden");
+
+      try {
+        const user = await AdminAuth.login(username, password);
+
+        if (!user) {
+          if (errorDiv) {
+            errorDiv.textContent = "שם משתמש או סיסמה לא נכונים";
+            errorDiv.classList.remove("hidden");
+          }
+          if (loadingDiv) loadingDiv.classList.add("hidden");
+          return;
+        }
+
+        window.location.href = "/admin/";
+      } catch (err) {
+        if (errorDiv) {
+          errorDiv.textContent = "שגיאה בעת ההתחברות. נא לנסות שנית.";
+          errorDiv.classList.remove("hidden");
+        }
+        console.error("Login error:", err);
+      } finally {
+        if (loadingDiv) loadingDiv.classList.add("hidden");
+      }
+    });
+  });
+</script>

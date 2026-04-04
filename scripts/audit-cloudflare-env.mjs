@@ -19,9 +19,9 @@ const pagesSpecs = [
     scope: "Pages",
     kind: "secret",
     requirement: "required",
-    note: "ηεϊν ςεβιιϊ premium ε-fragment requests",
+    note: "Χ—Χ•ΧªΧ ΧΆΧ•Χ’Χ™Χ™Χª premium Χ•-fragment requests",
     validate(value) {
-      return value.length >= 16 ? null : "φψικ ξιπιξεν 16 ϊεειν";
+      return value.length >= 16 ? null : "Χ¦Χ¨Χ™Χ ΧΧ™Χ Χ™ΧΧ•Χ 16 ΧªΧ•Χ•Χ™Χ";
     },
   },
   {
@@ -29,16 +29,16 @@ const pagesSpecs = [
     scope: "Pages",
     kind: "public",
     requirement: "required",
-    note: "θτρι ιφιψϊ χωψ γψκ Web3Forms",
+    note: "ΧΧ¤Χ΅Χ™ Χ™Χ¦Χ™Χ¨Χª Χ§Χ©Χ¨ Χ“Χ¨Χ Web3Forms",
   },
   {
     name: "PUBLIC_NM_CLUB_WEBHOOK_URL",
     scope: "Pages",
     kind: "public",
     requirement: "recommended",
-    note: "λϊεαϊ login ωμ Worker μξεςγεο",
+    note: "Χ›ΧªΧ•Χ‘Χª login Χ©Χ Worker ΧΧΧ•ΧΆΧ“Χ•Χ",
     validate(value) {
-      return /^https:\/\//i.test(value) ? null : "φψικ μδϊηιμ α-https://";
+      return /^https:\/\//i.test(value) ? null : "Χ¦Χ¨Χ™Χ ΧΧ”ΧªΧ—Χ™Χ Χ‘-https://";
     },
   },
   {
@@ -46,19 +46,19 @@ const pagesSpecs = [
     scope: "Pages",
     kind: "public",
     requirement: "recommended",
-    note: "ξτςιμ πιδεμ γψκ /api/club-admin αξχεν JWT αγτγτο",
+    note: "ΧΧ¤ΧΆΧ™Χ Χ Χ™Χ”Χ•Χ Χ“Χ¨Χ /api/club-admin Χ‘ΧΧ§Χ•Χ JWT Χ‘Χ“Χ¤Χ“Χ¤Χ",
   },
   {
     name: "NM_CLUB_AUTH_BASE_URL",
     scope: "Pages",
     kind: "plain",
     requirement: "conditional",
-    note: "λϊεαϊ δαριρ ωμ Worker ςαεψ admin proxy",
+    note: "Χ›ΧªΧ•Χ‘Χª Χ”Χ‘Χ΅Χ™Χ΅ Χ©Χ Worker ΧΆΧ‘Χ•Χ¨ admin proxy",
     when(env) {
       return boolFlag(env.PUBLIC_CLUB_ADMIN_VIA_PROXY || "");
     },
     validate(value) {
-      return /^https:\/\//i.test(value) ? null : "φψικ μδϊηιμ α-https://";
+      return /^https:\/\//i.test(value) ? null : "Χ¦Χ¨Χ™Χ ΧΧ”ΧªΧ—Χ™Χ Χ‘-https://";
     },
   },
   {
@@ -66,7 +66,7 @@ const pagesSpecs = [
     scope: "Pages",
     kind: "secret",
     requirement: "conditional",
-    note: "ρεγ ξωεϊσ αιο Pages μ-Worker ςαεψ admin proxy",
+    note: "Χ΅Χ•Χ“ ΧΧ©Χ•ΧªΧ£ Χ‘Χ™Χ Pages Χ-Worker ΧΆΧ‘Χ•Χ¨ admin proxy",
     when(env) {
       return boolFlag(env.PUBLIC_CLUB_ADMIN_VIA_PROXY || "");
     },
@@ -84,7 +84,7 @@ const pagesSpecs = [
     scope: "Pages",
     kind: "secret",
     requirement: "optional",
-    note: "alias μ-PSI_API_KEY",
+    note: "alias Χ-PSI_API_KEY",
     alternatives: ["PSI_API_KEY"],
   },
   {
@@ -92,14 +92,14 @@ const pagesSpecs = [
     scope: "Pages",
     kind: "secret",
     requirement: "optional",
-    note: "πγψω μ-purge cache ξδγωαεψγ",
+    note: "Χ Χ“Χ¨Χ© Χ-purge cache ΧΧ”Χ“Χ©Χ‘Χ•Χ¨Χ“",
   },
   {
     name: "CF_API_TOKEN",
     scope: "Pages",
     kind: "secret",
     requirement: "optional",
-    note: "πγψω μ-purge cache ξδγωαεψγ",
+    note: "Χ Χ“Χ¨Χ© Χ-purge cache ΧΧ”Χ“Χ©Χ‘Χ•Χ¨Χ“",
   },
   {
     name: "GITHUB_CLIENT_ID",
@@ -120,49 +120,49 @@ const pagesSpecs = [
     scope: "Pages",
     kind: "plain",
     requirement: "optional",
-    note: "αψιψϊ ξηγμ αχεγ: repo",
+    note: "Χ‘Χ¨Χ™Χ¨Χª ΧΧ—Χ“Χ Χ‘Χ§Χ•Χ“: repo",
   },
   {
     name: "PUBLIC_GA_MEASUREMENT_ID",
     scope: "Pages",
     kind: "public",
     requirement: "optional",
-    note: "θςιπϊ GA4 αφγ μχεη",
+    note: "ΧΧΆΧ™Χ Χª GA4 Χ‘Χ¦Χ“ ΧΧ§Χ•Χ—",
   },
   {
     name: "GA4_MEASUREMENT_ID",
     scope: "Pages",
     kind: "plain",
     requirement: "optional",
-    note: "γιεεη premium unlock αφγ ωψϊ",
+    note: "Χ“Χ™Χ•Χ•Χ— premium unlock Χ‘Χ¦Χ“ Χ©Χ¨Χª",
   },
   {
     name: "GA4_API_SECRET",
     scope: "Pages",
     kind: "secret",
     requirement: "optional",
-    note: "γιεεη premium unlock αφγ ωψϊ",
+    note: "Χ“Χ™Χ•Χ•Χ— premium unlock Χ‘Χ¦Χ“ Χ©Χ¨Χª",
   },
   {
     name: "ANALYTICS_PREMIUM_WEBHOOK_URL",
     scope: "Pages",
     kind: "plain",
     requirement: "optional",
-    note: "Webhook ημετι μ-premium unlock analytics",
+    note: "Webhook Χ—ΧΧ•Χ¤Χ™ Χ-premium unlock analytics",
   },
   {
     name: "PUBLIC_HCAPTCHA_SITE_KEY",
     scope: "Pages",
     kind: "public",
     requirement: "optional",
-    note: "δτςμϊ hCaptcha αθτριν",
+    note: "Χ”Χ¤ΧΆΧΧª hCaptcha Χ‘ΧΧ¤Χ΅Χ™Χ",
   },
   {
     name: "PUBLIC_CLIENT_LOG_URL",
     scope: "Pages",
     kind: "public",
     requirement: "optional",
-    note: "γιεεη ωβιΰεϊ client-side",
+    note: "Χ“Χ™Χ•Χ•Χ— Χ©Χ’Χ™ΧΧ•Χª client-side",
   },
 ];
 
@@ -172,28 +172,28 @@ const workerSpecs = [
     scope: "Worker",
     kind: "secret",
     requirement: "required",
-    note: "salt μ-hash ωμ IP εθεχπιν",
+    note: "salt Χ-hash Χ©Χ IP Χ•ΧΧ•Χ§Χ Χ™Χ",
   },
   {
     name: "ADMIN_PASSWORD",
     scope: "Worker",
     kind: "secret",
     requirement: "required",
-    note: "δϊηαψεϊ admin ιωιψδ μ-Worker",
+    note: "Χ”ΧªΧ—Χ‘Χ¨Χ•Χª admin Χ™Χ©Χ™Χ¨Χ” Χ-Worker",
   },
   {
     name: "ALLOWED_ORIGINS",
     scope: "Worker",
     kind: "plain",
     requirement: "recommended",
-    note: "CORS μ-login/member APIs",
+    note: "CORS Χ-login/member APIs",
   },
   {
     name: "NM_CLUB_ADMIN_SERVICE_KEY",
     scope: "Worker",
     kind: "secret",
     requirement: "recommended",
-    note: "ςγισ ΰεϊε ςψκ λξε α-Pages admin proxy",
+    note: "ΧΆΧ“Χ™Χ£ ΧΧ•ΧªΧ• ΧΆΧ¨Χ Χ›ΧΧ• Χ‘-Pages admin proxy",
     alternatives: ["ADMIN_SERVICE_KEY"],
   },
   {
@@ -201,7 +201,7 @@ const workerSpecs = [
     scope: "Worker",
     kind: "secret",
     requirement: "optional",
-    note: "alias πϊξκ αχεγ μ-NM_CLUB_ADMIN_SERVICE_KEY",
+    note: "alias Χ ΧªΧΧ Χ‘Χ§Χ•Χ“ Χ-NM_CLUB_ADMIN_SERVICE_KEY",
     alternatives: ["NM_CLUB_ADMIN_SERVICE_KEY"],
   },
 ];
@@ -212,14 +212,14 @@ const workerBindings = [
     scope: "Worker binding",
     kind: "kv_namespace",
     requirement: "required",
-    note: "ΰηρεο ηαψιν, progress ε-insights",
+    note: "ΧΧ—Χ΅Χ•Χ Χ—Χ‘Χ¨Χ™Χ, progress Χ•-insights",
   },
   {
     name: "CLUB_ACTIVITY",
     scope: "Worker binding",
     kind: "kv_namespace",
     requirement: "required",
-    note: "rate limit, recent activity ε-fraud flags",
+    note: "rate limit, recent activity Χ•-fraud flags",
   },
 ];
 
@@ -232,14 +232,14 @@ function pickStatus(spec, env) {
   const isApplicable = typeof spec.when === "function" ? spec.when(env) : true;
 
   if (!isApplicable) {
-    return { status: "skip", detail: "μΰ πγψω αξφα δπεληι", activeName, activeValue: active };
+    return { status: "skip", detail: "ΧΧ Χ Χ“Χ¨Χ© Χ‘ΧΧ¦Χ‘ Χ”Χ Χ•Χ›Χ—Χ™", activeName, activeValue: active };
   }
 
   if (!active) {
     if (spec.requirement === "required" || spec.requirement === "conditional") {
-      return { status: "missing", detail: "ηρψ", activeName, activeValue: active };
+      return { status: "missing", detail: "Χ—Χ΅Χ¨", activeName, activeValue: active };
     }
-    return { status: "optional-missing", detail: "μΰ ξεβγψ", activeName, activeValue: active };
+    return { status: "optional-missing", detail: "ΧΧ ΧΧ•Χ’Χ“Χ¨", activeName, activeValue: active };
   }
 
   if (typeof spec.validate === "function") {
@@ -249,7 +249,7 @@ function pickStatus(spec, env) {
     }
   }
 
-  return { status: "ok", detail: primary ? "ξεβγψ" : `ξεβγψ γψκ ${activeName}`, activeName, activeValue: active };
+  return { status: "ok", detail: primary ? "ΧΧ•Χ’Χ“Χ¨" : `ΧΧ•Χ’Χ“Χ¨ Χ“Χ¨Χ ${activeName}`, activeName, activeValue: active };
 }
 
 function formatRequirement(spec) {
@@ -305,45 +305,45 @@ function printConsistencyChecks(env, packageJson) {
       const baseUrl = new URL(base);
       if (webhookUrl.origin !== baseUrl.origin) {
         issues.push(
-          `PUBLIC_NM_CLUB_WEBHOOK_URL ξφαις μ-${webhookUrl.origin} ΰαμ NM_CLUB_AUTH_BASE_URL ξφαις μ-${baseUrl.origin}.`
+          `PUBLIC_NM_CLUB_WEBHOOK_URL ΧΧ¦Χ‘Χ™ΧΆ Χ-${webhookUrl.origin} ΧΧ‘Χ NM_CLUB_AUTH_BASE_URL ΧΧ¦Χ‘Χ™ΧΆ Χ-${baseUrl.origin}.`
         );
       } else if (webhookUrl.pathname !== "/auth/login") {
-        notes.push("PUBLIC_NM_CLUB_WEBHOOK_URL μΰ ξφαις μ-/auth/login. ζδ ηεχι, ΰαμ λψβς δ-frontend ξφτδ μ-login path δζδ.");
+        notes.push("PUBLIC_NM_CLUB_WEBHOOK_URL ΧΧ ΧΧ¦Χ‘Χ™ΧΆ Χ-/auth/login. Χ–Χ” Χ—Χ•Χ§Χ™, ΧΧ‘Χ Χ›Χ¨Χ’ΧΆ Χ”-frontend ΧΧ¦Χ¤Χ” Χ-login path Χ”Χ–Χ”.");
       }
     } catch {
-      issues.push("μΰ πιϊο μπϊη PUBLIC_NM_CLUB_WEBHOOK_URL ΰε NM_CLUB_AUTH_BASE_URL λ-URL ϊχιο.");
+      issues.push("ΧΧ Χ Χ™ΧªΧ ΧΧ ΧªΧ— PUBLIC_NM_CLUB_WEBHOOK_URL ΧΧ• NM_CLUB_AUTH_BASE_URL Χ›-URL ΧªΧ§Χ™Χ.");
     }
   }
 
   const workerServiceKey = env.NM_CLUB_ADMIN_SERVICE_KEY || env.ADMIN_SERVICE_KEY;
   if (env.NM_CLUB_ADMIN_SERVICE_KEY && env.ADMIN_SERVICE_KEY && env.NM_CLUB_ADMIN_SERVICE_KEY !== env.ADMIN_SERVICE_KEY) {
-    issues.push("βν NM_CLUB_ADMIN_SERVICE_KEY εβν ADMIN_SERVICE_KEY ξεβγψιν ΰαμ ςν ςψλιν ωεπιν.");
+    issues.push("Χ’Χ NM_CLUB_ADMIN_SERVICE_KEY Χ•Χ’Χ ADMIN_SERVICE_KEY ΧΧ•Χ’Χ“Χ¨Χ™Χ ΧΧ‘Χ ΧΆΧ ΧΆΧ¨Χ›Χ™Χ Χ©Χ•Χ Χ™Χ.");
   }
 
   if (boolFlag(env.PUBLIC_CLUB_ADMIN_VIA_PROXY || "")) {
     if (!env.NM_CLUB_AUTH_BASE_URL) {
-      issues.push("PUBLIC_CLUB_ADMIN_VIA_PROXY τςιμ ΰαμ ηρψ NM_CLUB_AUTH_BASE_URL.");
+      issues.push("PUBLIC_CLUB_ADMIN_VIA_PROXY Χ¤ΧΆΧ™Χ ΧΧ‘Χ Χ—Χ΅Χ¨ NM_CLUB_AUTH_BASE_URL.");
     }
     if (!env.NM_CLUB_ADMIN_SERVICE_KEY) {
-      issues.push("PUBLIC_CLUB_ADMIN_VIA_PROXY τςιμ ΰαμ ηρψ NM_CLUB_ADMIN_SERVICE_KEY αφγ Pages.");
+      issues.push("PUBLIC_CLUB_ADMIN_VIA_PROXY Χ¤ΧΆΧ™Χ ΧΧ‘Χ Χ—Χ΅Χ¨ NM_CLUB_ADMIN_SERVICE_KEY Χ‘Χ¦Χ“ Pages.");
     }
     if (!workerServiceKey) {
-      notes.push("δρχψιτθ μΰ ψεΰδ NM_CLUB_ADMIN_SERVICE_KEY/ADMIN_SERVICE_KEY αφγ Worker. εγΰ ωδρεγ χιιν βν α-Worker.");
+      notes.push("Χ”Χ΅Χ§Χ¨Χ™Χ¤Χ ΧΧ Χ¨Χ•ΧΧ” NM_CLUB_ADMIN_SERVICE_KEY/ADMIN_SERVICE_KEY Χ‘Χ¦Χ“ Worker. Χ•Χ“Χ Χ©Χ”Χ΅Χ•Χ“ Χ§Χ™Χ™Χ Χ’Χ Χ‘-Worker.");
     }
   }
 
   const scripts = packageJson?.scripts ?? {};
   if (typeof scripts["deploy:cloudflare"] === "string" && typeof scripts["deploy:worker"] !== "string") {
-    issues.push("χιιν deploy:cloudflare μ-Pages ΰαμ ηρψ deploy:worker. ζδ ξβγιμ ριλεο μ-drift αιο δΰϊψ μ-Worker.");
+    issues.push("Χ§Χ™Χ™Χ deploy:cloudflare Χ-Pages ΧΧ‘Χ Χ—Χ΅Χ¨ deploy:worker. Χ–Χ” ΧΧ’Χ“Χ™Χ Χ΅Χ™Χ›Χ•Χ Χ-drift Χ‘Χ™Χ Χ”ΧΧªΧ¨ Χ-Worker.");
   }
   if (typeof scripts["deploy:all"] !== "string") {
-    notes.push("ΰιο deploy:all ωξτψρν βν Pages εβν Worker αΰεϊε flow.");
+    notes.push("ΧΧ™Χ deploy:all Χ©ΧΧ¤Χ¨Χ΅Χ Χ’Χ Pages Χ•Χ’Χ Worker Χ‘ΧΧ•ΧªΧ• flow.");
   }
 
   console.log("\nConsistency Checks");
   console.log("------------------");
   if (issues.length === 0 && notes.length === 0) {
-    console.log("OK   μΰ πξφΰε τςψι ςχαιεϊ αψεψιν αραιαδ δξχεξιϊ.");
+    console.log("OK   ΧΧ Χ ΧΧ¦ΧΧ• Χ¤ΧΆΧ¨Χ™ ΧΆΧ§Χ‘Χ™Χ•Χª Χ‘Χ¨Χ•Χ¨Χ™Χ Χ‘Χ΅Χ‘Χ™Χ‘Χ” Χ”ΧΧ§Χ•ΧΧ™Χª.");
     return;
   }
 
@@ -361,7 +361,7 @@ function printBindingSection() {
   for (const binding of workerBindings) {
     console.log(`REQ  ${binding.name} [${binding.kind}; required] - ${binding.note}`);
   }
-  console.log("INFO Bindings μΰ παγχιν ξϊεκ process.env. φψικ μΰξϊ ΰεϊν α-wrangler.toml εα-Cloudflare dashboard.");
+  console.log("INFO Bindings ΧΧ Χ Χ‘Χ“Χ§Χ™Χ ΧΧªΧ•Χ process.env. Χ¦Χ¨Χ™Χ ΧΧΧΧª ΧΧ•ΧªΧ Χ‘-wrangler.toml Χ•Χ‘-Cloudflare dashboard.");
 }
 
 async function readPackageJson() {
@@ -375,8 +375,8 @@ async function main() {
 
   console.log("NeverMind Cloudflare Environment Audit");
   console.log("======================================");
-  console.log("δγεη αεγχ ΰϊ φιτιεϊ δχεγ μτι δραιαδ δξχεξιϊ δπεληιϊ.");
-  console.log("δεΰ μΰ ξεωκ πϊεπιν ιωιψεϊ ξ-Cloudflare, ΰμΰ ςεζψ μζδεϊ ξδ ηιια μδιεϊ ξεβγψ α-Pages εα-Worker.");
+  console.log("Χ”Χ“Χ•Χ— Χ‘Χ•Χ“Χ§ ΧΧª Χ¦Χ™Χ¤Χ™Χ•Χª Χ”Χ§Χ•Χ“ ΧΧ¤Χ™ Χ”Χ΅Χ‘Χ™Χ‘Χ” Χ”ΧΧ§Χ•ΧΧ™Χª Χ”Χ Χ•Χ›Χ—Χ™Χª.");
+  console.log("Χ”Χ•Χ ΧΧ ΧΧ•Χ©Χ Χ ΧªΧ•Χ Χ™Χ Χ™Χ©Χ™Χ¨Χ•Χª Χ-Cloudflare, ΧΧΧ ΧΆΧ•Χ–Χ¨ ΧΧ–Χ”Χ•Χª ΧΧ” Χ—Χ™Χ™Χ‘ ΧΧ”Χ™Χ•Χª ΧΧ•Χ’Χ“Χ¨ Χ‘-Pages Χ•Χ‘-Worker.");
 
   printSection("Pages Variables", pagesSpecs, env);
   printSection("Worker Variables", workerSpecs, env);

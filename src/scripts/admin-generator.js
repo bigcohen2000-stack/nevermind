@@ -281,7 +281,7 @@ function buildMdxStub(data) {
     .map((tag) => tag.trim())
     .filter(Boolean);
   const tagsYaml = tagParts.map((t) => `"${yq(t)}"`).join(", ");
-  const body = data.body.trim() || "<!-- גוף המאמר -->\n";
+  const body = data.body.trim() || "גוף המאמר\n";
 
   return `---
 title: "${yq(data.topic || "כותרת זמנית")}"
@@ -1089,5 +1089,4 @@ if (!wizardGlobal.__nmWizardLoadBound) {
 window.requestAnimationFrame(() => {
   setupArticleWizard();
 });
-
 

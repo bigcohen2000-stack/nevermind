@@ -1,0 +1,17 @@
+---
+interface Props {
+  class?: string;
+}
+
+const { class: className = "" } = Astro.props;
+---
+
+<section class={`rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-6 ${className}`} aria-labelledby="community-heading">
+  <h2 id="community-heading" class="text-[clamp(1.5rem,1.3rem+0.8vw,2rem)] font-semibold mb-4">הצטרף לקהילה השקטה</h2>
+  <p class="text-base leading-8 text-[color-mix(in_srgb,var(--nm-fg)_74%,var(--nm-bg))] mb-4">
+    מקום לדיונים עמוקים, שיתוף תובנות, ושאלות ללא רעש.
+  </p>
+  <a href="/premium-access/" class="inline-flex min-h-[48px] items-center justify-center rounded-full bg-[var(--nm-inverse)] px-6 py-3 text-sm font-semibold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-inverse-hover)]">
+    הצטרף עכשיו
+  </a>
+</section>
