@@ -14,8 +14,8 @@ function pickNumeric(audits, id) {
 }
 
 /**
- * PageSpeed Insights v5 (Lighthouse) — דגימה לפי קריאה, לא סטרים בזמן אמת.
- * דורש מפתח API של Google (Pages env: PSI_API_KEY).
+ * PageSpeed Insights v5 (Lighthouse), דגימה לפי קריאה ולא סטרים בזמן אמת.
+ * דורש מפתח Pages בשם PSI_API_KEY.
  */
 export async function onRequestGet(context) {
   const { request, env } = context;
@@ -27,7 +27,7 @@ export async function onRequestGet(context) {
 
   const apiKey = String(env.PSI_API_KEY ?? env.GOOGLE_PAGESPEED_API_KEY ?? "").trim();
   if (!apiKey) {
-    return json({ ok: false, error: "חסר PSI_API_KEY (או GOOGLE_PAGESPEED_API_KEY) בפריסה." }, 503);
+    return json({ ok: false, error: "חסר PSI_API_KEY בפריסה." }, 503);
   }
 
   const reqUrl = new URL(request.url);

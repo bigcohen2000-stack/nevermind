@@ -81,7 +81,7 @@ const clubBenefits = [
     body: "כאן אתה מקבל גישה קרובה יותר, קצב אישי, ותחושה שאתה כבר בבית.",
   },
   {
-    title: "12,000 שעות מחכות לך",
+    title: "עד 10,000 שעות מחכות לך",
     body: "כתיבה, קריאה ושיחות שנבנו כדי לעזור לך להישאר צלול גם ביום רגיל.",
   },
   {
@@ -725,15 +725,7 @@ const offerSchema = {
 
       const trackWaClick = (location) => {
         try {
-          window.dataLayer = window.dataLayer || [];
-          window.dataLayer.push({ event: "unlock_whatsapp_click", location });
-          if (typeof window.gtag === "function") {
-            window.gtag("event", "unlock_whatsapp_click", {
-              event_category: "engagement",
-              event_label: location,
-              destination: "whatsapp",
-            });
-          }
+          window.nmTrackEvent?.("unlock_whatsapp_click", { location, destination: "whatsapp" });
         } catch {
           /* ignore */
         }

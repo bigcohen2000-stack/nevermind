@@ -283,22 +283,67 @@ function buildMdxStub(data) {
   const tagsYaml = tagParts.map((t) => `"${yq(t)}"`).join(", ");
   const body = data.body.trim() || "גוף המאמר\n";
 
+  const takeaways = (data.points || "")
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .slice(0, 3);
+  while (takeaways.length < 3) {
+    takeaways.push(`נקודה קצרה ${takeaways.length + 1}`);
+  }
+
   return `---
 title: "${yq(data.topic || "כותרת זמנית")}"
 description: "${yq(data.summary || "תקציר לחיפוש")}"
+simpleSummary: "${yq(data.summary || "הסבר פשוט מאוד על מה המאמר ולמה כדאי להתחיל ממנו.")}"
+quickTakeaways:
+  - "${yq(takeaways[0])}"
+  - "${yq(takeaways[1])}"
+  - "${yq(takeaways[2])}"
+originalInsight: "${yq(data.aha || "תובנת ליבה זמנית")}"
+bottomLine: "${yq(data.bottomLine || "שורה אחת שמזקקת את הכיוון המעשי.")}"
 pubDate: ${today}
+updatedDate:
 author: "השם לא משנה"
-questionForSchema: "${yq(data.questionForSchema)}"
-originalInsight: "${yq(data.aha)}"
-difficultyLevel: ${data.difficultyLevel || "beginner"}
-mindShiftIntensity: ${Number(data.mindShiftIntensity) || 3}
-imageAlt: "${yq(data.imageAlt)}"
-slug: "${yq(slug)}"
 tags: [${tagsYaml}]
 image: "/assets/images/articles/${slug}.webp"
-isPremium: ${Boolean(data.isPremium)}${data.youtubeId ? `\nyoutubeId: "${yq(data.youtubeId)}"` : ""}
+imageAlt: "${yq(data.imageAlt || "סצנה חזותית פשוטה - ייצוג ויזואלי לרעיון המרכזי של המאמר")}"
+canonicalUrl: "https://nevermind.co.il/articles/${yq(slug)}/"
+keywords: "${yq(data.tags || "")}"
+audioUrl: ""
+youtubeId: "${yq(data.youtubeId || "")}"
+isPremium: ${Boolean(data.isPremium)}
 draft: true
+audience: "${yq(data.audience || "למי זה מיועד")}"
+difficulty: "${data.difficultyLevel === "beginner" ? "beginner" : "advanced"}"
+intendedAudience: "${yq(data.audience || "קורא שמחפש הסבר פשוט ואז עומק")}"
+readTime: 4
+isPublic: true
+workflowStatus: "writing"
+difficultyLevel: ${data.difficultyLevel || "beginner"}
+mindShiftIntensity: ${Number(data.mindShiftIntensity) || 3}
+inversionNote: "${yq(data.inversionNote || "")}"
+inversionQuestion: "${yq(data.questionForSchema || "מה קורה אם ההנחה המרכזית כאן בכלל לא נכונה")}"
+finalQuestion: "${yq("איזה מנגנון מתוך המאמר אתה מזהה עכשיו אצלך")}"
+reflectionQuestions:
+  - "מה אני בטוח בו מהר מדי"
+  - "איזה פירוש אני מצמיד לעובדה"
+  - "מה משתנה אם אני עוצר לפני תגובה"
+relatedConcepts: [${tagsYaml}]
+questionForSchema: "${yq(data.questionForSchema || "")}"
+faq:
+  - question: "שאלה קצרה אחת"
+    answer: "תשובה קצרה אחת"
+hubPosition: "latest"
+hubOrder: 999
+journeyTopic: "general"
 ---
+
+${Boolean(data.isPremium)
+    ? `<iframe width="560" height="315" src="https://www.youtube.com/embed/${yq(data.youtubeId || "[youtube-id]")}" title="${yq(data.topic || "סרטון למנויים")}" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`
+    : `<img src="/images/lock-nevermind-club.png" alt="טיזר למועדון NeverMind" loading="lazy" />
+
+התמונה הזו מסמנת שיש למאמר עוד רובד למי שרוצה להמשיך פנימה. אם תרצה להעמיק מעבר לבסיס, המועדון מחכה לך בקצב שקט.`}
 
 ${body}
 `;
@@ -595,42 +640,51 @@ function setupArticleWizard() {
     const defaultImagePath = data.slug ? `/assets/images/articles/${data.slug}.webp` : "/assets/images/articles/[slug].webp";
     const roboticBannedList = ROBOTIC_BLOCKLIST.join(", ");
 
-    return `[Role: Strategic Content Expert]
+    return `[Role: Lead Writer for NeverMind]
 [Context: NeverMind Project]
-Act as a high-end content strategist for NeverMind. Write an article about ${data.topic || "[Topic]"} for ${data.audience || "[Audience]"}. The core insight is ${data.aha || "[originalInsight]"}.${bottomLine}${inversionNote}
+Act as the primary writer for NeverMind. Write exactly one article about ${data.topic || "[Topic]"} for ${data.audience || "[Audience]"}. The core insight is ${data.aha || "[originalInsight]"}.${bottomLine}${inversionNote}
 
 [Content policy - Hebrew instruction for the model]
 חוקי תוכן: היה מודע לכך שנושאים כמו סמים, מין, פורנו, הימורים והתמכרויות (וביטויים קרובים באנגלית כגון drugs, porn, gambling, addiction) גורמים לזיהוי פרימיום בזרימת האתר. אם הנושא נוגע לכך, הגדר isPremium: true. השתמש בשפה ישירה אך אחראית. בלי סנסציה. בלי הנחיות מפרות חוק.
 
 You MUST output a single MDX file with YAML frontmatter.
 
-Mandatory frontmatter - always generate these keys with real, non-empty values (never placeholder text, never skip):
-- questionForSchema
-- originalInsight
-- difficultyLevel (beginner | advanced | deep)
-- mindShiftIntensity (integer 1-5)
-- imageAlt
-
 Forbidden robotic / corporate cliche vocabulary - do NOT use these strings anywhere in the entire output (including YAML values, title, description, and body). Case-insensitive; includes multi-word phrases:
 ${roboticBannedList}
 
 Wizard inputs vs final file: Values typed in the wizard (topic, bullets, draft body inside [DRAFT_BODY_START]...[DRAFT_BODY_END]) may include rough notes or placeholder phrasing. The final MDX you produce must rewrite this into clean NeverMind voice and MUST obey every rule above. Do not paste robotic or filler phrasing from the draft into the published text.
 
+Frontmatter rules:
+- use the full article frontmatter example from the project template
+- isPremium must be ${Boolean(data.isPremium)}
+- youtubeId must be "${yq(data.youtubeId || "")}"
+- never skip required keys and never leave placeholder text in published output
+
 Required frontmatter keys (all must be present with non-empty values where noted):
 - title: Hebrew title
 - description: meta description ~150-160 chars
+- simpleSummary: very simple summary in Hebrew
+- quickTakeaways: exactly 3 short items
 - pubDate: YYYY-MM-DD
+- updatedDate
 - author: default "השם לא משנה"
 - questionForSchema: distilled search-facing question (Hebrew) - ${data.questionForSchema || "[fill]"}
 - originalInsight: same core as the article spine - ${data.aha || "[fill]"}
+- bottomLine: short practical closing line
+- audience: ${data.audience || "[Audience]"}
+- intendedAudience: refined audience phrasing in Hebrew
+- difficulty: beginner | intermediate | advanced
 - difficultyLevel: one of beginner | advanced | deep - use ${data.difficultyLevel}
+- readTime: integer
+- isPublic: true unless there is a real reason not to
+- workflowStatus: writing
 - mindShiftIntensity: integer 1-5 - use ${data.mindShiftIntensity}
 - imageAlt: Hebrew. Describe the CONCEPT the hero image stands for, not only pixels. Pattern: [brief visible scene] - [semantic role for the article]. Example shape: "אדם עומד מול מראה שבורה - ייצוג ויזואלי לפירוק האגו". Search engines use this for topical/philosophical context; keep concrete + interpretive in one line. Wizard draft: ${data.imageAlt || "[fill]"}
 - slug: REQUIRED, English only, kebab-case, aligned with title - ${data.slug || "[Slug]"}
 - tags: array; ONLY these exact Hebrew strings (comma-separated canonical list): ${canonicalTagsCsv}
 - image: default hero path ${defaultImagePath} unless a different asset is explicitly intended
 - isPremium: ${data.isPremium}
-- youtubeId, bottomLine, inversionNote, reflectionQuestions, faq: as in project conventions
+- youtubeId, inversionQuestion, finalQuestion, reflectionQuestions, relatedConcepts, faq: as in project conventions
 
 Tags rule: never invent a tag outside the canonical list. Slug rule: [a-z0-9-] only.
 imageAlt rule: must fuse literal scene with symbolic meaning tied to the article thesis; avoid generic stock phrases ("תמונה של אדם").
@@ -642,16 +696,29 @@ ${data.body.trim() || "[no draft yet]"}
 ${depthBlock}
 Follow the brand identity: zero fluff, focus on thought-shifts, NeverMind voice (direct, analytical, no filler).
 [Output Instructions: Markdown; no fluff; focus on Thought-Shifts; structure for web reading.
+- Generate exactly one article, not alternatives.
+- The opening must be simple enough for a smart 10-year-old reader, and then rise gradually into depth.
+- Every paragraph must contain exactly 2 sentences.
+- Sentence 1 in every paragraph must be simple and concrete.
+- Sentence 2 in every paragraph must deepen the point and make it more exact.
+- Never use high-register language, hype, or marketing tone.
+- Never use exclamation marks anywhere in the output.
 - Use the following heading order and exact labels (must match exactly):
   1) ## מה המנגנון כאן
   2) ## שאלת היפוך
   3) ### ניסוי קצר
   4) ## סיכום פרקטי
+- Immediately after the frontmatter:
+  - if isPremium is true, place a YouTube embed at the top using the youtubeId
+  - otherwise place a teaser image that points gently to the club using /images/lock-nevermind-club.png
 - Never use the Hebrew word "שלב" inside the article body.
-- End with exactly one open question about the reader's own reality (not about the article).
+- End the article with a bottomLine line and then exactly one open question about the reader's own reality.
 - Inside at least 2 headings above, weave 2-3 natural SEO phrases derived from the topic (use Hebrew patterns like: איך {topic}, איך להפסיק {topic}, פתרון ... בזוגיות when relevant).
 - Two-layer writing: each paragraph has two sentences. First sentence simple and concrete. Second sentence deeper and more precise.
 - Keep paragraphs short. No generic filler.
+- After the MDX, add 2 separate blocks:
+  1) glossary block for glossary/
+  2) image prompt block with exact save path ${defaultImagePath}
 ]`;
   };
 
@@ -806,6 +873,30 @@ Follow the brand identity: zero fluff, focus on thought-shifts, NeverMind voice 
     }
   };
 
+  const normalizeAudienceValue = (value) => {
+    const raw = String(value ?? "").trim();
+    if (raw === "Beginners" || raw === "מתחילים") return "מתחילים";
+    if (raw === "Experienced Readers" || raw === "Advanced Readers" || raw === "קוראים מנוסים") return "קוראים מנוסים";
+    if (raw === "Inner Community" || raw === "קהילה פנימית") return "קהילה פנימית";
+    return "מתחילים";
+  };
+
+  const normalizeToneValue = (value) => {
+    const raw = String(value ?? "").trim();
+    if (raw === "Provocative" || raw === "חד") return "חד";
+    if (raw === "Analytical" || raw === "אנליטי") return "אנליטי";
+    if (raw === "Grounded" || raw === "מחובר לקרקע") return "מחובר לקרקע";
+    return "חד";
+  };
+
+  const normalizeLengthValue = (value) => {
+    const raw = String(value ?? "").trim();
+    if (raw === "Short Post" || raw === "קצר") return "קצר";
+    if (raw === "Deep Dive" || raw === "עמוק") return "עמוק";
+    if (raw === "Full Research" || raw === "מחקר מלא") return "מחקר מלא";
+    return "קצר";
+  };
+
   const restoreDraft = () => {
     const audience = document.getElementById("wiz-audience");
     const isPremium = document.getElementById("wiz-is-premium");
@@ -822,7 +913,7 @@ Follow the brand identity: zero fluff, focus on thought-shifts, NeverMind voice 
 
       const data = JSON.parse(raw) || {};
       setFieldValue("wiz-topic", String(data.topic ?? ""));
-      if (audience instanceof HTMLSelectElement) audience.value = String(data.audience ?? "Beginners");
+      if (audience instanceof HTMLSelectElement) audience.value = normalizeAudienceValue(data.audience ?? "מתחילים");
       setFieldValue("wiz-aha", String(data.aha ?? ""));
       setFieldValue("wiz-bottom-line", String(data.bottomLine ?? ""));
       setFieldValue("wiz-inversion", String(data.inversionNote ?? ""));
@@ -839,9 +930,9 @@ Follow the brand identity: zero fluff, focus on thought-shifts, NeverMind voice 
         mindShift.value = ["1", "2", "3", "4", "5"].includes(intensity) ? intensity : "3";
       }
       setFieldValue("wiz-summary", String(data.summary ?? ""));
-      if (tone instanceof HTMLSelectElement) tone.value = String(data.tone ?? "Provocative");
+      if (tone instanceof HTMLSelectElement) tone.value = normalizeToneValue(data.tone ?? "חד");
       setFieldValue("wiz-points", String(data.points ?? ""));
-      if (length instanceof HTMLSelectElement) length.value = String(data.length ?? "Short Post");
+      if (length instanceof HTMLSelectElement) length.value = normalizeLengthValue(data.length ?? "קצר");
       setFieldValue("wiz-tags", String(data.tags ?? ""));
       setFieldValue("wiz-youtube", String(data.youtubeId ?? ""));
       setFieldValue("wiz-body", String(data.body ?? ""));
@@ -1089,4 +1180,3 @@ if (!wizardGlobal.__nmWizardLoadBound) {
 window.requestAnimationFrame(() => {
   setupArticleWizard();
 });
-

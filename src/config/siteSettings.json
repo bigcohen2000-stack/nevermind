@@ -1,7 +1,7 @@
 {
   "stagingBanner": {
     "enabled": false,
-    "message": "האתר בהרצה"
+    "message": "עדכון אתר"
   },
   "seo": {
     "allowIndexing": true

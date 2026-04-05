@@ -67,8 +67,6 @@ interface Window {
   __nmReportConnectivityIssue?: (message: string) => void;
   __nmClearConnectivityIssue?: () => void;
   nmTrackEvent?: (name: string, params?: Record<string, unknown>) => void;
-  dataLayer?: unknown[];
-  gtag?: (...args: unknown[]) => void;
   hcaptcha?: {
     render: (container: HTMLElement, params: Record<string, unknown>) => number;
     remove: (widgetId: number) => void;
@@ -86,4 +84,3 @@ declare namespace astroHTML.JSX {
     };
   }
 }
-

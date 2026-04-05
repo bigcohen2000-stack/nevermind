@@ -1,18 +1,18 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 
-const pageTitle = "מעבר ללוח ניהול";
-const pageDescription = "העברה לנתיב החדש של מרכז הניהול.";
+const pageTitle = "מעבר לדשבורד התפעולי";
+const pageDescription = "העברה לנתיב החדש של הדשבורד התפעולי.";
 ---
 
 <Layout title={pageTitle} description={pageDescription} noIndex={true}>
   <section class="mx-auto max-w-2xl px-4 py-16 text-right text-[var(--nm-fg)]">
-    <p class="text-sm text-[color-mix(in_srgb,var(--nm-fg)_65%,var(--nm-bg))]">מעביר למרכז הניהול…</p>
+    <p class="text-sm text-[color-mix(in_srgb,var(--nm-fg)_65%,var(--nm-bg))]">מעביר לדשבורד התפעולי…</p>
     <p class="mt-4 text-sm">
-      <a href="/admin/" class="font-semibold text-[var(--nm-accent)] underline underline-offset-4">לחץ כאן אם לא קרה כלום</a>
+      <a href="/dashboard/" class="font-semibold text-[var(--nm-accent)] underline underline-offset-4">לחץ כאן אם לא קרה כלום</a>
     </p>
   </section>
   <script is:inline>
-    location.replace("/admin/");
+    location.replace("/dashboard/");
   </script>
 </Layout>

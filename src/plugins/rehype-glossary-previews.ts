@@ -1,5 +1,5 @@
 /**
- * ????? class + data-glossary-preview ??????? ????? (???? remark).
+ * מוסיף class ו־data-glossary-preview לקישורי מילון כדי לאפשר tooltip קצר.
  */
 import { visit } from "unist-util-visit";
 import { glossaryMap } from "../data/glossary";

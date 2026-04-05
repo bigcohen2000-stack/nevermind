@@ -1,71 +1,231 @@
 ---
 import Layout from "../../layouts/Layout.astro";
+import appConfig from "../../config/appConfig.json";
+import { buildWhatsAppHref } from "../../lib/services";
 
-const pageTitle = "איך זה עובד כאן";
-const pageDescription = "מנגנון כניסה למועדון. מה נשמר בשרת. איך נפתחת גישה. למה מופיעים Flags.";
+type ContactCfg = {
+  whatsAppNumber?: string;
+  phoneDisplay?: string;
+  email?: string;
+};
+
+type PremiumAccessCfg = {
+  enabled?: boolean;
+  sessionHours?: number;
+  unlockRoute?: string;
+  helperText?: string;
+};
+
+const contact = appConfig.contact as ContactCfg;
+const premiumAccess = appConfig.premiumAccess as PremiumAccessCfg;
+
+const premiumEnabled = premiumAccess.enabled === true;
+const sessionHours = Number(premiumAccess.sessionHours ?? 0);
+const unlockRoute =
+  typeof premiumAccess.unlockRoute === "string" && premiumAccess.unlockRoute.trim().length > 0
+    ? premiumAccess.unlockRoute.trim()
+    : "/me/unlock/";
+const helperText =
+  typeof premiumAccess.helperText === "string" && premiumAccess.helperText.trim().length > 0
+    ? premiumAccess.helperText.trim()
+    : "הגישה נפתחת דרך עמוד כניסה ייעודי ונשמרת רק על המכשיר של החבר.";
+const webhookUrl = String(import.meta.env.PUBLIC_NM_CLUB_WEBHOOK_URL ?? "").trim();
+const webhookConfigured = webhookUrl.length > 0;
+
+let webhookHost = "לא הוגדר";
+if (webhookConfigured) {
+  try {
+    webhookHost = new URL(webhookUrl).host;
+  } catch {
+    webhookHost = "הוגדר אך צריך בדיקת כתובת";
+  }
+}
+
+const sessionLabel = (() => {
+  if (!Number.isFinite(sessionHours) || sessionHours <= 0) return "לא הוגדר";
+  const days = Math.floor(sessionHours / 24);
+  const hours = sessionHours % 24;
+  if (days > 0 && hours > 0) return `${days} ימים ו-${hours} שעות`;
+  if (days > 0) return `${days} ימים`;
+  return `${sessionHours} שעות`;
+})();
+
+const whatsAppHref = buildWhatsAppHref(
+  "היי, ראיתי את עמוד המועדון באתר ורוצה להבין איך פותחים גישה."
+);
+
+const pageTitle = "מנגנון המועדון";
+const pageDescription =
+  "עמוד מצב טכני למועדון. אפשר לראות אם הגישה פעילה, כמה זמן היא נשמרת, ולאן נשלח אימות הכניסה.";
+
+const statusCards = [
+  {
+    label: "מצב גישה",
+    value: premiumEnabled ? "פעיל" : "כבוי",
+    detail: premiumEnabled ? "המועדון פתוח דרך נתיב כניסה ייעודי." : "הגדרת המועדון כבויה כרגע בקובץ ההגדרות.",
+  },
+  {
+    label: "משך סשן",
+    value: sessionLabel,
+    detail: "זהו פרק הזמן שבו ההתחברות נשמרת על אותו מכשיר.",
+  },
+  {
+    label: "אימות Worker",
+    value: webhookConfigured ? "מחובר" : "חסר",
+    detail: webhookConfigured ? webhookHost : "צריך להגדיר PUBLIC_NM_CLUB_WEBHOOK_URL בפריסה.",
+  },
+];
+
+const storageRows = [
+  {
+    title: "CLUB_MEMBERS",
+    body: "שומר פרטי חברות בסיסיים כמו שם תצוגה, טלפון, hash של סיסמה, תוקף גישה וסטטוס.",
+  },
+  {
+    title: "CLUB_ACTIVITY",
+    body: "שומר אירועי כניסה וגלישה רלוונטיים לבדיקה, בלי לחשוף את הסיסמה עצמה.",
+  },
+  {
+    title: "nm_club_session",
+    body: "נשמר על המכשיר המקומי אחרי אימות תקין ומאפשר כניסה שקטה עד סיום התוקף.",
+  },
+];
+
+const flowRows = [
+  "החבר נכנס דרך עמוד פתיחת הגישה ומזין שם, טלפון וסיסמה.",
+  "הדפדפן שולח בקשת JSON ל-Worker דרך PUBLIC_NM_CLUB_WEBHOOK_URL.",
+  "אם האימות תקין, נשמר session מקומי עם שם חבר, תוקף וסטטוס חי.",
+  "אם אותו טלפון או אותו hash מופיעים מדפוסים חריגים, נוצר דגל בדיקה ידני ולא חסימה אוטומטית.",
+];
+
+const adminRows = [
+  "ממשק הניהול מוסיף חבר חדש, מעדכן תוקף, ומחליף hash בלי לגעת בשאר הנתונים.",
+  "איפוס סיסמה מחליף רק את ערך האימות, כך שהיסטוריית החבר נשארת רציפה.",
+  "אם ה-Worker לא מוגדר בפריסה, כפתור הכניסה מושבת והעמוד מציג הסבר במקום ליפול.",
+];
 ---
 
-<Layout title={pageTitle} description={pageDescription}>
-  <section class="mx-auto max-w-3xl space-y-8 px-4 py-14 text-right">
-    <header
-      class="space-y-4 rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-gradient-to-br from-[var(--nm-bg-canvas)] to-[color-mix(in_srgb,var(--nm-tint)_40%,var(--nm-bg-canvas))] p-8 shadow-[0_28px_70px_rgba(0,0,0,0.05)]"
-    >
-      <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--nm-accent)]">מנגנון מועדון</p>
-      <h1 class="text-[clamp(2rem,1.6rem+1.5vw,3rem)] font-semibold leading-tight text-[var(--nm-fg)]">
-        איך זה עובד כאן
+<Layout title={pageTitle} description={pageDescription} noIndex={true}>
+  <section class="mx-auto max-w-5xl space-y-8 px-4 py-14 text-right">
+    <header class="space-y-4 rounded-[var(--nm-radius-card)] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[color-mix(in_srgb,var(--nm-bg-canvas)_94%,white)] p-8 shadow-[0_20px_60px_rgba(26,26,26,0.06)]">
+      <p class="text-sm font-semibold tracking-[0.16em] text-[var(--nm-accent)]">מועדון</p>
+      <h1 class="text-[clamp(2rem,1.7rem+1.4vw,3.1rem)] font-semibold leading-tight text-[var(--nm-fg)]">
+        מנגנון הגישה למועדון
       </h1>
-      <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
-        זה הסבר עובדתי. המטרה היא פירוק מה נשמר איפה ומה מפעיל גישה.
+      <p class="max-w-3xl text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">
+        זהו עמוד מצב תפעולי. הוא קורא את ההגדרות החיות של האתר ומרכז במקום אחד את מצב הגישה, משך הסשן, וכתובת האימות.
+      </p>
+      <p class="rounded-[var(--nm-radius-control)] border border-[color-mix(in_srgb,var(--nm-accent)_18%,transparent)] bg-[var(--nm-tint)] px-4 py-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))]">
+        {helperText}
       </p>
     </header>
 
-    <section class="space-y-4 rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/85 p-7 shadow-[0_16px_44px_color-mix(in_srgb,var(--nm-fg)_4%,transparent)]">
-      <h2 class="text-xl font-semibold text-[var(--nm-fg)]">מה נשמר בשרת</h2>
-      <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">
-        `CLUB_MEMBERS` שומר פרטי חבר. כולל `memberName`. `phone`. `passwordHash`. `expiresAt`. וסטטוס גישה.
-      </p>
-      <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">
-        `CLUB_ACTIVITY` שומר שורות קצרות של כניסה. כולל `ipHash`. זמן. נתיב באתר. טלפון. ודפדפן.
-      </p>
+    <section class="grid gap-4 md:grid-cols-3">
+      {statusCards.map((card) => (
+        <article class="rounded-[var(--nm-radius-card)] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 p-6 shadow-[0_16px_44px_color-mix(in_srgb,var(--nm-fg)_4%,transparent)]">
+          <p class="text-sm font-semibold text-[var(--nm-accent)]">{card.label}</p>
+          <p class="mt-3 text-2xl font-semibold text-[var(--nm-fg)]">{card.value}</p>
+          <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
+            {card.detail}
+          </p>
+        </article>
+      ))}
     </section>
 
-    <section class="space-y-4 rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/85 p-7 shadow-[0_16px_44px_color-mix(in_srgb,var(--nm-fg)_4%,transparent)]">
-      <h2 class="text-xl font-semibold text-[var(--nm-fg)]">איך נפתחת גישה</h2>
-      <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">
-        הכניסה מבוצעת מול Worker דרך webhook. המשתמש נותן `phone` וסיסמה.
-      </p>
-      <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">
-        אם ה Worker מאשר. הדפדפן שומר `nm_club_session` במכשיר. ואז מוצג פס עליון עם סטטוס גישה.
-      </p>
+    <section class="grid gap-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
+      <article class="space-y-4 rounded-[var(--nm-radius-card)] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 p-7 shadow-[0_16px_44px_color-mix(in_srgb,var(--nm-fg)_4%,transparent)]">
+        <h2 class="text-xl font-semibold text-[var(--nm-fg)]">מה נשמר ואיפה</h2>
+        <div class="space-y-4">
+          {storageRows.map((row) => (
+            <div class="rounded-[var(--nm-radius-control)] border border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] bg-[var(--nm-bg-canvas)] px-4 py-4">
+              <p class="text-sm font-semibold text-[var(--nm-fg)]">{row.title}</p>
+              <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
+                {row.body}
+              </p>
+            </div>
+          ))}
+        </div>
+      </article>
+
+      <article class="space-y-4 rounded-[var(--nm-radius-card)] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 p-7 shadow-[0_16px_44px_color-mix(in_srgb,var(--nm-fg)_4%,transparent)]">
+        <h2 class="text-xl font-semibold text-[var(--nm-fg)]">המשתנים שנקראו מהאתר</h2>
+        <dl class="space-y-4 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+          <div>
+            <dt class="font-semibold text-[var(--nm-fg)]">premiumAccess.enabled</dt>
+            <dd>{premiumEnabled ? "כן" : "לא"}</dd>
+          </div>
+          <div>
+            <dt class="font-semibold text-[var(--nm-fg)]">premiumAccess.sessionHours</dt>
+            <dd>{sessionHours > 0 ? `${sessionHours} שעות` : "לא הוגדר"}</dd>
+          </div>
+          <div>
+            <dt class="font-semibold text-[var(--nm-fg)]">premiumAccess.unlockRoute</dt>
+            <dd class="font-mono text-xs text-[color-mix(in_srgb,var(--nm-fg)_74%,var(--nm-bg))]">{unlockRoute}</dd>
+          </div>
+          <div>
+            <dt class="font-semibold text-[var(--nm-fg)]">PUBLIC_NM_CLUB_WEBHOOK_URL</dt>
+            <dd class="break-all font-mono text-xs text-[color-mix(in_srgb,var(--nm-fg)_74%,var(--nm-bg))]">
+              {webhookConfigured ? webhookUrl : "לא הוגדר"}
+            </dd>
+          </div>
+          <div>
+            <dt class="font-semibold text-[var(--nm-fg)]">איש קשר</dt>
+            <dd>{contact.phoneDisplay ?? contact.email ?? "לא הוגדר"}</dd>
+          </div>
+        </dl>
+      </article>
     </section>
 
-    <section class="space-y-4 rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/85 p-7 shadow-[0_16px_44px_color-mix(in_srgb,var(--nm-fg)_4%,transparent)]">
-      <h2 class="text-xl font-semibold text-[var(--nm-fg)]">למה יש Fraud Flags</h2>
-      <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">
-        אם אותו טלפון או אותו `passwordHash` מופיעים ממספר IP שונים בחלון זמן קצר. נוצרת רשומת flag.
-      </p>
-      <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">
-        זה לא חסימה אוטומטית. זה אות שמאפשר בדיקה ידנית.
-      </p>
+    <section class="grid gap-6 lg:grid-cols-2">
+      <article class="space-y-4 rounded-[var(--nm-radius-card)] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 p-7 shadow-[0_16px_44px_color-mix(in_srgb,var(--nm-fg)_4%,transparent)]">
+        <h2 class="text-xl font-semibold text-[var(--nm-fg)]">איך הגישה נפתחת</h2>
+        <ol class="space-y-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+          {flowRows.map((row) => (
+            <li class="flex gap-3">
+              <span aria-hidden="true" class="mt-1 h-2.5 w-2.5 rounded-full bg-[var(--nm-accent)]"></span>
+              <span>{row}</span>
+            </li>
+          ))}
+        </ol>
+      </article>
+
+      <article class="space-y-4 rounded-[var(--nm-radius-card)] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 p-7 shadow-[0_16px_44px_color-mix(in_srgb,var(--nm-fg)_4%,transparent)]">
+        <h2 class="text-xl font-semibold text-[var(--nm-fg)]">מה ממשק הניהול עושה</h2>
+        <ul class="space-y-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+          {adminRows.map((row) => (
+            <li class="flex gap-3">
+              <span aria-hidden="true" class="mt-1 h-2.5 w-2.5 rounded-full bg-[var(--nm-accent)]"></span>
+              <span>{row}</span>
+            </li>
+          ))}
+        </ul>
+      </article>
     </section>
 
-    <section class="space-y-4 rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/85 p-7 shadow-[0_16px_44px_color-mix(in_srgb,var(--nm-fg)_4%,transparent)]">
-      <h2 class="text-xl font-semibold text-[var(--nm-fg)]">מה עושה Admin</h2>
-      <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">
-        דרך ממשק ניהול. מוסיפים חבר חדש. בוחרים `phone` וסיסמה. ושומרים `passwordHash` עם תוקף.
-      </p>
-      <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">
-        Admin יכול גם לאפס סיסמה. זה מחליף את ה hash בלי לגעת בשאר המידע.
-      </p>
+    <section class="rounded-[var(--nm-radius-card)] border border-[color-mix(in_srgb,var(--nm-accent)_18%,transparent)] bg-[var(--nm-tint)] p-7 shadow-inner">
+      <h2 class="text-xl font-semibold text-[var(--nm-fg)]">צעדים מהירים לבדיקה</h2>
+      <div class="mt-4 flex flex-wrap justify-end gap-3">
+        <a
+          href={unlockRoute}
+          class="inline-flex min-h-[48px] items-center rounded-full bg-[var(--nm-accent)] px-6 py-3 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]"
+        >
+          מעבר לעמוד פתיחת גישה
+        </a>
+        <a
+          href="/services/"
+          class="inline-flex min-h-[48px] items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-white/90 px-6 py-3 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-white"
+        >
+          מעבר לשירותים
+        </a>
+        <a
+          href={whatsAppHref}
+          target="_blank"
+          rel="noreferrer"
+          class="inline-flex min-h-[48px] items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-white/90 px-6 py-3 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-white"
+        >
+          בדיקה ידנית מול ווטסאפ
+        </a>
+      </div>
     </section>
-
-    <div
-      class="rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)] bg-[var(--nm-tint)] p-7 shadow-inner"
-    >
-      <h2 class="text-xl font-semibold text-[var(--nm-fg)]">בדיקה עצמית קצרה</h2>
-      <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
-        איזה שדה אתה רוצה לראות בבירור בזמן אמת כדי לדעת מה באמת מפעיל את הגישה כאן.
-      </p>
-    </div>
   </section>
 </Layout>

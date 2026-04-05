@@ -1,73 +1,11 @@
 <script is:inline>
   (() => {
-    const pending = [];
-    let canTrack = false;
-
-    const getDataLayer = () => {
-      window.dataLayer = window.dataLayer || [];
-      return window.dataLayer;
-    };
-
-    const pushEvent = (name, params = {}) => {
+    window.nmTrackEvent = (name, params = {}) => {
       if (!name) return;
-      getDataLayer().push({ event: name, ...params });
-    };
-
-    const flush = () => {
-      if (!canTrack) return;
-      while (pending.length > 0) {
-        const next = pending.shift();
-        if (!next) continue;
-        pushEvent(next.name, next.params || {});
-      }
-    };
-
-    const track = (name, params = {}) => {
-      if (!name) return;
-      if (!canTrack) {
-        pending.push({ name, params });
-        return;
-      }
-      pushEvent(name, params);
-    };
-
-    const syncConsent = () => {
       try {
-        canTrack = localStorage.getItem("nm-cookie-consent") === "accepted";
+        window.dispatchEvent(new CustomEvent("nm-analytics-event", { detail: { name, params } }));
       } catch {
-        canTrack = false;
       }
-      flush();
     };
-
-    window.nmTrackEvent = track;
-
-    window.addEventListener("nm-analytics", (event) => {
-      const detail = event && event.detail;
-      if (!detail || !detail.name) return;
-      track(detail.name, detail.params || {});
-    });
-
-    document.addEventListener("click", (event) => {
-      const target = event.target;
-      if (!(target instanceof Element)) return;
-      const anchor = target.closest("a[href]");
-      if (!(anchor instanceof HTMLAnchorElement)) return;
-      const href = anchor.getAttribute("href") || "";
-      if (href.includes("tally.so")) {
-        track("book_session_click", { link_url: href });
-      }
-      if (anchor.hasAttribute("download") || /\.pdf($|[?#])/i.test(href)) {
-        track("digital_file_click", { link_url: href });
-      }
-    });
-
-    window.addEventListener("nm-cookie-accepted", () => {
-      canTrack = true;
-      flush();
-    });
-
-    document.addEventListener("astro:page-load", syncConsent);
-    syncConsent();
   })();
 </script>

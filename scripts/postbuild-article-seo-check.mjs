@@ -136,7 +136,11 @@ for (const name of fs.readdirSync(articlesDir)) {
     continue;
   }
   if (data.draft === true) continue;
-  const slug = name.replace(/\.mdx$/i, "");
+  const fileSlug = name.replace(/\.mdx$/i, "");
+  const slug =
+    typeof data.slug === "string" && data.slug.trim().length > 0
+      ? data.slug.trim()
+      : fileSlug;
   const isPremium = Boolean(data.isPremium);
   const expectedArticleBody = mdxContentToSeoPlain(content).slice(0, 120000);
   const mod = data.updatedDate ?? data.pubDate;

@@ -1,6 +1,7 @@
 ﻿---
 import { getCollection } from "astro:content";
 import ClubAdminPanel from "../../components/admin/ClubAdminPanel.astro";
+import RoleGate from "../../components/admin/RoleGate.astro";
 import ContentHealthWidget from "../../components/dashboard/ContentHealthWidget";
 import DashboardCard from "../../components/dashboard/DashboardCard.astro";
 import DashboardCommandBar from "../../components/dashboard/DashboardCommandBar";
@@ -79,9 +80,10 @@ const managerQuickLinks = [
 ---
 
 <Layout title={pageTitle} description={pageDescription} noIndex={true}>
-  <div class="min-h-screen bg-[#FAFAF8] text-[#1A1A1A] dark:bg-[#1A1A1A] dark:text-[#FAFAF8]">
-    <main class="mx-auto max-w-7xl px-4 pb-16 pt-8 lg:px-6">
-      <DashboardCommandBar client:load index={searchIndex} />
+  <RoleGate requiredRole="admin">
+    <div class="min-h-screen bg-[#FAFAF8] text-[#1A1A1A] dark:bg-[#1A1A1A] dark:text-[#FAFAF8]">
+      <main class="mx-auto max-w-7xl px-4 pb-16 pt-8 lg:px-6">
+        <DashboardCommandBar client:load index={searchIndex} />
 
       <div class="grid gap-6 lg:grid-cols-[15rem_minmax(0,1fr)]">
         <DashboardNav />
@@ -98,7 +100,7 @@ const managerQuickLinks = [
                   </p>
                   <div class="flex flex-wrap gap-2 pt-1 text-xs">
                     <span class="inline-flex items-center rounded-full border-[0.5px] border-[rgba(212,43,43,0.18)] bg-[rgba(212,43,43,0.08)] px-3 py-1 font-medium text-[#D42B2B] dark:border-[rgba(212,43,43,0.22)] dark:bg-[rgba(212,43,43,0.12)] dark:text-[#ff8a8a]">מנהל בלבד</span>
-                    <span class="inline-flex items-center rounded-full border-[0.5px] border-[rgba(26,26,26,0.1)] bg-white/70 px-3 py-1 font-medium text-[#1A1A1A]/72 dark:border-[rgba(250,250,248,0.12)] dark:bg-[rgba(255,255,255,0.05)] dark:text-[#FAFAF8]/72">Cloudflare Access: bigcohen2000@gmail.com</span>
+                    <span class="inline-flex items-center rounded-full border-[0.5px] border-[rgba(26,26,26,0.1)] bg-white/70 px-3 py-1 font-medium text-[#1A1A1A]/72 dark:border-[rgba(250,250,248,0.12)] dark:bg-[rgba(255,255,255,0.05)] dark:text-[#FAFAF8]/72">Cloudflare Access למייל bigcohen2000@gmail.com</span>
                     <span class="inline-flex items-center rounded-full border-[0.5px] border-[rgba(26,26,26,0.1)] bg-white/70 px-3 py-1 font-medium text-[#1A1A1A]/72 dark:border-[rgba(250,250,248,0.12)] dark:bg-[rgba(255,255,255,0.05)] dark:text-[#FAFAF8]/72">החבר לא רואה את המסך הזה</span>
                   </div>
                   <div class="flex flex-wrap items-center justify-between gap-3">
@@ -236,16 +238,24 @@ const managerQuickLinks = [
             <DashboardCard
               eyebrow="הגדרות מערכת"
               title="בריאות מערכת"
-              description="מצב חיבורי ה-worker, טפסי המייל, אימות ה-hCaptcha, דוח build אחרון וקריאות הטקסטים."
-              helpText="למה: זו נקודת בקרה אחת על מה שנשבר בשקט. איך: בדיקות runtime מגיעות מ-Pages Functions בזמן אמת, ודוח build סטטי מציג מצב קישורים פנימיים וקריאות מאמרים מהבנייה האחרונה."
+              description="כאן מרוכזים מצב Cloudflare, בדיקת מובייל, פערי חיפוש, דוח build אחרון וחיבורי ה־worker."
+              helpText="למה: זו נקודת בקרה אחת על מה שנשבר בשקט ועל מה שעדיין לא מחובר. איך: הנתונים נמשכים מ־Pages Functions, מ־Cloudflare GraphQL, מדוח build סטטי ומיומן החיפושים בלי תוצאות."
               mechanismTitle="מאחורי הקלעים של בדיקות הבריאות"
-              mechanismSummary="/api/dashboard/system-health בודק חיבור worker וסודות סביבה, ו-/admin-build-report.json נבנה אוטומטית לפני ואחרי build כדי לשמור דוח קריאות וקישורים פנימיים."
+              mechanismSummary="/api/dashboard/system-health בודק חיבור worker וסודות סביבה, /api/site/pulse מושך ספירת תנועה חיה מ־Cloudflare, /api/admin/psi מריץ בדיקת מובייל לפי דרישה, ו־/api/log-search-gap מחזיר חיפושים שלא מצאו התאמה."
               mechanismDetails={[
-                "ה-runtime health בודק Web3Forms, hCaptcha, Cloudflare Analytics וחיבור ה-worker.",
-                "דוח ה-build שומר קריאות ממוצעת של כל המאמרים, מספר עמודי HTML, וסטטוס בדיקת קישורים פנימיים."
+                "ה־runtime health בודק Worker, Web3Forms, hCaptcha, Cloudflare ויכולת משיכה של מוני תנועה.",
+                "דוח ה־build שומר קריאות ממוצעת של כל המאמרים, מספר עמודי HTML וסטטוס בדיקת קישורים פנימיים.",
+                "בדיקת המובייל רצה רק בלחיצה, כדי לא לייצר קריאות מיותרות."
               ]}
             >
-              <SystemHealthWidget client:load endpoint="/api/dashboard/system-health" buildReportHref="/admin-build-report.json" />
+              <SystemHealthWidget
+                client:load
+                endpoint="/api/dashboard/system-health"
+                buildReportHref="/admin-build-report.json"
+                pulseEndpoint="/api/site/pulse"
+                psiEndpoint="/api/admin/psi?strategy=mobile"
+                gapsEndpoint="/api/log-search-gap"
+              />
             </DashboardCard>
           </section>
 
@@ -261,8 +271,9 @@ const managerQuickLinks = [
           </section>
         </div>
       </div>
-    </main>
-  </div>
+      </main>
+    </div>
+  </RoleGate>
 
   <script>
     import "../../scripts/admin-dashboard.js";

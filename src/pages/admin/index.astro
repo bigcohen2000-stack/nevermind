@@ -1,147 +1,328 @@
 ---
 import { getCollection } from "astro:content";
-import Layout from "../../layouts/Layout.astro";
+import AppConfigControlPanel from "../../components/admin/AppConfigControlPanel.astro";
+import ArticlesTable from "../../components/admin/ArticlesTable.astro";
+import ClarityPathsControlPanel from "../../components/admin/ClarityPathsControlPanel.astro";
+import HomeCanvasControlPanel from "../../components/admin/HomeCanvasControlPanel.astro";
 import RoleGate from "../../components/admin/RoleGate.astro";
+import ServicesControlPanel from "../../components/admin/ServicesControlPanel.astro";
+import SiteSettingsControlPanel from "../../components/admin/SiteSettingsControlPanel.astro";
+import appConfig from "../../config/appConfig.json";
+import Layout from "../../layouts/Layout.astro";
 
-const pageTitle = "לוח ניהול NeverMind";
-const pageDescription = "מרכז הניהול של NeverMind - מאמרים, שירותים והגדרות";
+const pageTitle = "מרכז ניהול NeverMind";
+const pageDescription = "מרכז עבודה אחד לניהול מאמרים, שירותים, דף הבית והגדרות האתר.";
 
-// קבל כל המאמרים
 const allArticles = await getCollection("articles");
-const stats = {
-  total: allArticles.length,
-  published: allArticles.filter((a) => !a.data.draft).length,
-  draft: allArticles.filter((a) => a.data.draft).length,
-};
-
-const articles = allArticles
-  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
-  .slice(0, 10);
-
 const formatDate = new Intl.DateTimeFormat("he-IL", {
   year: "numeric",
   month: "2-digit",
   day: "2-digit",
 });
 
-const quickStats = [
-  { icon: "📝", label: "כל המאמרים", value: stats.total },
-  { icon: "✅", label: "פורסמו", value: stats.published },
-  { icon: "⏳", label: "טיוטות", value: stats.draft },
+const workflowMeta = (status: string | undefined, isDraft: boolean) => {
+  const normalized = typeof status === "string" ? status : "";
+  if (normalized === "published" || !isDraft) {
+    return {
+      label: "פורסם",
+      tone: "border-[rgba(5,150,105,0.18)] bg-[rgba(5,150,105,0.08)] text-[rgb(5,120,90)]",
+    };
+  }
+  if (normalized === "ready") {
+    return {
+      label: "מוכן",
+      tone: "border-[rgba(212,43,43,0.18)] bg-[rgba(212,43,43,0.08)] text-[var(--nm-accent)]",
+    };
+  }
+  if (normalized === "review") {
+    return {
+      label: "בבדיקה",
+      tone: "border-[rgba(15,23,42,0.14)] bg-[rgba(15,23,42,0.06)] text-[rgb(15,23,42)]",
+    };
+  }
+  return {
+    label: "כתיבה",
+    tone: "border-[rgba(217,119,6,0.18)] bg-[rgba(217,119,6,0.08)] text-[rgb(146,64,14)]",
+  };
+};
+
+const difficultyMeta = (value: string | undefined) => {
+  if (value === "deep") {
+    return {
+      label: "מועדון",
+      tone: "border-[rgba(212,43,43,0.18)] bg-[rgba(212,43,43,0.08)] text-[var(--nm-accent)]",
+    };
+  }
+  if (value === "advanced" || value === "intermediate") {
+    return {
+      label: "עמוק",
+      tone: "border-[rgba(15,23,42,0.14)] bg-[rgba(15,23,42,0.06)] text-[rgb(15,23,42)]",
+    };
+  }
+  return {
+    label: "פשוט",
+    tone: "border-[rgba(5,150,105,0.18)] bg-[rgba(5,150,105,0.08)] text-[rgb(5,120,90)]",
+  };
+};
+
+const statusMeta = (isDraft: boolean) =>
+  isDraft
+    ? {
+        label: "טיוטה",
+        tone: "border-[rgba(217,119,6,0.18)] bg-[rgba(217,119,6,0.08)] text-[rgb(146,64,14)]",
+      }
+    : {
+        label: "באוויר",
+        tone: "border-[rgba(5,150,105,0.18)] bg-[rgba(5,150,105,0.08)] text-[rgb(5,120,90)]",
+      };
+
+const premiumMeta = (isPremium: boolean) =>
+  isPremium
+    ? {
+        label: "מועדון",
+        tone: "border-[rgba(212,43,43,0.18)] bg-[rgba(212,43,43,0.08)] text-[var(--nm-accent)]",
+      }
+    : {
+        label: "פתוח",
+        tone: "border-[rgba(15,23,42,0.14)] bg-[rgba(15,23,42,0.06)] text-[rgb(15,23,42)]",
+      };
+
+const articles = allArticles
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .map((article) => {
+    const workflow = workflowMeta(article.data.workflowStatus, article.data.draft);
+    const difficulty = difficultyMeta(article.data.difficultyLevel ?? article.data.difficulty);
+    const status = statusMeta(article.data.draft);
+    const premium = premiumMeta(Boolean(article.data.isPremium));
+    const publicSlug = article.data.slug ?? article.slug;
+    const fileName = `${article.slug}.mdx`;
+
+    return {
+      title: article.data.title,
+      workflowStatus: workflow.label,
+      workflowTone: workflow.tone,
+      difficulty: difficulty.label,
+      difficultyTone: difficulty.tone,
+      status: status.label,
+      statusTone: status.tone,
+      premium: premium.label,
+      premiumTone: premium.tone,
+      dateLabel: formatDate.format(article.data.updatedDate ?? article.data.pubDate),
+      editHref: `https://github.com/${appConfig.github.owner}/${appConfig.github.repo}/edit/${appConfig.github.branch}/${appConfig.github.articlesPath}/${fileName}`,
+      viewHref: `/articles/${publicSlug}/`,
+      slug: publicSlug,
+    };
+  });
+
+const stats = {
+  total: allArticles.length,
+  published: allArticles.filter((article) => !article.data.draft).length,
+  draft: allArticles.filter((article) => article.data.draft).length,
+  premium: allArticles.filter((article) => article.data.isPremium).length,
+};
+
+const sectionLinks = [
+  { href: "#content", label: "תוכן" },
+  { href: "#services", label: "שירותים" },
+  { href: "#homepage", label: "דף הבית" },
+  { href: "#journeys", label: "מסלולים" },
+  { href: "#site-settings", label: "הגדרות אתר" },
+  { href: "#app-config", label: "קונפיג" },
+  { href: "#ops", label: "תפעול" },
 ];
 
-const recentArticles = articles.map((a) => ({
-  title: a.data.title,
-  status: a.data.draft ? "טיוטה" : "פורסם",
-  date: formatDate.format(a.data.pubDate),
-  slug: a.slug,
-  href: `/articles/${a.slug}/`,
-}));
+const quickActions = [
+  {
+    title: "אשף מאמרים",
+    description: "מילוי שדות, יצירת פרומפט, בדיקת מבנה והכנה ל־MDX מלא לפי חוקי NeverMind.",
+    href: "/admin/generator/",
+    cta: "לפתוח את האשף",
+  },
+  {
+    title: "מחולל פרדוקסים",
+    description: "יצירת משפטים חדים לסטוריז, hooks, פתיחים ומחשבות שיתוף מתוך רעיון גולמי.",
+    href: "/admin/paradoxes/",
+    cta: "לפתוח את המחולל",
+  },
+  {
+    title: "ניהול חברים",
+    description: "חיפוש חבר, איפוס סיסמה, פתיחת גישה, בדיקת תצוגת חבר ותצוגת אורח.",
+    href: "/dashboard/#access",
+    cta: "לעבור לתפעול חברים",
+  },
+  {
+    title: "בריאות מערכת",
+    description: "בדיקת Cloudflare, Worker, טפסים, build אחרון וקישורים פנימיים לפני פריסה.",
+    href: "/dashboard/#system-health",
+    cta: "לבדוק מערכת",
+  },
+];
+
+const docsLinks = [
+  {
+    title: "צ'ק ליסט פריסה",
+    href: `https://github.com/${appConfig.github.owner}/${appConfig.github.repo}/blob/${appConfig.github.branch}/docs/DEPLOYMENT_CHECKLIST.md`,
+    helper: "מה חייב להיות מוגדר בפרודקשן",
+  },
+  {
+    title: "Zero Trust",
+    href: `https://github.com/${appConfig.github.owner}/${appConfig.github.repo}/blob/${appConfig.github.branch}/docs/ZERO_TRUST_SETUP.md`,
+    helper: "הקשחת גישה לאזורי ניהול",
+  },
+  {
+    title: "בדיקות אחרי deploy",
+    href: `https://github.com/${appConfig.github.owner}/${appConfig.github.repo}/blob/${appConfig.github.branch}/docs/POST_DEPLOY_SMOKE.md`,
+    helper: "סבב smoke מסודר",
+  },
+];
 ---
 
-<Layout
-  title={pageTitle}
-  description={pageDescription}
-  noIndex={true}
->
-  <RoleGate requiredRole="viewer">
-    <div class="mx-auto max-w-6xl space-y-8 px-5 py-8 text-right sm:px-8 lg:px-12">
-      <div class="space-y-2">
-        <p class="text-sm font-semibold uppercase tracking-[0.2em] text-[var(--nm-accent)]">לוח בקרה</p>
-        <h1 class="text-[clamp(2rem,1.6rem+1vw,2.8rem)] font-semibold">ברוכים הבאים לניהול</h1>
-        <p class="max-w-2xl text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">
-          כאן אתה יכול לנהל את כל התכנים, השירותים וההגדרות של NeverMind.
-        </p>
-      </div>
-
-      <div class="grid gap-4 sm:grid-cols-3">
-        {quickStats.map((stat) => (
-          <div class="rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 p-6 shadow-sm backdrop-blur-md">
-            <div class="text-4xl">{stat.icon}</div>
-            <p class="mt-3 text-sm font-semibold text-[color-mix(in_srgb,var(--nm-fg)_65%,var(--nm-bg))]">{stat.label}</p>
-            <p class="mt-1 text-2xl font-bold text-[var(--nm-fg)]">{stat.value}</p>
+<Layout title={pageTitle} description={pageDescription} noIndex={true}>
+  <RoleGate requiredRole="admin">
+    <div class="mx-auto max-w-7xl space-y-8 px-4 pb-16 text-right sm:px-6 lg:px-8">
+      <header class="space-y-4 rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 p-6 shadow-[0_22px_60px_rgba(26,26,26,0.06)]">
+        <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--nm-accent)]">מנהל בלבד</p>
+        <div class="grid gap-6 xl:grid-cols-[minmax(0,1.25fr)_minmax(0,0.95fr)] xl:items-end">
+          <div class="space-y-3">
+            <h1 class="text-[clamp(2rem,1.5rem+1.5vw,3rem)] font-semibold text-[var(--nm-fg)]">שער הכניסה לניהול הראשי</h1>
+            <p class="max-w-3xl text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
+              העמוד הזה מיועד רק לך. מכאן עוברים למחולל התוכן, לניהול החברים, לבדיקת תצוגת חבר ולבדיקת מצב הפריסה. החבר הרגיל לא רואה את המסך הזה.
+            </p>
+            <p class="max-w-3xl text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_60%,var(--nm-bg))]">
+              מומלץ לנעול את <code>/admin/*</code>, את <code>/dashboard/*</code>, את <code>/api/dashboard/*</code> ואת <code>/api/club-admin/*</code> ב־Cloudflare Access למייל <code>bigcohen2000@gmail.com</code> בלבד.
+            </p>
+            <nav class="flex flex-wrap justify-end gap-2" aria-label="ניווט מהיר בתוך מרכז הניהול">
+              {sectionLinks.map((link) => (
+                <a
+                  href={link.href}
+                  class="inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] px-4 py-2 text-sm font-semibold text-[var(--nm-fg)] transition hover:border-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)] hover:text-[var(--nm-accent)]"
+                >
+                  {link.label}
+                </a>
+              ))}
+            </nav>
           </div>
-        ))}
-      </div>
 
-      <div class="grid gap-4 sm:grid-cols-2">
-        <RoleGate requiredRole="editor">
-          <a href="/admin/articles/" class="group rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/92 p-6 shadow-sm transition hover:border-[var(--nm-accent)] hover:shadow-md">
-            <div class="text-3xl">📝</div>
-            <h3 class="mt-3 font-semibold text-[var(--nm-fg)]">ניהול מאמרים</h3>
-            <p class="mt-2 text-sm text-[color-mix(in_srgb,var(--nm-fg)_65%,var(--nm-bg))]">
-              יצירה, עריכה ופרסום של מאמרים
-            </p>
-          </a>
-        </RoleGate>
-
-        <RoleGate requiredRole="editor">
-          <a href="/admin/services/" class="group rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/92 p-6 shadow-sm transition hover:border-[var(--nm-accent)] hover:shadow-md">
-            <div class="text-3xl">🛠️</div>
-            <h3 class="mt-3 font-semibold text-[var(--nm-fg)]">שירותים</h3>
-            <p class="mt-2 text-sm text-[color-mix(in_srgb,var(--nm-fg)_65%,var(--nm-bg))]">
-              ניהול שירותים וחבילות
-            </p>
-          </a>
-        </RoleGate>
-
-        <RoleGate requiredRole="admin">
-          <a href="/admin/settings/" class="group rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/92 p-6 shadow-sm transition hover:border-[var(--nm-accent)] hover:shadow-md">
-            <div class="text-3xl">⚙️</div>
-            <h3 class="mt-3 font-semibold text-[var(--nm-fg)]">הגדרות</h3>
-            <p class="mt-2 text-sm text-[color-mix(in_srgb,var(--nm-fg)_65%,var(--nm-bg))]">
-              הגדרות כלל-אתר והרשאות
-            </p>
-          </a>
-        </RoleGate>
-
-        <RoleGate requiredRole="admin">
-          <a href="/admin/users/" class="group rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/92 p-6 shadow-sm transition hover:border-[var(--nm-accent)] hover:shadow-md">
-            <div class="text-3xl">👥</div>
-            <h3 class="mt-3 font-semibold text-[var(--nm-fg)]">משתמשים</h3>
-            <p class="mt-2 text-sm text-[color-mix(in_srgb,var(--nm-fg)_65%,var(--nm-bg))]">
-              ניהול משתמשים והרשאות
-            </p>
-          </a>
-        </RoleGate>
-      </div>
-
-      <RoleGate requiredRole="editor">
-        <div class="space-y-4">
-          <h2 class="font-semibold text-[var(--nm-fg)]">מאמרים אחרונים</h2>
-          <div class="overflow-x-auto rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 shadow-sm">
-            <table class="w-full text-right text-sm">
-              <thead class="border-b border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)]">
-                <tr>
-                  <th class="px-4 py-3 font-semibold">כותרת</th>
-                  <th class="px-4 py-3 font-semibold">סטטוס</th>
-                  <th class="px-4 py-3 font-semibold">תאריך</th>
-                </tr>
-              </thead>
-              <tbody>
-                {recentArticles.map((article) => (
-                  <tr class="border-b border-[color-mix(in_srgb,var(--nm-fg)_6%,transparent)] transition hover:bg-[var(--nm-surface-muted)]">
-                    <td class="px-4 py-3">
-                      <a href={article.href} class="font-semibold text-[var(--nm-accent)] underline underline-offset-2">
-                        {article.title}
-                      </a>
-                    </td>
-                    <td class="px-4 py-3">
-                      <span class={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${article.status === "פורסם" ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"}`}>
-                        {article.status}
-                      </span>
-                    </td>
-                    <td class="px-4 py-3 text-[color-mix(in_srgb,var(--nm-fg)_65%,var(--nm-bg))]">{article.date}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div class="grid gap-3 sm:grid-cols-2">
+            <div class="rounded-[1.5rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-4">
+              <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">כל המאמרים</p>
+              <p class="mt-3 text-3xl font-semibold text-[var(--nm-fg)]">{stats.total}</p>
+            </div>
+            <div class="rounded-[1.5rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-4">
+              <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">פורסמו</p>
+              <p class="mt-3 text-3xl font-semibold text-[var(--nm-fg)]">{stats.published}</p>
+            </div>
+            <div class="rounded-[1.5rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-4">
+              <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">טיוטות</p>
+              <p class="mt-3 text-3xl font-semibold text-[var(--nm-fg)]">{stats.draft}</p>
+            </div>
+            <div class="rounded-[1.5rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-4">
+              <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">מאמרי מועדון</p>
+              <p class="mt-3 text-3xl font-semibold text-[var(--nm-fg)]">{stats.premium}</p>
+            </div>
           </div>
         </div>
+      </header>
+
+      <section id="content" class="space-y-6">
+        <div class="grid gap-4 xl:grid-cols-4">
+          {quickActions.map((action) => (
+            <article class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 p-5 shadow-[0_18px_50px_rgba(26,26,26,0.05)]">
+              <h2 class="text-lg font-semibold text-[var(--nm-fg)]">{action.title}</h2>
+              <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_66%,var(--nm-bg))]">{action.description}</p>
+              <a
+                href={action.href}
+                class="mt-4 inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] px-4 py-2 text-sm font-semibold text-[var(--nm-fg)] transition hover:border-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)] hover:text-[var(--nm-accent)]"
+              >
+                {action.cta}
+              </a>
+            </article>
+          ))}
+        </div>
+
+        <RoleGate requiredRole="editor">
+          <ArticlesTable articles={articles} />
+        </RoleGate>
+      </section>
+
+      <RoleGate requiredRole="editor">
+        <section id="services">
+          <ServicesControlPanel />
+        </section>
       </RoleGate>
 
-      <div class="flex justify-end gap-3">
-        <button type="button" id="admin-logout-btn" class="rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-6 py-3 font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]">
+      <div class="grid gap-6 xl:grid-cols-2">
+        <RoleGate requiredRole="editor">
+          <section id="homepage">
+            <HomeCanvasControlPanel />
+          </section>
+        </RoleGate>
+
+        <RoleGate requiredRole="editor">
+          <section id="journeys">
+            <ClarityPathsControlPanel />
+          </section>
+        </RoleGate>
+      </div>
+
+      <div class="grid gap-6 xl:grid-cols-2">
+        <RoleGate requiredRole="admin">
+          <section id="site-settings">
+            <SiteSettingsControlPanel />
+          </section>
+        </RoleGate>
+
+        <RoleGate requiredRole="admin">
+          <section id="app-config">
+            <AppConfigControlPanel />
+          </section>
+        </RoleGate>
+      </div>
+
+      <section id="ops" class="grid gap-6 xl:grid-cols-[minmax(0,1fr)_22rem]">
+        <article class="rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 p-6 shadow-[0_18px_50px_rgba(26,26,26,0.05)]">
+          <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--nm-accent)]">תפעול מתקדם</p>
+          <h2 class="mt-2 text-2xl font-semibold text-[var(--nm-fg)]">מה נשאר מחוץ למסך הזה</h2>
+          <p class="mt-3 max-w-3xl text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_66%,var(--nm-bg))]">
+            תפעול חברים חי, פיד אבטחה, חיבורי Worker ובריאות מערכת נשארים ב־`/dashboard/` כי הם נשענים על מידע חי מהשרת. מרכז הניהול כאן מטפל בקבצי המקור ובזרימת התוכן.
+          </p>
+          <div class="mt-5 flex flex-wrap justify-end gap-3">
+            <a href="/dashboard/" class="inline-flex min-h-[44px] items-center justify-center rounded-full bg-[var(--nm-accent)] px-5 py-2.5 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]">
+              לפתוח דשבורד תפעולי
+            </a>
+            <a href="/dashboard/#access" class="inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] px-5 py-2.5 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]">
+              לעבור לניהול חברים
+            </a>
+            <a href="/dashboard/#system-health" class="inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] px-5 py-2.5 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]">
+              לעבור לבריאות מערכת
+            </a>
+          </div>
+        </article>
+
+        <aside class="space-y-4 rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 p-5 shadow-[0_18px_50px_rgba(26,26,26,0.05)]">
+          <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--nm-accent)]">מסמכי עבודה</p>
+          <div class="space-y-3">
+            {docsLinks.map((doc) => (
+              <a
+                href={doc.href}
+                target="_blank"
+                rel="noreferrer"
+                class="block rounded-[1.25rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3 transition hover:border-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)]"
+              >
+                <p class="font-semibold text-[var(--nm-fg)]">{doc.title}</p>
+                <p class="mt-1 text-xs leading-6 text-[color-mix(in_srgb,var(--nm-fg)_60%,var(--nm-bg))]">{doc.helper}</p>
+              </a>
+            ))}
+          </div>
+        </aside>
+      </section>
+
+      <div class="flex justify-end">
+        <button
+          type="button"
+          id="admin-logout-btn"
+          class="inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-6 py-3 font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]"
+        >
           התנתקות
         </button>
       </div>
@@ -152,7 +333,9 @@ const recentArticles = articles.map((a) => ({
 
       document.addEventListener("astro:page-load", () => {
         const logoutBtn = document.getElementById("admin-logout-btn");
-        logoutBtn?.addEventListener("click", () => {
+        if (!(logoutBtn instanceof HTMLButtonElement)) return;
+
+        logoutBtn.addEventListener("click", () => {
           AdminAuth.logout();
           window.location.href = "/admin/login/";
         });

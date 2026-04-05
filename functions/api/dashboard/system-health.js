@@ -42,10 +42,10 @@ export async function onRequestGet(context) {
     ),
     item(
       "cloudflare_analytics",
-      "מדדי Cloudflare",
+      "מונה חי של Cloudflare",
       hasValue(env.CF_API_TOKEN) && hasValue(env.CF_ZONE_ID),
       hasValue(env.CF_API_TOKEN) && hasValue(env.CF_ZONE_ID)
-        ? "אפשר למשוך Analytics של האתר"
+        ? "אפשר למשוך ספירת תנועה חיה מהאתר"
         : "חסרים CF_API_TOKEN או CF_ZONE_ID"
     ),
   ];

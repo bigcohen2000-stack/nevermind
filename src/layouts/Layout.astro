@@ -1,11 +1,10 @@
----
+﻿---
 import "@fontsource-variable/assistant/wght.css";
 import "@fontsource/heebo/index.css";
 import "../styles/global.css";
 import { ClientRouter } from "astro:transitions";
 import A11yWidget from "../components/A11yWidget.astro";
 import Analytics from "../components/Analytics.astro";
-import CookieBanner from "../components/CookieBanner.astro";
 import IntegrityReporter from "../components/IntegrityReporter.astro";
 import PwaInstallPrompt from "../components/PwaInstallPrompt.astro";
 import SearchModal from "../components/SearchModal";
@@ -45,7 +44,7 @@ const stagingEnabled = Boolean(stagingCfg?.enabled);
 const stagingMessage =
   typeof stagingCfg?.message === "string" && stagingCfg.message.trim().length > 0
     ? stagingCfg.message.trim()
-    : "האתר בהרצה";
+    : "עדכון אתר";
 const navTopClass = stagingEnabled
   ? "top-[calc(var(--nm-staging-banner-height)+var(--nm-nav-top,1.5rem))]"
   : "top-[var(--nm-nav-top,1.5rem)]";
@@ -73,19 +72,23 @@ const waTags = Array.isArray(frontmatter?.tags) ? frontmatter.tags : [];
 const waArticleTitle = typeof title === "string" ? title : "";
 const waSlug = typeof waArticleSlug === "string" ? waArticleSlug.trim() : "";
 
-const siteTitle = appConfig.site.name;
+const siteBrandEn = appConfig.site.name;
+const siteWordmark =
+  typeof brandCfg.wordmarkHe === "string" && brandCfg.wordmarkHe.trim().length > 0
+    ? brandCfg.wordmarkHe.trim()
+    : "השם לא משנה";
+const siteTitle = `${siteWordmark} | ${siteBrandEn}`;
 const trimMetaDescription = (value: string) => {
   const normalized = String(value || "").trim().replace(/\s+/g, " ");
   if (normalized.length <= 155) return normalized;
   return `${normalized.slice(0, 152).trimEnd()}...`;
 };
-const gtmContainerId = "GTM-TL2FM3SD";
 /** מטא ברירת מחדל: מילות מפתח SEO + בלי משפטי "ש…" */
 const siteDescription = trimMetaDescription(
-  "מרכז חקירה: שקט נפשי, חשיבה צלולה, אמת אובייקטיבית, הבנה מושלמת של עובדה מול סיפור. איך להפסיק לסבול מתוך בלבול. NeverMind."
+  "השם לא משנה הוא הבית של NeverMind: שקט נפשי, בהירות, חשיבה צלולה והפרדה בין עובדה, פירוש ותגובה."
 );
 const seoKeywords =
-  "שקט נפשי, הבנה מושלמת, אמת אובייקטיבית, חשיבה צלולה, איך להפסיק לסבול, NeverMind";
+  "השם לא משנה, NeverMind, שקט נפשי, חשיבה צלולה, עובדה מול פירוש, הבנה לפני תגובה, בהירות";
 const siteUrl = appConfig.site.url;
 const siteUrlSlash = siteUrl.endsWith("/") ? siteUrl : `${siteUrl}/`;
 const logoPath =
@@ -106,7 +109,13 @@ const emailUser = emailUserRaw.trim();
 const emailDomain = emailDomainRaw.trim();
 const normalizeTitle = (value: unknown) => String(value ?? "").trim();
 const rawPageTitle = normalizeTitle(title);
-const pageTitle = rawPageTitle ? `${rawPageTitle} | ${siteTitle}` : siteTitle;
+const pageTitle = !rawPageTitle
+  ? siteTitle
+  : rawPageTitle.includes(siteWordmark)
+    ? rawPageTitle
+    : rawPageTitle.toLowerCase().includes(siteBrandEn.toLowerCase())
+      ? `${rawPageTitle} | ${siteWordmark}`
+      : `${rawPageTitle} | ${siteTitle}`;
 const pageDescription = trimMetaDescription(description ?? frontmatter?.description ?? siteDescription);
 const pageUrl = Astro.url ? new URL(Astro.url.pathname, siteUrl).toString() : siteUrl;
 const canonicalURL = Astro.site ? new URL(Astro.url.pathname, Astro.site).toString() : pageUrl;
@@ -134,10 +143,7 @@ const ogImageAlt =
 const clientLogUrl = (import.meta.env.PUBLIC_CLIENT_LOG_URL ?? "").trim();
 const clubWebhookUrl = String(import.meta.env.PUBLIC_NM_CLUB_WEBHOOK_URL ?? "").trim();
 const logoAbsolute = new URL(logoPath.replace(/^\//, ""), siteUrlSlash).toString();
-const wordmarkHe =
-  typeof brandCfg.wordmarkHe === "string" && brandCfg.wordmarkHe.trim().length > 0
-    ? brandCfg.wordmarkHe.trim()
-    : "השם לא משנה";
+const wordmarkHe = siteWordmark;
 
 const organizationSchema = {
   "@context": "https://schema.org",
@@ -495,18 +501,7 @@ const socialLinks = [
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <script is:inline define:vars={{ gtmContainerId }}>
-      (function (w, d, s, l, i) {
-        w[l] = w[l] || [];
-        w[l].push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
-        var f = d.getElementsByTagName(s)[0];
-        var j = d.createElement(s);
-        var dl = l != "dataLayer" ? "&l=" + l : "";
-        j.async = true;
-        j.src = "https://www.googletagmanager.com/gtm.js?id=" + i + dl;
-        f.parentNode.insertBefore(j, f);
-      })(window, document, "script", "dataLayer", gtmContainerId);
-    </script>
+    <script is:inline defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token":"7f4a6c326cc14178bba8457078baf381"}'></script>
     <title>{pageTitle}</title>
     <meta name="description" content={pageDescription} />
     <meta name="keywords" content={seoKeywords} />
@@ -566,14 +561,6 @@ const socialLinks = [
     data-staging={stagingEnabled ? "true" : "false"}
     class={`min-h-screen overflow-x-hidden bg-[var(--nm-bg)] text-[var(--nm-fg)] antialiased selection:bg-[color-mix(in_srgb,var(--nm-accent)_18%,var(--nm-bg))] selection:text-[var(--nm-fg)]`}
   >
-    <noscript>
-      <iframe
-        src={`https://www.googletagmanager.com/ns.html?id=${gtmContainerId}`}
-        height="0"
-        width="0"
-        style="display:none;visibility:hidden"
-      ></iframe>
-    </noscript>
     <div id="nm-route-progress" aria-hidden="true"></div>
     <a
       href={skipToContentHref}
@@ -927,7 +914,6 @@ const socialLinks = [
     />
     <SearchModal client:idle />
     <A11yWidget />
-    <CookieBanner />
     <IntegrityReporter whatsAppNumber={appConfig.contact.whatsAppNumber} />
     <PwaInstallPrompt />
     <Analytics />
@@ -2020,6 +2006,7 @@ const socialLinks = [
     </script>
   </body>
 </html>
+
 
 
 

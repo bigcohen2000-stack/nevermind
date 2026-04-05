@@ -1,7 +1,7 @@
 /**
  * Admin Authentication & Authorization
- * הערה: בשרת אמיתי, צריך לתקשר עם backend מאובטח
- * כאן - demo עם localStorage (אל מדות לא להשתמש בעיתוד לרגיש truly)
+ * בסביבת פיתוח זהו מנגנון מקומי בלבד.
+ * בייצור ההגנה האמיתית צריכה להגיע מ־Cloudflare Access או backend מאובטח.
  */
 
 export type AdminRole = "viewer" | "editor" | "admin";
@@ -14,8 +14,7 @@ export interface AdminUser {
 }
 
 /**
- * Demo credentials - במערכת אמיתית יהיה backend מאובטח
- * במצב פיתוח זה סתם דוגמה
+ * חשבונות פיתוח מקומיים בלבד.
  */
 const DEMO_USERS: Record<string, { password: string; role: AdminRole }> = {
   viewer: { password: "view123", role: "viewer" },

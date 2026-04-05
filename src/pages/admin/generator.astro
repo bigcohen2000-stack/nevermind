@@ -1,6 +1,7 @@
 ---
 import { getCollection } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
+import RoleGate from "../../components/admin/RoleGate.astro";
 import { FloatingInput } from "../../components/ui/FloatingInput";
 import appConfig from "../../config/appConfig.json";
 import { ARTICLE_TAG_WHITELIST } from "../../data/article-tags";
@@ -22,7 +23,8 @@ const tagWhitelist = [...ARTICLE_TAG_WHITELIST];
 ---
 
 <Layout title={pageTitle} description={pageDescription} noIndex={true}>
-  <style is:global>
+  <RoleGate requiredRole="editor">
+    <style is:global>
     #nm-article-wizard.nm-wizard--focus #wiz-chrome {
       display: none;
     }
@@ -47,11 +49,11 @@ const tagWhitelist = [...ARTICLE_TAG_WHITELIST];
       border-color: #0f172a;
       background: var(--nm-tint);
     }
-  </style>
-  <script is:inline define:vars={{ existingSlugs, latestArticlesForWizard, tagWhitelist }}>
-    window.__NM_WIZARD_BOOT = { existingSlugs, latestArticlesForWizard, tagWhitelist };
-  </script>
-  <section class="mx-auto max-w-4xl space-y-8 px-4 pb-16 text-right text-[var(--nm-fg)]">
+    </style>
+    <script is:inline define:vars={{ existingSlugs, latestArticlesForWizard, tagWhitelist }}>
+      window.__NM_WIZARD_BOOT = { existingSlugs, latestArticlesForWizard, tagWhitelist };
+    </script>
+    <section class="mx-auto max-w-4xl space-y-8 px-4 pb-16 text-right text-[var(--nm-fg)]">
     <header class="space-y-3">
       <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--nm-accent)]">יצירת תוכן</p>
       <h1 class="text-[clamp(2rem,1.5rem+1.8vw,3.2rem)] font-semibold leading-[1.05]">אשף מאמרים</h1>
@@ -115,9 +117,9 @@ const tagWhitelist = [...ARTICLE_TAG_WHITELIST];
         <label class="block space-y-2">
           <span class="text-sm font-semibold">למי מיועד המאמר?</span>
           <select id="wiz-audience" class="w-full rounded-[1rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-transparent px-4 py-3 outline-none focus:border-[color-mix(in_srgb,var(--nm-accent)_35%,transparent)]">
-            <option value="Beginners">מתחילים</option>
-            <option value="Advanced">קוראים מנוסים</option>
-            <option value="Internal Community">קהילה פנימית</option>
+            <option value="מתחילים">מתחילים</option>
+            <option value="קוראים מנוסים">קוראים מנוסים</option>
+            <option value="קהילה פנימית">קהילה פנימית</option>
           </select>
         </label>
         <FloatingInput
@@ -212,9 +214,9 @@ const tagWhitelist = [...ARTICLE_TAG_WHITELIST];
         <label class="block space-y-2">
           <span class="text-sm font-semibold">תדר השיחה</span>
           <select id="wiz-tone" class="w-full rounded-[1rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-transparent px-4 py-3 outline-none focus:border-[color-mix(in_srgb,var(--nm-accent)_35%,transparent)]">
-            <option value="Provocative">חד</option>
-            <option value="Analytical">אנליטי</option>
-            <option value="Grounded">מחובר לקרקע</option>
+            <option value="חד">חד</option>
+            <option value="אנליטי">אנליטי</option>
+            <option value="מחובר לקרקע">מחובר לקרקע</option>
           </select>
         </label>
         <FloatingInput
@@ -229,9 +231,9 @@ const tagWhitelist = [...ARTICLE_TAG_WHITELIST];
         <label class="block space-y-2">
           <span class="text-sm font-semibold">אורך משוער</span>
           <select id="wiz-length" class="w-full rounded-[1rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-transparent px-4 py-3 outline-none focus:border-[color-mix(in_srgb,var(--nm-accent)_35%,transparent)]">
-            <option value="Short Post">פוסט קצר</option>
-            <option value="Deep Dive">צלילה עמוקה</option>
-            <option value="Full Research">מחקר מלא</option>
+            <option value="קצר">פוסט קצר</option>
+            <option value="עמוק">צלילה עמוקה</option>
+            <option value="מחקר מלא">מחקר מלא</option>
           </select>
         </label>
         <div class="space-y-2">
@@ -375,11 +377,10 @@ const tagWhitelist = [...ARTICLE_TAG_WHITELIST];
       </div>
       <div id="wiz-mobile-preview-body" class="mx-auto max-h-[70vh] w-[min(100%,360px)] overflow-y-auto rounded-xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white p-3 text-sm leading-relaxed text-[var(--nm-fg)] [overflow-wrap:anywhere]"></div>
     </dialog>
-  </section>
+    </section>
 
-  <script>
-    import "../../scripts/admin-generator.js";
-  </script>
+    <script>
+      import "../../scripts/admin-generator.js";
+    </script>
+  </RoleGate>
 </Layout>
-
-
