@@ -66,7 +66,7 @@ type SearchGapPayload = {
   rows: SearchGapRow[];
 };
 
-type PageSpeedPayload = {
+type MobileAuditPayload = {
   ok: boolean;
   error?: string;
   url?: string;
@@ -124,7 +124,7 @@ export default function SystemHealthWidget({
   const [pulsePayload, setPulsePayload] = useState<PulsePayload | null>(null);
   const [gapPayload, setGapPayload] = useState<SearchGapPayload | null>(null);
   const [error, setError] = useState("");
-  const [psiPayload, setPsiPayload] = useState<PageSpeedPayload | null>(null);
+  const [psiPayload, setPsiPayload] = useState<MobileAuditPayload | null>(null);
   const [psiLoading, setPsiLoading] = useState(false);
   const [psiError, setPsiError] = useState("");
 
@@ -176,7 +176,7 @@ export default function SystemHealthWidget({
     setPsiError("");
     try {
       const response = await fetch(psiEndpoint, { headers: { accept: "application/json" }, cache: "no-store" });
-      const data = (await response.json()) as PageSpeedPayload;
+      const data = (await response.json()) as MobileAuditPayload;
       if (!response.ok || !data?.ok) {
         throw new Error(data?.error || "psi");
       }
@@ -291,7 +291,7 @@ export default function SystemHealthWidget({
         <section className="space-y-3 rounded-[24px] border border-black/8 bg-white p-4">
           <div className="space-y-1 text-right">
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#D42B2B]">Core Web Vitals</p>
-            <h3 className="text-lg font-semibold text-[#1A1A1A]">PageSpeed מובייל</h3>
+            <h3 className="text-lg font-semibold text-[#1A1A1A]">בדיקת מובייל</h3>
             <p className="text-sm leading-6 text-black/62">דגימה אחת לפי קריאה. זו לא מדידה רציפה, ולכן היא רצה רק בלחיצה.</p>
           </div>
           <button

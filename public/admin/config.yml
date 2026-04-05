@@ -13,6 +13,7 @@ locale: he
 publish_mode: simple
 media_folder: public/uploads
 public_folder: /uploads
+show_preview_links: false
 
 slug:
   encoding: unicode
@@ -21,6 +22,8 @@ slug:
 
 editor:
   preview: false
+  frame: false
+  wysiwyg: true
 
 collections:
   - name: articles
@@ -52,6 +55,7 @@ collections:
       - label: תיאור קצר
         name: description
         widget: text
+        hint: "תוצג בתוצאות חיפוש ובמטא-תיאור. עד 160 תווים."
       - label: תאריך פרסום
         name: pubDate
         widget: datetime
@@ -59,6 +63,7 @@ collections:
         format: "YYYY-MM-DD"
         date_format: "YYYY-MM-DD"
         time_format: false
+        hint: "התאריך שהמאמר פורסם במקור או כרצונך שיופיע בפרסום."
       - label: תאריך עדכון
         name: updatedDate
         widget: datetime
@@ -66,14 +71,17 @@ collections:
         format: "YYYY-MM-DD"
         date_format: "YYYY-MM-DD"
         time_format: false
+        hint: "עדכן אם ערכת את המאמר לאחר הפרסום הראשוני."
       - label: מחבר
         name: author
         widget: string
         default: "השם לא משנה"
+        hint: "שם האדם או הגוף שנכתב על ידו המאמר. השווה ל-שם המהדר אם שונה מהמאמר המקורי."
       - label: תגיות
         name: tags
         widget: select
         multiple: true
+        hint: "בחר 2-5 תגיות המתארות את ההדרים המרכזיים של המאמר. זה עוזר קוראים למצוא מאמרים קשורים."
         options:
           - חופש
           - מכניקת מחשבה
@@ -88,10 +96,11 @@ collections:
           - שאלות גדולות
           - רגשות
           - ניסויי מחשבה
-      - label: רמת עומק (MDX)
+      - label: רמת עומק
         name: difficultyLevel
         widget: select
         required: false
+        hint: "מתחילים = מציגים בסיס, מתקדמים = דורשים בסיס, עומק = תיאוריה מורכבת וטקים"
         options:
           - { label: מתחילים, value: beginner }
           - { label: מתקדמים, value: advanced }
@@ -104,15 +113,18 @@ collections:
         min: 1
         max: 5
         step: 1
-      - label: תובנת ליבה (originalInsight)
+        hint: "1 = הרחבה קטנה בחשיבה, 5 = היפוך מיסודי של הבנה עולם. כיצד המאמר משנה את תפיסת הקורא?"
+      - label: תובנת ליבה
         name: originalInsight
         widget: text
         required: false
-      - label: שאלה לסכמת TruthBlock / SEO (questionForSchema)
+        hint: "מה הרעיון המרכזי שהקורא יישא עמו? המשפט שישנה את דרך חשיבתו. סמן את זה בחיזוק בטקסט."
+      - label: שאלה לחידוד סכמה (SEO)
         name: questionForSchema
         widget: string
         required: false
-      - label: תיאור קונספט לתמונה (imageAlt)
+        hint: "שאלה משמעותית שהקורא יעלה בעקבות הקריאה. תופיע בתוצאות חיפוש AI (Perplexity, ChatGPT Search)."
+      - label: תיאור קונספט לתמונה
         name: imageAlt
         widget: string
         required: false
@@ -129,30 +141,37 @@ collections:
         name: canonicalUrl
         widget: string
         required: false
+        hint: "קישור מוחלט למקום המקורי של המאמר אם פורסם במקום אחר קודם (למשל מדיום). השאר ריק אם המאמר חדש בפלטפורמה."
       - label: מילות מפתח
         name: keywords
         widget: string
         required: false
+        hint: "5 מילות מפתח בעברית המתארות את ההדר המרכזי של המאמר. יפריד בפסיקים."
       - label: קישור לאודיו
         name: audioUrl
         widget: string
         required: false
+        hint: "קישור ישיר לקובץ אודיו (MP3/M4A). השאר ריק אם אין אודיו."
       - label: מזהה יוטיוב
         name: youtubeId
         widget: string
         required: false
+        hint: "המזהה של הסרטון מ-YouTube (החלק אחרי v= בכתובת). למשל: dQw4w9WgXcQ"
       - label: קישור ל-Tally
         name: tallyUrl
         widget: string
         required: false
+        hint: "קישור לטופס Tally לאיסוף משוב. עזוב בריק אם לא רציתך איסוף משוב."
       - label: תוכן פרימיום
         name: isPremium
         widget: boolean
         default: false
+        hint: "אם זה מופעל, הקורא יצטרך הרשמה לראות את המאמר."
       - label: טיוטה
         name: draft
         widget: boolean
         default: true
+        hint: "אם זה מופעל, המאמר לא יופיע בפרסום. בטל כשהמאמר מוכן לפרסום."
       - label: שאלות נפוצות
         name: faq
         widget: list
@@ -176,4 +195,5 @@ collections:
           - image
           - code-block
           - link
+        hint: "כתב בעברית טבעית וברורה. השתמש בנושאי משנה (#), דגשים, וקבלות אומץ לקריאה טובה. הימנע מטקסט טכני או חזר על טקסטים."
 

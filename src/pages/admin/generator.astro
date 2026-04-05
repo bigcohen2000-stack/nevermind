@@ -23,7 +23,7 @@ const tagWhitelist = [...ARTICLE_TAG_WHITELIST];
 ---
 
 <Layout title={pageTitle} description={pageDescription} noIndex={true}>
-  <RoleGate requiredRole="editor">
+  <RoleGate requiredRole="admin">
     <style is:global>
     #nm-article-wizard.nm-wizard--focus #wiz-chrome {
       display: none;

@@ -2,41 +2,39 @@
 import AdminLoginPanel from "../../components/admin/AdminLoginPanel.astro";
 
 const pageTitle = "כניסה לפאנל ניהול NeverMind";
-const pageDescription = "הכנס את הנתונים שלך כדי להגיע לפאנל הניהול";
+const pageDescription = "כניסה פנימית לניהול הראשי של NeverMind.";
 ---
 
 <html lang="he" dir="rtl" class="scroll-smooth">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
-    <meta name="theme-color" content="#0F172A" />
+    <meta name="theme-color" content="#1A1A1A" />
     <meta name="apple-mobile-web-app-capable" content="true" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="NM Admin" />
+    <meta name="apple-mobile-web-app-title" content="NeverMind Admin" />
     
     <title>{pageTitle}</title>
     <meta name="description" content={pageDescription} />
     <meta name="robots" content="noindex, nofollow" />
     
     <link rel="manifest" href="/admin-manifest.json" />
-    
     <link rel="icon" type="image/svg+xml" href="/images/logo.svg" />
     <link rel="apple-touch-icon" href="/images/logo.svg" />
-    
     <style>
       :root {
-        color-scheme: dark;
-        --color-text-primary: #fafaf8;
-        --color-surface-page: #1a1a1a;
-        --color-surface-canvas: color-mix(in srgb, #fafaf8 3%, #1a1a1a);
-        --color-accent: #d42b2b;
-        --color-inverse-bg: #d42b2b;
+        color-scheme: light;
+        --color-text-primary: #1a1a1a;
+        --color-surface-page: #fafaf8;
+        --color-surface-canvas: #fafaf8;
+        --color-accent: #0f172a;
+        --color-inverse-bg: #1a1a1a;
         --color-inverse-fg: #fafaf8;
         
         --nm-fg: var(--color-text-primary);
         --nm-bg: var(--color-surface-page);
         --nm-bg-canvas: var(--color-surface-canvas);
-        --nm-surface-muted: color-mix(in srgb, var(--color-text-primary) 7%, var(--color-surface-page));
+        --nm-surface-muted: color-mix(in srgb, var(--color-text-primary) 4%, var(--color-surface-page));
         --nm-accent: var(--color-accent);
         --nm-inverse: var(--color-inverse-bg);
         --nm-inverse-fg: var(--color-inverse-fg);
@@ -55,11 +53,6 @@ const pageDescription = "הכנס את הנתונים שלך כדי להגיע �
         padding: 0;
         min-height: 100vh;
       }
-
-      [class*="bg-white"] {
-        background-color: color-mix(in srgb, var(--nm-bg-canvas) 94%, transparent);
-        color: var(--nm-fg);
-      }
     </style>
   </head>
   <body dir="rtl">
@@ -69,15 +62,9 @@ const pageDescription = "הכנס את הנתונים שלך כדי להגיע �
       if ("serviceWorker" in navigator) {
         navigator.serviceWorker
           .register("/admin-sw.js", { scope: "/admin/" })
-          .then((registration) => {
-            console.log("Service Worker registered:", registration);
-          })
-          .catch((error) => {
-            console.error("Service Worker registration failed:", error);
-          });
+          .catch(() => {});
       }
 
-      // Install prompt handler
       let deferredPrompt = null;
 
       window.addEventListener("beforeinstallprompt", (e) => {
@@ -85,12 +72,10 @@ const pageDescription = "הכנס את הנתונים שלך כדי להגיע �
         deferredPrompt = e;
       });
 
-      // Expose install function
       window.__nmAdminInstallApp = async () => {
         if (deferredPrompt) {
           deferredPrompt.prompt();
-          const { outcome } = await deferredPrompt.userChoice;
-          console.log(`User response to the install prompt: ${outcome}`);
+          await deferredPrompt.userChoice;
           deferredPrompt = null;
         }
       };

@@ -1,7 +1,7 @@
 /* NeverMind: Service Worker בסיסי - ניווט: רשת קודם, בלי רשת עמוד offline */
-const CACHE_NAME = "nevermind-v1";
+const CACHE_NAME = "nevermind-v2";
 const OFFLINE = "/offline.html";
-const PRECACHE_URLS = ["/manifest.webmanifest", OFFLINE];
+const PRECACHE_URLS = ["/", "/manifest.webmanifest", OFFLINE];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(

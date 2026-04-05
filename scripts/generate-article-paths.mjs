@@ -3,7 +3,7 @@
  */
 import fs from "node:fs";
 import path from "node:path";
-import matter from "gray-matter";
+import { parseFrontmatter } from "./_lib/frontmatter.mjs";
 
 const articlesDir = path.resolve("src/content/articles");
 const outPath = path.resolve("public/article-paths.json");
@@ -17,7 +17,7 @@ function main() {
       const raw = fs.readFileSync(full, "utf8");
       let data;
       try {
-        data = matter(raw).data;
+        data = parseFrontmatter(raw).data;
       } catch {
         continue;
       }

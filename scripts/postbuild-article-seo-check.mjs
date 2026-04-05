@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import matter from "gray-matter";
+import { parseFrontmatter } from "./_lib/frontmatter.mjs";
 
 const root = process.cwd();
 const distDir = path.join(root, "dist");
@@ -129,7 +129,7 @@ for (const name of fs.readdirSync(articlesDir)) {
   let data;
   let content;
   try {
-    const p = matter(raw);
+    const p = parseFrontmatter(raw);
     data = p.data;
     content = p.content;
   } catch {

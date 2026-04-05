@@ -170,7 +170,7 @@ const websiteSchema = {
   inLanguage: "he-IL",
   potentialAction: {
     "@type": "SearchAction",
-    target: new URL("archive/?q={search_term_string}", siteUrlSlash).toString(),
+    target: new URL("search/?q={search_term_string}", siteUrlSlash).toString(),
     "query-input": "required name=search_term_string",
   },
   publisher: {
@@ -295,6 +295,20 @@ const breadcrumbSchema =
         })),
       }
     : null;
+
+const webPageSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  url: pageUrl,
+  name: pageTitle,
+  description: pageDescription,
+  inLanguage: "he-IL",
+  isPartOf: {
+    "@type": "WebSite",
+    name: siteTitle,
+    url: siteUrl,
+  },
+};
 
 const toIso = (value: string | Date | undefined) => {
   if (!value) return undefined;
@@ -481,6 +495,7 @@ const podcastSessionProductsSchema = [
 const coreStructuredData = [
   organizationSchema,
   websiteSchema,
+  webPageSchema,
   professionalServiceSchema,
   ...podcastSessionProductsSchema,
   ...(breadcrumbSchema ? [breadcrumbSchema] : []),
@@ -522,6 +537,10 @@ const socialLinks = [
     <link rel="apple-touch-icon" href={iconPath} />
     <link rel="manifest" href="/manifest.webmanifest" />
     <meta name="theme-color" content={pwaThemeColor} />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content={siteWordmark} />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
     <meta property="og:site_name" content={siteTitle} />
@@ -686,6 +705,14 @@ const socialLinks = [
                   <circle cx="11" cy="11" r="8" />
                   <path d="m21 21-4.3-4.3" />
                 </svg>
+              </button>
+              <button
+                id="theme-toggle-button"
+                type="button"
+                aria-label="החלף בין מצב בהיר לכהה"
+                class="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))] transition-colors duration-200 [transition-timing-function:ease] hover:border-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)] hover:text-[var(--nm-accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-red)]"
+              >
+                <span aria-hidden="true">🌗</span>
               </button>
               <a
                 href="/premium-access/"
@@ -1902,6 +1929,58 @@ const socialLinks = [
           navigator.serviceWorker.register("/sw.js", { scope: "/" }).catch(function () {});
         });
       }
+    </script>
+    <script is:inline>
+      (() => {
+        const root = document.documentElement;
+        const storageKey = "nm-theme";
+        const button = document.getElementById("theme-toggle-button");
+
+        const applyTheme = (theme) => {
+          if (theme === "dark") {
+            root.setAttribute("data-theme", "dark");
+          } else {
+            root.removeAttribute("data-theme");
+          }
+          if (button instanceof HTMLElement) {
+            button.setAttribute("aria-pressed", theme === "dark" ? "true" : "false");
+          }
+        };
+
+        const getStoredTheme = () => {
+          try {
+            const value = window.localStorage.getItem(storageKey);
+            if (value === "dark" || value === "light") return value;
+          } catch {
+            return null;
+          }
+          return null;
+        };
+
+        const systemPrefersDark = () => window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+        const initTheme = () => {
+          const stored = getStoredTheme();
+          applyTheme(stored ?? (systemPrefersDark() ? "dark" : "light"));
+        };
+
+        const toggleTheme = () => {
+          const current = root.getAttribute("data-theme") === "dark" ? "dark" : "light";
+          const next = current === "dark" ? "light" : "dark";
+          applyTheme(next);
+          try {
+            window.localStorage.setItem(storageKey, next);
+          } catch {
+            /* ignore */
+          }
+        };
+
+        if (button instanceof HTMLElement) {
+          button.addEventListener("click", toggleTheme);
+        }
+
+        initTheme();
+      })();
     </script>
       <script is:inline>
       (() => {

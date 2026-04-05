@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "astro dev",
     "check:text": "node scripts/check-text-integrity.mjs",
-    "validate:articles": "tsx scripts/validate-article-frontmatter.ts",
+    "validate:articles": "node --experimental-strip-types scripts/validate-article-frontmatter.ts",
     "validate": "npm run check:text && npm run validate:articles && node scripts/pre-publish-check.mjs",
     "migration:report": "node scripts/migration-orphan-report.mjs",
     "validate:links": "node scripts/validate-links.mjs",
@@ -17,8 +17,10 @@
     "build": "astro build",
     "postbuild": "node scripts/generate-rss.mjs && node scripts/check-internal-links.mjs && node scripts/generate-admin-build-report.mjs --stage=postbuild && node scripts/postbuild-article-seo-check.mjs",
     "preview": "astro preview",
-    "check": "astro check",
-    "image:import": "node scripts/import-dashboard-image.mjs",
+    "test": "vitest",
+    "test:accessibility": "playwright test e2e/accessibility.spec.js",
+    "lighthouse": "lighthouse http://localhost:4321 --output html --output-path ./lighthouse-report.html",
+    "optimize:images": "node scripts/optimize-images.mjs",
     "format": "prettier --write .",
     "pagefind": "pagefind --site dist",
     "pre-deploy": "npm run verify:prod-env && node scripts/pre-deploy-check.js",
@@ -49,21 +51,32 @@
     "marked": "^17.0.5",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "unist-util-visit": "^5.1.0"
+    "unist-util-visit": "^5.1.0",
+    "web-vitals": "^5.2.0"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.8",
+    "@axe-core/playwright": "^4.11.1",
+    "@playwright/test": "^1.59.1",
     "@tailwindcss/vite": "^4.1.11",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
     "@types/mdast": "^4.0.4",
     "@types/node": "^22.9.0",
     "@types/react": "^18.3.5",
     "@types/react-dom": "^18.3.0",
+    "browserslist": "^4.28.2",
+    "jsdom": "^29.0.1",
+    "lighthouse": "^13.0.3",
     "prettier": "^3.5.3",
     "prettier-plugin-tailwindcss": "^0.6.11",
+    "sharp": "^0.34.5",
     "tailwindcss": "^4.2.1",
     "tsx": "^4.19.4",
     "typescript": "^5.6.3",
-    "unist-util-visit-parents": "^6.0.1"
+    "unist-util-visit-parents": "^6.0.1",
+    "vitest": "^4.1.2",
+    "yargs-parser": "^21.1.1"
   },
   "type": "module"
 }

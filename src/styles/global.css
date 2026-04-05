@@ -1,25 +1,28 @@
 @import "tailwindcss";
 
 /**
- * פלטת NeverMind / השם לא משנה.
- * רקע כהה, טקסט בהיר, דגש כחול.
+ * פלטת NeverMind / השם לא משנה. בוטיק, עם תמיכה ב־Dark Mode.
+ * רקע, טקסט, דגש מותג (#0F172A) (+ נגזרות mix).
  */
 :root {
-  color-scheme: dark;
+  color-scheme: light;
 
-  /* מקור האמת: #FAFAF8 טקסט, #1A1A1A משטח, כחול לדגש */
-  --color-text-primary: #fafaf8;
-  --color-surface-page: #1a1a1a;
-  --color-surface-canvas: color-mix(in srgb, #fafaf8 3%, #1a1a1a);
-  --color-text-secondary: color-mix(in srgb, var(--color-text-primary) 72%, var(--color-surface-page));
-  --color-surface-muted: color-mix(in srgb, var(--color-text-primary) 7%, var(--color-surface-page));
-  --color-accent: #2563eb;
-  --color-accent-hover: color-mix(in srgb, var(--color-accent) 84%, #60a5fa);
+  --font-body: "Inter Variable", "Heebo", "Assistant Variable", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-heading: var(--font-body);
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+  --color-text-primary: #111111;
+  --color-surface-page: #fafaf8;
+  --color-surface-canvas: #ffffff;
+  --color-text-secondary: color-mix(in srgb, var(--color-text-primary) 76%, var(--color-surface-page));
+  --color-surface-muted: color-mix(in srgb, var(--color-text-primary) 6%, var(--color-surface-page));
+  --color-accent: #0f172a;
+  --color-accent-hover: color-mix(in srgb, var(--color-accent) 88%, #ffffff);
   --color-on-accent: #fafaf8;
-  --color-inverse-bg: #2563eb;
-  --color-inverse-bg-hover: color-mix(in srgb, var(--color-inverse-bg) 88%, #60a5fa);
+  --color-inverse-bg: #1a1a1a;
+  --color-inverse-bg-hover: color-mix(in srgb, var(--color-inverse-bg) 85%, var(--color-accent));
   --color-inverse-fg: #fafaf8;
-  --color-code-bg: #111827;
+  --color-code-bg: #1a1a1a;
   --color-code-fg: #fafaf8;
 
   --nm-fg: var(--color-text-primary);
@@ -37,42 +40,93 @@
   --nm-code-bg: var(--color-code-bg);
   --nm-code-fg: var(--color-code-fg);
 
-  --nm-tint: color-mix(in srgb, var(--nm-accent) 9%, var(--nm-bg-canvas));
-  --nm-tint-hover: color-mix(in srgb, var(--nm-accent) 14%, var(--nm-bg-canvas));
-  --nm-tint-strong: color-mix(in srgb, var(--nm-accent) 20%, var(--nm-bg-canvas));
+  --nm-tint: color-mix(in srgb, var(--nm-accent) 10%, var(--nm-bg-canvas));
+  --nm-tint-hover: color-mix(in srgb, var(--nm-accent) 16%, var(--nm-bg-canvas));
+  --nm-tint-strong: color-mix(in srgb, var(--nm-accent) 24%, var(--nm-bg-canvas));
 
-  --nm-grid: color-mix(in srgb, var(--color-text-primary) 8%, transparent);
-  --nm-grid-step: 2rem;
+  --nm-grid: color-mix(in srgb, var(--color-text-primary) 6%, transparent);
   --nm-nav-top: 1.5rem;
-  --nm-space-1: 0.5rem;
-  --nm-space-2: 1rem;
-  --nm-space-3: 1.5rem;
-  --nm-space-4: 2rem;
-  --nm-radius-card: 1.5rem;
-  --nm-radius-control: 1rem;
-  --nm-radius-pill: 999px;
-  --nm-motion-duration: 180ms;
-  --nm-touch-target: 48px;
-  /* באנר "בהרצה" בראש כל עמוד (Layout) */
   --nm-staging-banner-height: 3.5rem;
 
-  /* שמות מותג (מצביעים על אותם ערכים, בלי כפילות HEX בקומפוננטות) */
   --color-white: var(--color-surface-page);
   --color-red: var(--color-accent);
   --color-black: var(--color-text-primary);
   --content-width: 65ch;
-  --line-height-ui: 1.6;
-  --line-height-article: 1.8;
-  /* טיפוגרפיה נוזלית: גוף וכותרות */
-  --nm-text-body: clamp(1rem, 0.96rem + 0.22vw, 1.125rem);
-  --nm-text-lead: clamp(1.05rem, 0.98rem + 0.35vw, 1.25rem);
+  --line-height-ui: 1.75;
+  --line-height-article: 1.95;
+  --nm-text-body: clamp(1.125rem, 1rem + 0.2vw, 1.25rem);
+  --nm-text-lead: clamp(1.125rem, 1.05rem + 0.35vw, 1.4rem);
   --nm-text-display: clamp(2rem, 1.55rem + 2vw, 3.25rem);
-  --transition-fast: var(--nm-motion-duration) ease;
-  --transition-medium: 240ms ease;
+  --transition-fast: 0.2s ease;
+  --transition-medium: 0.3s ease;
   --nm-feedback-press-scale: 0.98;
 
-  --color-valid: #4ade80;
-  --color-mark-highlight: color-mix(in srgb, var(--color-accent) 22%, var(--color-surface-page));
+  --color-valid: #16a34a;
+  --color-mark-highlight: color-mix(in srgb, var(--color-accent) 20%, var(--color-surface-page));
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --color-text-primary: #f5f5f4;
+    --color-surface-page: #0e1728;
+    --color-surface-canvas: #111827;
+    --color-text-secondary: color-mix(in srgb, var(--color-text-primary) 72%, var(--color-surface-page));
+    --color-surface-muted: color-mix(in srgb, var(--color-text-primary) 12%, var(--color-surface-page));
+    --color-accent: #8ab8ff;
+    --color-accent-hover: color-mix(in srgb, var(--color-accent) 88%, var(--color-surface-page));
+    --color-on-accent: #0f172a;
+    --color-inverse-bg: #f8fafc;
+    --color-inverse-bg-hover: color-mix(in srgb, var(--color-inverse-bg) 88%, var(--color-accent));
+    --color-inverse-fg: #0f172a;
+    --color-code-bg: #0f172a;
+    --color-code-fg: #f8fafc;
+
+    --nm-bg: var(--color-surface-page);
+    --nm-bg-canvas: var(--color-surface-canvas);
+    --nm-fg: var(--color-text-primary);
+    --nm-fg-secondary: var(--color-text-secondary);
+    --nm-surface-muted: var(--color-surface-muted);
+    --nm-accent: var(--color-accent);
+    --nm-accent-hover: var(--color-accent-hover);
+    --nm-on-accent: var(--color-on-accent);
+    --nm-inverse: var(--color-inverse-bg);
+    --nm-inverse-hover: var(--color-inverse-bg-hover);
+    --nm-inverse-fg: var(--color-inverse-fg);
+    --nm-code-bg: var(--color-code-bg);
+    --nm-code-fg: var(--color-code-fg);
+  }
+}
+
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --color-text-primary: #f5f5f4;
+  --color-surface-page: #0e1728;
+  --color-surface-canvas: #111827;
+  --color-text-secondary: color-mix(in srgb, var(--color-text-primary) 72%, var(--color-surface-page));
+  --color-surface-muted: color-mix(in srgb, var(--color-text-primary) 12%, var(--color-surface-page));
+  --color-accent: #8ab8ff;
+  --color-accent-hover: color-mix(in srgb, var(--color-accent) 88%, var(--color-surface-page));
+  --color-on-accent: #0f172a;
+  --color-inverse-bg: #f8fafc;
+  --color-inverse-bg-hover: color-mix(in srgb, var(--color-inverse-bg) 88%, var(--color-accent));
+  --color-inverse-fg: #0f172a;
+  --color-code-bg: #0f172a;
+  --color-code-fg: #f8fafc;
+
+  --nm-bg: var(--color-surface-page);
+  --nm-bg-canvas: var(--color-surface-canvas);
+  --nm-fg: var(--color-text-primary);
+  --nm-fg-secondary: var(--color-text-secondary);
+  --nm-surface-muted: var(--color-surface-muted);
+  --nm-accent: var(--color-accent);
+  --nm-accent-hover: var(--color-accent-hover);
+  --nm-on-accent: var(--color-on-accent);
+  --nm-inverse: var(--color-inverse-bg);
+  --nm-inverse-hover: var(--color-inverse-bg-hover);
+  --nm-inverse-fg: var(--color-inverse-fg);
+  --nm-code-bg: var(--color-code-bg);
+  --nm-code-fg: var(--color-code-fg);
 }
 
 /* נגישות: הגדלת טקסט (A11yWidget) */
@@ -85,10 +139,10 @@ html[data-nm-a11y-font="xl"] body {
 
 /* נגישות: ניגודיות גבוהה */
 html[data-nm-a11y-contrast="high"] {
-  --nm-fg: #fff;
-  --nm-fg-secondary: #fff;
-  --nm-bg: #000;
-  --nm-bg-canvas: #000;
+  --nm-fg: #1a1a1a;
+  --nm-fg-secondary: #1a1a1a;
+  --nm-bg: #fafaf8;
+  --nm-bg-canvas: #fafaf8;
   --nm-surface-muted: color-mix(in srgb, var(--nm-fg) 8%, var(--nm-bg));
   --nm-grid: color-mix(in srgb, var(--nm-fg) 12%, transparent);
 }
@@ -105,6 +159,15 @@ html[data-nm-a11y-links="on"] a[href]:where(:not([class*="rounded-full"])) {
 }
 html[data-nm-a11y-links="on"] a[href]:focus-visible {
   outline-color: var(--nm-accent);
+}
+
+/* נגישות: מיקוד גלוי לכפתורים ללא סגנון מותאם */
+button:focus-visible,
+input[type="button"]:focus-visible,
+input[type="submit"]:focus-visible,
+input[type="reset"]:focus-visible {
+  outline: 2px solid var(--nm-accent);
+  outline-offset: 2px;
 }
 
 @import "./components.css";
@@ -137,8 +200,6 @@ html {
   scroll-behavior: smooth;
   max-width: 100%;
   overflow-x: clip;
-  scrollbar-gutter: stable both-edges;
-  background-color: var(--nm-bg);
 }
 
 html[lang="he"] {
@@ -147,14 +208,13 @@ html[lang="he"] {
 }
 
 body {
-  font-family: "Heebo", "Assistant Variable", system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-family: var(--font-body);
   max-width: 100%;
   overflow-x: clip;
-  direction: rtl;
-  text-align: right;
   font-size: var(--nm-text-body);
   line-height: var(--line-height-ui);
   letter-spacing: 0;
+  text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: var(--nm-bg);
@@ -164,18 +224,15 @@ body {
     color var(--transition-fast);
 }
 
-:where([class*="bg-white"], [class*="bg-[#FAFAF8]"]) {
-  background-color: color-mix(in srgb, var(--nm-bg-canvas) 94%, transparent);
-  color: var(--nm-fg);
-}
-
-:where([class*="text-[#1A1A1A]"], [class*="text-[var(--color-black)]"]) {
-  color: var(--nm-fg);
-}
-
-:where(input, textarea, select) {
-  background-color: color-mix(in srgb, var(--nm-bg-canvas) 96%, transparent);
-  color: var(--nm-fg);
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 /* מיקוד מקלדת אחיד */
@@ -223,8 +280,6 @@ body {
     a[href][class*="rounded"],
     a[href][data-nm-pressable]
   ) {
-  min-height: var(--nm-touch-target);
-  border-radius: var(--nm-radius-pill);
   transition:
     transform var(--transition-fast),
     background-color var(--transition-fast),
@@ -256,14 +311,6 @@ body {
     a[href][data-nm-pressable]
   ):focus-visible {
   box-shadow: 0 0 0 4px color-mix(in srgb, var(--nm-accent) 18%, transparent);
-}
-
-:where(article, section, aside, form)[class*="rounded"] {
-  border-radius: var(--nm-radius-card);
-}
-
-:where(input, textarea, select):not([type="checkbox"]):not([type="radio"]) {
-  border-radius: var(--nm-radius-control);
 }
 
 :where(button, [role="button"], a.inline-flex, a.inline-block)[data-nm-loading="true"] {
@@ -545,14 +592,14 @@ textarea,
 input[type="button"],
 input[type="submit"],
 input[type="reset"] {
-  min-height: var(--nm-touch-target);
+  min-height: 44px;
 }
 
 button,
 [role="button"],
 a.inline-flex,
 a[aria-label] {
-  min-width: var(--nm-touch-target);
+  min-width: 44px;
 }
 
 @media (max-width: 767px) {
@@ -606,7 +653,7 @@ body::before {
   background-image:
     linear-gradient(var(--nm-grid) 0.5px, transparent 0.5px),
     linear-gradient(90deg, var(--nm-grid) 0.5px, transparent 0.5px);
-  background-size: var(--nm-grid-step) var(--nm-grid-step);
+  background-size: 36px 36px;
   opacity: 0.3;
   pointer-events: none;
   z-index: 0;

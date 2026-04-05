@@ -1,7 +1,7 @@
 ﻿import fs from "node:fs";
 import path from "node:path";
-import matter from "gray-matter";
 import { globSync } from "glob";
+import { parseFrontmatter } from "./_lib/frontmatter.mjs";
 
 const root = process.cwd();
 const distDir = path.join(root, "dist");
@@ -31,7 +31,7 @@ const items = files
   .map((relativeFile) => {
     const full = path.join(root, relativeFile);
     const raw = fs.readFileSync(full, "utf8");
-    const { data } = matter(raw);
+    const { data } = parseFrontmatter(raw);
     if (data.draft === true) return null;
     const slug = relativeFile
       .replace(/^src[\\/]content[\\/]articles[\\/]/, "")

@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import matter from "gray-matter";
+import { parseFrontmatter } from "./_lib/frontmatter.mjs";
 
 const root = process.cwd();
 const stageArg = process.argv.find((item) => item.startsWith("--stage="));
@@ -52,7 +52,7 @@ const readabilityItems = articleFiles
   .map((name) => {
     const fullPath = path.join(articlesDir, name);
     const raw = fs.readFileSync(fullPath, "utf8");
-    const parsed = matter(raw);
+    const parsed = parseFrontmatter(raw);
     const metrics = estimateReadability(parsed.content);
     return {
       slug: String(parsed.data.slug || name.replace(/\.mdx$/i, "")).trim(),

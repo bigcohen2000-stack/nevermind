@@ -1,12 +1,12 @@
 /**
  * ולידציה לפני בילד: pubDate, תגיות whitelist, פסילת שפה (validateAndClassify).
- * הרצה: npx tsx scripts/validate-article-frontmatter.ts
+ * הרצה: node --experimental-strip-types scripts/validate-article-frontmatter.ts
  */
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import yaml from "js-yaml";
-import { validateAndClassify } from "../src/utils/contentValidator";
+import { validateAndClassify } from "../src/utils/contentValidator.ts";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, "..");
@@ -42,17 +42,6 @@ function parseFrontmatter(raw: string) {
 }
 
 const errors: string[] = [];
-const metadataWarningCounts = {
-  audience: 0,
-  difficulty: 0,
-  intendedAudience: 0,
-  readTime: 0,
-  isPublic: 0,
-};
-
-function hasNonEmptyString(value: unknown): value is string {
-  return typeof value === "string" && value.trim().length > 0;
-}
 
 for (const name of fs.readdirSync(articlesDir)) {
   if (!name.endsWith(".mdx")) continue;
@@ -86,30 +75,20 @@ for (const name of fs.readdirSync(articlesDir)) {
     }
   }
 
-  if (data.audience == null) {
-    metadataWarningCounts.audience += 1;
-  } else if (!hasNonEmptyString(data.audience)) {
-    errors.push(`${name}: audience חייב להיות מחרוזת לא ריקה`);
+  if (!data.audience || typeof data.audience !== "string") {
+    errors.push(`${name}: חסר או לא תקין audience (מחרוזת)`);
   }
-  if (data.difficulty == null) {
-    metadataWarningCounts.difficulty += 1;
-  } else if (typeof data.difficulty !== "string" || !["beginner", "intermediate", "advanced"].includes(data.difficulty)) {
-    errors.push(`${name}: difficulty חייב להיות beginner/intermediate/advanced`);
+  if (!data.difficulty || typeof data.difficulty !== "string" || !["beginner", "intermediate", "advanced"].includes(data.difficulty)) {
+    errors.push(`${name}: חסר או לא תקין difficulty (beginner/intermediate/advanced)`);
   }
-  if (data.intendedAudience == null) {
-    metadataWarningCounts.intendedAudience += 1;
-  } else if (!hasNonEmptyString(data.intendedAudience)) {
-    errors.push(`${name}: intendedAudience חייב להיות מחרוזת לא ריקה`);
+  if (!data.intendedAudience || typeof data.intendedAudience !== "string") {
+    errors.push(`${name}: חסר או לא תקין intendedAudience (מחרוזת)`);
   }
-  if (data.readTime == null) {
-    metadataWarningCounts.readTime += 1;
-  } else if (typeof data.readTime !== "number" || data.readTime <= 0) {
-    errors.push(`${name}: readTime חייב להיות מספר חיובי`);
+  if (data.readTime == null || typeof data.readTime !== "number" || data.readTime <= 0) {
+    errors.push(`${name}: חסר או לא תקין readTime (מספר חיובי)`);
   }
-  if (data.isPublic == null) {
-    metadataWarningCounts.isPublic += 1;
-  } else if (data.isPublic !== true && data.isPublic !== false) {
-    errors.push(`${name}: isPublic חייב להיות true/false`);
+  if (data.isPublic !== true && data.isPublic !== false) {
+    errors.push(`${name}: חסר או לא תקין isPublic (true/false)`);
   }
 
   const classified = validateAndClassify(raw);
@@ -121,14 +100,6 @@ for (const name of fs.readdirSync(articlesDir)) {
 if (errors.length) {
   console.error("שגיאות ולידציה במאמרים:\n" + errors.join("\n"));
   process.exit(1);
-}
-
-const warningLines = Object.entries(metadataWarningCounts)
-  .filter(([, count]) => count > 0)
-  .map(([field, count]) => `- ${field}: ${count} קבצים בלי metadata משלים`);
-
-if (warningLines.length) {
-  console.warn("אזהרות metadata במאמרים קיימים (לא חוסם build):\n" + warningLines.join("\n"));
 }
 
 console.log("validate-article-frontmatter: עבר (כל קבצי המאמרים).");

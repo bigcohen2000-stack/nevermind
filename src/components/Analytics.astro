@@ -9,3 +9,81 @@
     };
   })();
 </script>
+
+<script>
+  // Web Vitals tracking
+  const reportWebVitals = (metric) => {
+    // Send to analytics
+    window.nmTrackEvent('web_vitals', {
+      name: metric.name,
+      value: metric.value,
+      rating: metric.rating,
+      delta: metric.delta,
+      id: metric.id
+    });
+
+    // Log to console in development
+    if (import.meta.env.DEV) {
+      console.log('Web Vital:', metric);
+    }
+  };
+
+  // Dynamic import to avoid bundle bloat
+  import('web-vitals').then(({ onCLS, onFID, onFCP, onLCP, onTTFB }) => {
+    onCLS(reportWebVitals);
+    onFID(reportWebVitals);
+    onFCP(reportWebVitals);
+    onLCP(reportWebVitals);
+    onTTFB(reportWebVitals);
+  }).catch(err => {
+    console.warn('Web Vitals tracking failed to load:', err);
+  });
+
+  // User interaction tracking
+  let interactionCount = 0;
+  const trackInteraction = () => {
+    interactionCount++;
+    if (interactionCount === 1) {
+      window.nmTrackEvent('first_interaction');
+    }
+  };
+
+  document.addEventListener('click', trackInteraction, { once: true });
+  document.addEventListener('keydown', trackInteraction, { once: true });
+  document.addEventListener('touchstart', trackInteraction, { once: true });
+
+  // Theme preference tracking
+  const trackThemeChange = (theme) => {
+    window.nmTrackEvent('theme_change', { theme });
+  };
+
+  // Listen for theme changes
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (mutation.type === 'attributes' && mutation.attributeName === 'data-theme') {
+        const theme = document.documentElement.getAttribute('data-theme') || 'light';
+        trackThemeChange(theme);
+      }
+    });
+  });
+
+  observer.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['data-theme']
+  });
+
+  // Search tracking
+  const trackSearch = (query, results) => {
+    window.nmTrackEvent('search', {
+      query: query.substring(0, 100), // Limit length
+      results_count: results,
+      has_results: results > 0
+    });
+  };
+
+  // Listen for search events
+  window.addEventListener('nm-search-performed', (event) => {
+    const { query, results } = event.detail;
+    trackSearch(query, results);
+  });
+</script>

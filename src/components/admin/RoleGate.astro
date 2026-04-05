@@ -1,9 +1,4 @@
 ---
-/**
- * RoleGate.astro
- * Shows content only if user has required role
- */
-
 import type { AdminRole } from "../../lib/admin-auth";
 
 interface Props {
@@ -13,9 +8,6 @@ interface Props {
 }
 
 const { requiredRole = "viewer", fallback = "אין לך הרשאה לתוכן זה", showIfAuthed = false } = Astro.props;
-
-// במקום לבדוק server-side (לא ניתן ב-static), נשתמש בפקד client-side
-// הרעיון: הסתר בצד שרת וגלה בצד client אם יש הרשאה
 ---
 
 <div class="role-gate" data-role-gate data-required-role={requiredRole} data-show-if-authed={showIfAuthed}>
@@ -24,12 +16,12 @@ const { requiredRole = "viewer", fallback = "אין לך הרשאה לתוכן �
   </div>
 
   <div class="gate-fallback rounded-lg border border-yellow-200 bg-yellow-50 px-4 py-3 text-right text-sm text-yellow-800 hidden">
-    <p class="font-semibold">🔒 {fallback}</p>
+    <p class="font-semibold">{fallback}</p>
     <a href="/admin/login/" class="mt-2 inline-block text-yellow-700 underline underline-offset-2 hover:text-yellow-900">לחזור לכניסה</a>
   </div>
 
   <div class="gate-loading animate-pulse rounded-lg bg-gray-200 px-4 py-3 text-right text-sm text-gray-600">
-    בדיקת הרשאות...
+    בודק הרשאה...
   </div>
 </div>
 
@@ -48,27 +40,19 @@ const { requiredRole = "viewer", fallback = "אין לך הרשאה לתוכן �
 
       const user = AdminAuth.getCurrentUser();
 
-      // הסתר loading
       loading?.classList.add("hidden");
 
       if (!user) {
-        // אין משתמש
-        if (showIfAuthed) {
-          // הצג תוכן רק לחברים - הצג fallback
-          fallback?.classList.remove("hidden");
-          content?.classList.add("hidden");
-        }
+        fallback?.classList.remove("hidden");
+        content?.classList.add("hidden");
         return;
       }
 
-      // בדוק הרשאות
       const requiredRoleSafe = (["viewer", "editor", "admin"].includes(requiredRole) ? requiredRole : "viewer") as import("../../lib/admin-auth").AdminRole;
       if (AdminAuth.hasPermission(user.role, requiredRoleSafe)) {
-        // יש הרשאה - הצג תוכן
         content?.classList.remove("hidden");
         fallback?.classList.add("hidden");
       } else {
-        // חסר הרשאה - הצג fallback
         fallback?.classList.remove("hidden");
         content?.classList.add("hidden");
       }

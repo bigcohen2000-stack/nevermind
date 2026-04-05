@@ -23,15 +23,14 @@ const pubDateSchema = z
   });
 
 const tagsSchema = z
-  .array(z.string())
+  .array(z.string().trim().min(1, "תגית לא יכולה להיות ריקה"))
   .default([])
   .superRefine((arr, ctx) => {
     for (const tag of arr) {
-      const t = tag.trim();
-      if (!ARTICLE_TAG_WHITELIST_SET.has(t)) {
+      if (!ARTICLE_TAG_WHITELIST_SET.has(tag)) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: `תגית לא ברשימה המאושרת: "${t}". רשימה: ${[...ARTICLE_TAG_WHITELIST_SET].join(", ")}`,
+          message: `תגית לא ברשימה המאושרת: "${tag}". רשימה: ${[...ARTICLE_TAG_WHITELIST_SET].join(", ")}`,
         });
       }
     }
@@ -48,29 +47,30 @@ const articles = defineCollection({
     bottomLine: z.string().optional(),
     pubDate: pubDateSchema,
     updatedDate: z.coerce.date().optional(),
-    author: z.string().default("השם לא משנה"),
+    author: z.string().trim().default("השם לא משנה"),
     tags: tagsSchema,
-    image: z.string().default("/images/logo.svg"),
-    canonicalUrl: z.string().url().optional(),
-    keywords: z.string().optional(),
-    audioUrl: z.string().optional(),
+    image: z.string().trim().default("/images/logo.svg"),
+    canonicalUrl: z.string().trim().url().optional(),
+    keywords: z.string().trim().optional(),
+    audioUrl: z.string().trim().url().optional(),
     audioFile: z
       .string()
+      .trim()
       .regex(/^[a-zA-Z0-9._-]+\.(mp3|m4a|ogg|wav)$/)
       .optional(),
-    youtubeId: z.string().optional(),
+    youtubeId: z.string().trim().optional(),
     /** וידאו נוסף לבעלי סשן פרימיום בלבד (מאמר חינמי) */
     premiumYoutubeId: z.string().optional(),
     /** כותרת לווידאון הפרימיום (לנגן ולנגישות) */
     premiumVideoTitle: z.string().optional(),
     videoSummaryPoints: z.array(z.string()).optional(),
-    tallyUrl: z.string().url().optional(),
+    tallyUrl: z.string().trim().url().optional(),
     isPremium: z.boolean().default(false),
     draft: z.boolean().default(false),
-    audience: z.string().optional(),
+    audience: z.string().trim().optional(),
     difficulty: z.enum(["beginner", "intermediate", "advanced"]).optional(),
-    intendedAudience: z.string().optional(),
-    readTime: z.number().optional(),
+    intendedAudience: z.string().trim().optional(),
+    readTime: z.coerce.number().int().positive().optional(),
     isPublic: z.boolean().default(true),
     workflowStatus: z.enum(["writing", "review", "ready", "published"]).optional(),
     difficultyLevel: z.enum(["beginner", "advanced", "deep"]).optional(),
@@ -84,13 +84,13 @@ const articles = defineCollection({
     reflectionQuestions: z.array(z.string()).length(3).optional(),
     relatedConcepts: z.array(z.string()).optional(),
     /** ל־TruthBlock microdata: Question + acceptedAnswer */
-    questionForSchema: z.string().optional(),
+    questionForSchema: z.string().trim().optional(),
     forbiddenLibrary: z.boolean().default(false),
     faq: z
       .array(
         z.object({
-          question: z.string(),
-          answer: z.string(),
+          question: z.string().trim().min(1, "שאלה לא יכולה להיות ריקה"),
+          answer: z.string().trim().min(1, "תשובה לא יכולה להיות ריקה"),
         })
       )
       .optional(),
@@ -103,11 +103,11 @@ const articles = defineCollection({
     sensitivityWarning: z.boolean().default(false),
     videoContent: z
       .object({
-        hook: z.string().optional(),
-        questions: z.array(z.string()).max(10).optional(),
-        visualDirection: z.string().optional(),
-        reelScript: z.string().optional(),
-        bridgeLogic: z.string().optional(),
+        hook: z.string().trim().optional(),
+        questions: z.array(z.string().trim().min(1, "שאלה לא יכולה להיות ריקה")).max(10).optional(),
+        visualDirection: z.string().trim().optional(),
+        reelScript: z.string().trim().optional(),
+        bridgeLogic: z.string().trim().optional(),
       })
       .optional(),
   }),

@@ -1,16 +1,16 @@
 /**
  * לפני פרסום: פסילה עם מיקום שורה; תוכן רגיש בלי isPremium → עדכון אוטומטי (מקומי בלבד).
  * ב-CI (process.env.CI): read-only — אין כתיבה; חסר isPremium או blocklist → כשל.
- * מופעל דרך pre-publish-check.mjs או: npx tsx scripts/pre-publish-check.ts
+ * מופעל דרך pre-publish-check.mjs או: node --experimental-strip-types scripts/pre-publish-check.ts
  */
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import matter from "gray-matter";
+import yaml from "js-yaml";
 import {
   findPhraseLineOccurrences,
   validateAndClassify,
-} from "../src/utils/contentValidator";
+} from "../src/utils/contentValidator.ts";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, "..");
@@ -43,6 +43,33 @@ const blockErrors: BlockError[] = [];
 const premiumMissingErrors: PremiumMissingError[] = [];
 const premiumAutoFixWarnings: string[] = [];
 
+function parseFrontmatter(raw: string) {
+  const match = raw.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?/);
+  if (!match) {
+    return {
+      data: {},
+      content: raw,
+      hasFrontmatter: false,
+    };
+  }
+
+  const data = yaml.load(match[1], { schema: yaml.JSON_SCHEMA });
+  return {
+    data: data && typeof data === "object" ? (data as Record<string, unknown>) : {},
+    content: raw.slice(match[0].length),
+    hasFrontmatter: true,
+  };
+}
+
+function stringifyFrontmatter(data: Record<string, unknown>, content: string) {
+  const frontmatter = yaml.dump(data, {
+    lineWidth: 120,
+    noRefs: true,
+  }).trimEnd();
+
+  return `---\n${frontmatter}\n---\n${content.replace(/^\r?\n/, "")}`;
+}
+
 if (readOnly) {
   console.warn("pre-publish-check: מצב CI — read-only (ללא עדכון קבצים).");
 }
@@ -60,9 +87,22 @@ for (const abs of walkMdxFiles(contentRoot)) {
   }
 
   if (classified.recommendPremium) {
-    let parsed: ReturnType<typeof matter>;
     try {
-      parsed = matter(raw);
+      const parsed = parseFrontmatter(raw);
+      const data = { ...parsed.data };
+      const isPremium = Boolean(data.isPremium);
+      if (!isPremium) {
+        if (readOnly) {
+          premiumMissingErrors.push({ rel, triggers: [...classified.matchedSensitive] });
+        } else {
+          data.isPremium = true;
+          const out = stringifyFrontmatter(data, parsed.content);
+          fs.writeFileSync(abs, out, "utf8");
+          premiumAutoFixWarnings.push(
+            `${rel}: נושא רגיש - isPremium עודכן ל-true (טריגרים: ${classified.matchedSensitive.join(", ")}).`
+          );
+        }
+      }
     } catch {
       const msg = `${rel}: לא ניתן לפרסר frontmatter — דלג על בדיקת isPremium.`;
       if (readOnly) {
@@ -70,21 +110,6 @@ for (const abs of walkMdxFiles(contentRoot)) {
         console.error(`pre-publish-check: ${msg}`);
       } else {
         console.warn(`pre-publish-check: ${msg}`);
-      }
-      continue;
-    }
-    const data = parsed.data as Record<string, unknown>;
-    const isPremium = Boolean(data.isPremium);
-    if (!isPremium) {
-      if (readOnly) {
-        premiumMissingErrors.push({ rel, triggers: [...classified.matchedSensitive] });
-      } else {
-        data.isPremium = true;
-        const out = matter.stringify(parsed.content, data);
-        fs.writeFileSync(abs, out, "utf8");
-        premiumAutoFixWarnings.push(
-          `${rel}: נושא רגיש — isPremium עודכן ל-true (טריגרים: ${classified.matchedSensitive.join(", ")}).`
-        );
       }
     }
   }

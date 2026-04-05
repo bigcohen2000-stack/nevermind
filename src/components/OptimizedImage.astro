@@ -1,0 +1,94 @@
+---
+interface Props {
+  src: string;
+  alt: string;
+  placeholder?: string;
+  class?: string;
+  width?: number;
+  height?: number;
+}
+
+const { src, alt, placeholder, class: className, width, height } = Astro.props;
+const imgId = `img-${Math.random().toString(36).substr(2, 9)}`;
+---
+
+<div class="lazy-image-container" style={`aspect-ratio: ${width && height ? width / height : 'auto'};`}>
+  {placeholder && (
+    <img
+      src={placeholder}
+      alt=""
+      class={`lazy-placeholder ${className || ''}`}
+      width={width}
+      height={height}
+      aria-hidden="true"
+    />
+  )}
+
+  <img
+    id={imgId}
+    src={src}
+    alt={alt}
+    class={`lazy-image ${className || ''}`}
+    width={width}
+    height={height}
+    loading="lazy"
+    decoding="async"
+    style="opacity: 0; transition: opacity 0.3s ease;"
+  />
+</div>
+
+<script>
+  // Intersection Observer for enhanced lazy loading
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const img = entry.target as HTMLImageElement;
+        img.style.opacity = '1';
+
+        // Preload nearby images
+        const container = img.closest('.lazy-image-container');
+        if (container) {
+          const nextImg = container.nextElementSibling?.querySelector('.lazy-image') as HTMLImageElement;
+          if (nextImg && !nextImg.complete) {
+            nextImg.src = nextImg.src; // Trigger load
+          }
+        }
+
+        observer.unobserve(img);
+      }
+    });
+  }, {
+    rootMargin: '50px 0px',
+    threshold: 0.1
+  });
+
+  // Observe all lazy images
+  document.querySelectorAll('.lazy-image').forEach(img => {
+    observer.observe(img);
+  });
+</script>
+
+<style>
+  .lazy-image-container {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .lazy-placeholder {
+    filter: blur(10px);
+    transform: scale(1.1);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .lazy-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+</style>

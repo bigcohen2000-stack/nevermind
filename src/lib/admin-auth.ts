@@ -1,7 +1,6 @@
 /**
- * Admin Authentication & Authorization
- * בסביבת פיתוח זהו מנגנון מקומי בלבד.
- * בייצור ההגנה האמיתית צריכה להגיע מ־Cloudflare Access או backend מאובטח.
+ * שכבת כניסה מקומית לאזור הניהול.
+ * בפריסה חיה ההגנה העיקרית צריכה להיות דרך Cloudflare Access.
  */
 
 export type AdminRole = "viewer" | "editor" | "admin";
@@ -13,9 +12,6 @@ export interface AdminUser {
   loginTime: number;
 }
 
-/**
- * חשבונות פיתוח מקומיים בלבד.
- */
 const DEMO_USERS: Record<string, { password: string; role: AdminRole }> = {
   viewer: { password: "view123", role: "viewer" },
   editor: { password: "edit456", role: "editor" },
@@ -27,10 +23,9 @@ const SESSION_TIMEOUT = 12 * 60 * 60 * 1000; // 12 hours
 
 export class AdminAuth {
   /**
-   * התחבר עם שם משתמש וסיסמה
+   * התחברות עם שם משתמש וסיסמה מקומיים
    */
   static async login(username: string, password: string): Promise<AdminUser | null> {
-    // Simulate network delay
     await new Promise((resolve) => setTimeout(resolve, 300));
 
     const user = DEMO_USERS[username];
@@ -53,7 +48,7 @@ export class AdminAuth {
   }
 
   /**
-   * קבל את המשתמש הנוכחי מ-session
+   * החזרת המשתמש הנוכחי מה-session
    */
   static getCurrentUser(): AdminUser | null {
     if (typeof window === "undefined") return null;
@@ -64,7 +59,6 @@ export class AdminAuth {
     try {
       const user: AdminUser = JSON.parse(stored);
 
-      // בדוק אם session הוא עדיין בתוקף
       if (Date.now() - user.loginTime > SESSION_TIMEOUT) {
         localStorage.removeItem(STORAGE_KEY);
         return null;
@@ -86,7 +80,7 @@ export class AdminAuth {
   }
 
   /**
-   * בדוק אם למשתמש יש הרשאה מסוימת
+   * בדיקת הרשאה לפי תפקיד
    */
   static hasPermission(role: AdminRole, requiredRole: AdminRole | string): boolean {
     const roleHierarchy: Record<AdminRole, number> = {
@@ -100,14 +94,14 @@ export class AdminAuth {
   }
 
   /**
-   * קבל עמודים זמינים לפי role
+   * רשימת מסכים זמינים לפי תפקיד
    */
   static getAvailablePages(role: AdminRole): string[] {
     switch (role) {
       case "admin":
-        return ["dashboard", "articles", "services", "settings", "users"];
+        return ["dashboard", "generator", "paradoxes", "articles", "services", "settings", "users"];
       case "editor":
-        return ["dashboard", "articles"];
+        return ["dashboard", "generator", "paradoxes", "articles"];
       case "viewer":
         return ["dashboard"];
       default:
@@ -116,9 +110,6 @@ export class AdminAuth {
   }
 }
 
-/**
- * הרשאות לעמוד מסוים
- */
 export const PAGE_PERMISSIONS: Record<
   string,
   {
@@ -131,31 +122,43 @@ export const PAGE_PERMISSIONS: Record<
   dashboard: {
     label: "לוח בקרה",
     minRole: "viewer",
-    icon: "📊",
+    icon: "לוח",
     description: "סטטיסטיקות וסקירה כללית",
+  },
+  generator: {
+    label: "מחולל תוכן",
+    minRole: "editor",
+    icon: "תוכן",
+    description: "יצירת טיוטות ומבנה מאמרים",
+  },
+  paradoxes: {
+    label: "מחולל פרדוקסים",
+    minRole: "editor",
+    icon: "עומק",
+    description: "עבודה על שאלות עומק וניסויי מחשבה",
   },
   articles: {
     label: "מאמרים",
     minRole: "editor",
-    icon: "📝",
+    icon: "מאמר",
     description: "ניהול ויצירה של מאמרים",
   },
   services: {
     label: "שירותים",
     minRole: "editor",
-    icon: "🛠️",
+    icon: "שירות",
     description: "ניהול שירותים וחבילות",
   },
   settings: {
     label: "הגדרות",
     minRole: "admin",
-    icon: "⚙️",
+    icon: "הגדר",
     description: "הגדרות כלל-אתר",
   },
   users: {
     label: "משתמשים",
     minRole: "admin",
-    icon: "👥",
+    icon: "משתמש",
     description: "ניהול משתמשים והרשאות",
   },
 };

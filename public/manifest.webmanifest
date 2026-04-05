@@ -5,10 +5,13 @@
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
+  "display_override": ["standalone", "fullscreen"],
   "background_color": "#FAFAF8",
   "theme_color": "#0F172A",
   "lang": "he",
   "dir": "rtl",
+  "categories": ["education", "health", "lifestyle"],
+  "prefer_related_applications": false,
   "icons": [
     {
       "src": "/images/logo.svg",
