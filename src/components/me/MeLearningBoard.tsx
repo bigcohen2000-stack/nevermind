@@ -4,10 +4,13 @@ import { memberProgressUrl } from "../../lib/club-api-base";
 type Article = {
   slug: string;
   title: string;
+  description: string;
   pubDate: string;
   updatedDate?: string;
   tags: string[];
   difficultyLevel?: "beginner" | "advanced" | "deep";
+  image?: string;
+  youtubeId?: string;
 };
 
 type ClubSession = { progressToken?: string; expiresAt?: string };
@@ -40,17 +43,20 @@ export default function MeLearningBoard({ articles, totalPublished }: Props) {
   const [progress, setProgress] = useState<{ articlesRead: string[]; secondsRead: number } | null>(null);
 
   const load = useCallback(async () => {
-    const s = readSession();
+    const session = readSession();
     const url = memberProgressUrl();
-    if (!s?.progressToken || !url) {
+    if (!session?.progressToken || !url) {
       setProgress(null);
       return;
     }
     try {
       const res = await fetch(url, {
-        headers: { Authorization: `Bearer ${s.progressToken}`, Accept: "application/json" },
+        headers: { Authorization: `Bearer ${session.progressToken}`, Accept: "application/json" },
       });
-      const data = (await res.json().catch(() => null)) as { ok?: boolean; progress?: { articlesRead: string[]; secondsRead: number } };
+      const data = (await res.json().catch(() => null)) as {
+        ok?: boolean;
+        progress?: { articlesRead: string[]; secondsRead: number };
+      };
       if (res.ok && data?.ok && data.progress) setProgress(data.progress);
     } catch {
       setProgress(null);
@@ -62,18 +68,18 @@ export default function MeLearningBoard({ articles, totalPublished }: Props) {
   }, [load]);
 
   const allTags = useMemo(() => {
-    const s = new Set<string>();
-    articles.forEach((a) => a.tags.forEach((t) => s.add(t)));
-    return [...s].sort((a, b) => a.localeCompare(b, "he"));
+    const set = new Set<string>();
+    articles.forEach((article) => article.tags.forEach((item) => set.add(item)));
+    return [...set].sort((a, b) => a.localeCompare(b, "he"));
   }, [articles]);
 
   const filtered = useMemo(() => {
-    const topicQ = topic.trim();
-    return articles.filter((a) => {
-      if (level !== "all" && a.difficultyLevel !== level) return false;
-      if (topicQ && !a.tags.some((x) => x.includes(topicQ))) return false;
-      const tg = tag.trim();
-      if (tg && !a.tags.includes(tg)) return false;
+    const topicQuery = topic.trim();
+    return articles.filter((article) => {
+      if (level !== "all" && article.difficultyLevel !== level) return false;
+      if (topicQuery && !article.tags.some((item) => item.includes(topicQuery))) return false;
+      const selectedTag = tag.trim();
+      if (selectedTag && !article.tags.includes(selectedTag)) return false;
       return true;
     });
   }, [articles, level, topic, tag]);
@@ -82,7 +88,7 @@ export default function MeLearningBoard({ articles, totalPublished }: Props) {
   const ratio = totalPublished > 0 ? Math.min(100, Math.round((readSet.size / totalPublished) * 100)) : 0;
 
   const recommended = useMemo(() => {
-    const unread = filtered.filter((a) => !readSet.has(a.slug));
+    const unread = filtered.filter((article) => !readSet.has(article.slug));
     return unread.slice(0, 3);
   }, [filtered, readSet]);
 
@@ -106,7 +112,7 @@ export default function MeLearningBoard({ articles, totalPublished }: Props) {
 
       <div className="flex flex-wrap items-end justify-end gap-3 rounded-[1.4rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-4">
         <label className="flex w-full min-w-0 flex-col gap-1 text-sm font-semibold text-[var(--nm-fg)] sm:min-w-[10rem]">
-          נושא (חיפוש בתג)
+          נושא מתוך תגיות
           <input
             type="search"
             value={topic}
@@ -133,9 +139,9 @@ export default function MeLearningBoard({ articles, totalPublished }: Props) {
           תגית
           <select value={tag} onChange={(e) => setTag(e.target.value)} className="min-h-[44px] rounded-[1rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-white px-3 py-2 text-[var(--nm-fg)]">
             <option value="">הכל</option>
-            {allTags.map((x) => (
-              <option key={x} value={x}>
-                {x}
+            {allTags.map((item) => (
+              <option key={item} value={item}>
+                {item}
               </option>
             ))}
           </select>
@@ -145,15 +151,31 @@ export default function MeLearningBoard({ articles, totalPublished }: Props) {
       {recommended.length > 0 ? (
         <section className="space-y-3">
           <h3 className="text-base font-semibold text-[var(--nm-fg)]">המלצות להמשך</h3>
-          <ul className="space-y-2">
-            {recommended.map((a) => (
-              <li key={a.slug}>
-                <a href={`/articles/${a.slug}/`} className="text-sm font-semibold text-[var(--nm-accent)] underline-offset-4 hover:underline">
-                  {a.title}
-                </a>
-                <span className="mr-2 text-xs text-[color-mix(in_srgb,var(--nm-fg)_55%,var(--nm-bg))]">
-                  {levelHe(a.difficultyLevel)}
-                </span>
+          <ul className="grid gap-3 md:grid-cols-3">
+            {recommended.map((article) => (
+              <li key={article.slug} className="overflow-hidden rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/92">
+                {article.image && article.image !== "/images/logo.svg" ? (
+                  <img
+                    src={article.image}
+                    alt={article.title}
+                    width={1200}
+                    height={675}
+                    loading="lazy"
+                    className="aspect-[16/9] w-full object-cover"
+                  />
+                ) : null}
+                <div className="space-y-2 p-4">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <span className="text-xs font-semibold text-[var(--nm-accent)]">{levelHe(article.difficultyLevel)}</span>
+                    {article.youtubeId ? (
+                      <span className="rounded-full bg-[var(--nm-tint)] px-2.5 py-1 text-[0.7rem] font-semibold text-[var(--nm-accent)]">וידאו</span>
+                    ) : null}
+                  </div>
+                  <a href={`/articles/${article.slug}/`} className="block text-base font-semibold text-[var(--nm-fg)] underline-offset-4 hover:text-[var(--nm-accent)] hover:underline">
+                    {article.title}
+                  </a>
+                  <p className="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_66%,var(--nm-bg))]">{article.description}</p>
+                </div>
               </li>
             ))}
           </ul>
@@ -163,21 +185,39 @@ export default function MeLearningBoard({ articles, totalPublished }: Props) {
       <section className="space-y-3">
         <h3 className="text-base font-semibold text-[var(--nm-fg)]">רשימה ({filtered.length})</h3>
         <ul className="space-y-2">
-          {filtered.map((a) => {
-            const done = readSet.has(a.slug);
+          {filtered.map((article) => {
+            const done = readSet.has(article.slug);
             return (
-              <li key={a.slug} className="flex flex-wrap items-center justify-between gap-2 rounded-[1.1rem] border border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] bg-white/90 px-3 py-2">
-                <a href={`/articles/${a.slug}/`} className="text-sm font-medium text-[var(--nm-fg)] hover:text-[var(--nm-accent)]">
-                  {a.title}
-                </a>
-                <span className="text-xs text-[color-mix(in_srgb,var(--nm-fg)_55%,var(--nm-bg))]">
-                  {levelHe(a.difficultyLevel)}
-                  {done ? " · נסרק" : ""}
-                </span>
+              <li key={article.slug} className="rounded-[1.1rem] border border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] bg-white/90 px-3 py-3">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <a href={`/articles/${article.slug}/`} className="text-sm font-medium text-[var(--nm-fg)] hover:text-[var(--nm-accent)]">
+                      {article.title}
+                    </a>
+                    <p className="mt-1 text-xs leading-6 text-[color-mix(in_srgb,var(--nm-fg)_58%,var(--nm-bg))]">
+                      {article.description}
+                    </p>
+                  </div>
+                  <span className="text-xs text-[color-mix(in_srgb,var(--nm-fg)_55%,var(--nm-bg))]">
+                    {levelHe(article.difficultyLevel)}
+                    {done ? " • נסרק" : ""}
+                  </span>
+                </div>
               </li>
             );
           })}
         </ul>
+      </section>
+
+      <section className="rounded-[1.4rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-4">
+        <div className="flex flex-wrap justify-end gap-2 text-sm font-semibold text-[var(--nm-accent)]">
+          <a href="/glossary/" className="rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white px-3 py-2 transition hover:bg-[var(--nm-tint)]">
+            לבדוק מושג במילון
+          </a>
+          <a href="/me/unlock/" className="rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white px-3 py-2 transition hover:bg-[var(--nm-tint)]">
+            להמשיך לאזור הסגור
+          </a>
+        </div>
       </section>
     </div>
   );

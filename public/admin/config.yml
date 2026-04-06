@@ -72,11 +72,60 @@ collections:
         date_format: "YYYY-MM-DD"
         time_format: false
         hint: "עדכן אם ערכת את המאמר לאחר הפרסום הראשוני."
-      - label: מחבר
+      - label: תאריך מתוזמן לפרסום
+        name: scheduledDate
+        widget: datetime
+        required: false
+        format: "YYYY-MM-DD"
+        date_format: "YYYY-MM-DD"
+        time_format: false
+        hint: "אם תרצה לתזמן מאמר לפרסום ביום מסוים, רשום כאן את התאריך."
+      - label: מחבר ראשי
         name: author
         widget: string
         default: "השם לא משנה"
         hint: "שם האדם או הגוף שנכתב על ידו המאמר. השווה ל-שם המהדר אם שונה מהמאמר המקורי."
+      - label: מחברים נוספים
+        name: authors
+        widget: list
+        required: false
+        hint: "הוסף עד 5 שמות מחברים נוספים או שותפים לכתיבה."
+        field:
+          label: שם מחבר
+          name: author
+          widget: string
+      - label: בוחן / מבקר
+        name: reviewer
+        widget: string
+        required: false
+        hint: "מי בדק את המאמר או מי אחראי על האישור הסופי."
+      - label: הערות סקירה
+        name: reviewNotes
+        widget: text
+        required: false
+        hint: "הערות צוות העריכה לגבי תיקונים, תשובות פתוחות או משימות נוספות."
+      - label: סיכום שדרוג
+        name: revisionNote
+        widget: string
+        required: false
+        hint: "מה השתנה במהדורה זו של המאמר?"
+      - label: סוג תוכן
+        name: contentType
+        widget: select
+        required: false
+        options:
+          - { label: מאמר, value: article }
+          - { label: מדריך, value: guide }
+          - { label: מאמר דעה, value: opinion }
+          - { label: טור, value: essay }
+      - label: עדיפות תוכן
+        name: contentPriority
+        widget: select
+        default: standard
+        options:
+          - { label: רגיל, value: standard }
+          - { label: מומלץ, value: featured }
+          - { label: עיקרי, value: pillar }
       - label: תגיות
         name: tags
         widget: select

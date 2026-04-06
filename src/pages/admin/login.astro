@@ -1,84 +1,32 @@
 ---
-import AdminLoginPanel from "../../components/admin/AdminLoginPanel.astro";
+import Layout from "../../layouts/Layout.astro";
 
-const pageTitle = "כניסה לפאנל ניהול NeverMind";
-const pageDescription = "כניסה פנימית לניהול הראשי של NeverMind.";
+const pageTitle = "גישת ניהול";
+const pageDescription = "הגישה לניהול מתבצעת דרך Cloudflare Access.";
 ---
 
-<html lang="he" dir="rtl" class="scroll-smooth">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
-    <meta name="theme-color" content="#1A1A1A" />
-    <meta name="apple-mobile-web-app-capable" content="true" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="NeverMind Admin" />
-    
-    <title>{pageTitle}</title>
-    <meta name="description" content={pageDescription} />
-    <meta name="robots" content="noindex, nofollow" />
-    
-    <link rel="manifest" href="/admin-manifest.json" />
-    <link rel="icon" type="image/svg+xml" href="/images/logo.svg" />
-    <link rel="apple-touch-icon" href="/images/logo.svg" />
-    <style>
-      :root {
-        color-scheme: light;
-        --color-text-primary: #1a1a1a;
-        --color-surface-page: #fafaf8;
-        --color-surface-canvas: #fafaf8;
-        --color-accent: #0f172a;
-        --color-inverse-bg: #1a1a1a;
-        --color-inverse-fg: #fafaf8;
-        
-        --nm-fg: var(--color-text-primary);
-        --nm-bg: var(--color-surface-page);
-        --nm-bg-canvas: var(--color-surface-canvas);
-        --nm-surface-muted: color-mix(in srgb, var(--color-text-primary) 4%, var(--color-surface-page));
-        --nm-accent: var(--color-accent);
-        --nm-inverse: var(--color-inverse-bg);
-        --nm-inverse-fg: var(--color-inverse-fg);
-        --nm-inverse-hover: color-mix(in srgb, var(--color-inverse-bg) 85%, var(--color-accent));
-        --nm-tint: color-mix(in srgb, var(--nm-accent) 9%, var(--nm-bg-canvas));
-      }
-
-      html {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Assistant", "Heebo", sans-serif;
-      }
-
-      body {
-        background-color: var(--nm-bg);
-        color: var(--nm-fg);
-        margin: 0;
-        padding: 0;
-        min-height: 100vh;
-      }
-    </style>
-  </head>
-  <body dir="rtl">
-    <AdminLoginPanel onLoginSuccess="/admin/" />
-
-    <script is:inline>
-      if ("serviceWorker" in navigator) {
-        navigator.serviceWorker
-          .register("/admin-sw.js", { scope: "/admin/" })
-          .catch(() => {});
-      }
-
-      let deferredPrompt = null;
-
-      window.addEventListener("beforeinstallprompt", (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-      });
-
-      window.__nmAdminInstallApp = async () => {
-        if (deferredPrompt) {
-          deferredPrompt.prompt();
-          await deferredPrompt.userChoice;
-          deferredPrompt = null;
-        }
-      };
-    </script>
-  </body>
-</html>
+<Layout title={pageTitle} description={pageDescription} noIndex={true}>
+  <section class="mx-auto flex min-h-[70vh] max-w-2xl items-center px-4 py-16 text-right text-[var(--nm-fg)]">
+    <div class="w-full rounded-[28px] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/92 p-6 shadow-[0_24px_70px_rgba(26,26,26,0.05)]">
+      <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--nm-accent)]">מנהל בלבד</p>
+      <h1 class="mt-3 text-[clamp(2rem,1.6rem+1vw,2.8rem)] font-semibold">הגישה לניהול מתבצעת דרך Cloudflare Access</h1>
+      <p class="mt-4 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
+        אין כאן מסך כניסה רגיל. אם המייל שלך מורשה ב־Access, רענון או מעבר לניהול יחזירו אותך ישר למסכים הפנימיים.
+      </p>
+      <div class="mt-6 flex flex-wrap gap-3">
+        <a
+          href="/admin/"
+          class="inline-flex min-h-[44px] items-center justify-center rounded-full bg-[var(--nm-inverse)] px-5 py-2.5 text-sm font-semibold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-inverse-hover)]"
+        >
+          לעבור לניהול
+        </a>
+        <a
+          href="/cdn-cgi/access/logout"
+          class="inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-5 py-2.5 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]"
+        >
+          להתנתק מ־Access
+        </a>
+      </div>
+    </div>
+  </section>
+</Layout>

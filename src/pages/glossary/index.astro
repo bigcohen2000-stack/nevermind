@@ -1,76 +1,136 @@
 ---
+import { getCollection } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
 import { glossaryConcepts } from "../../data/glossary";
 import { glossaryTagToTopicHref } from "../../data/glossary-topics";
+import { getCanonicalArticleSlug } from "../../lib/articles";
 
-const pageTitle = "הגדרות מחדש";
+const pageTitle = "מילון המושגים של השם לא משנה";
 const pageDescription =
-  "כדי להבין אחד את השני באמת, חייבים להסכים על משמעות המילים. כאן נמצא ההסבר הפשוט והנקי למושגים שאנחנו משתמשים בהם, בלי כוונה נסתרת.";
+  "הגדרות פשוטות וברורות למושגים המרכזיים של NeverMind: בהירות, אגו, בחירה, חופש, עובדה מול פירוש, מנגנון ועוד.";
+
+const entries = await getCollection("articles", ({ data }) => data.draft !== true);
+const featuredArticles = new Map<string, { href: string; title: string }>();
+
+for (const concept of glossaryConcepts) {
+  const match = entries
+    .map((entry) => {
+      const tags = Array.isArray(entry.data.tags) ? entry.data.tags : [];
+      const haystack = `${entry.data.title} ${entry.data.description} ${tags.join(" ")}`.toLowerCase();
+      const tagScore = tags.filter((tag) => concept.tags.includes(tag)).length * 3;
+      const keywordScore = concept.keywords.filter((keyword) => haystack.includes(keyword.toLowerCase())).length;
+      return {
+        href: `/articles/${getCanonicalArticleSlug(entry)}/`,
+        title: entry.data.title,
+        score: tagScore + keywordScore,
+      };
+    })
+    .filter((item) => item.score > 0)
+    .sort((left, right) => right.score - left.score)[0];
+
+  if (match) featuredArticles.set(concept.slug, { href: match.href, title: match.title });
+}
 ---
 
 <Layout title={pageTitle} description={pageDescription}>
   <section class="mx-auto max-w-6xl space-y-10 px-4 pb-20 text-[var(--nm-fg)]">
     <header class="space-y-4 text-right">
       <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--nm-accent)]">מילון</p>
-      <h1 class="text-[clamp(2.2rem,1.7rem+2vw,3.4rem)] font-semibold text-[var(--nm-fg)]">הגדרות מחדש</h1>
+      <h1 class="text-[clamp(2.2rem,1.7rem+2vw,3.4rem)] font-semibold text-[var(--nm-fg)]">מילון המושגים של השם לא משנה</h1>
       <p class="max-w-4xl text-[clamp(1rem,0.95rem+0.35vw,1.18rem)] leading-8 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">
-        כדי להבין אחד את השני באמת, חייבים להסכים על משמעות המילים. כאן נמצא ההסבר הפשוט והנקי למושגים שאנחנו משתמשים בהם, בלי כוונה נסתרת.
+        כדי להבין באמת, צריך להסכים קודם על המשמעות של המילים. כאן נמצאות הגדרות פשוטות, ההפך שמחדד אותן, דוגמה יומיומית, וקישור להמשך קריאה.
       </p>
-      <p>
+      <div class="flex flex-wrap justify-end gap-3 text-sm font-semibold text-[var(--nm-accent)]">
         <a
           href="/glossary/ego/"
           class="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full bg-[var(--nm-inverse)] px-5 py-3 text-sm font-semibold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-inverse-hover)]"
         >
-          התחל ממה זה אגו?
+          להתחיל מאגו
         </a>
-      </p>
+        <a href="/articles/" class="inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] px-5 py-3 transition hover:bg-[var(--nm-surface-muted)]">לכל המאמרים</a>
+        <a href="/me/learning/" class="inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] px-5 py-3 transition hover:bg-[var(--nm-surface-muted)]">לוח הלמידה</a>
+      </div>
     </header>
 
     <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-      {glossaryConcepts.map((concept) => (
-        <article
-          class="flex h-full flex-col rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/82 text-right shadow-[0_20px_60px_rgba(26,26,26,0.05)] transition duration-300 hover:translate-y-[-2px] hover:bg-white"
-        >
-          <a
-            href={`/glossary/${concept.slug}/`}
-            class="group flex flex-1 flex-col justify-between gap-5 p-6 text-inherit no-underline"
+      {glossaryConcepts.map((concept) => {
+        const featuredArticle = featuredArticles.get(concept.slug);
+        return (
+          <article
+            class="flex h-full flex-col rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/82 text-right shadow-[0_20px_60px_rgba(26,26,26,0.05)] transition duration-300 hover:translate-y-[-2px] hover:bg-white"
           >
-            <div class="space-y-3">
-              <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">מושג יסוד</p>
-              <h2 class="text-2xl font-semibold text-[var(--nm-fg)] group-hover:text-[var(--nm-accent)]">{concept.title}</h2>
-              <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">{concept.summary}</p>
-            </div>
-            <div class="space-y-3">
-              {concept.oppositeLink && (
-                <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_58%,var(--nm-bg))]">
-                  ההפך שמבהיר את הראייה:
-                  <span class="font-semibold text-[var(--nm-accent)]"> {concept.oppositeLink.title.replace("הצד השני: ", "")}</span>
-                </p>
-              )}
-              <span class="inline-flex items-center justify-end gap-2 text-sm font-semibold text-[var(--nm-accent)]">
-                פתח את המושג
+            <div class="flex flex-1 flex-col gap-5 p-6">
+              <div class="space-y-3">
+                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">מושג יסוד</p>
+                <h2 class="text-2xl font-semibold text-[var(--nm-fg)]">{concept.title}</h2>
+                <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">{concept.summary}</p>
+              </div>
+
+              <div class="space-y-3 rounded-[1.4rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] px-4 py-4">
+                <p class="text-sm font-semibold text-[var(--nm-fg)]">הגדרה</p>
+                <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">{concept.definition}</p>
+              </div>
+
+              {concept.oppositeLink ? (
+                <div class="space-y-2">
+                  <p class="text-sm font-semibold text-[var(--nm-accent)]">ההפך שמחדד</p>
+                  <a href={concept.oppositeLink.href} class="block rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-accent)_16%,transparent)] bg-[var(--nm-tint)] px-4 py-3 transition hover:bg-white">
+                    <p class="font-semibold text-[var(--nm-fg)]">{concept.oppositeLink.title.replace("הצד השני: ", "")}</p>
+                    <p class="mt-1 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_66%,var(--nm-bg))]">{concept.oppositeLink.description}</p>
+                  </a>
+                </div>
+              ) : null}
+
+              {concept.dailyExample ? (
+                <div class="space-y-2">
+                  <p class="text-sm font-semibold text-[var(--nm-accent)]">דוגמה יומיומית</p>
+                  <p class="rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white px-4 py-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
+                    {concept.dailyExample}
+                  </p>
+                </div>
+              ) : null}
+
+              <div class="space-y-2">
+                <p class="text-sm font-semibold text-[var(--nm-accent)]">להמשך קריאה</p>
+                {featuredArticle ? (
+                  <a href={featuredArticle.href} class="block rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white px-4 py-3 transition hover:bg-[var(--nm-surface-muted)]">
+                    <p class="font-semibold text-[var(--nm-fg)]">{featuredArticle.title}</p>
+                    <p class="mt-1 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_64%,var(--nm-bg))]">מאמר פתוח שממשיך את אותו מנגנון מזווית אחרת.</p>
+                  </a>
+                ) : (
+                  <a href={`/glossary/${concept.slug}/`} class="block rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white px-4 py-3 transition hover:bg-[var(--nm-surface-muted)]">
+                    <p class="font-semibold text-[var(--nm-fg)]">לעמוד המלא של {concept.title}</p>
+                    <p class="mt-1 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_64%,var(--nm-bg))]">העמקה בהגדרה, בהפך, ובקישורים קרובים.</p>
+                  </a>
+                )}
+              </div>
+
+              <a
+                href={`/glossary/${concept.slug}/`}
+                class="inline-flex min-h-[44px] items-center justify-end gap-2 font-semibold text-[var(--nm-accent)]"
+              >
+                לפתוח את המושג
                 <span aria-hidden="true">←</span>
-              </span>
+              </a>
             </div>
-          </a>
-          <div class="flex flex-wrap justify-end gap-2 border-t border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] px-6 pb-6 pt-4 text-xs text-[color-mix(in_srgb,var(--nm-fg)_55%,var(--nm-bg))]">
-            {concept.tags.map((tag) => {
-              const topicHref = glossaryTagToTopicHref[tag];
-              const pillClass =
-                "rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-3 py-1 transition hover:border-[color-mix(in_srgb,var(--nm-accent)_28%,transparent)] hover:text-[var(--nm-accent)]";
-              return topicHref ? (
-                <a href={topicHref} class={`inline-flex min-h-[32px] items-center ${pillClass}`}>
-                  {tag}
-                </a>
-              ) : (
-                <span class={`inline-flex min-h-[32px] items-center ${pillClass}`}>{tag}</span>
-              );
-            })}
-          </div>
-        </article>
-      ))}
+
+            <div class="flex flex-wrap justify-end gap-2 border-t border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] px-6 pb-6 pt-4 text-xs text-[color-mix(in_srgb,var(--nm-fg)_55%,var(--nm-bg))]">
+              {concept.tags.map((tag) => {
+                const topicHref = glossaryTagToTopicHref[tag];
+                const pillClass =
+                  "rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-3 py-1 transition hover:border-[color-mix(in_srgb,var(--nm-accent)_28%,transparent)] hover:text-[var(--nm-accent)]";
+                return topicHref ? (
+                  <a href={topicHref} class={pillClass}>
+                    {tag}
+                  </a>
+                ) : (
+                  <span class={pillClass}>{tag}</span>
+                );
+              })}
+            </div>
+          </article>
+        );
+      })}
     </div>
   </section>
 </Layout>
-
-

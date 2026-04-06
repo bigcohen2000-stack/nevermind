@@ -486,7 +486,7 @@ export default function MePersonalDashboard({ articles, totalPublished, whatsApp
 
       <section aria-label="תגים" className="space-y-3">
         <h2 className="text-[0.9375rem] font-semibold" style={{ color: FG }}>
-          Badges
+          סימוני דרך
         </h2>
         <div className="flex flex-wrap justify-end gap-6">
           {[
@@ -518,7 +518,7 @@ export default function MePersonalDashboard({ articles, totalPublished, whatsApp
       </section>
 
       <p className="text-center text-[0.8125rem] font-medium leading-relaxed" style={{ color: `${FG}55` }}>
-        עוד 12 חברים לומדים עכשיו באתר
+        הקצב כאן אישי. גם בלי מונה ציבורי, מה שנשמר לך נשאר קרוב וזמין.
       </p>
 
       <p className="pb-4 text-center text-[0.75rem] font-medium leading-relaxed" style={{ color: `${FG}50` }}>

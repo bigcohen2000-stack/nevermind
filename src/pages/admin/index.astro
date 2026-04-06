@@ -140,13 +140,15 @@ const statusCards = [
     </div>
 
     <script>
-      import { AdminAuth } from "../../lib/admin-auth";
-
       document.addEventListener("astro:page-load", () => {
         const logoutBtn = document.getElementById("admin-logout-btn");
         logoutBtn?.addEventListener("click", () => {
-          AdminAuth.logout();
-          window.location.href = "/admin/login/";
+          try {
+            window.localStorage.removeItem("nm-admin-session");
+            window.localStorage.removeItem("nm_admin_session");
+          } catch {
+          }
+          window.location.href = "/cdn-cgi/access/logout";
         });
       });
     </script>

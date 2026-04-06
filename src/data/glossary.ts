@@ -10,9 +10,11 @@ export type GlossaryConcept = {
   summary: string;
   definition: string;
   whyItMatters: string;
+  dailyExample?: string;
   tags: string[];
   keywords: string[];
   oppositeLink?: GlossaryLink;
+  relatedConceptSlugs?: string[];
   relatedLinks: GlossaryLink[];
 };
 
@@ -23,6 +25,7 @@ export const glossaryConcepts: GlossaryConcept[] = [
     summary: "המנגנון שמגן על סיפור פנימי על מי אני.",
     definition: "אגו הוא המאמץ לשמור על דמות קבועה. ברגע שמישהו מערער את הדמות, המוח מגיב כאילו הקיום עצמו הותקף.",
     whyItMatters: "כשמזהים שהתגובה מגנה על דמות ולא על עובדה, אפשר להפסיק להילחם על סיפור שלא חייב להישאר.",
+    dailyExample: "מישהו העיר לך משהו קטן, ופתאום הרגשת שאתה חייב להסביר מי אתה באמת.",
     tags: ["העצמי", "מכניקת מחשבה"],
     keywords: ["אגו", "זהות", "דימוי עצמי", "הגנה"],
     oppositeLink: {
@@ -30,6 +33,7 @@ export const glossaryConcepts: GlossaryConcept[] = [
       title: "הצד השני: בהירות",
       description: "אם אגו מגן על סיפור, בהירות בודקת מה ממנו באמת נכון.",
     },
+    relatedConceptSlugs: ["self", "clarity"],
     relatedLinks: [
       {
         href: "/topics/self/",
@@ -49,6 +53,7 @@ export const glossaryConcepts: GlossaryConcept[] = [
     summary: "הנקודה שבה רואים שיש יותר מאפשרות אוטומטית אחת.",
     definition: "בחירה לא מתחילה בתחושת חופש, אלא בזיהוי של מה שמפעיל אותי. רק אחרי שהכפייה נראית, נפתח מקום לכיוון אחר.",
     whyItMatters: "בלי להבין בחירה, קל לפרש הרגל כגורל. כשמבינים את המנגנון, אפשר לזוז ממנו.",
+    dailyExample: "עמדת לשלוח תגובה אוטומטית, ואז ראית שיש עוד דרך לדבר או בכלל לעצור.",
     tags: ["בחירה", "חופש"],
     keywords: ["בחירה", "רצון", "חופש", "הרגל"],
     oppositeLink: {
@@ -56,6 +61,7 @@ export const glossaryConcepts: GlossaryConcept[] = [
       title: "הצד השני: חופש",
       description: "בחירה היא הרגע המקומי. חופש הוא היכולת לא להישאר עבד של הרגע הזה.",
     },
+    relatedConceptSlugs: ["freedom", "habit"],
     relatedLinks: [
       {
         href: "/topics/choice/",
@@ -75,6 +81,7 @@ export const glossaryConcepts: GlossaryConcept[] = [
     summary: "ההבדל בין מה שקרה בפועל לבין מה שהמוח אומר שזה אומר.",
     definition: "עובדה היא תיאור שאפשר למסור בלי עלילה. פירוש הוא המשמעות שהמוח מלביש על התיאור הזה.",
     whyItMatters: "כמעט כל סערה פנימית גדלה במקום שבו פירוש מוצג כאילו הוא עובדה. ההפרדה הזאת היא בסיס לבהירות.",
+    dailyExample: "הוא לא ענה לך, ובלי לשים לב כבר סיפרת לעצמך מה זה אומר עליך.",
     tags: ["בהירות", "מכניקת מחשבה"],
     keywords: ["עובדה", "פירוש", "משמעות", "בהירות"],
     oppositeLink: {
@@ -82,6 +89,7 @@ export const glossaryConcepts: GlossaryConcept[] = [
       title: "הצד השני: אגו",
       description: "כשפירוש נדבק לעובדה, הרבה פעמים אגו הוא זה ששומר שהפירוש יישאר חי.",
     },
+    relatedConceptSlugs: ["reality", "story"],
     relatedLinks: [
       {
         href: "/topics/clarity/",
@@ -101,6 +109,7 @@ export const glossaryConcepts: GlossaryConcept[] = [
     summary: "היכולת לראות את המבנה בלי שהרעש יניע את המסקנה.",
     definition: "בהירות היא לא רוגע. היא מצב שבו אני כבר לא מערבב עובדה, פחד, והרגל באותו משפט.",
     whyItMatters: "כשהמבנה ברור, קל יותר לדעת מה לעשות. לא כי המציאות תמיד נעימה, אלא כי היא כבר לא מעורפלת.",
+    dailyExample: "יש בלגן בחוץ, אבל פתאום ברור לך מה שייך לעובדה ומה שייך לפחד.",
     tags: ["בהירות", "בחירה"],
     keywords: ["בהירות", "דיוק", "ראייה", "החלטה"],
     oppositeLink: {
@@ -108,6 +117,7 @@ export const glossaryConcepts: GlossaryConcept[] = [
       title: "הצד השני: אגו",
       description: "אם בהירות בודקת, אגו ממהר להגן.",
     },
+    relatedConceptSlugs: ["fact-vs-interpretation", "observation"],
     relatedLinks: [
       {
         href: "/topics/clarity/",
@@ -127,6 +137,7 @@ export const glossaryConcepts: GlossaryConcept[] = [
     summary: "לא לעשות מה שבא לי, אלא לראות מה מפעיל אותי לפני שאני מגיב.",
     definition: "חופש הוא היכולת לא להיות מופעל אוטומטית על ידי פחד, הרגל, או צורך להגן על דימוי.",
     whyItMatters: "בלי חופש, גם החלטה שנראית מודעת יכולה להיות רק המשך של אותו מנגנון ישן.",
+    dailyExample: "אמרת כן מהר, ואז ראית שלא באמת בחרת אלא רק המשכת הרגל ישן.",
     tags: ["חופש", "בחירה"],
     keywords: ["חופש", "אחריות", "כפייה", "הרגל"],
     oppositeLink: {
@@ -134,6 +145,7 @@ export const glossaryConcepts: GlossaryConcept[] = [
       title: "הצד השני: העצמי",
       description: "ככל שהדמות קשיחה יותר, כך קשה יותר לזוז ממנה בחופש.",
     },
+    relatedConceptSlugs: ["choice", "self"],
     relatedLinks: [
       {
         href: "/topics/freedom/",
@@ -151,10 +163,9 @@ export const glossaryConcepts: GlossaryConcept[] = [
     slug: "reality",
     title: "המציאות",
     summary: "מה שניתן לבדוק, למדוד, או לתעד בלי להוסיף עלילה.",
-    definition:
-      "המציאות כאן היא שכבת התיאור שעומדת לפני המשמעות: מה שקרה, מה שמופיע, מה שניתן להצביע עליו. הפירוש על המציאות הוא כבר סיפור נפרד.",
-    whyItMatters:
-      "כשמערבבים בין מציאות לפירוש, קל להילחם בסיפור במקום לבדוק עובדה. ההפרדה מחזירה דיוק.",
+    definition: "המציאות כאן היא שכבת התיאור שעומדת לפני המשמעות: מה שקרה, מה שמופיע, מה שניתן להצביע עליו. הפירוש על המציאות הוא כבר סיפור נפרד.",
+    whyItMatters: "כשמערבבים בין מציאות לפירוש, קל להילחם בסיפור במקום לבדוק עובדה. ההפרדה מחזירה דיוק.",
+    dailyExample: "הגשם ירד באמת. זה כבר משהו אחר לגמרי מלהחליט שהיום נהרס.",
     tags: ["בהירות", "מכניקת מחשבה"],
     keywords: ["מציאות", "עובדה", "תצפית", "סיפור", "פירוש"],
     oppositeLink: {
@@ -162,6 +173,7 @@ export const glossaryConcepts: GlossaryConcept[] = [
       title: "הצד השני: עובדה מול פירוש",
       description: "כשמפרידים בין תיאור למשמעות, רואים איפה המציאות נגמרת והסיפור מתחיל.",
     },
+    relatedConceptSlugs: ["observation", "fact-vs-interpretation"],
     relatedLinks: [
       {
         href: "/glossary/clarity/",
@@ -179,10 +191,9 @@ export const glossaryConcepts: GlossaryConcept[] = [
     slug: "mechanism",
     title: "מנגנון",
     summary: "הדפוס הקבוע שבו משהו נגרם שוב ושוב, בלי שזה נראה כמו בחירה בודדת.",
-    definition:
-      "מנגנון הוא תיאור של איך חלקים מתחברים: קלט, פירוש, תגובה, חיזוק. כשמזהים מנגנון, אפשר לעצור לפני שמספרים את עצמנו שזה רק אופי או מזל.",
-    whyItMatters:
-      "האתר מדבר הרבה על מכניקת מחשבה כי כאן המטרה היא לא לשפוט את האדם אלא לראות את השרשרת. בלי מילה למנגנון, קל לבלבל בין תיאור לבין גזר דין.",
+    definition: "מנגנון הוא תיאור של איך חלקים מתחברים: קלט, פירוש, תגובה, חיזוק. כשמזהים מנגנון, אפשר לעצור לפני שמספרים את עצמנו שזה רק אופי או מזל.",
+    whyItMatters: "האתר מדבר הרבה על מכניקת מחשבה כי כאן המטרה היא לא לשפוט את האדם אלא לראות את השרשרת. בלי מילה למנגנון, קל לבלבל בין תיאור לבין גזר דין.",
+    dailyExample: "אותה הודעה, אותו כיווץ בגוף, אותה תגובה. כשזה חוזר שוב, כבר יש כאן מנגנון.",
     tags: ["מכניקת מחשבה", "בהירות"],
     keywords: ["מנגנון", "דפוס", "שרשרת", "מחשבה", "תגובה"],
     oppositeLink: {
@@ -190,6 +201,7 @@ export const glossaryConcepts: GlossaryConcept[] = [
       title: "הצד השני: בהירות",
       description: "בהירות היא הרגע שבו רואים את המנגנון בלי שהוא מסתיר את עצמו.",
     },
+    relatedConceptSlugs: ["habit", "reaction"],
     relatedLinks: [
       {
         href: "/topics/thought-mechanics/",
@@ -207,17 +219,17 @@ export const glossaryConcepts: GlossaryConcept[] = [
     slug: "story",
     title: "הסיפור",
     summary: "הגרסה שהמוח בונה על מה שקרה, אחרי שכבר עיבד את התצפית.",
-    definition:
-      "הסיפור הוא שכבת המשמעות: מי אשם, מה זה אומר עליי, מה יקרה הלאה. הוא לא בהכרח שקר. הוא לעיתים שילוב של עובדה קטנה עם השערה גדולה.",
-    whyItMatters:
-      "כשמערבבים בין סיפור לעובדה, כל שיחה הופכת למלחמה על פרשנות. כשמפרידים, אפשר לבדוק את הסיפור במקום להילחם עליו.",
+    definition: "הסיפור הוא שכבת המשמעות: מי אשם, מה זה אומר עליי, מה יקרה הלאה. הוא לא בהכרח שקר. הוא לעיתים שילוב של עובדה קטנה עם השערה גדולה.",
+    whyItMatters: "כשמערבבים בין סיפור לעובדה, כל שיחה הופכת למלחמה על פרשנות. כשמפרידים, אפשר לבדוק את הסיפור במקום להילחם עליו.",
+    dailyExample: "מישהו עבר לידך בלי שלום, ותוך שנייה כבר נבנה בפנים סיפור שלם.",
     tags: ["בהירות", "מכניקת מחשבה"],
     keywords: ["סיפור", "פרשנות", "משמעות", "עובדה", "השערה"],
     oppositeLink: {
       href: "/glossary/reality/",
       title: "הצד השני: המציאות",
-      description: "המציאות היא מה שניתן לתאר בלי עלילה. הסיפור הוא העילה שמוסיפים אחרי.",
+      description: "המציאות היא מה שניתן לתאר בלי עלילה. הסיפור הוא העלילה שמוסיפים אחריה.",
     },
+    relatedConceptSlugs: ["reality", "hidden-assumption"],
     relatedLinks: [
       {
         href: "/glossary/fact-vs-interpretation/",
@@ -235,10 +247,9 @@ export const glossaryConcepts: GlossaryConcept[] = [
     slug: "habit",
     title: "הרגל",
     summary: "תגובה שחוזרת עד שהיא מרגישה כמו אופי, בלי בדיקה בכל פעם מחדש.",
-    definition:
-      "הרגל הוא מסלול שכבר נחצה: אותו טריגר, אותה תנועה פנימית, אותה תוצאה. הוא לא מוכיח שאין ברירה. הוא מוכיח שהמערכת למדה קיצור.",
-    whyItMatters:
-      "כשקוראים להרגל גורל, נסגר החלון לחקירה. כשקוראים לו מנגנון, נפתח מקום לזוז אחרת בפעם הבאה.",
+    definition: "הרגל הוא מסלול שכבר נחרץ: אותו טריגר, אותה תנועה פנימית, אותה תוצאה. הוא לא מוכיח שאין ברירה. הוא מוכיח שהמערכת למדה קיצור.",
+    whyItMatters: "כשקוראים להרגל גורל, נסגר החלון לחקירה. כשקוראים לו מנגנון, נפתח מקום לזוז אחרת בפעם הבאה.",
+    dailyExample: "בכל פעם שיש לחץ אתה פותח את הטלפון, עוד לפני שבדקת מה באמת קורה.",
     tags: ["בחירה", "מכניקת מחשבה"],
     keywords: ["הרגל", "דפוס", "חזרתיות", "טריגר", "קיצור"],
     oppositeLink: {
@@ -246,6 +257,7 @@ export const glossaryConcepts: GlossaryConcept[] = [
       title: "הצד השני: בחירה",
       description: "בחירה מתחילה כשההרגל כבר נראה כהרגל ולא כאמת על העולם.",
     },
+    relatedConceptSlugs: ["choice", "mechanism"],
     relatedLinks: [
       {
         href: "/topics/choice/",
@@ -263,10 +275,9 @@ export const glossaryConcepts: GlossaryConcept[] = [
     slug: "hidden-assumption",
     title: "הנחה נסתרת",
     summary: "כלל שקט שמנהל את החשיבה בלי שנראה שהוא בכלל נבחר.",
-    definition:
-      "הנחה נסתרת היא משפט בסיס שהמוח מתייחס אליו כאמת מובנת מאליה. למשל: אם מישהו לא ענה, זה אומר שאני לא חשוב. כל השרשרת נבנית עליה בלי בדיקה.",
-    whyItMatters:
-      "כשלא מזהים את ההנחה, נלחמים רק בתוצאה. כשמזהים אותה, אפשר לבדוק את הבסיס ולפרק מנגנון שלם.",
+    definition: "הנחה נסתרת היא משפט בסיס שהמוח מתייחס אליו כאמת מובנת מאליה. למשל: אם מישהו לא ענה, זה אומר שאני לא חשוב. כל השרשרת נבנית עליה בלי בדיקה.",
+    whyItMatters: "כשלא מזהים את ההנחה, נלחמים רק בתוצאה. כשמזהים אותה, אפשר לבדוק את הבסיס ולפרק מנגנון שלם.",
+    dailyExample: "שמעת לא, ומיד קבעת שזה אומר שאין לך מקום או ערך.",
     tags: ["מכניקת מחשבה", "בהירות"],
     keywords: ["הנחה", "הנחה נסתרת", "בסיס", "פירוש", "מנגנון"],
     oppositeLink: {
@@ -274,6 +285,7 @@ export const glossaryConcepts: GlossaryConcept[] = [
       title: "הצד השני: עובדה מול פירוש",
       description: "ההפרדה מחייבת לבדוק מה עובדה ומה רק הנחה.",
     },
+    relatedConceptSlugs: ["story", "fact-vs-interpretation"],
     relatedLinks: [
       {
         href: "/tags/hidden-assumption/",
@@ -291,10 +303,9 @@ export const glossaryConcepts: GlossaryConcept[] = [
     slug: "observation",
     title: "תצפית",
     summary: "מה שנקלט כרגע בלי לקפוץ למסקנה.",
-    definition:
-      "תצפית היא תיאור של מה שיש: מילה שנאמרה, פעולה שנעשתה, תחושה בגוף. בלי להוסיף עדיין מה זה אומר עליי או על העתיד.",
-    whyItMatters:
-      "בלי תצפית, הדיון מתחיל כבר מפירוש. תצפית מחזירה קרקע מוצקה לחקירה.",
+    definition: "תצפית היא תיאור של מה שיש: מילה שנאמרה, פעולה שנעשתה, תחושה בגוף. בלי להוסיף עדיין מה זה אומר עליי או על העתיד.",
+    whyItMatters: "בלי תצפית, הדיון מתחיל כבר מפירוש. תצפית מחזירה קרקע מוצקה לחקירה.",
+    dailyExample: "אתה שם לב שהלב דופק מהר. זה עדיין לא אומר כלום על מה הולך לקרות.",
     tags: ["בהירות", "בחירה"],
     keywords: ["תצפית", "תיאור", "עובדה", "דיוק", "בדיקה"],
     oppositeLink: {
@@ -302,6 +313,7 @@ export const glossaryConcepts: GlossaryConcept[] = [
       title: "הצד השני: הסיפור",
       description: "תצפית נשארת עם מה שקרה. סיפור מוסיף למה שקרה משמעות רחבה.",
     },
+    relatedConceptSlugs: ["reality", "story"],
     relatedLinks: [
       {
         href: "/glossary/reality/",
@@ -319,10 +331,9 @@ export const glossaryConcepts: GlossaryConcept[] = [
     slug: "reaction",
     title: "תגובה",
     summary: "המהלך המיידי שמופיע אחרי טריגר, לרוב לפני בדיקה.",
-    definition:
-      "תגובה היא לא רק פעולה חיצונית. היא גם משפט פנימי, מתח בגוף, או דחף להתגונן. ברוב המקרים היא מגיעה מהר יותר מהמחשבה המסודרת.",
-    whyItMatters:
-      "כדי לשנות דפוס צריך לזהות את נקודת התגובה בזמן אמת. שם נמצאת האפשרות לבחירה.",
+    definition: "תגובה היא לא רק פעולה חיצונית. היא גם משפט פנימי, מתח בגוף, או דחף להתגונן. ברוב המקרים היא מגיעה מהר יותר מהמחשבה המסודרת.",
+    whyItMatters: "כדי לשנות דפוס צריך לזהות את נקודת התגובה בזמן אמת. שם נמצאת האפשרות לבחירה.",
+    dailyExample: "עוד לפני שחשבת, כבר הרמת קול, נסגרת, או רצית לברוח.",
     tags: ["בחירה", "מכניקת מחשבה"],
     keywords: ["תגובה", "טריגר", "אוטומט", "דחף", "בחירה"],
     oppositeLink: {
@@ -330,6 +341,7 @@ export const glossaryConcepts: GlossaryConcept[] = [
       title: "הצד השני: בחירה",
       description: "בחירה מתחילה ברגע שבו רואים את התגובה ולא נבלעים בתוכה.",
     },
+    relatedConceptSlugs: ["choice", "mechanism"],
     relatedLinks: [
       {
         href: "/glossary/habit/",
@@ -349,6 +361,7 @@ export const glossaryConcepts: GlossaryConcept[] = [
     summary: "הדמות שאני מחזיק, ומפחד לאבד.",
     definition: "העצמי הוא לא רק מי שאני, אלא גם הסיפור שאני מתאמץ להחזיק על עצמי מול העולם.",
     whyItMatters: "כשהעצמי נדבק לסיפור אחד, כל שינוי מרגיש כמו איום. כשהסיפור נבדק, נפתח מרחב תנועה.",
+    dailyExample: "כשמשהו לא מסתדר, זה מרגיש כאילו כל מי שאתה עומד להתערער.",
     tags: ["העצמי", "בהירות"],
     keywords: ["העצמי", "זהות", "דמות", "אגו"],
     oppositeLink: {
@@ -356,6 +369,7 @@ export const glossaryConcepts: GlossaryConcept[] = [
       title: "הצד השני: חופש",
       description: "אם העצמי נאחז בדמות, חופש מאפשר לראות שהדמות איננה כל המציאות.",
     },
+    relatedConceptSlugs: ["ego", "freedom"],
     relatedLinks: [
       {
         href: "/topics/self/",

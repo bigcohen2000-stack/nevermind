@@ -1,5 +1,5 @@
 ---
-import type { AdminRole } from "../../lib/admin-auth";
+type AdminRole = "viewer" | "editor" | "admin";
 
 interface Props {
   requiredRole?: AdminRole;
@@ -7,7 +7,7 @@ interface Props {
   showIfAuthed?: boolean;
 }
 
-const { requiredRole = "viewer", fallback = "אין לך הרשאה לתוכן זה", showIfAuthed = false } = Astro.props;
+const { requiredRole = "viewer", fallback = "נדרשת גישת Cloudflare Access כדי להיכנס למסך הזה", showIfAuthed = false } = Astro.props;
 ---
 
 <div class="role-gate" data-role-gate data-required-role={requiredRole} data-show-if-authed={showIfAuthed}>
@@ -17,7 +17,7 @@ const { requiredRole = "viewer", fallback = "אין לך הרשאה לתוכן �
 
   <div class="gate-fallback rounded-lg border border-yellow-200 bg-yellow-50 px-4 py-3 text-right text-sm text-yellow-800 hidden">
     <p class="font-semibold">{fallback}</p>
-    <a href="/admin/login/" class="mt-2 inline-block text-yellow-700 underline underline-offset-2 hover:text-yellow-900">לחזור לכניסה</a>
+    <a href="/admin/" class="mt-2 inline-block text-yellow-700 underline underline-offset-2 hover:text-yellow-900">לנסות שוב דרך Access</a>
   </div>
 
   <div class="gate-loading animate-pulse rounded-lg bg-gray-200 px-4 py-3 text-right text-sm text-gray-600">
@@ -26,36 +26,35 @@ const { requiredRole = "viewer", fallback = "אין לך הרשאה לתוכן �
 </div>
 
 <script>
-  import { AdminAuth } from "../../lib/admin-auth";
-
   document.addEventListener("astro:page-load", () => {
     const gates = document.querySelectorAll("[data-role-gate]");
+    const accessStatusPromise = fetch("/api/admin/access-status", {
+      headers: { accept: "application/json" },
+      cache: "no-store",
+      credentials: "same-origin",
+    })
+      .then(async (response) => {
+        const payload = await response.json().catch(() => null);
+        return response.ok && payload?.ok === true;
+      })
+      .catch(() => false);
 
     gates.forEach((gate) => {
       const content = gate.querySelector(".gate-content");
       const fallback = gate.querySelector(".gate-fallback");
       const loading = gate.querySelector(".gate-loading");
-      const requiredRole = gate instanceof HTMLElement ? gate.dataset.requiredRole || "viewer" : "viewer";
-      const showIfAuthed = gate instanceof HTMLElement ? gate.dataset.showIfAuthed === "true" : false;
+      accessStatusPromise.then((allowed) => {
+        loading?.classList.add("hidden");
 
-      const user = AdminAuth.getCurrentUser();
+        if (allowed) {
+          content?.classList.remove("hidden");
+          fallback?.classList.add("hidden");
+          return;
+        }
 
-      loading?.classList.add("hidden");
-
-      if (!user) {
         fallback?.classList.remove("hidden");
         content?.classList.add("hidden");
-        return;
-      }
-
-      const requiredRoleSafe = (["viewer", "editor", "admin"].includes(requiredRole) ? requiredRole : "viewer") as import("../../lib/admin-auth").AdminRole;
-      if (AdminAuth.hasPermission(user.role, requiredRoleSafe)) {
-        content?.classList.remove("hidden");
-        fallback?.classList.add("hidden");
-      } else {
-        fallback?.classList.remove("hidden");
-        content?.classList.add("hidden");
-      }
+      });
     });
   });
 </script>

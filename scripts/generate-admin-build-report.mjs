@@ -46,7 +46,7 @@ function estimateReadability(text) {
 
 const articleFiles = fs
   .readdirSync(articlesDir)
-  .filter((name) => name.endsWith(".mdx") && !["template.mdx", "decap-cms-setup.mdx"].includes(name));
+  .filter((name) => name.endsWith(".mdx") && !["_template.mdx", "decap-cms-setup.mdx"].includes(name));
 
 const readabilityItems = articleFiles
   .map((name) => {

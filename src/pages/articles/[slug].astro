@@ -1,36 +1,58 @@
 ---
-import { getCollection } from "astro:content";
+import { getCollection, type CollectionEntry } from "astro:content";
+import ArticlePage from "../../components/articles/ArticlePage.astro";
 import StaticRedirectPage from "../../components/StaticRedirectPage.astro";
+import { getCanonicalArticleSlug } from "../../lib/articles";
 
 export async function getStaticPaths() {
   const articles = await getCollection("articles");
+  const seen = new Set<string>();
 
   return articles.flatMap((entry) => {
     const sourceSlug = entry.slug.trim();
-    const canonicalSlug =
-      typeof entry.data.slug === "string" && entry.data.slug.trim().length > 0
-        ? entry.data.slug.trim()
-        : sourceSlug;
+    const canonicalSlug = getCanonicalArticleSlug(entry);
+    const rows: Array<{
+      params: { slug: string };
+      props: { entry?: CollectionEntry<"articles">; destination?: string };
+    }> = [];
 
-    if (!sourceSlug || sourceSlug === canonicalSlug) return [];
+    if (canonicalSlug && !seen.has(canonicalSlug)) {
+      seen.add(canonicalSlug);
+      rows.push({
+        params: { slug: canonicalSlug },
+        props: { entry },
+      });
+    }
 
-    return [
-      {
+    if (sourceSlug && sourceSlug !== canonicalSlug && !seen.has(sourceSlug)) {
+      seen.add(sourceSlug);
+      rows.push({
         params: { slug: sourceSlug },
         props: {
           destination: `/articles/${encodeURIComponent(canonicalSlug)}/`,
         },
-      },
-    ];
+      });
+    }
+
+    return rows;
   });
 }
 
-const { destination } = Astro.props;
+const { destination, entry } = Astro.props as {
+  destination?: string;
+  entry?: CollectionEntry<"articles">;
+};
 ---
 
-<StaticRedirectPage
-  to={destination}
-  title="מעביר למאמר"
-  message="המאמר עבר לכתובת חדשה"
-  ctaLabel="למאמר"
-/>
+{
+  destination ? (
+    <StaticRedirectPage
+      to={destination}
+      title="מעביר למאמר"
+      message="המאמר עבר לכתובת חדשה"
+      ctaLabel="למאמר"
+    />
+  ) : entry ? (
+    <ArticlePage entry={entry} />
+  ) : null
+}

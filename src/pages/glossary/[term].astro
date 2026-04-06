@@ -1,10 +1,11 @@
-﻿---
+---
 import { getCollection } from "astro:content";
-import Layout from "../../layouts/Layout.astro";
-import appConfig from "../../config/appConfig.json";
-import { glossaryConcepts, type GlossaryConcept, type GlossaryLink } from "../../data/glossary";
-import { glossaryTagToTopicHref } from "../../data/glossary-topics";
 import { DirectLink } from "../../components/ui/DirectLink";
+import appConfig from "../../config/appConfig.json";
+import { glossaryConcepts, type GlossaryConcept, type GlossaryLink, glossaryMap } from "../../data/glossary";
+import { glossaryTagToTopicHref } from "../../data/glossary-topics";
+import Layout from "../../layouts/Layout.astro";
+import { getCanonicalArticleSlug } from "../../lib/articles";
 
 type RelatedArticle = {
   href: string;
@@ -32,7 +33,7 @@ const relatedArticles: RelatedArticle[] = entries
     const score = tagScore + keywordScore;
 
     return {
-      href: `/articles/${entry.slug}/`,
+      href: `/articles/${getCanonicalArticleSlug(entry)}/`,
       title: entry.data.title,
       description: entry.data.description,
       score,
@@ -66,17 +67,33 @@ if (!fallbackLinks.some((item) => item.href === "/articles/")) {
 }
 
 const relatedLinks = [
-  ...relatedArticles.map((article) => ({ href: article.href, title: article.title, description: article.description })),
+  ...relatedArticles.map((article) => ({
+    href: article.href,
+    title: article.title,
+    description: article.description,
+  })),
   ...fallbackLinks.filter((link) => !relatedArticles.some((article) => article.href === link.href)),
 ].slice(0, 5);
 
-const otherConcepts = glossaryConcepts
+const explicitRelatedConcepts = (concept.relatedConceptSlugs ?? [])
+  .map((slug) => glossaryMap[slug])
+  .filter((item): item is GlossaryConcept => Boolean(item) && item.slug !== concept.slug);
+
+const fallbackOtherConcepts = glossaryConcepts
   .filter((item) => item.slug !== concept.slug)
-  .filter((item) => item.tags.some((tag) => concept.tags.includes(tag)) || item.keywords.some((keyword) => concept.keywords.includes(keyword)))
+  .filter(
+    (item) =>
+      item.tags.some((tag) => concept.tags.includes(tag)) ||
+      item.keywords.some((keyword) => concept.keywords.includes(keyword))
+  )
   .slice(0, 3);
 
-const pageTitle = `${concept.title} | הגדרות מחדש`;
-const pageDescription = concept.summary;
+const otherConcepts = [...explicitRelatedConcepts, ...fallbackOtherConcepts].filter(
+  (item, index, array) => array.findIndex((candidate) => candidate.slug === item.slug) === index
+).slice(0, 3);
+
+const pageTitle = `${concept.title} | מילון המושגים של השם לא משנה`;
+const pageDescription = `${concept.summary} הגדרה, ההפך, דוגמה יומיומית, וקישורים להמשך קריאה.`;
 const relatedSearchHref = `/services/?q=${encodeURIComponent(concept.title)}&topic=${encodeURIComponent(concept.title)}`;
 const isFactVsInterpretation = concept.slug === "fact-vs-interpretation";
 const factRows = [
@@ -102,6 +119,12 @@ const factRows = [
         >
           עוד על {concept.title}
         </a>
+        <a href="/glossary/" class="inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] px-5 py-2.5 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]">
+          חזרה למילון
+        </a>
+        <a href="/me/learning/" class="inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] px-5 py-2.5 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]">
+          לוח הלמידה
+        </a>
       </div>
       <div class="mt-5 flex flex-wrap justify-end gap-2 text-xs text-[color-mix(in_srgb,var(--nm-fg)_55%,var(--nm-bg))]">
         {concept.tags.map((tag) => {
@@ -122,19 +145,19 @@ const factRows = [
         {isFactVsInterpretation ? (
           <>
             <div class="space-y-3">
-              <p class="text-sm font-semibold text-[var(--nm-accent)]">🧱 מה זו עובדה?</p>
+              <p class="text-sm font-semibold text-[var(--nm-accent)]">הגדרה</p>
               <p class="text-[clamp(1rem,0.95rem+0.35vw,1.16rem)] leading-[1.75] text-[var(--nm-fg)]/80">
-                עובדה היא משהו שאפשר לצלם, להקליט, או למדוד. אין בה מסקנה עליך.
+                עובדה היא משהו שאפשר לצלם, להקליט, או למדוד. פירוש הוא מה שהמוח אומר שהעובדה אומרת.
               </p>
             </div>
             <div class="space-y-3 border-t border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] pt-5">
-              <p class="text-sm font-semibold text-[var(--nm-accent)]">🎨 מה זה פירוש?</p>
+              <p class="text-sm font-semibold text-[var(--nm-accent)]">למה זה משנה</p>
               <p class="text-[clamp(1rem,0.95rem+0.35vw,1.16rem)] leading-[1.75] text-[var(--nm-fg)]/80">
-                פירוש הוא מה שהמוח אומר שהעובדה אומרת. כאן נכנסים פחד, עלבון, זהות, וסיפור.
+                ברגע שהפירוש מתחפש לעובדה, כל התגובה כבר מרגישה מוצדקת. ההפרדה מחזירה בדיקה במקום סערה.
               </p>
             </div>
             <div class="space-y-4 border-t border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] pt-5">
-              <p class="text-sm font-semibold text-[var(--nm-accent)]">דוגמאות</p>
+              <p class="text-sm font-semibold text-[var(--nm-accent)]">דוגמה יומיומית</p>
               <div class="overflow-x-auto">
                 <table class="min-w-full border-separate border-spacing-0 overflow-hidden rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] text-sm">
                   <thead>
@@ -158,28 +181,36 @@ const factRows = [
         ) : (
           <>
             <div class="space-y-3">
-              <p class="text-sm font-semibold text-[var(--nm-accent)]">הגדרה קצרה</p>
+              <p class="text-sm font-semibold text-[var(--nm-accent)]">הגדרה</p>
               <p class="text-[clamp(1rem,0.95rem+0.35vw,1.16rem)] leading-[1.75] text-[var(--nm-fg)]/80">{concept.definition}</p>
             </div>
             <div class="space-y-3 border-t border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] pt-5">
               <p class="text-sm font-semibold text-[var(--nm-accent)]">למה זה משנה</p>
               <p class="text-[clamp(1rem,0.95rem+0.35vw,1.16rem)] leading-[1.75] text-[var(--nm-fg)]/80">{concept.whyItMatters}</p>
             </div>
+            {concept.dailyExample ? (
+              <div class="space-y-3 border-t border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] pt-5">
+                <p class="text-sm font-semibold text-[var(--nm-accent)]">דוגמה יומיומית</p>
+                <p class="rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] px-4 py-4 text-[clamp(1rem,0.95rem+0.35vw,1.12rem)] leading-[1.75] text-[var(--nm-fg)]/80">
+                  {concept.dailyExample}
+                </p>
+              </div>
+            ) : null}
           </>
         )}
       </article>
 
       <div class="space-y-4">
-        {concept.oppositeLink && (
+        {concept.oppositeLink ? (
           <aside class="rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-accent)_18%,transparent)] bg-[var(--nm-tint)] p-6 text-right shadow-[0_16px_40px_rgba(212,43,43,0.08)]">
-            <p class="text-sm font-semibold text-[var(--nm-accent)]">הצד השני</p>
+            <p class="text-sm font-semibold text-[var(--nm-accent)]">ההפך שמחדד</p>
             <h2 class="mt-3 text-2xl font-semibold text-[var(--nm-fg)]">{concept.oppositeLink.title}</h2>
             <p class="mt-3 text-sm leading-[1.75] text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">{concept.oppositeLink.description}</p>
             <a href={concept.oppositeLink.href} class="mt-5 inline-flex min-h-[44px] items-center rounded-full border border-[color-mix(in_srgb,var(--nm-accent)_18%,transparent)] bg-white px-4 py-2 text-sm font-semibold text-[var(--nm-accent)] transition hover:bg-[var(--nm-tint)]">
               לעבור לצד השני
             </a>
           </aside>
-        )}
+        ) : null}
 
         <aside class="space-y-4 rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] p-6 text-right">
           <p class="text-sm font-semibold text-[var(--nm-accent)]">להמשך</p>
@@ -195,10 +226,10 @@ const factRows = [
       </div>
     </section>
 
-    {otherConcepts.length > 0 && (
+    {otherConcepts.length > 0 ? (
       <section class="space-y-4 text-right">
         <div class="space-y-2">
-          <p class="text-sm font-semibold text-[var(--nm-accent)]">מושגים קרובים</p>
+          <p class="text-sm font-semibold text-[var(--nm-accent)]">מושג קרוב</p>
           <h2 class="text-2xl font-semibold text-[var(--nm-fg)]">אפשר להמשיך מכאן לעוד שכבה אחת</h2>
         </div>
         <div class="grid gap-4 md:grid-cols-3">
@@ -210,7 +241,7 @@ const factRows = [
           ))}
         </div>
       </section>
-    )}
+    ) : null}
 
     <div class="flex justify-end border-t border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] pt-10" aria-label="פתיחת שיחה אחרי קריאה">
       <DirectLink client:load whatsAppNumber={appConfig.contact.whatsAppNumber} fallbackEmail={appConfig.contact.email} />

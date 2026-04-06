@@ -219,17 +219,24 @@ const archivePreviewItems = [
       <div class="flex flex-wrap items-center justify-center gap-3">
         <a
           href={joinClubHref}
-          class="inline-flex min-h-[52px] items-center justify-center rounded-full bg-[var(--nm-accent)] px-7 py-3 text-base font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]"
+          class="inline-flex min-h-[52px] w-full items-center justify-center rounded-full bg-[var(--nm-accent)] px-7 py-3 text-base font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)] sm:w-auto"
         >
           רוצה להצטרף ל-NeverMind
         </a>
         <a
           href="#tracks"
-          class="inline-flex min-h-[52px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-7 py-3 text-base font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]"
+          class="inline-flex min-h-[52px] w-full items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-7 py-3 text-base font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)] sm:w-auto"
         >
           מה מתאים לי עכשיו
         </a>
       </div>
+
+      <nav class="flex flex-wrap items-center justify-center gap-3 text-sm font-semibold text-[var(--nm-accent)]">
+        <a href="/articles/" class="inline-flex min-h-[44px] items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] px-4 py-2 transition hover:bg-[var(--nm-surface-muted)]">מאמרים פתוחים</a>
+        <a href="/glossary/" class="inline-flex min-h-[44px] items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] px-4 py-2 transition hover:bg-[var(--nm-surface-muted)]">מילון המושגים</a>
+        <a href="/me/learning/" class="inline-flex min-h-[44px] items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] px-4 py-2 transition hover:bg-[var(--nm-surface-muted)]">לוח הלמידה</a>
+        <a href={joinClubHref} class="inline-flex min-h-[44px] items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] px-4 py-2 transition hover:bg-[var(--nm-surface-muted)]">המועדון</a>
+      </nav>
 
       <div class="grid gap-4 text-right md:grid-cols-[minmax(0,1fr)_minmax(16rem,20rem)]">
         <div class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/88 p-5 shadow-[0_14px_36px_color-mix(in_srgb,var(--nm-fg)_4%,transparent)]">
@@ -267,7 +274,7 @@ const archivePreviewItems = [
         </p>
       </div>
 
-      <div class="grid gap-5 lg:grid-cols-2 xl:grid-cols-4">
+      <div class="grid gap-5 md:grid-cols-2 2xl:grid-cols-4">
         {
           featuredServices.map((item) => (
             <article
@@ -323,10 +330,10 @@ const archivePreviewItems = [
               ) : null}
 
               <div class="mt-auto pt-5">
-                <div class="flex flex-col gap-2">
+                <div class="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
                   <a
                     href={item.primaryHref}
-                    class="inline-flex min-h-[46px] items-center justify-center rounded-full bg-[var(--nm-inverse)] px-5 py-2.5 text-sm font-semibold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-inverse-hover)]"
+                    class="inline-flex min-h-[46px] items-center justify-center rounded-full bg-[var(--nm-inverse)] px-5 py-2.5 text-sm font-semibold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-inverse-hover)] sm:flex-1"
                   >
                     {item.primaryLabel}
                   </a>
@@ -334,7 +341,7 @@ const archivePreviewItems = [
                     href={item.reservationHref}
                     target="_blank"
                     rel="noreferrer"
-                    class="inline-flex min-h-[46px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-5 py-2.5 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]"
+                    class="inline-flex min-h-[46px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-5 py-2.5 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)] sm:flex-1"
                   >
                     {item.actionLabel}
                   </a>

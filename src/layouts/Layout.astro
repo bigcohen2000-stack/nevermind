@@ -22,6 +22,7 @@ import {
   breadcrumbTrailToJsonLd,
 } from "../lib/site-breadcrumbs";
 import { GOOGLE_SITE_VERIFICATION } from "../data/migration-map";
+import { getArticleYoutubeId } from "../lib/articles";
 
 type StagingBannerCfg = { enabled?: boolean; message?: string };
 type BrandCfg = {
@@ -400,7 +401,7 @@ const faqSchema =
       }
     : null;
 
-const youtubeIdRaw = typeof frontmatter?.youtubeId === "string" ? frontmatter.youtubeId.trim() : "";
+const youtubeIdRaw = getArticleYoutubeId(frontmatter) ?? "";
 const videoSummaryPointsForSchema = Array.isArray(frontmatter?.videoSummaryPoints)
   ? frontmatter.videoSummaryPoints.map((p: string) => String(p).trim()).filter(Boolean)
   : [];

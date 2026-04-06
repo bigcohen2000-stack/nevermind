@@ -58,7 +58,6 @@ const articles = defineCollection({
       .trim()
       .regex(/^[a-zA-Z0-9._-]+\.(mp3|m4a|ogg|wav)$/)
       .optional(),
-    youtube: z.string().trim().optional(),
     youtubeId: z.string().trim().optional(),
     /** וידאו נוסף לבעלי סשן פרימיום בלבד (מאמר חינמי) */
     premiumYoutubeId: z.string().optional(),
@@ -74,6 +73,13 @@ const articles = defineCollection({
     readTime: z.coerce.number().int().positive().optional(),
     isPublic: z.boolean().default(true),
     workflowStatus: z.enum(["writing", "review", "ready", "published"]).optional(),
+    scheduledDate: pubDateSchema.optional(),
+    authors: z.array(z.string().trim().min(1, "שם מחבר לא יכול להיות ריק")).max(5).default([]),
+    reviewer: z.string().trim().optional(),
+    reviewNotes: z.string().trim().max(1000).optional(),
+    revisionNote: z.string().trim().optional(),
+    contentType: z.enum(["article", "guide", "essay", "opinion"]).optional(),
+    contentPriority: z.enum(["standard", "featured", "pillar"]).default("standard"),
     difficultyLevel: z.enum(["beginner", "advanced", "deep"]).optional(),
     /** עוצמת שינוי תפיסתי לתצוגה (1-5) */
     mindShiftIntensity: z.coerce.number().int().min(1).max(5).optional(),
