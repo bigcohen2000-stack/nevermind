@@ -5,7 +5,7 @@ import FormAntispamFields from "../components/FormAntispamFields.astro";
 import Web3FormsHcaptcha from "../components/Web3FormsHcaptcha.astro";
 import SubscribeBanner from "../components/SubscribeBanner.astro";
 import { FloatingInput } from "../components/ui/FloatingInput";
-import { WEB3FORMS_ACCESS_KEY, WEB3FORMS_ENABLED } from "../lib/web3forms-access";
+import { WEB3FORMS_ENABLED } from "../lib/web3forms-access";
 
 const whatsappGroupUrl = "https://chat.whatsapp.com/C5M4j0ZCUPa3D3A4zCrCrL";
 const allArticles = await getCollection("articles", ({ data }) => data.draft !== true);
@@ -80,7 +80,6 @@ const siteUpdates = [
       אפשר גם להשאיר הודעה
     </h2>
     <form id="contact-form" data-contact-form data-nm-antispam class="space-y-4 rounded-3xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/80 p-6" action="/api/forms/submit" method="POST">
-      <input type="hidden" name="access_key" value={WEB3FORMS_ACCESS_KEY} />
       <input type="hidden" name="subject" value="פנייה מעמוד מה קורה כאן עכשיו" />
       <input type="text" name="botcheck" class="hidden" tabindex="-1" autocomplete="off" aria-hidden="true" />
       <FormAntispamFields />
@@ -161,11 +160,6 @@ const siteUpdates = [
       };
 
       const hasHcaptcha = () => Boolean(contactForm.querySelector("[data-nm-hcaptcha-wrap]"));
-      const hasAccessKey = () => {
-        const accessKey = contactForm.querySelector('input[name="access_key"]');
-        return accessKey instanceof HTMLInputElement && accessKey.value.trim().length > 0;
-      };
-
       const onSubmit = async (event) => {
         event.preventDefault();
         if (submitButton instanceof HTMLElement) {
@@ -173,13 +167,6 @@ const siteUpdates = [
         }
 
         const formData = new FormData(form);
-        if (!hasAccessKey()) {
-          const message = "שליחה במייל ממתינה לחיבור שרת הטפסים. אפשר להמשיך לוואטסאפ או ליצירת קשר.";
-          showStatus(message);
-          window.__nmReportConnectivityIssue?.(message);
-          clearLoading();
-          return;
-        }
         const msg = String(formData.get("message") || "").trim();
         const read = window.__nmReadAntispamFromForm;
         const validate = window.__nmValidateAntispamFields;

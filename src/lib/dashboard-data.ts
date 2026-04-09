@@ -1,5 +1,7 @@
 ﻿import type { CollectionEntry } from "astro:content";
 
+import { getCanonicalArticleHref, getCanonicalArticleSlug } from "./articles";
+
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 export type DashboardTone = "critical" | "watch" | "ok";
@@ -108,10 +110,12 @@ export function buildDashboardContentHealth(
       );
       const tone = computeTone(daysSinceUpdate, bounceRate);
 
+      const slug = getCanonicalArticleSlug(entry);
+
       return {
-        slug: entry.slug || entry.id.replace(/\.mdx$/i, ""),
+        slug,
         title: entry.data.title,
-        href: `/articles/${entry.slug || entry.id.replace(/\.mdx$/i, "")}/`,
+        href: getCanonicalArticleHref(entry),
         updatedLabel: formatHebrewDate(updatedDate),
         daysSinceUpdate,
         bounceRate,

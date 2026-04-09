@@ -3,6 +3,7 @@ import { getCollection } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
 import appConfig from "../../config/appConfig.json";
 import { jsonLdForInlineScript } from "../../lib/json-ld-inline";
+import { getCanonicalArticleHref, getCanonicalArticleSlug } from "../../lib/articles";
 
 const siteUrlRaw = typeof appConfig.site?.url === "string" ? appConfig.site.url.trim() : "https://www.nevermind.co.il";
 const siteUrl = siteUrlRaw.replace(/\/+$/, "");
@@ -61,7 +62,7 @@ type LatestPoolItem = {
 };
 
 const latestPool: LatestPoolItem[] = published.map((a) => ({
-  slug: a.slug,
+  slug: getCanonicalArticleSlug(a),
   title: a.data.title,
   description: a.data.description,
   pub: new Date(a.data.pubDate).toISOString(),
@@ -108,7 +109,7 @@ const collectionPageSchema = {
         "@type": "BlogPosting",
         headline: a.data.title,
         description: a.data.description,
-        url: `${siteUrl}/articles/${a.slug}/`,
+        url: `${siteUrl}${getCanonicalArticleHref(a)}`,
         datePublished: new Date(a.data.pubDate).toISOString(),
         inLanguage: "he-IL",
       },
@@ -172,7 +173,7 @@ function formatHeDate(d: Date) {
             {startHere.map((article) => (
               <li>
                 <a
-                  href={`/articles/${article.slug}/`}
+                  href={getCanonicalArticleHref(article)}
                   class="group [-webkit-tap-highlight-color:transparent] flex min-h-[11rem] flex-col rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_6%,transparent)] bg-[var(--nm-bg-canvas)] p-5 text-right transition-colors active:border-[color-mix(in_srgb,var(--nm-accent)_30%,transparent)] [@media(hover:hover)]:hover:border-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)] md:min-h-[12rem] md:p-6"
                 >
                   <span class="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--nm-accent)]">נקודת כניסה</span>
@@ -208,7 +209,7 @@ function formatHeDate(d: Date) {
             {coreConcepts.map((article) => (
               <li>
                 <a
-                  href={`/articles/${article.slug}/`}
+                  href={getCanonicalArticleHref(article)}
                   class="group [-webkit-tap-highlight-color:transparent] flex min-h-[11rem] flex-col rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_6%,transparent)] bg-[color-mix(in_srgb,var(--nm-bg-canvas)_96%,transparent)] p-5 text-right transition-colors active:border-[color-mix(in_srgb,var(--nm-accent)_28%,transparent)] [@media(hover:hover)]:hover:border-[color-mix(in_srgb,var(--nm-accent)_20%,transparent)] md:min-h-[12rem] md:p-6"
                 >
                   <span class="text-xs font-semibold uppercase tracking-[0.14em] text-[color-mix(in_srgb,var(--nm-fg)_48%,var(--nm-bg))]">
@@ -322,7 +323,7 @@ function formatHeDate(d: Date) {
                 </time>
                 <h3 class="mt-2 text-lg font-semibold leading-snug text-[var(--nm-fg)]">
                   <a
-                    href={`/articles/${article.slug}/`}
+                    href={getCanonicalArticleHref(article)}
                     class="[-webkit-tap-highlight-color:transparent] inline-flex min-h-11 w-full items-start py-1 text-[var(--nm-fg)] underline-offset-4 transition-colors active:text-[var(--nm-accent)] [@media(hover:hover)]:hover:text-[var(--nm-accent)] [@media(hover:hover)]:hover:underline"
                   >
                     {article.data.title}

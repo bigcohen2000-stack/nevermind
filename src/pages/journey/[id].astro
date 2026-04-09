@@ -2,6 +2,7 @@
 import { getCollection, type CollectionEntry } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
 import clarityPathsFile from "../../config/clarityPaths.json";
+import { getCanonicalArticleHref, getCanonicalArticleSlug } from "../../lib/articles";
 
 type ArticleEntry = CollectionEntry<"articles">;
 type JourneyDef = (typeof clarityPathsFile.paths)[number];
@@ -13,7 +14,8 @@ export async function getStaticPaths() {
   for (const entry of entries) {
     const base = entry.id.replace(/\.mdx$/i, "");
     const tail = base.split("/").pop();
-    const keys = [entry.slug, base, tail].filter(Boolean) as string[];
+    const canonicalSlug = getCanonicalArticleSlug(entry);
+    const keys = [canonicalSlug, entry.slug, base, tail].filter(Boolean) as string[];
 
     for (const key of keys) {
       if (!slugMap.has(key)) slugMap.set(key, entry);
@@ -84,7 +86,7 @@ const description = journey.shortDescription;
               <h2 class="text-xl font-semibold text-[var(--nm-fg-secondary)] md:text-2xl">{article.data.title}</h2>
               <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">{article.data.description}</p>
               <a
-                href={`/articles/${article.slug}`}
+                href={getCanonicalArticleHref(article)}
                 title={`לקריאת המאמר: ${article.data.title}`}
                 class="inline-flex w-fit items-center justify-center rounded-full bg-[var(--nm-accent)] px-5 py-2.5 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]"
               >

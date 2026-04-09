@@ -5,7 +5,6 @@ interface ImportMetaEnv {
   readonly PUBLIC_CLUB_ADMIN_VIA_PROXY?: string;
   readonly PUBLIC_NM_CLUB_WEBHOOK_URL?: string;
   readonly PUBLIC_HCAPTCHA_SITE_KEY?: string;
-  readonly PUBLIC_WEB3FORMS_ACCESS_KEY?: string;
   readonly PUBLIC_CLIENT_LOG_URL?: string;
   readonly PUBLIC_WHATSAPP_NUMBER?: string;
   readonly NEXT_PUBLIC_WHATSAPP_NUMBER?: string;
@@ -25,14 +24,6 @@ type NmClubSession = {
   liveStatus?: string;
 };
 
-type NmAdminSession = {
-  role: "admin";
-  token: string;
-  expiresAt: string;
-  loggedInAt?: string;
-  label?: string;
-};
-
 interface Window {
   __nmArticleCleanup?: () => void;
   __nmAnnounce?: (message: string) => void;
@@ -42,8 +33,6 @@ interface Window {
   __nmClearButtonLoading?: (target: HTMLElement) => void;
   __nmReadClubSession?: () => NmClubSession | null;
   __nmClearClubSession?: () => void;
-  __nmReadAdminSession?: () => NmAdminSession | null;
-  __nmClearAdminSession?: () => void;
   __nmLayoutCleanup?: () => void;
   __nmAdminLoginCleanup?: () => void;
   __nmAdminDashboardCleanup?: () => void;

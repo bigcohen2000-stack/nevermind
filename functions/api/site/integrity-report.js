@@ -1,7 +1,7 @@
 ﻿import { fetchClubWorkerJson, json } from "../../_lib/club-admin.js";
 
 function resolveAccessKey(env) {
-  return String(env.WEB3FORMS_ACCESS_KEY ?? env.PUBLIC_WEB3FORMS_ACCESS_KEY ?? "").trim();
+  return String(env.WEB3FORMS_ACCESS_KEY ?? "").trim();
 }
 
 function readString(source, key, max = 2000) {

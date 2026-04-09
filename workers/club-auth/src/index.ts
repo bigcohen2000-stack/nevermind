@@ -2,7 +2,6 @@ interface Env {
   CLUB_MEMBERS: KVNamespace;
   CLUB_ACTIVITY: KVNamespace;
   CLUB_IP_PEPPER: string;
-  ADMIN_PASSWORD: string;
   /** מפתח שירות לפרוקסי Pages (כותרת X-NM-Admin-Service). אופציונלי. */
   ADMIN_SERVICE_KEY?: string;
   /** כינוי ל־ADMIN_SERVICE_KEY (אותו ערך כמו ב־Pages). */
@@ -15,10 +14,6 @@ type LoginRequest = {
   password?: string;
   path?: string;
   fullName?: string;
-};
-
-type AdminLoginRequest = {
-  password?: string;
 };
 
 type AdminResetPasswordRequest = {
@@ -112,21 +107,14 @@ type ProgressTokenPayload = {
   exp: number;
 };
 
-type AdminSessionPayload = {
-  role: "admin";
-  iat: number;
-  exp: number;
-  nonce: string;
-};
-
 const DEFAULT_ALLOWED_ORIGINS = [
   "https://www.nevermind.co.il",
   "https://nevermind.co.il",
   "http://localhost:4321",
 ];
+const MEMBER_PASSWORD_PBKDF2_ITERATIONS = 180000;
 const LOGIN_WINDOW_MS = 6 * 60 * 60 * 1000;
 const MAX_ACTIVITY_ENTRIES = 12;
-const ADMIN_SESSION_MS = 8 * 60 * 60 * 1000;
 const RECENT_LOGIN_LIMIT = 24;
 const FRAUD_FLAG_LIMIT = 24;
 const KV_LIST_LIMIT = 1000;
@@ -379,10 +367,6 @@ export default {
       return handleClubPageBeacon(request, env, corsHeaders);
     }
 
-    if (request.method === "POST" && url.pathname === "/admin/login") {
-      return handleAdminLogin(request, env, corsHeaders);
-    }
-
     if (request.method === "GET" && url.pathname === "/admin/overview") {
       return handleAdminOverview(request, env, corsHeaders);
     }
@@ -476,16 +460,20 @@ export default {
     }
 
     const passwordHash = String(member.passwordHash ?? "").trim();
+    const passwordHashVersion = getPasswordHashVersion(passwordHash);
     const isValidPassword = await verifyPassword(password, passwordHash);
     if (!isValidPassword) {
       return json({ ok: false, error: "הטלפון או הסיסמה לא תואמים." }, 401, corsHeaders);
     }
 
+    const migratedPasswordHash =
+      passwordHashVersion === "v1" ? await createPasswordHash(password) : passwordHash;
+
     const nowIso = new Date().toISOString();
     const userAgent = String(request.headers.get("user-agent") ?? "").slice(0, 240);
     const ip = readClientIp(request);
     const ipHash = await sha256Hex(`${env.CLUB_IP_PEPPER}:${ip}`);
-    const passwordGroup = String(member.passwordGroup ?? passwordHash).trim();
+    const passwordGroup = String(member.passwordGroup ?? migratedPasswordHash).trim();
 
     const memberActivityKey = `activity:member:${phone}`;
     const passwordActivityKey = `activity:password:${passwordGroup}`;
@@ -514,6 +502,8 @@ export default {
       ...member,
       phone,
       memberName: String(member.memberName ?? fallbackName ?? "").trim() || "חבר",
+      passwordHash: migratedPasswordHash,
+      passwordGroup,
       lastLoginAt: nowIso,
       lastIpHash: ipHash,
       ...(fraudFlag ? { flaggedAt: nowIso } : {}),
@@ -557,44 +547,6 @@ export default {
     );
   },
 };
-
-async function handleAdminLogin(request: Request, env: Env, headers: Headers): Promise<Response> {
-  const ip = readClientIp(request);
-  const ipHash = await sha256Hex(`${env.CLUB_IP_PEPPER}:${ip}`);
-  const limited = await checkRateLimit(env, ipHash, "admin_login", 15, 60, headers);
-  if (limited) return limited;
-
-  let payload: AdminLoginRequest | null = null;
-  try {
-    payload = (await request.json()) as AdminLoginRequest;
-  } catch {
-    return json({ ok: false, error: "הבקשה לא נקראה כמו שצריך." }, 400, headers);
-  }
-
-  const password = String(payload?.password ?? "");
-  if (!password) {
-    return json({ ok: false, error: "צריך סיסמת ניהול." }, 400, headers);
-  }
-
-  if (!timingSafeEqual(password, String(env.ADMIN_PASSWORD ?? ""))) {
-    return json({ ok: false, error: "סיסמת הניהול לא תואמת." }, 401, headers);
-  }
-
-  const now = Date.now();
-  const token = await createAdminToken(env, now);
-  return json(
-    {
-      ok: true,
-      role: "admin",
-      label: "Admin",
-      token,
-      loggedInAt: new Date(now).toISOString(),
-      expiresAt: new Date(now + ADMIN_SESSION_MS).toISOString(),
-    },
-    200,
-    headers
-  );
-}
 
 async function handleAdminOverview(request: Request, env: Env, headers: Headers): Promise<Response> {
   const auth = await requireAdminAuth(request, env, headers);
@@ -836,18 +788,32 @@ function readClientIp(request: Request): string {
 }
 
 async function verifyPassword(password: string, passwordHash: string): Promise<boolean> {
-  const [version, salt, expectedHash] = String(passwordHash ?? "").split("$");
-  if (version !== "v1" || !salt || !expectedHash) {
-    return false;
+  const [version, first, second, third] = String(passwordHash ?? "").split("$");
+  if (version === "v1" && first && second) {
+    const actualHash = await sha256Hex(`${first}:${password}`);
+    return timingSafeEqual(actualHash, second);
   }
-  const actualHash = await sha256Hex(`${salt}:${password}`);
-  return timingSafeEqual(actualHash, expectedHash);
+  if (version === "v2" && first && second && third) {
+    const iterations = Number.parseInt(first, 10);
+    if (!Number.isFinite(iterations) || iterations < 100000) {
+      return false;
+    }
+    const actualHash = await pbkdf2Sha256Hex(password, second, iterations);
+    return timingSafeEqual(actualHash, third);
+  }
+  return false;
 }
 
 async function createPasswordHash(password: string): Promise<string> {
   const salt = randomHex(16);
-  const digest = await sha256Hex(`${salt}:${password}`);
-  return `v1$${salt}$${digest}`;
+  const digest = await pbkdf2Sha256Hex(password, salt, MEMBER_PASSWORD_PBKDF2_ITERATIONS);
+  return `v2$${MEMBER_PASSWORD_PBKDF2_ITERATIONS}$${salt}$${digest}`;
+}
+
+function getPasswordHashVersion(passwordHash: string): "v1" | "v2" | "unknown" {
+  if (String(passwordHash ?? "").startsWith("v1$")) return "v1";
+  if (String(passwordHash ?? "").startsWith("v2$")) return "v2";
+  return "unknown";
 }
 
 function randomHex(bytes: number): string {
@@ -863,6 +829,36 @@ async function sha256Hex(input: string): Promise<string> {
   return Array.from(new Uint8Array(buffer))
     .map((byte) => byte.toString(16).padStart(2, "0"))
     .join("");
+}
+
+async function pbkdf2Sha256Hex(password: string, saltHex: string, iterations: number): Promise<string> {
+  const baseKey = await crypto.subtle.importKey("raw", new TextEncoder().encode(password), "PBKDF2", false, ["deriveBits"]);
+  const derivedBits = await crypto.subtle.deriveBits(
+    {
+      name: "PBKDF2",
+      salt: hexToBytes(saltHex),
+      iterations,
+      hash: "SHA-256",
+    },
+    baseKey,
+    256
+  );
+  return Array.from(new Uint8Array(derivedBits))
+    .map((byte) => byte.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+function hexToBytes(value: string): Uint8Array {
+  const normalized = String(value ?? "").trim();
+  if (!normalized || normalized.length % 2 !== 0) {
+    return new Uint8Array();
+  }
+  const bytes = new Uint8Array(normalized.length / 2);
+  for (let index = 0; index < normalized.length; index += 2) {
+    const byte = Number.parseInt(normalized.slice(index, index + 2), 16);
+    bytes[index / 2] = Number.isFinite(byte) ? byte : 0;
+  }
+  return bytes;
 }
 
 function timingSafeEqual(left: string, right: string): boolean {
@@ -894,56 +890,15 @@ function countDistinctIps(entries: ActivityEntry[]): number {
   return new Set(entries.map((entry) => entry.ipHash)).size;
 }
 
-async function createAdminToken(env: Env, nowMs: number): Promise<string> {
-  const payload: AdminSessionPayload = {
-    role: "admin",
-    iat: nowMs,
-    exp: nowMs + ADMIN_SESSION_MS,
-    nonce: randomHex(12),
-  };
-  const encodedPayload = encodeBase64Url(JSON.stringify(payload));
-  const signature = await sha256Hex(`${env.CLUB_IP_PEPPER}:${env.ADMIN_PASSWORD}:${encodedPayload}`);
-  return `${encodedPayload}.${signature}`;
-}
-
-async function requireAdminAuth(request: Request, env: Env, headers: Headers): Promise<AdminSessionPayload | Response> {
+async function requireAdminAuth(request: Request, env: Env, headers: Headers): Promise<true | Response> {
   const serviceSecret = String(env.ADMIN_SERVICE_KEY ?? env.NM_CLUB_ADMIN_SERVICE_KEY ?? "").trim();
   const serviceHeader = String(request.headers.get("x-nm-admin-service") ?? "").trim();
   if (serviceSecret && serviceHeader) {
     if (timingSafeEqual(serviceHeader, serviceSecret)) {
-      const nowMs = Date.now();
-      return { role: "admin", iat: nowMs, exp: nowMs + ADMIN_SESSION_MS, nonce: "service" };
+      return true;
     }
   }
-
-  const authHeader = String(request.headers.get("authorization") ?? "").trim();
-  if (!authHeader.startsWith("Bearer ")) {
-    return json({ ok: false, error: "צריך כניסת ניהול." }, 401, headers);
-  }
-  const token = authHeader.slice(7).trim();
-  const payload = await verifyAdminToken(token, env);
-  if (!payload) {
-    return json({ ok: false, error: "הגישה לניהול כבר לא פעילה." }, 401, headers);
-  }
-  return payload;
-}
-
-async function verifyAdminToken(token: string, env: Env): Promise<AdminSessionPayload | null> {
-  const parts = String(token || "").split(".");
-  if (parts.length !== 2) return null;
-  const [encodedPayload, signature] = parts;
-  if (!encodedPayload || !signature) return null;
-  const expectedSignature = await sha256Hex(`${env.CLUB_IP_PEPPER}:${env.ADMIN_PASSWORD}:${encodedPayload}`);
-  if (!timingSafeEqual(signature, expectedSignature)) return null;
-
-  try {
-    const payload = JSON.parse(decodeBase64Url(encodedPayload)) as AdminSessionPayload;
-    if (!payload || payload.role !== "admin") return null;
-    if (!Number.isFinite(payload.exp) || payload.exp < Date.now()) return null;
-    return payload;
-  } catch {
-    return null;
-  }
+  return json({ ok: false, error: "נדרש מפתח שירות פנימי לניהול." }, 401, headers);
 }
 
 function encodeBase64Url(input: string): string {

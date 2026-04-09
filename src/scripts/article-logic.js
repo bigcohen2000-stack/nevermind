@@ -140,7 +140,7 @@ function setupArticlePage() {
         ? "הגישה שלך פעילה"
         : overrides.title || premiumBody.dataset.premiumTitle || "מכאן הלאה - נכנסים לפרטים";
       const description = alreadyUnlocked
-        ? `הגישה למאמר "${articleTitle}" פתוחה עכשיו. בגלל שהאתר נפרס סטטית ב-GitHub Pages, המשך הכניסה לתוכן הפרימיום עובר דרך אזור הגישה האישי.`
+        ? `הגישה למאמר "${articleTitle}" פתוחה עכשיו. המשך הכניסה לתוכן הפרימיום עובר דרך האזור האישי לאחר אימות.`
         : overrides.description ||
           premiumBody.dataset.premiumDescription ||
           "הבסיס תמיד פתוח לכולם. ההמשך של המאמר הזה מיועד למי שרוצה להעמיק עוד צעד, עם גישה דרך אזור אישי או מסלול מלא.";
@@ -148,7 +148,7 @@ function setupArticlePage() {
       const fallbackCtaHref = overrides.ctaHref || premiumBody.dataset.premiumCtaHref || "/services/";
       const accessRoute = premiumBody.dataset.premiumAccessRoute || "/me/unlock/";
       const helperText =
-        premiumBody.dataset.premiumAccessHelper || "גישה לתוכן פרימיום נפתחת כרגע דרך קוד גישה מתחלף.";
+        premiumBody.dataset.premiumAccessHelper || "גישה לתוכן פרימיום נפתחת כרגע דרך האזור האישי לאחר אימות.";
       const returnTo = encodeURIComponent(window.location.pathname);
       const primaryHref = accessEnabled ? `${accessRoute}?returnTo=${returnTo}` : fallbackCtaHref;
       const primaryLabel = "כניסה לאזור האישי";

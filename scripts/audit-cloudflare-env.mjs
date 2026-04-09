@@ -25,9 +25,9 @@ const pagesSpecs = [
     },
   },
   {
-    name: "PUBLIC_WEB3FORMS_ACCESS_KEY",
+    name: "WEB3FORMS_ACCESS_KEY",
     scope: "Pages",
-    kind: "public",
+    kind: "secret",
     requirement: "required",
     note: "טפסי יצירת קשר דרך Web3Forms",
   },
@@ -175,10 +175,6 @@ const workerSpecs = [
     note: "salt ל-hash של IP וטוקנים",
   },
   {
-    name: "ADMIN_PASSWORD",
-    scope: "Worker",
-    kind: "secret",
-    requirement: "required",
     note: "התחברות admin ישירה ל-Worker",
   },
   {
@@ -263,7 +259,7 @@ function printSection(title, specs, env) {
   console.log(`\n${title}`);
   console.log("-".repeat(title.length));
 
-  for (const spec of specs) {
+  for (const spec of specs.filter((item) => item?.name)) {
     const result = pickStatus(spec, env);
     const marker =
       result.status === "ok"
@@ -283,8 +279,9 @@ function printSection(title, specs, env) {
 }
 
 function collectEnvSnapshot() {
-  const names = new Set([...pagesSpecs, ...workerSpecs].map((spec) => spec.name));
-  for (const spec of [...pagesSpecs, ...workerSpecs]) {
+  const combinedSpecs = [...pagesSpecs, ...workerSpecs].filter((spec) => spec?.name);
+  const names = new Set(combinedSpecs.map((spec) => spec.name));
+  for (const spec of combinedSpecs) {
     for (const alternative of spec.alternatives ?? []) {
       names.add(alternative);
     }

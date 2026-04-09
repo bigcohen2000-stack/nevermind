@@ -1202,7 +1202,6 @@ const socialLinks = [
         document.addEventListener("astro:page-load", onAfterSwap);
 
         const NM_CLUB_STORAGE_KEY = "nm_club_session";
-        const NM_ADMIN_STORAGE_KEY = "nm_admin_session";
         const NM_FAVORITES_STORAGE_KEY = "nm_favorites";
         const NM_HISTORY_STORAGE_KEY = "nm_watch_history";
         const readJsonStorage = (key) => {
@@ -1244,31 +1243,6 @@ const socialLinks = [
             lastLoginAt,
           };
         };
-        const nmReadAdminSession = () => {
-          const data = readJsonStorage(NM_ADMIN_STORAGE_KEY);
-          if (!data || typeof data !== "object") return null;
-          const role = typeof data.role === "string" ? data.role.trim() : "";
-          const token = typeof data.token === "string" ? data.token.trim() : "";
-          const expiresAt = typeof data.expiresAt === "string" ? data.expiresAt.trim() : "";
-          const loggedInAt = typeof data.loggedInAt === "string" ? data.loggedInAt.trim() : "";
-          const label = typeof data.label === "string" ? data.label.trim() : "Admin";
-          if (role !== "admin" || !token || !expiresAt) return null;
-          const expiresTs = Date.parse(expiresAt);
-          if (Number.isNaN(expiresTs) || expiresTs < Date.now()) {
-            try {
-              window.localStorage.removeItem(NM_ADMIN_STORAGE_KEY);
-            } catch {
-            }
-            return null;
-          }
-          return {
-            role,
-            token,
-            expiresAt: new Date(expiresTs).toISOString(),
-            loggedInAt,
-            label: label || "Admin",
-          };
-        };
         const nmFormatMemberDate = (value) => {
           const date = new Date(value || "");
           if (Number.isNaN(date.getTime())) return "";
@@ -1289,12 +1263,6 @@ const socialLinks = [
           const strip = document.querySelector("[data-nm-premium-strip]");
           const textEl = strip?.querySelector(".nm-premium-strip-text");
           if (!(strip instanceof HTMLElement) || !(textEl instanceof HTMLElement)) return;
-          const adminSession = nmReadAdminSession();
-          if (adminSession) {
-            const lastLogin = nmFormatMemberDateTime(adminSession.loggedInAt);
-            textEl.textContent = lastLogin ? `ADMIN · כניסה אחרונה ${lastLogin}` : "ADMIN · גישת ניהול פעילה";
-            return;
-          }
           const session = nmReadClubSession();
           if (!session) {
             textEl.textContent = "";
@@ -1309,7 +1277,6 @@ const socialLinks = [
           textEl.textContent = parts.join(" · ");
         };
         const nmSyncHeaderAuth = () => {
-          const adminSession = nmReadAdminSession();
           const memberSession = nmReadClubSession();
           const loginLink = document.querySelector("[data-nm-auth-login]");
           const memberLink = document.querySelector("[data-nm-auth-me]");
@@ -1317,9 +1284,9 @@ const socialLinks = [
           const logoutButton = document.querySelector("[data-nm-auth-logout]");
           const memberSummaryEl = memberLink?.querySelector("[data-nm-auth-summary]");
           const adminSummaryEl = adminLink?.querySelector("[data-nm-auth-admin-summary]");
-          const memberActive = Boolean(memberSession) && !adminSession;
-          const adminActive = Boolean(adminSession);
-          const active = memberActive || adminActive;
+          const memberActive = Boolean(memberSession);
+          const adminActive = false;
+          const active = memberActive;
           if (loginLink instanceof HTMLElement) {
             loginLink.classList.toggle("hidden", active);
             loginLink.toggleAttribute("hidden", active);
@@ -1342,33 +1309,23 @@ const socialLinks = [
               : "LIVE";
           }
           if (adminSummaryEl instanceof HTMLElement) {
-            adminSummaryEl.textContent = adminSession ? ["Admin", adminSession.label].filter(Boolean).join(" · ") : "Admin";
+            adminSummaryEl.textContent = "Admin";
           }
         };
         const nmSyncPremiumUi = () => {
-          const adminSession = nmReadAdminSession();
           const memberSession = nmReadClubSession();
           document.body.classList.toggle("is-premium", Boolean(memberSession));
-          document.body.classList.toggle("is-admin", Boolean(adminSession));
+          document.body.classList.remove("is-admin");
           nmSyncPremiumStripText();
           nmSyncHeaderAuth();
         };
         window.__nmReadClubSession = nmReadClubSession;
-        window.__nmReadAdminSession = nmReadAdminSession;
         window.__nmClearClubSession = () => {
           try {
             window.localStorage.removeItem(NM_CLUB_STORAGE_KEY);
           } catch {
           }
           window.dispatchEvent(new CustomEvent("nm-club-session-changed"));
-          nmSyncPremiumUi();
-        };
-        window.__nmClearAdminSession = () => {
-          try {
-            window.localStorage.removeItem(NM_ADMIN_STORAGE_KEY);
-          } catch {
-          }
-          window.dispatchEvent(new CustomEvent("nm-admin-session-changed"));
           nmSyncPremiumUi();
         };
         const readFavorites = () => {
@@ -1443,10 +1400,8 @@ const socialLinks = [
           const trigger = target.closest("[data-nm-auth-logout]");
           if (!(trigger instanceof HTMLButtonElement)) return;
           event.preventDefault();
-          const hasAdminSession = typeof window.__nmReadAdminSession === "function" && Boolean(window.__nmReadAdminSession());
-          window.__nmClearAdminSession?.();
           window.__nmClearClubSession?.();
-          window.__nmAnnounce?.(hasAdminSession ? "יציאת הניהול נשמרה על המכשיר הזה." : "היציאה נשמרה על המכשיר הזה.");
+          window.__nmAnnounce?.("היציאה נשמרה על המכשיר הזה.");
         };
         const onNmPageLoadSync = () => {
           nmSyncPremiumUi();
@@ -1463,7 +1418,6 @@ const socialLinks = [
           if (
             e.key === null ||
             e.key === NM_CLUB_STORAGE_KEY ||
-            e.key === NM_ADMIN_STORAGE_KEY ||
             e.key === NM_FAVORITES_STORAGE_KEY ||
             e.key === NM_HISTORY_STORAGE_KEY
           ) {
@@ -1473,7 +1427,6 @@ const socialLinks = [
         };
         window.addEventListener("storage", onNmClubStorage);
         window.addEventListener("nm-club-session-changed", nmSyncPremiumUi);
-        window.addEventListener("nm-admin-session-changed", nmSyncPremiumUi);
         window.addEventListener("nm-club-session-changed", syncFavoriteButtons);
 
         const formatAvailabilityDateHebrew = (isoString) => {
@@ -1761,7 +1714,6 @@ const socialLinks = [
           window.removeEventListener("scroll", onHeaderScroll);
           window.removeEventListener("storage", onNmClubStorage);
           window.removeEventListener("nm-club-session-changed", nmSyncPremiumUi);
-          window.removeEventListener("nm-admin-session-changed", nmSyncPremiumUi);
           window.removeEventListener("nm-club-session-changed", syncFavoriteButtons);
           if (backBtn instanceof HTMLElement) {
             backBtn.removeEventListener("click", onBackToTopClick);

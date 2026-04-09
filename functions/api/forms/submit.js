@@ -9,7 +9,7 @@ function json(data, status = 200) {
 }
 
 function resolveAccessKey(env) {
-  return String(env.WEB3FORMS_ACCESS_KEY ?? env.PUBLIC_WEB3FORMS_ACCESS_KEY ?? "").trim();
+  return String(env.WEB3FORMS_ACCESS_KEY ?? "").trim();
 }
 
 export async function onRequestPost(context) {

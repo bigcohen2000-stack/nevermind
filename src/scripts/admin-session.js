@@ -1,124 +1,39 @@
-export const ADMIN_STORAGE_KEY = "nm_admin_session";
-
-const webhookUrl = (import.meta.env.PUBLIC_NM_CLUB_WEBHOOK_URL ?? "").trim();
-
-/** ניהול דרך פרוקסי Pages + Cloudflare Access - בלי JWT בדפדפן */
 export function isClubAdminViaProxy() {
-  return String(import.meta.env.PUBLIC_CLUB_ADMIN_VIA_PROXY ?? "").trim() === "true";
+  return true;
 }
 
-const safeLocalStorage = () => {
-  if (typeof window === "undefined") return null;
-  try {
-    return window.localStorage;
-  } catch {
-    return null;
-  }
-};
-
 export function buildAdminApiUrl(pathname) {
-  if (isClubAdminViaProxy()) {
-    const p = pathname.startsWith("/") ? pathname : `/${pathname}`;
-    if (typeof window !== "undefined" && window.location?.origin) {
-      return `${window.location.origin}/api/club-admin${p}`;
-    }
-    return `/api/club-admin${p}`;
+  const normalizedPath = pathname.startsWith("/") ? pathname : `/${pathname}`;
+  if (typeof window !== "undefined" && window.location?.origin) {
+    return `${window.location.origin}/api/club-admin${normalizedPath}`;
   }
-  if (!webhookUrl) return "";
-  const url = new URL(webhookUrl);
-  url.pathname = pathname.startsWith("/") ? pathname : `/${pathname}`;
-  url.search = "";
-  url.hash = "";
-  return url.toString();
+  return `/api/club-admin${normalizedPath}`;
 }
 
 export function readAdminSession() {
-  const storage = safeLocalStorage();
-  if (!storage) return null;
-
-  try {
-    const raw = storage.getItem(ADMIN_STORAGE_KEY);
-    if (!raw) return null;
-    const data = JSON.parse(raw);
-    if (!data || typeof data !== "object") return null;
-
-    const role = typeof data.role === "string" ? data.role.trim() : "";
-    const token = typeof data.token === "string" ? data.token.trim() : "";
-    const expiresAt = typeof data.expiresAt === "string" ? data.expiresAt.trim() : "";
-    const loggedInAt = typeof data.loggedInAt === "string" ? data.loggedInAt.trim() : "";
-    const label = typeof data.label === "string" ? data.label.trim() : "Admin";
-
-    if (role !== "admin" || !token || !expiresAt) {
-      storage.removeItem(ADMIN_STORAGE_KEY);
-      return null;
-    }
-
-    const expiresTs = Date.parse(expiresAt);
-    if (Number.isNaN(expiresTs) || expiresTs < Date.now()) {
-      storage.removeItem(ADMIN_STORAGE_KEY);
-      return null;
-    }
-
-    return {
-      role,
-      token,
-      expiresAt: new Date(expiresTs).toISOString(),
-      loggedInAt,
-      label: label || "Admin",
-    };
-  } catch {
-    return null;
-  }
+  return null;
 }
 
-export function saveAdminSession(session) {
-  const storage = safeLocalStorage();
-  if (!storage) return false;
-
-  const next = {
-    role: "admin",
-    token: String(session?.token ?? "").trim(),
-    expiresAt: String(session?.expiresAt ?? "").trim(),
-    loggedInAt: String(session?.loggedInAt ?? new Date().toISOString()).trim(),
-    label: String(session?.label ?? "Admin").trim() || "Admin",
-  };
-
-  if (!next.token || !next.expiresAt) return false;
-
-  try {
-    storage.setItem(ADMIN_STORAGE_KEY, JSON.stringify(next));
-    window.dispatchEvent(new CustomEvent("nm-admin-session-changed"));
-    return true;
-  } catch {
-    return false;
-  }
+export function saveAdminSession() {
+  return false;
 }
 
 export function clearAdminSession() {
-  const storage = safeLocalStorage();
-  if (!storage) return;
-  try {
-    storage.removeItem(ADMIN_STORAGE_KEY);
-  } catch {
-  }
-  window.dispatchEvent(new CustomEvent("nm-admin-session-changed"));
 }
 
 export function buildAdminAuthHeaders(headers = {}) {
-  if (isClubAdminViaProxy()) {
-    return { ...headers };
-  }
-  const session = readAdminSession();
-  if (!session) return headers;
-  return {
-    ...headers,
-    Authorization: `Bearer ${session.token}`,
-  };
+  return { ...headers };
 }
 
 export function bindAdminDraftPersistence(form, options = {}) {
   if (!(form instanceof HTMLFormElement)) return () => {};
-  const storage = safeLocalStorage();
+
+  let storage = null;
+  try {
+    storage = typeof window === "undefined" ? null : window.localStorage;
+  } catch {
+    storage = null;
+  }
   if (!storage) return () => {};
 
   const storageKey = String(options.storageKey || "nm-admin-draft");
@@ -176,9 +91,4 @@ export function bindAdminDraftPersistence(form, options = {}) {
     });
     if (options.clearOnCleanup) clear();
   };
-}
-
-if (typeof window !== "undefined") {
-  window.__nmReadAdminSession = readAdminSession;
-  window.__nmClearAdminSession = clearAdminSession;
 }

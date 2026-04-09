@@ -5,7 +5,7 @@ import Web3FormsHcaptcha from "../components/Web3FormsHcaptcha.astro";
 import ReturnToContextCta from "../components/ReturnToContextCta.astro";
 import { FloatingInput } from "../components/ui/FloatingInput";
 import { buildWhatsAppHref } from "../lib/services";
-import { WEB3FORMS_ACCESS_KEY, WEB3FORMS_ENABLED } from "../lib/web3forms-access";
+import { WEB3FORMS_ENABLED } from "../lib/web3forms-access";
 
 const waMessage = "שלום, אני רוצה לפתוח גישה לאזור האישי של NeverMind.";
 const waHref = buildWhatsAppHref(waMessage);
@@ -64,7 +64,6 @@ const heroSubtitle = isExistingBuyer
     <section class="space-y-5 rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/86 p-8 shadow-[0_18px_42px_color-mix(in_srgb,var(--nm-fg)_5%,transparent)]">
       <h3 class="text-[clamp(1.2rem,1.05rem+0.7vw,1.6rem)] font-semibold text-[var(--nm-fg)]">רוצה להוסיף עוד שאלה</h3>
       <form id="thank-you-form" data-nm-antispam class="mx-auto max-w-2xl space-y-6" action="/api/forms/submit" method="POST">
-        <input type="hidden" name="access_key" value={WEB3FORMS_ACCESS_KEY} />
         <input type="hidden" name="subject" value="פנייה מעמוד תודה | NeverMind" />
         <input type="hidden" name="page" value="thank-you" />
         <input type="text" name="botcheck" style="display:none" tabindex="-1" autocomplete="off" aria-hidden="true" />
@@ -120,11 +119,6 @@ const heroSubtitle = isExistingBuyer
       };
 
       const hasHcaptcha = () => Boolean(form.querySelector("[data-nm-hcaptcha-wrap]"));
-      const hasAccessKey = () => {
-        const accessKey = form.querySelector('input[name="access_key"]');
-        return accessKey instanceof HTMLInputElement && accessKey.value.trim().length > 0;
-      };
-
       const onSubmit = async (event) => {
         event.preventDefault();
         if (submitButton instanceof HTMLElement) {
@@ -132,13 +126,6 @@ const heroSubtitle = isExistingBuyer
         }
 
         const fd = new FormData(form);
-        if (!hasAccessKey()) {
-          const message = "שליחה במייל ממתינה לחיבור שרת הטפסים. אפשר להמשיך לוואטסאפ או לדף יצירת קשר.";
-          showStatus(message);
-          window.__nmReportConnectivityIssue?.(message);
-          clearLoading();
-          return;
-        }
         const msg = String(fd.get("message") || "").trim();
         const read = window.__nmReadAntispamFromForm;
         const validate = window.__nmValidateAntispamFields;

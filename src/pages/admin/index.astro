@@ -143,11 +143,6 @@ const statusCards = [
       document.addEventListener("astro:page-load", () => {
         const logoutBtn = document.getElementById("admin-logout-btn");
         logoutBtn?.addEventListener("click", () => {
-          try {
-            window.localStorage.removeItem("nm-admin-session");
-            window.localStorage.removeItem("nm_admin_session");
-          } catch {
-          }
           window.location.href = "/cdn-cgi/access/logout";
         });
       });

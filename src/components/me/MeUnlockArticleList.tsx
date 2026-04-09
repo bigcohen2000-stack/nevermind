@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { getCanonicalArticleHref } from "../../lib/articles";
 
 export type UnlockArticleRow = {
   slug: string;
@@ -117,7 +118,7 @@ export default function MeUnlockArticleList({ articles, buildTimeMs }: Props) {
             >
               <div className="min-w-0 flex-1">
                 <a
-                  href={`/articles/${a.slug}/`}
+                  href={getCanonicalArticleHref({ slug: a.slug })}
                   className="font-semibold text-[var(--nm-fg)] underline-offset-4 hover:text-[var(--nm-accent)] hover:underline"
                 >
                   {a.title}

@@ -6,8 +6,7 @@ const root = process.cwd();
 const stageArg = process.argv.find((item) => item.startsWith("--stage="));
 const stage = stageArg ? stageArg.slice("--stage=".length) : "manual";
 const articlesDir = path.join(root, "src", "content", "articles");
-const publicReportPath = path.join(root, "public", "admin-build-report.json");
-const distReportPath = path.join(root, "dist", "admin-build-report.json");
+const generatedReportPath = path.join(root, "src", "generated", "admin-build-report.json");
 
 function stripMdx(content) {
   return String(content || "")
@@ -114,10 +113,7 @@ if (fs.existsSync(distDir)) {
   }
 }
 
-fs.mkdirSync(path.dirname(publicReportPath), { recursive: true });
-fs.writeFileSync(publicReportPath, JSON.stringify(report, null, 2) + "\n", "utf8");
-if (fs.existsSync(distDir)) {
-  fs.writeFileSync(distReportPath, JSON.stringify(report, null, 2) + "\n", "utf8");
-}
+fs.mkdirSync(path.dirname(generatedReportPath), { recursive: true });
+fs.writeFileSync(generatedReportPath, JSON.stringify(report, null, 2) + "\n", "utf8");
 
 console.log(`[generate-admin-build-report] stage=${stage} readability=${averageScore}`);

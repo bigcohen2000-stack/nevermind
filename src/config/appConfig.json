@@ -19,7 +19,7 @@
                           "enabled":  true,
                           "sessionHours":  168,
                           "unlockRoute":  "/me/unlock/",
-                          "helperText":  "גישה לתוכן פרימיום נפתחת כרגע דרך קוד גישה מתחלף.",
+                          "helperText":  "גישה לתוכן פרימיום נפתחת כרגע דרך האזור האישי לאחר אימות.",
                           "codes":  [
                                         {
                                             "label":  "Access 2026",

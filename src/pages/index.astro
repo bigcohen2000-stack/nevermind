@@ -7,6 +7,7 @@ import MethodTextBlock from "../components/methodology/MethodTextBlock.astro";
 import appConfig from "../config/appConfig.json";
 import { buildWhatsAppHref } from "../lib/services";
 import { jsonLdForInlineScript } from "../lib/json-ld-inline";
+import { getCanonicalArticleHref } from "../lib/articles";
 
 const allArticles = await getCollection("articles", ({ data }) => data.draft !== true);
 const sortedArticles = allArticles.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
@@ -22,7 +23,7 @@ const homeArticleListSchema = {
     item: {
       "@type": "BlogPosting",
       headline: a.data.title,
-      url: `${siteUrlNoSlash}/articles/${a.slug}/`,
+      url: `${siteUrlNoSlash}${getCanonicalArticleHref(a)}`,
       datePublished: new Date(a.data.pubDate).toISOString(),
       description: a.data.description,
     },
@@ -119,7 +120,7 @@ const starterLinks = [
   { href: "/about/", label: "מה זה NeverMind", note: "היכרות קצרה עם השיטה והכיוון" },
   { href: "#home-steps", label: "שלושת הצעדים", note: "איך מתחילים לבדוק בלי להסתבך" },
   {
-    href: sampleArticles[0] ? `/articles/${sampleArticles[0].slug}/` : "/articles/",
+    href: sampleArticles[0] ? getCanonicalArticleHref(sampleArticles[0]) : "/articles/",
     label: "מאמר ראשון מומלץ",
     note: sampleArticles[0]?.data.title ?? "כניסה שקטה דרך הארכיון",
   },
@@ -330,7 +331,7 @@ const emailAddress = String((appConfig.contact as { email?: string }).email ?? "
       <div class="grid gap-5 lg:grid-cols-3">
         {sampleArticles.map((article) => (
           <a
-            href={`/articles/${article.slug}/`}
+            href={getCanonicalArticleHref(article)}
             class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/92 p-6 shadow-[0_18px_50px_rgba(26,26,26,0.04)] transition hover:border-[color-mix(in_srgb,var(--nm-accent)_20%,transparent)] hover:bg-[var(--nm-surface-muted)]"
           >
             <p class="text-lg font-semibold text-[var(--nm-fg)]">{article.data.title}</p>

@@ -1,6 +1,7 @@
 ---
 import { getCollection } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
+import { getCanonicalArticleHref } from "../../lib/articles";
 
 const pageTitle = "מסע בתוך הנפש";
 const pageDescription =
@@ -97,7 +98,7 @@ const placeholders = [
             {mental.map((e) => (
               <li>
                 <a
-                  href={`/articles/${e.slug}/`}
+                  href={getCanonicalArticleHref(e)}
                   class="block min-h-11 rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[color-mix(in_srgb,var(--nm-bg-canvas)_96%,transparent)] p-5 leading-[1.75] transition hover:border-[color-mix(in_srgb,#c45c5c_30%,transparent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color-mix(in_srgb,#c45c5c_50%,var(--nm-accent))]"
                 >
                   <span class="flex flex-wrap items-baseline justify-between gap-2">

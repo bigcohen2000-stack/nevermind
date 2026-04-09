@@ -21,6 +21,7 @@ import {
   premiumTags,
   preJoinFaq,
 } from "../../data/methodology/metadata";
+import { getCanonicalArticleHref, getCanonicalArticleSlug } from "../../lib/articles";
 
 const joinHref = "/premium-access/";
 const quietJoinHref = "/premium-access/";
@@ -34,7 +35,8 @@ const previewArticles = [...articleEntries]
   })
   .slice(0, 4)
   .map((entry) => ({
-    slug: entry.slug,
+    slug: getCanonicalArticleSlug(entry),
+    href: getCanonicalArticleHref(entry),
     title: entry.data.title,
     excerpt: String(entry.data.description || "").trim(),
   }));

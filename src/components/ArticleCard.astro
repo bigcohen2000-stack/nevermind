@@ -1,4 +1,5 @@
 ---
+import { getCanonicalArticleHref } from "../lib/articles";
 import { MIND_SHIFT_INACTIVE_HEX, MIND_SHIFT_SCALE_HEX } from "../data/mind-shift-scale";
 
 export type DifficultyKey = "beginner" | "advanced" | "deep";
@@ -51,7 +52,7 @@ const difficultyBadgeClass: Record<DifficultyKey, string> = {
   deep: "border-[#d9d2ea] bg-[#f6f3fb] text-[#3f355b]",
 };
 
-const articleHref = `/articles/${slug}/`;
+const articleHref = getCanonicalArticleHref({ slug });
 ---
 
 <article

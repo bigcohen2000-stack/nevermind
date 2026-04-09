@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { memberInsightsUrl, memberProgressUrl } from "../../lib/club-api-base";
+import { getCanonicalArticleHref } from "../../lib/articles";
 
 export type DashboardArticle = {
   slug: string;
@@ -370,7 +371,7 @@ export default function MePersonalDashboard({ articles, totalPublished, whatsApp
         </h2>
         {lastOpen ? (
           <a
-            href={`/articles/${lastOpen.slug}/`}
+            href={getCanonicalArticleHref({ slug: lastOpen.slug })}
             className="mt-4 block rounded-xl px-4 py-4 transition hover:opacity-90"
             style={{ background: `${ACCENT}14` }}
           >
@@ -397,7 +398,7 @@ export default function MePersonalDashboard({ articles, totalPublished, whatsApp
             {historyEight.map((a) => (
               <li key={a.slug}>
                 <a
-                  href={`/articles/${a.slug}/`}
+                  href={getCanonicalArticleHref({ slug: a.slug })}
                   className="block rounded-xl border px-4 py-3 text-sm font-medium transition hover:bg-[color-mix(in_srgb,#1A1A1A_04%,white)]"
                   style={{ borderColor: `${FG}12`, color: FG }}
                 >
@@ -415,7 +416,7 @@ export default function MePersonalDashboard({ articles, totalPublished, whatsApp
             {recommended.map((a) => (
               <li key={a.slug}>
                 <a
-                  href={`/articles/${a.slug}/`}
+                  href={getCanonicalArticleHref({ slug: a.slug })}
                   className="block rounded-xl border px-4 py-3 text-sm font-medium transition hover:bg-[color-mix(in_srgb,#1A1A1A_04%,white)]"
                   style={{ borderColor: `${FG}12`, color: FG }}
                 >

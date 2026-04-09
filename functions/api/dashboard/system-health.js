@@ -27,18 +27,14 @@ export async function onRequestGet(context) {
     item(
       "forms",
       "טפסי מייל",
-      hasValue(env.WEB3FORMS_ACCESS_KEY) || hasValue(env.PUBLIC_WEB3FORMS_ACCESS_KEY),
-      hasValue(env.WEB3FORMS_ACCESS_KEY) || hasValue(env.PUBLIC_WEB3FORMS_ACCESS_KEY)
-        ? "מפתח Web3Forms מוגדר"
-        : "חסר WEB3FORMS_ACCESS_KEY או PUBLIC_WEB3FORMS_ACCESS_KEY"
+      hasValue(env.WEB3FORMS_ACCESS_KEY),
+      hasValue(env.WEB3FORMS_ACCESS_KEY) ? "מפתח Web3Forms מוגדר" : "חסר WEB3FORMS_ACCESS_KEY"
     ),
     item(
       "hcaptcha",
       "אימות טפסים",
       hasValue(env.PUBLIC_HCAPTCHA_SITE_KEY),
-      hasValue(env.PUBLIC_HCAPTCHA_SITE_KEY)
-        ? "מפתח hCaptcha ציבורי מוגדר"
-        : "PUBLIC_HCAPTCHA_SITE_KEY לא מוגדר"
+      hasValue(env.PUBLIC_HCAPTCHA_SITE_KEY) ? "מפתח hCaptcha ציבורי מוגדר" : "PUBLIC_HCAPTCHA_SITE_KEY לא מוגדר"
     ),
     item(
       "cloudflare_analytics",

@@ -81,7 +81,7 @@ type MobileAuditPayload = {
 
 type Props = {
   endpoint: string;
-  buildReportHref: string;
+  initialBuildReport: BuildPayload;
   pulseEndpoint: string;
   psiEndpoint: string;
   gapsEndpoint: string;
@@ -114,13 +114,13 @@ function metricLabel(value: number | null | undefined, suffix = "") {
 
 export default function SystemHealthWidget({
   endpoint,
-  buildReportHref,
+  initialBuildReport,
   pulseEndpoint,
   psiEndpoint,
   gapsEndpoint,
 }: Props) {
   const [runtimePayload, setRuntimePayload] = useState<RuntimePayload | null>(null);
-  const [buildPayload, setBuildPayload] = useState<BuildPayload | null>(null);
+  const [buildPayload] = useState<BuildPayload | null>(initialBuildReport ?? null);
   const [pulsePayload, setPulsePayload] = useState<PulsePayload | null>(null);
   const [gapPayload, setGapPayload] = useState<SearchGapPayload | null>(null);
   const [error, setError] = useState("");
@@ -133,15 +133,13 @@ export default function SystemHealthWidget({
 
     const load = async () => {
       try {
-        const [runtimeResponse, buildResponse, pulseResponse, gapResponse] = await Promise.all([
+        const [runtimeResponse, pulseResponse, gapResponse] = await Promise.all([
           fetch(endpoint, { headers: { accept: "application/json" }, cache: "no-store" }),
-          fetch(buildReportHref, { headers: { accept: "application/json" }, cache: "no-store" }),
           fetch(pulseEndpoint, { headers: { accept: "application/json" }, cache: "no-store" }),
           fetch(gapsEndpoint, { headers: { accept: "application/json" }, cache: "no-store" }),
         ]);
 
         const runtimeData = (await runtimeResponse.json()) as RuntimePayload;
-        const buildData = (await buildResponse.json()) as BuildPayload;
         const pulseData = (await pulseResponse.json()) as PulsePayload;
         const gapData = (await gapResponse.json()) as SearchGapPayload;
 
@@ -151,7 +149,6 @@ export default function SystemHealthWidget({
 
         if (!cancelled) {
           setRuntimePayload(runtimeData);
-          setBuildPayload(buildData);
           setPulsePayload(pulseData);
           setGapPayload(gapData);
           setError("");
@@ -169,7 +166,7 @@ export default function SystemHealthWidget({
       cancelled = true;
       window.clearInterval(timer);
     };
-  }, [buildReportHref, endpoint, gapsEndpoint, pulseEndpoint]);
+  }, [endpoint, gapsEndpoint, pulseEndpoint]);
 
   const runPsi = async () => {
     setPsiLoading(true);

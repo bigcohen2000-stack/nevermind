@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { memberProgressUrl } from "../../lib/club-api-base";
+import { getCanonicalArticleHref } from "../../lib/articles";
 
 type Article = {
   slug: string;
@@ -171,7 +172,7 @@ export default function MeLearningBoard({ articles, totalPublished }: Props) {
                       <span className="rounded-full bg-[var(--nm-tint)] px-2.5 py-1 text-[0.7rem] font-semibold text-[var(--nm-accent)]">וידאו</span>
                     ) : null}
                   </div>
-                  <a href={`/articles/${article.slug}/`} className="block text-base font-semibold text-[var(--nm-fg)] underline-offset-4 hover:text-[var(--nm-accent)] hover:underline">
+                  <a href={getCanonicalArticleHref({ slug: article.slug })} className="block text-base font-semibold text-[var(--nm-fg)] underline-offset-4 hover:text-[var(--nm-accent)] hover:underline">
                     {article.title}
                   </a>
                   <p className="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_66%,var(--nm-bg))]">{article.description}</p>
@@ -191,7 +192,7 @@ export default function MeLearningBoard({ articles, totalPublished }: Props) {
               <li key={article.slug} className="rounded-[1.1rem] border border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] bg-white/90 px-3 py-3">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
-                    <a href={`/articles/${article.slug}/`} className="text-sm font-medium text-[var(--nm-fg)] hover:text-[var(--nm-accent)]">
+                    <a href={getCanonicalArticleHref({ slug: article.slug })} className="text-sm font-medium text-[var(--nm-fg)] hover:text-[var(--nm-accent)]">
                       {article.title}
                     </a>
                     <p className="mt-1 text-xs leading-6 text-[color-mix(in_srgb,var(--nm-fg)_58%,var(--nm-bg))]">

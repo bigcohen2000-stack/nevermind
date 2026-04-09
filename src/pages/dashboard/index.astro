@@ -14,6 +14,7 @@ import MechanismCard from "../../components/dashboard/MechanismCard.astro";
 import SystemSettingsPanel from "../../components/dashboard/SystemSettingsPanel.astro";
 import SystemHealthWidget from "../../components/dashboard/SystemHealthWidget";
 import Layout from "../../layouts/Layout.astro";
+import buildReport from "../../generated/admin-build-report.json";
 import {
   buildDashboardContentHealth,
   buildDashboardOverviewSummary,
@@ -251,7 +252,7 @@ const managerQuickLinks = [
               <SystemHealthWidget
                 client:load
                 endpoint="/api/dashboard/system-health"
-                buildReportHref="/admin-build-report.json"
+                initialBuildReport={buildReport}
                 pulseEndpoint="/api/site/pulse"
                 psiEndpoint="/api/admin/psi?strategy=mobile"
                 gapsEndpoint="/api/log-search-gap"

@@ -4,7 +4,7 @@ import appConfig from "../config/appConfig.json";
 import { validateAntispamFields } from "../lib/form-antispam";
 import { HCAPTCHA_SITE_KEY } from "../lib/hcaptcha-public";
 import { pickIntakeHumanChallenge, type IntakeHumanChallenge } from "../lib/intake-human-check";
-import { WEB3FORMS_ACCESS_KEY, WEB3FORMS_ENABLED } from "../lib/web3forms-access";
+import { WEB3FORMS_ENABLED } from "../lib/web3forms-access";
 import { FloatingInput } from "./ui/FloatingInput";
 
 const WA_MAX_CHARS = 3600;
@@ -407,7 +407,6 @@ export default function IntakeForm() {
 
     setStatus("sending");
     const fd = new FormData();
-    fd.append("access_key", WEB3FORMS_ACCESS_KEY);
     fd.append("subject", "הכרות לפני שיחה | NeverMind");
     fd.append("name", name.trim());
     fd.append("from_name", name.trim());
