@@ -1,17 +1,8 @@
 /**
- * פרוקסי ל-worker nm-club-auth: מוסיף X-NM-Admin-Service בצד שרת.
- * דורש Cf-Access-Jwt-Assertion (Zero Trust) או CLUB_ADMIN_PROXY_SKIP_AUTH=1 לפיתוח מקומי.
+ * Proxy to the nm-club-auth worker using a server-side service key.
+ * Requires Cloudflare Access for production requests.
  */
-
-function json(data, status = 200) {
-  return new Response(JSON.stringify(data), {
-    status,
-    headers: {
-      "content-type": "application/json; charset=utf-8",
-      "cache-control": "no-store",
-    },
-  });
-}
+import { isDashboardAuthorized, json } from "../../_lib/club-admin.js";
 
 function normalizePathParam(raw) {
   if (raw == null) return "";
@@ -21,10 +12,8 @@ function normalizePathParam(raw) {
 
 export async function onRequest(context) {
   const { request, env } = context;
-  const accessJwt = request.headers.get("Cf-Access-Jwt-Assertion");
-  const skipAuth = env.CLUB_ADMIN_PROXY_SKIP_AUTH === "1";
 
-  if (!accessJwt && !skipAuth) {
+  if (!isDashboardAuthorized(request, env)) {
     return json({ ok: false, error: "נדרש אימות Cloudflare Access לנתיב הזה." }, 401);
   }
 
@@ -40,6 +29,7 @@ export async function onRequest(context) {
     const pathname = new URL(request.url).pathname;
     pathSegment = pathname.replace(/^\/api\/club-admin\/?/, "") || "";
   }
+
   const suffix = pathSegment ? (pathSegment.startsWith("/") ? pathSegment : `/${pathSegment}`) : "";
   const url = new URL(request.url);
   const targetUrl = `${base}${suffix}${url.search}`;

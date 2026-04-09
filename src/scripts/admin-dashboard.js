@@ -2,9 +2,7 @@ import {
   bindAdminDraftPersistence,
   buildAdminApiUrl,
   buildAdminAuthHeaders,
-  clearAdminSession,
   isClubAdminViaProxy,
-  readAdminSession,
 } from "./admin-session.js";
 
 const formatDateTime = (value) => {
@@ -107,10 +105,10 @@ const initAdminDashboard = () => {
   const confirmCancelButtons = Array.from(root.querySelectorAll("[data-admin-reset-cancel]"));
 
   const viaProxy = isClubAdminViaProxy();
-  if (!viaProxy && !readAdminSession()) {
+  if (!viaProxy) {
     if (errorEl instanceof HTMLElement) {
       errorEl.textContent =
-        "אין אסימון ניהול בדפדפן. בפרודקשן מומלץ לעבוד עם PUBLIC_CLUB_ADMIN_VIA_PROXY=true ו-Cloudflare Access על /dashboard/ ועל /api/club-admin/.";
+        "הניהול הזה עובד רק דרך Cloudflare Access ופרוקסי השרת.";
       errorEl.classList.remove("hidden");
     }
     if (loadingEl instanceof HTMLElement) loadingEl.classList.add("hidden");
@@ -175,13 +173,7 @@ const initAdminDashboard = () => {
   };
 
   const handleUnauthorized = () => {
-    if (viaProxy) {
-      showError("השרת לא אישר את הבקשה. בדוק את Cloudflare Access על /dashboard/ ועל /api/club-admin/ ואת סודות הפרוקסי.");
-      setLoading(false);
-      return;
-    }
-    clearAdminSession();
-    showError("הגישה לניהול כבר לא פעילה. רענן את הדף והתחבר מחדש.");
+    showError("השרת לא אישר את הבקשה. בדוק את Cloudflare Access על /dashboard/, /api/dashboard/ ו־/api/club-admin/.");
     setLoading(false);
   };
 

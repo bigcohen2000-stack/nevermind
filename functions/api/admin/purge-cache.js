@@ -1,17 +1,9 @@
-function json(data, status = 200) {
-  return new Response(JSON.stringify(data), {
-    status,
-    headers: {
-      "content-type": "application/json; charset=utf-8",
-      "cache-control": "no-store",
-    },
-  });
-}
+import { isDashboardAuthorized, json } from "../../_lib/club-admin.js";
 
 export async function onRequestPost(context) {
   const { request, env } = context;
-  const accessJwt = request.headers.get("Cf-Access-Jwt-Assertion");
-  if (!accessJwt) {
+
+  if (!isDashboardAuthorized(request, env)) {
     return json({ ok: false, error: "נדרש אימות Cloudflare Access." }, 401);
   }
 
@@ -41,4 +33,3 @@ export async function onRequestPost(context) {
     return json({ ok: false, error: "קריאה ל-Cloudflare נכשלה." }, 502);
   }
 }
-

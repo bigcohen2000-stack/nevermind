@@ -5,9 +5,12 @@ export function isClubAdminViaProxy() {
 export function buildAdminApiUrl(pathname) {
   const normalizedPath = pathname.startsWith("/") ? pathname : `/${pathname}`;
   if (typeof window !== "undefined" && window.location?.origin) {
-    return `${window.location.origin}/api/club-admin${normalizedPath}`;
+    const protectedBase = window.location.pathname.startsWith("/admin/")
+      ? "/admin/api/club-admin"
+      : "/dashboard/api/club-admin";
+    return `${window.location.origin}${protectedBase}${normalizedPath}`;
   }
-  return `/api/club-admin${normalizedPath}`;
+  return `/dashboard/api/club-admin${normalizedPath}`;
 }
 
 export function readAdminSession() {

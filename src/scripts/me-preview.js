@@ -1,4 +1,4 @@
-const PREVIEW_ENDPOINT = "/api/club-admin/admin/member";
+const PREVIEW_ENDPOINT = "/dashboard/api/club-admin/admin/member";
 
 const normalizePhone = (value) => String(value ?? "").replace(/\D/g, "");
 

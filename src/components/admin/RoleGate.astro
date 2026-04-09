@@ -7,7 +7,11 @@ interface Props {
   showIfAuthed?: boolean;
 }
 
-const { requiredRole = "viewer", fallback = "נדרשת גישת Cloudflare Access כדי להיכנס למסך הזה", showIfAuthed = false } = Astro.props;
+const {
+  requiredRole = "viewer",
+  fallback = "נדרשת גישת Cloudflare Access עם המייל המורשה כדי להיכנס למסך הזה",
+  showIfAuthed = false,
+} = Astro.props;
 ---
 
 <div class="role-gate" data-role-gate data-required-role={requiredRole} data-show-if-authed={showIfAuthed}>
@@ -28,28 +32,37 @@ const { requiredRole = "viewer", fallback = "נדרשת גישת Cloudflare Acce
 <script>
   document.addEventListener("astro:page-load", () => {
     const gates = document.querySelectorAll("[data-role-gate]");
-    const accessStatusPromise = fetch("/api/admin/access-status", {
+    const accessStatusUrl = new URL("./api/access-status", window.location.href);
+    const accessStatusPromise = fetch(accessStatusUrl, {
       headers: { accept: "application/json" },
       cache: "no-store",
       credentials: "same-origin",
     })
       .then(async (response) => {
         const payload = await response.json().catch(() => null);
-        return response.ok && payload?.ok === true;
+        return {
+          allowed: response.ok && payload?.ok === true,
+          allowedEmails: Array.isArray(payload?.allowedEmails) ? payload.allowedEmails : [],
+        };
       })
-      .catch(() => false);
+      .catch(() => ({ allowed: false, allowedEmails: [] }));
 
     gates.forEach((gate) => {
       const content = gate.querySelector(".gate-content");
       const fallback = gate.querySelector(".gate-fallback");
       const loading = gate.querySelector(".gate-loading");
-      accessStatusPromise.then((allowed) => {
+      accessStatusPromise.then(({ allowed, allowedEmails }) => {
         loading?.classList.add("hidden");
 
         if (allowed) {
           content?.classList.remove("hidden");
           fallback?.classList.add("hidden");
           return;
+        }
+
+        const title = fallback?.querySelector(".font-semibold");
+        if (title instanceof HTMLElement && allowedEmails.length > 0) {
+          title.textContent = `נדרשת גישת Cloudflare Access עם ${allowedEmails.join(", ")} כדי להיכנס למסך הזה`;
         }
 
         fallback?.classList.remove("hidden");

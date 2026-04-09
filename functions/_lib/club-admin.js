@@ -1,4 +1,4 @@
-﻿function json(data, status = 200) {
+function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
     status,
     headers: {
@@ -8,11 +8,43 @@
   });
 }
 
+function readAllowedAdminEmails(env) {
+  const configured = String(env.NM_ADMIN_ACCESS_EMAILS ?? env.ADMIN_ACCESS_EMAILS ?? "")
+    .split(",")
+    .map((value) => value.trim().toLowerCase())
+    .filter(Boolean);
+
+  if (configured.length > 0) {
+    return configured;
+  }
+
+  return ["bigcohen2000@gmail.com"];
+}
+
+function readAccessEmail(request) {
+  return String(request.headers.get("Cf-Access-Authenticated-User-Email") ?? "")
+    .trim()
+    .toLowerCase();
+}
+
+function isAuthorizedAccessEmail(request, env) {
+  const email = readAccessEmail(request);
+  return email.length > 0 && readAllowedAdminEmails(env).includes(email);
+}
+
 function isDashboardAuthorized(request, env) {
   const url = new URL(request.url);
   const isLocal = url.hostname === "127.0.0.1" || url.hostname === "localhost";
   const skipAuth = env.CLUB_ADMIN_PROXY_SKIP_AUTH === "1";
-  return isLocal || skipAuth || Boolean(request.headers.get("Cf-Access-Jwt-Assertion"));
+  if (isLocal || skipAuth) {
+    return true;
+  }
+
+  if (!request.headers.get("Cf-Access-Jwt-Assertion")) {
+    return false;
+  }
+
+  return isAuthorizedAccessEmail(request, env);
 }
 
 function readClubWorkerConfig(env) {
@@ -46,7 +78,10 @@ async function fetchClubWorkerJson(env, path, init = {}) {
       return {
         ok: false,
         status: response.status,
-        error: typeof payload?.error === "string" && payload.error.trim() ? payload.error.trim() : "שרת המועדון לא החזיר תשובה תקינה.",
+        error:
+          typeof payload?.error === "string" && payload.error.trim()
+            ? payload.error.trim()
+            : "שרת המועדון לא החזיר תשובה תקינה.",
         payload,
       };
     }
@@ -70,4 +105,11 @@ async function fetchClubAdminOverview(env) {
   return fetchClubWorkerJson(env, "/admin/overview", { method: "GET" });
 }
 
-export { json, isDashboardAuthorized, fetchClubWorkerJson, fetchClubAdminOverview };
+export {
+  json,
+  isDashboardAuthorized,
+  fetchClubWorkerJson,
+  fetchClubAdminOverview,
+  readAllowedAdminEmails,
+  readAccessEmail,
+};

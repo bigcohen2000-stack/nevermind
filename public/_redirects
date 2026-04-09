@@ -105,6 +105,8 @@
 
 # Astro: כפיפות סלאש לנתיב אדמין (נשמר מהגרסה הקודמת)
 /admin /admin/ 301
+/dashborad /dashboard/ 301
+/dashborad/* /dashboard/:splat 301
 
 ## 4. Final Fallback
 /* /404.html 404

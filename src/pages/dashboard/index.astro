@@ -164,7 +164,7 @@ const managerQuickLinks = [
                   "הסיכום העליון מחשב כמה חברים נראו בחלון של עשרים הדקות האחרונות, והרשימה עצמה מציגה את שמונת החיבורים האחרונים."
                 ]}
               >
-                <LiveConnectionsWidget client:load endpoint="/api/dashboard/live-connections" />
+                <LiveConnectionsWidget client:load endpoint="/dashboard/api/dashboard/live-connections" />
               </DashboardCard>
             </section>
 
@@ -182,7 +182,7 @@ const managerQuickLinks = [
                   "אם אין Flags פתוחים, הפיד מחזיר שורת שקט אחת במקום להמציא אירועים."
                 ]}
               >
-                <LiveSecurityFeedWidget client:load endpoint="/api/dashboard/security-feed" />
+                <LiveSecurityFeedWidget client:load endpoint="/dashboard/api/dashboard/security-feed" />
               </DashboardCard>
             </section>
           </section>
@@ -251,11 +251,11 @@ const managerQuickLinks = [
             >
               <SystemHealthWidget
                 client:load
-                endpoint="/api/dashboard/system-health"
+                endpoint="/dashboard/api/dashboard/system-health"
                 initialBuildReport={buildReport}
-                pulseEndpoint="/api/site/pulse"
-                psiEndpoint="/api/admin/psi?strategy=mobile"
-                gapsEndpoint="/api/log-search-gap"
+                pulseEndpoint="/dashboard/api/site/pulse"
+                psiEndpoint="/dashboard/api/admin/psi?strategy=mobile"
+                gapsEndpoint="/dashboard/api/log-search-gap"
               />
             </DashboardCard>
           </section>
