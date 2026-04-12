@@ -22,9 +22,15 @@ function readAllowedAdminEmails(env) {
 }
 
 function readAccessEmail(request) {
-  return String(request.headers.get("Cf-Access-Authenticated-User-Email") ?? "")
+  const directEmail = String(request.headers.get("Cf-Access-Authenticated-User-Email") ?? "")
     .trim()
     .toLowerCase();
+  if (directEmail) return directEmail;
+
+  const identity = String(request.headers.get("Cf-Access-Authenticated-User-Identity") ?? "")
+    .trim()
+    .toLowerCase();
+  return identity;
 }
 
 function isAuthorizedAccessEmail(request, env) {
