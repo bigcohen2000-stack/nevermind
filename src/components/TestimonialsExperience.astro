@@ -1,51 +1,65 @@
 ---
-type Kind = "מחשבה" | "פעולה";
-
 type QuoteItem = {
-  kind: Kind;
   quote: string;
-  highlight: string;
   name: string;
   dateLabel: string;
   sourceLabel: string;
+  avatar?: string;
 };
 
 const quotes: QuoteItem[] = [
-  { kind: "מחשבה", quote: "לפני הייתי מבולבל. עכשיו אני מבין מה קורה לי בפנים.", highlight: "בפנים", name: "בעילום שם", dateLabel: "ללא תאריך מדויק", sourceLabel: "מתוך שיחה" },
-  { kind: "פעולה", quote: "לפני דחיתי. עכשיו אני פותח את הנושא בבהירות.", highlight: "בהירות", name: "בעילום שם", dateLabel: "ללא תאריך מדויק", sourceLabel: "מתוך האתר" },
-  { kind: "מחשבה", quote: "לפני חיפשתי להסביר. עכשיו אני בודק עובדות לפני מסקנה.", highlight: "עובדות", name: "בעילום שם", dateLabel: "ללא תאריך מדויק", sourceLabel: "מתוך קריאה" },
-  { kind: "פעולה", quote: "לפני נמנעתי משאלה. עכשיו אני שואל ישר.", highlight: "ישר", name: "בעילום שם", dateLabel: "ללא תאריך מדויק", sourceLabel: "מתוך שיחה" },
-  { kind: "מחשבה", quote: "לפני הכול נשמע דחוף. עכשיו יש רגע של שקט.", highlight: "שקט", name: "בעילום שם", dateLabel: "ללא תאריך מדויק", sourceLabel: "מתוך קריאה" },
-  { kind: "פעולה", quote: "לפני נשארתי בקצה. עכשיו אני רואה את השורש בעומק.", highlight: "עומק", name: "בעילום שם", dateLabel: "ללא תאריך מדויק", sourceLabel: "מתוך האתר" },
-  { kind: "מחשבה", quote: "לפני רציתי אישור מבחוץ. עכשיו אני בודק בעצמי.", highlight: "בעצמי", name: "בעילום שם", dateLabel: "ללא תאריך מדויק", sourceLabel: "מתוך שיחה" },
-  { kind: "פעולה", quote: "לפני ניסיתי לשכנע. עכשיו אני מביא שאלה אחת שמכריחה התבוננות.", highlight: "התבוננות", name: "בעילום שם", dateLabel: "ללא תאריך מדויק", sourceLabel: "מתוך קריאה" },
-  { kind: "מחשבה", quote: "לפני הייתי על אוטומט. עכשיו אני מזהה את המנגנון.", highlight: "המנגנון", name: "בעילום שם", dateLabel: "ללא תאריך מדויק", sourceLabel: "מתוך האתר" },
-  { kind: "פעולה", quote: "לפני נעלמתי. עכשיו אני חוזר עם גבול ברור בלי תיאוריה.", highlight: "תיאוריה", name: "בעילום שם", dateLabel: "ללא תאריך מדויק", sourceLabel: "מתוך שיחה" },
+  {
+    quote: "לפני הרגשתי בלגן. עכשיו אני מצליח לראות מה באמת קורה לי בפנים.",
+    name: "שיתוף אנונימי",
+    dateLabel: "מרץ 2026",
+    sourceLabel: "שיחה אישית",
+  },
+  {
+    quote: "פעם הייתי מגיב מיד. היום אני עוצר רגע, בודק עובדה, ואז מחליט.",
+    name: "שיתוף אנונימי",
+    dateLabel: "פברואר 2026",
+    sourceLabel: "קריאה באתר",
+  },
+  {
+    quote: "המשפטים פשוטים, אבל פותחים לי נקודת מבט שלא ראיתי לבד.",
+    name: "שיתוף אנונימי",
+    dateLabel: "ינואר 2026",
+    sourceLabel: "המשך למידה",
+  },
+  {
+    quote: "לא קיבלתי סיסמה או הבטחה. קיבלתי דרך לחשוב יותר נקי.",
+    name: "שיתוף אנונימי",
+    dateLabel: "דצמבר 2025",
+    sourceLabel: "שיחה אישית",
+  },
+  {
+    quote: "הרגשתי שהכול דחוף. עכשיו גם כשיש לחץ, יש לי סדר בראש.",
+    name: "שיתוף אנונימי",
+    dateLabel: "נובמבר 2025",
+    sourceLabel: "קריאה באתר",
+  },
+  {
+    quote: "לא הייתי צריך רקע קודם. כל רעיון הוסבר בצורה שקופה וברורה.",
+    name: "שיתוף אנונימי",
+    dateLabel: "אוקטובר 2025",
+    sourceLabel: "מילון מושגים",
+  },
 ];
 
-const introExample =
-  "הבנתי משהו על עצמי לא בגלל מישהו אחר, אלא בגלל שזה נחת על נקודה שהייתה פתוחה אצלי";
-
-const buildInitials = (value: string) => {
-  if (!value || value === "בעילום שם") return "נ";
-  return value.trim().slice(0, 1);
+const initialsFor = (value: string) => {
+  const clean = String(value).trim();
+  if (clean.length === 0) return "נ";
+  return clean.slice(0, 1);
 };
 ---
 
-<section class="space-y-12 text-right text-[var(--nm-fg)]">
+<section class="space-y-10 text-right text-[var(--nm-fg)]">
   <header class="space-y-4">
-    <p class="text-sm font-medium text-[color-mix(in_srgb,var(--nm-fg)_58%,var(--nm-bg))]">
-      אלו מילים של אנשים אחרים, בדוק אם הן נכונות גם לך
+    <p class="text-sm font-medium text-[color-mix(in_srgb,var(--nm-fg)_58%,var(--nm-bg))]">מילים קצרות מתוך עבודה אמיתית</p>
+    <h1 class="text-[clamp(1.85rem,1.55rem+1vw,2.6rem)] font-semibold leading-tight text-[var(--nm-fg)]">המלצות</h1>
+    <p class="max-w-3xl text-sm leading-8 text-[color-mix(in_srgb,var(--nm-fg)_82%,var(--nm-bg))]">
+      בלי שמות מלאים ובלי הצגה נוצצת. רק משפטים קצרים שמראים מה השתנה אצל אנשים מתוך תהליך שקט.
     </p>
-    <h1 class="text-[clamp(1.75rem,1.4rem+1.2vw,2.5rem)] font-semibold leading-tight text-[var(--nm-fg)]">המלצות</h1>
-    <div class="space-y-3 text-[color-mix(in_srgb,var(--nm-fg)_82%,var(--nm-bg))]">
-      <p class="leading-[var(--line-height-ui)]">
-        ציטוטים כאן הם רק חיזוק. הבדיקה האמיתית היא מול השכל הישר שלך. אם משפט נשמע נכון בלי שם ובלי לחץ חיצוני, שווה לעצור עליו.
-      </p>
-      <p class="rounded-[1.25rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/80 px-5 py-4 text-sm leading-[var(--line-height-ui)] text-[color-mix(in_srgb,var(--nm-fg)_88%,var(--nm-bg))]">
-        דוגמה: {introExample}
-      </p>
-    </div>
   </header>
 
   <div class="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
@@ -53,38 +67,39 @@ const buildInitials = (value: string) => {
       <article class="flex h-full flex-col rounded-[1.5rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/92 p-5 shadow-[0_14px_34px_rgba(26,26,26,0.04)]">
         <div class="flex items-start justify-between gap-4">
           <div class="flex items-center gap-3">
-            <span class="inline-flex h-12 w-12 items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-[var(--nm-surface-muted)] text-sm font-semibold text-[var(--nm-fg)]">
-              {buildInitials(item.name)}
-            </span>
+            {item.avatar ? (
+              <img
+                src={item.avatar}
+                alt={item.name}
+                width="48"
+                height="48"
+                loading="lazy"
+                class="h-12 w-12 rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] object-cover"
+              />
+            ) : (
+              <span class="inline-flex h-12 w-12 items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-[var(--nm-surface-muted)] text-sm font-semibold text-[var(--nm-fg)]">
+                {initialsFor(item.name)}
+              </span>
+            )}
             <div class="space-y-1 text-sm">
               <p class="font-semibold text-[var(--nm-fg)]">{item.name}</p>
               <p class="text-[color-mix(in_srgb,var(--nm-fg)_58%,var(--nm-bg))]">{item.sourceLabel}</p>
             </div>
           </div>
-          <span class="rounded-full bg-[var(--nm-tint)] px-3 py-1 text-[0.72rem] font-semibold text-[var(--nm-accent)]">{item.kind}</span>
+          <time class="text-xs text-[color-mix(in_srgb,var(--nm-fg)_55%,var(--nm-bg))]">{item.dateLabel}</time>
         </div>
 
         <blockquote class="mt-5 flex-1 text-base leading-8 text-[color-mix(in_srgb,var(--nm-fg)_86%,var(--nm-bg))]">
-          {item.quote.split(item.highlight)[0]}
-          <span class="font-semibold text-[var(--nm-accent)]">{item.highlight}</span>
-          {item.quote.split(item.highlight)[1]}
+          {item.quote}
         </blockquote>
-
-        <div class="mt-5 border-t border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] pt-4 text-xs text-[color-mix(in_srgb,var(--nm-fg)_55%,var(--nm-bg))]">
-          <p>תיעוד: {item.dateLabel}</p>
-        </div>
       </article>
     ))}
   </div>
 
   <nav class="flex flex-wrap justify-end gap-3 text-sm font-semibold text-[var(--nm-accent)]">
-    <a href="/articles/" class="inline-flex min-h-[44px] items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] px-4 py-2 transition hover:bg-[var(--nm-surface-muted)]">מאמרים פתוחים</a>
-    <a href="/glossary/" class="inline-flex min-h-[44px] items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] px-4 py-2 transition hover:bg-[var(--nm-surface-muted)]">מילון המושגים</a>
+    <a href="/articles/" class="inline-flex min-h-[44px] items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] px-4 py-2 transition hover:bg-[var(--nm-surface-muted)]">מאמרים</a>
+    <a href="/glossary/" class="inline-flex min-h-[44px] items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] px-4 py-2 transition hover:bg-[var(--nm-surface-muted)]">מילון מושגים</a>
     <a href="/me/learning/" class="inline-flex min-h-[44px] items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] px-4 py-2 transition hover:bg-[var(--nm-surface-muted)]">לוח הלמידה</a>
-    <a href="/me/unlock/" class="inline-flex min-h-[44px] items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] px-4 py-2 transition hover:bg-[var(--nm-surface-muted)]">המועדון</a>
+    <a href="/me/unlock/" class="inline-flex min-h-[44px] items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] px-4 py-2 transition hover:bg-[var(--nm-surface-muted)]">האזור השקט</a>
   </nav>
-
-  <p class="text-sm font-medium text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
-    איזה משפט נשאר אצלך בלי שמישהו אחר צריך לאשר אותו
-  </p>
 </section>

@@ -21,7 +21,13 @@ const {
 
   <div class="gate-fallback rounded-lg border border-yellow-200 bg-yellow-50 px-4 py-3 text-right text-sm text-yellow-800 hidden">
     <p class="font-semibold">{fallback}</p>
-    <a href="/admin/" class="mt-2 inline-block text-yellow-700 underline underline-offset-2 hover:text-yellow-900">לנסות שוב דרך Access</a>
+    <a
+      href="/cdn-cgi/access/login"
+      class="mt-2 inline-block text-yellow-700 underline underline-offset-2 hover:text-yellow-900"
+      data-role-gate-retry
+    >
+      לנסות שוב דרך Access
+    </a>
   </div>
 
   <div class="gate-loading animate-pulse rounded-lg bg-gray-200 px-4 py-3 text-right text-sm text-gray-600">
@@ -33,6 +39,9 @@ const {
   document.addEventListener("astro:page-load", () => {
     const gates = document.querySelectorAll("[data-role-gate]");
     const accessStatusUrl = new URL("./api/access-status", window.location.href);
+    const defaultChallengeUrl = `/cdn-cgi/access/login?redirect_url=${encodeURIComponent(window.location.href)}`;
+    const defaultSwitchIdentityUrl = `/cdn-cgi/access/logout?returnTo=${encodeURIComponent(defaultChallengeUrl)}`;
+
     const accessStatusPromise = fetch(accessStatusUrl, {
       headers: { accept: "application/json" },
       cache: "no-store",
@@ -43,31 +52,60 @@ const {
         return {
           allowed: response.ok && payload?.ok === true,
           allowedEmails: Array.isArray(payload?.allowedEmails) ? payload.allowedEmails : [],
+          challengeUrl:
+            typeof payload?.challengeUrl === "string" && payload.challengeUrl.trim().length > 0
+              ? payload.challengeUrl.trim()
+              : defaultChallengeUrl,
+          switchIdentityUrl:
+            typeof payload?.switchIdentityUrl === "string" && payload.switchIdentityUrl.trim().length > 0
+              ? payload.switchIdentityUrl.trim()
+              : defaultSwitchIdentityUrl,
         };
       })
-      .catch(() => ({ allowed: false, allowedEmails: [] }));
+      .catch(() => ({
+        allowed: false,
+        allowedEmails: [],
+        challengeUrl: defaultChallengeUrl,
+        switchIdentityUrl: defaultSwitchIdentityUrl,
+      }));
 
     gates.forEach((gate) => {
       const content = gate.querySelector(".gate-content");
-      const fallback = gate.querySelector(".gate-fallback");
+      const fallbackNode = gate.querySelector(".gate-fallback");
       const loading = gate.querySelector(".gate-loading");
-      accessStatusPromise.then(({ allowed, allowedEmails }) => {
+      const retryLink = gate.querySelector("[data-role-gate-retry]");
+
+      accessStatusPromise.then(({ allowed, allowedEmails, challengeUrl, switchIdentityUrl }) => {
         loading?.classList.add("hidden");
 
         if (allowed) {
           content?.classList.remove("hidden");
-          fallback?.classList.add("hidden");
+          fallbackNode?.classList.add("hidden");
           return;
         }
 
-        const title = fallback?.querySelector(".font-semibold");
+        const title = fallbackNode?.querySelector(".font-semibold");
         if (title instanceof HTMLElement && allowedEmails.length > 0) {
           title.textContent = `נדרשת גישת Cloudflare Access עם ${allowedEmails.join(", ")} כדי להיכנס למסך הזה`;
         }
 
-        fallback?.classList.remove("hidden");
+        if (retryLink instanceof HTMLAnchorElement) {
+          retryLink.href = switchIdentityUrl;
+          retryLink.setAttribute("data-access-challenge-url", challengeUrl);
+        }
+
+        fallbackNode?.classList.remove("hidden");
         content?.classList.add("hidden");
       });
+
+      if (retryLink instanceof HTMLAnchorElement) {
+        retryLink.addEventListener("click", (event) => {
+          const challengeUrl = retryLink.getAttribute("data-access-challenge-url");
+          if (challengeUrl == null || challengeUrl.length === 0) return;
+          event.preventDefault();
+          window.location.assign(retryLink.href);
+        });
+      }
     });
   });
 </script>

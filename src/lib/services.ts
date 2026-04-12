@@ -524,7 +524,7 @@ export function buildServiceReservationWhatsAppHref(
   return buildWhatsAppHref(`${preface}\n\n${body}`);
 }
 
-/** התראת עניין בשירות - ללא Web3Forms (חובת hCaptcha בצד הספק). אפשר לחבר כאן לוג או ערוץ אחר. */
+/** התראת עניין בשירות - ללא ספק טפסים חיצוני בצד הדפדפן. אפשר לחבר כאן לוג או ערוץ אחר. */
 export async function notifyServiceInterest(_params: {
   serviceId: string;
   serviceTitle: string;

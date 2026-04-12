@@ -5,9 +5,14 @@ import Layout from "../../layouts/Layout.astro";
 import { getArticleYoutubeId, getCanonicalArticleSlug } from "../../lib/articles";
 import { resolveArticleHeroImage } from "../../lib/resolve-article-hero-image";
 
-const articleEntries = await getCollection("articles", ({ data }) => !data.draft);
-const totalPublished = articleEntries.length;
-const learningRows = articleEntries.map((entry) => {
+const articleEntries = await getCollection("articles", ({ data }) => (data.draft === true ? false : true));
+const orderedEntries = [...articleEntries].sort((left, right) => {
+  const leftTime = Date.parse((left.data.updatedDate ?? left.data.pubDate).toISOString());
+  const rightTime = Date.parse((right.data.updatedDate ?? right.data.pubDate).toISOString());
+  return rightTime - leftTime;
+});
+const totalPublished = orderedEntries.length;
+const learningRows = orderedEntries.map((entry) => {
   const slug = getCanonicalArticleSlug(entry);
   return {
     slug,

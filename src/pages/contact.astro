@@ -1,15 +1,15 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import FormAntispamFields from "../components/FormAntispamFields.astro";
-import Web3FormsHcaptcha from "../components/Web3FormsHcaptcha.astro";
+import FormHcaptcha from "../components/FormHcaptcha.astro";
 import { FloatingInput } from "../components/ui/FloatingInput";
 import appConfig from "../config/appConfig.json";
 import { buildWhatsAppHref } from "../lib/services";
-import { WEB3FORMS_ENABLED } from "../lib/web3forms-access";
+import { MAIL_DELIVERY_ENABLED } from "../lib/mail-delivery";
 
 const waGeneral = buildWhatsAppHref("שלום, יש לי שאלה דרך עמוד יצירת הקשר של NeverMind.");
 const tel = appConfig.contact.phoneTel?.trim() || "";
-const formsEnabled = WEB3FORMS_ENABLED;
+const formsEnabled = MAIL_DELIVERY_ENABLED;
 ---
 
 <Layout title="יצירת קשר" description="אם משהו באתר פתח שאלה, אפשר לכתוב כאן. אפשר גם לעבור ישר לוואטסאפ או למייל.">
@@ -62,13 +62,13 @@ const formsEnabled = WEB3FORMS_ENABLED;
         <FloatingInput client:load id="contact-email" name="email" label="אימייל" type="email" required dir="rtl" autoComplete="email" />
         <FloatingInput client:load id="contact-message" name="message" label="מה אתה רוצה לבדוק" multiline rows={5} required dir="rtl" autoComplete="off" />
 
-        <Web3FormsHcaptcha idSuffix="contact" />
+        <FormHcaptcha idSuffix="contact" />
 
         <button type="submit" disabled={!formsEnabled} aria-disabled={!formsEnabled} class="w-full rounded-full bg-[var(--nm-inverse)] px-6 py-4 text-xl font-bold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-accent)] disabled:cursor-not-allowed disabled:opacity-55">
           יש לי שאלה
         </button>
         <p data-contact-status aria-live="polite" class="text-center text-sm text-[color-mix(in_srgb,var(--nm-fg)_58%,var(--nm-bg))] opacity-0 transition-opacity"></p>
-        {!formsEnabled ? <p class="text-center text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_64%,var(--nm-bg))]">שליחה במייל ממתינה לחיבור שרת הטפסים. אפשר לעבור לוואטסאפ או למייל הישיר.</p> : null}
+        {!formsEnabled ? <p class="text-center text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_64%,var(--nm-bg))]">שליחה במייל ממתינה לחיבור שרת המייל. אפשר לעבור לוואטסאפ או למייל הישיר.</p> : null}
       </form>
     </section>
   </section>
@@ -156,8 +156,8 @@ const formsEnabled = WEB3FORMS_ENABLED;
               ? payload.message.trim()
               : errorCode.includes("hcaptcha") || errorCode.includes("mandatory")
                 ? "צריך להשלים את האימות לפני השליחה."
-                : errorCode.includes("missing_form_access_key")
-                  ? "שרת הטפסים עדיין לא הוגדר בפרודקשן."
+                : errorCode.includes("missing_mail_delivery_config")
+                  ? "שרת המייל עדיין לא הוגדר בפריסה."
                   : "השרת לא אישר קבלה. אפשר לנסות שוב או פשוט לשלוח לנו הודעה בוואטסאפ.";
             showStatus(message);
             window.__nmReportConnectivityIssue?.(message);

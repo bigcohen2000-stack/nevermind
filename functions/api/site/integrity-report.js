@@ -1,8 +1,5 @@
-﻿import { fetchClubWorkerJson, json } from "../../_lib/club-admin.js";
-
-function resolveAccessKey(env) {
-  return String(env.WEB3FORMS_ACCESS_KEY ?? "").trim();
-}
+import { fetchClubWorkerJson, json } from "../../_lib/club-admin.js";
+import { sendResendEmail } from "../../_lib/resend.js";
 
 function readString(source, key, max = 2000) {
   return String(source?.[key] ?? "").replace(/\s+/g, " ").trim().slice(0, max);
@@ -57,45 +54,17 @@ async function saveToClubAdmin(env, payload, request) {
   };
 }
 
-async function sendToWeb3Forms(env, payload) {
-  const accessKey = resolveAccessKey(env);
-  if (!accessKey) {
-    return { ok: false, skipped: true, error: "missing_form_access_key" };
-  }
-
-  const outbound = new FormData();
-  outbound.set("access_key", accessKey);
-  outbound.set("subject", payload.subject || "דיווח דיוק מהאתר");
-  outbound.set("from_name", payload.fromName || "דיווח דיוק");
-  outbound.set("message", payload.message || "דיווח חדש מהאתר");
-  outbound.set("page_url", payload.pageUrl || "");
-  outbound.set("page_path", payload.pagePath || "");
-  outbound.set("page_title", payload.pageTitle || "");
-  outbound.set("selected_text", payload.selectedText || "");
-  outbound.set("note", payload.note || "");
-  outbound.set("botcheck", "");
-
-  try {
-    const response = await fetch("https://api.web3forms.com/submit", {
-      method: "POST",
-      headers: { Accept: "application/json" },
-      body: outbound,
-    });
-
-    const result = await response.json().catch(() => null);
-    return {
-      ok: response.ok && result?.success === true,
-      skipped: false,
-      error:
-        response.ok && result?.success === true
-          ? ""
-          : typeof result?.message === "string" && result.message.trim()
-            ? result.message.trim()
-            : "web3forms_rejected",
-    };
-  } catch {
-    return { ok: false, skipped: false, error: "web3forms_unreachable" };
-  }
+function buildIntegrityMailText(payload, message) {
+  return [
+    `עמוד: ${payload.pageTitle || "ללא כותרת"}`,
+    `קישור: ${payload.pageUrl || payload.pagePath || "לא צוין"}`,
+    payload.selectedText ? `טקסט מסומן: ${payload.selectedText}` : "",
+    payload.note ? `הערה: ${payload.note}` : "",
+    "",
+    message || "דיווח חדש מהאתר",
+  ]
+    .filter(Boolean)
+    .join("\n");
 }
 
 export async function onRequestPost(context) {
@@ -128,18 +97,22 @@ export async function onRequestPost(context) {
 
   const [storage, mail] = await Promise.all([
     saveToClubAdmin(env, clubPayload, request),
-    sendToWeb3Forms(env, {
-      ...payload,
-      message: `${message}\n\n${payload.pageUrl || payload.pagePath || ""}`.trim(),
+    sendResendEmail(env, {
+      subject: payload.subject || "דיווח דיוק מהאתר",
+      text: buildIntegrityMailText(payload, message),
+      tags: [
+        { name: "source", value: "integrity_report" },
+        { name: "page", value: payload.pagePath || "unknown" },
+      ],
     }),
   ]);
 
   if (!storage.ok && !mail.ok) {
-    const message = !mail.skipped ? "לא הצלחנו לשמור את הדיווח כרגע." : storage.error || "שרת הדיווחים לא זמין כרגע.";
+    const messageText = !mail.skipped ? "לא הצלחנו לשמור את הדיווח כרגע." : storage.error || "שרת הדיווחים לא זמין כרגע.";
     return json(
       {
         ok: false,
-        message,
+        message: messageText,
         stored: false,
         emailed: false,
         emailEnabled: !mail.skipped,

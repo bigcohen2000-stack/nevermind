@@ -1,4 +1,5 @@
 import { fetchClubWorkerJson, isDashboardAuthorized, json } from "../../_lib/club-admin.js";
+import { resolveResendConfig } from "../../_lib/resend.js";
 
 function hasValue(input) {
   return String(input ?? "").trim().length > 0;
@@ -15,6 +16,8 @@ export async function onRequestGet(context) {
     return json({ ok: false, error: "נדרשת גישת Access לדשבורד." }, 401);
   }
 
+  const resend = resolveResendConfig(env);
+
   const checks = [
     item(
       "club_proxy",
@@ -27,8 +30,14 @@ export async function onRequestGet(context) {
     item(
       "forms",
       "טפסי מייל",
-      hasValue(env.WEB3FORMS_ACCESS_KEY),
-      hasValue(env.WEB3FORMS_ACCESS_KEY) ? "מפתח Web3Forms מוגדר" : "חסר WEB3FORMS_ACCESS_KEY"
+      resend.enabled,
+      resend.enabled
+        ? "Resend מוגדר עם מפתח וכתובת שולח"
+        : !resend.apiKey
+          ? "חסר RESEND_API_KEY"
+          : !resend.from
+            ? "חסר RESEND_FROM_EMAIL"
+            : "חסר יעד מייל לשליחה"
     ),
     item(
       "hcaptcha",

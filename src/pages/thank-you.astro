@@ -1,11 +1,11 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import FormAntispamFields from "../components/FormAntispamFields.astro";
-import Web3FormsHcaptcha from "../components/Web3FormsHcaptcha.astro";
+import FormHcaptcha from "../components/FormHcaptcha.astro";
 import ReturnToContextCta from "../components/ReturnToContextCta.astro";
 import { FloatingInput } from "../components/ui/FloatingInput";
 import { buildWhatsAppHref } from "../lib/services";
-import { WEB3FORMS_ENABLED } from "../lib/web3forms-access";
+import { MAIL_DELIVERY_ENABLED } from "../lib/mail-delivery";
 
 const waMessage = "שלום, אני רוצה לפתוח גישה לאזור האישי של NeverMind.";
 const waHref = buildWhatsAppHref(waMessage);
@@ -13,7 +13,7 @@ const source = Astro.url.searchParams.get("source")?.trim() || "";
 const purchaseState = Astro.url.searchParams.get("purchase")?.trim() || "";
 const isExistingBuyer = purchaseState === "existing";
 const heroTitle = isExistingBuyer ? "הבקשה נקלטה." : "השליחה התקבלה.";
-const formsEnabled = WEB3FORMS_ENABLED;
+const formsEnabled = MAIL_DELIVERY_ENABLED;
 const heroSubtitle = isExistingBuyer
   ? "כבר קיימת רכישה קודמת. עכשיו אפשר להמשיך לשלב הבא בלי לחזור על אותו צעד."
   : "מכאן אפשר להמשיך לקריאה, לשאול שאלה נוספת, או לפתוח גישה לאזור האישי.";
@@ -73,12 +73,12 @@ const heroSubtitle = isExistingBuyer
           <FloatingInput client:load id="thank-you-email" name="email" label="אימייל" type="email" required autoComplete="email" dir="rtl" />
         </div>
         <FloatingInput client:load id="thank-you-message" name="message" label="מה עוד נשאר פתוח" multiline rows={5} required autoComplete="off" dir="rtl" className="[&_.nm-floating-control--textarea]:min-h-[8rem]" />
-        <Web3FormsHcaptcha idSuffix="thank-you" />
+        <FormHcaptcha idSuffix="thank-you" />
         <button type="submit" disabled={!formsEnabled} aria-disabled={!formsEnabled} class="w-full rounded-full bg-[var(--nm-inverse)] px-6 py-4 text-xl font-bold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-accent)] disabled:cursor-not-allowed disabled:opacity-55">
           יש לי שאלה
         </button>
         <p data-thank-you-form-status aria-live="polite" class="text-center text-sm text-[color-mix(in_srgb,var(--nm-fg)_58%,var(--nm-bg))] opacity-0 transition-opacity"></p>
-        {!formsEnabled ? <p class="text-center text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_64%,var(--nm-bg))]">שליחה במייל ממתינה לחיבור שרת הטפסים. אפשר להמשיך לוואטסאפ או לדף יצירת קשר.</p> : null}
+        {!formsEnabled ? <p class="text-center text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_64%,var(--nm-bg))]">שליחה במייל ממתינה לחיבור שרת המייל. אפשר להמשיך לוואטסאפ או לדף יצירת קשר.</p> : null}
       </form>
     </section>
   </section>
@@ -166,8 +166,8 @@ const heroSubtitle = isExistingBuyer
               ? payload.message.trim()
               : errorCode.includes("hcaptcha") || errorCode.includes("mandatory")
                 ? "צריך להשלים את האימות לפני השליחה."
-                : errorCode.includes("missing_form_access_key")
-                  ? "שרת הטפסים עדיין לא הוגדר בפרודקשן."
+                : errorCode.includes("missing_mail_delivery_config")
+                  ? "שרת המייל עדיין לא הוגדר בפריסה."
                   : "השרת לא אישר קבלה. אפשר לנסות שוב או פשוט לשלוח לנו הודעה בוואטסאפ.";
             showStatus(message);
             window.__nmReportConnectivityIssue?.(message);

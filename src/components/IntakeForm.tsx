@@ -4,7 +4,7 @@ import appConfig from "../config/appConfig.json";
 import { validateAntispamFields } from "../lib/form-antispam";
 import { HCAPTCHA_SITE_KEY } from "../lib/hcaptcha-public";
 import { pickIntakeHumanChallenge, type IntakeHumanChallenge } from "../lib/intake-human-check";
-import { WEB3FORMS_ENABLED } from "../lib/web3forms-access";
+import { MAIL_DELIVERY_ENABLED } from "../lib/mail-delivery";
 import { FloatingInput } from "./ui/FloatingInput";
 
 const WA_MAX_CHARS = 3600;
@@ -17,7 +17,7 @@ const waDigits = String((appConfig as { contact?: { whatsAppNumber?: string } })
   "",
 );
 const DRAFT_KEY = "nm-intake-draft-v1";
-const MAIL_DELIVERY_READY = WEB3FORMS_ENABLED;
+const MAIL_DELIVERY_READY = MAIL_DELIVERY_ENABLED;
 
 type ExpressionMode = "" | "write" | "select" | "both";
 
@@ -391,7 +391,7 @@ export default function IntakeForm() {
     }
 
     if (!MAIL_DELIVERY_READY) {
-      const message = "שליחה במייל ממתינה לחיבור שרת הטפסים. אפשר להמשיך בוואטסאפ.";
+      const message = "שליחה במייל ממתינה לחיבור שרת המייל. אפשר להמשיך בוואטסאפ.";
       setClientError(message);
       if (typeof window !== "undefined") window.__nmReportConnectivityIssue?.(message);
       return;

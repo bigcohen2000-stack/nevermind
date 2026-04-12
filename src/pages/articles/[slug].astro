@@ -16,7 +16,7 @@ export async function getStaticPaths() {
       props: { entry?: CollectionEntry<"articles">; destination?: string };
     }> = [];
 
-    if (canonicalSlug && !seen.has(canonicalSlug)) {
+    if (canonicalSlug && seen.has(canonicalSlug) === false) {
       seen.add(canonicalSlug);
       rows.push({
         params: { slug: canonicalSlug },
@@ -24,7 +24,8 @@ export async function getStaticPaths() {
       });
     }
 
-    if (sourceSlug && sourceSlug !== canonicalSlug && !seen.has(sourceSlug)) {
+    const sourceIsDifferent = sourceSlug === canonicalSlug ? false : true;
+    if (sourceSlug && sourceIsDifferent && seen.has(sourceSlug) === false) {
       seen.add(sourceSlug);
       rows.push({
         params: { slug: sourceSlug },
@@ -42,17 +43,31 @@ const { destination, entry } = Astro.props as {
   destination?: string;
   entry?: CollectionEntry<"articles">;
 };
+
+const hasDestination = typeof destination === "string" && destination.length > 0;
+const hasEntry = entry == null ? false : true;
+
+if (hasDestination === false && hasEntry === false) {
+  Astro.response.status = 404;
+}
 ---
 
 {
-  destination ? (
+  hasDestination ? (
     <StaticRedirectPage
-      to={destination}
+      to={String(destination)}
       title="מעביר למאמר"
       message="המאמר עבר לכתובת חדשה"
       ctaLabel="למאמר"
     />
-  ) : entry ? (
-    <ArticlePage entry={entry} />
-  ) : null
+  ) : hasEntry ? (
+    <ArticlePage entry={entry as CollectionEntry<"articles">} />
+  ) : (
+    <StaticRedirectPage
+      to="/articles/"
+      title="המאמר לא נמצא"
+      message="יכול להיות שהכתובת השתנתה. אפשר להמשיך לרשימת המאמרים."
+      ctaLabel="למאמרים"
+    />
+  )
 }

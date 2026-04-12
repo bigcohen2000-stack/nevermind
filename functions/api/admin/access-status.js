@@ -1,14 +1,27 @@
 import { isDashboardAuthorized, json, readAccessEmail, readAllowedAdminEmails } from "../../_lib/club-admin.js";
 
+function buildAccessUrls(request) {
+  const requestUrl = new URL(request.url);
+  const protectedPath = requestUrl.pathname.replace(/\/api\/access-status\/?$/, "/");
+  const protectedUrl = new URL(protectedPath, requestUrl.origin).toString();
+  const challengeUrl = `${requestUrl.origin}/cdn-cgi/access/login?redirect_url=${encodeURIComponent(protectedUrl)}`;
+  const switchIdentityUrl = `${requestUrl.origin}/cdn-cgi/access/logout?returnTo=${encodeURIComponent(challengeUrl)}`;
+
+  return { challengeUrl, switchIdentityUrl };
+}
+
 export async function onRequestGet(context) {
   const { request, env } = context;
+  const urls = buildAccessUrls(request);
 
-  if (!isDashboardAuthorized(request, env)) {
+  if (isDashboardAuthorized(request, env) === false) {
     return json(
       {
         ok: false,
         error: "נדרשת גישת Cloudflare Access עם מייל מורשה.",
         allowedEmails: readAllowedAdminEmails(env),
+        challengeUrl: urls.challengeUrl,
+        switchIdentityUrl: urls.switchIdentityUrl,
       },
       401,
     );
@@ -23,5 +36,7 @@ export async function onRequestGet(context) {
     email,
     identity,
     allowedEmails: readAllowedAdminEmails(env),
+    challengeUrl: urls.challengeUrl,
+    switchIdentityUrl: urls.switchIdentityUrl,
   });
 }

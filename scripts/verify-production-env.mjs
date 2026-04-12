@@ -23,9 +23,19 @@ if (premium.length < 16) {
   errors.push("PREMIUM_SESSION_SECRET חייב להיות באורך מינימום 16 תווים בפרודקשן.");
 }
 
-const web3 = s("WEB3FORMS_ACCESS_KEY");
-if (!web3) {
-  errors.push("חסר WEB3FORMS_ACCESS_KEY לטפסי Web3Forms.");
+const resendApiKey = s("RESEND_API_KEY");
+if (!resendApiKey) {
+  errors.push("חסר RESEND_API_KEY לטפסי המייל.");
+}
+
+const resendFrom = s("RESEND_FROM_EMAIL");
+if (!resendFrom) {
+  errors.push("חסר RESEND_FROM_EMAIL לטפסי המייל.");
+}
+
+const resendTo = s("RESEND_TO_EMAIL");
+if (!resendTo) {
+  warns.push("חסר RESEND_TO_EMAIL. הטפסים יישלחו לכתובת השולח שהוגדרה ב־RESEND_FROM_EMAIL.");
 }
 
 const clubUrl = s("PUBLIC_NM_CLUB_WEBHOOK_URL");
@@ -37,7 +47,7 @@ if (!clubUrl) {
 
 const hcaptcha = s("PUBLIC_HCAPTCHA_SITE_KEY");
 if (hcaptcha.length > 0 && hcaptcha.length < 10) {
-  warns.push("PUBLIC_HCAPTCHA_SITE_KEY נראה קצר מדי. כדאי לבדוק התאמה מול Web3Forms.");
+  warns.push("PUBLIC_HCAPTCHA_SITE_KEY נראה קצר מדי. כדאי לבדוק את מפתח hCaptcha.");
 }
 
 const clubProxy = s("PUBLIC_CLUB_ADMIN_VIA_PROXY");
