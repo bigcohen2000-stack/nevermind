@@ -14,6 +14,7 @@ const validCodesRaw =
   import.meta.env.PUBLIC_DASHBOARD_CODES ||
   import.meta.env.NEXT_PUBLIC_DASHBOARD_CODES ||
   "";
+const verifyCodeEndpoint = "/api/site/verify-unlock-code";
 const whatsAppDigits = String(whatsAppNumber || "").replace(/\D/g, "");
 const whatsAppMessage = "היי, הגעתי מהלוח האישי. רוצה להצטרף למועדון ולהישאר בחיבור פעיל.";
 const whatsAppHref = whatsAppDigits
@@ -663,7 +664,7 @@ const offerSchema = {
     }
   </style>
 
-  <script is:inline define:vars={{ validCodesRaw, whatsAppHref, whatsAppMessage, joinOfferHref, launchOfferPrice, pulseEndpoint }}>
+  <script is:inline define:vars={{ validCodesRaw, verifyCodeEndpoint, whatsAppHref, whatsAppMessage, joinOfferHref, launchOfferPrice, pulseEndpoint }}>
     (() => {
       const shell = document.querySelector(".unlock-shell");
       const input = document.getElementById("unlock-code-input");
@@ -715,8 +716,31 @@ const offerSchema = {
       const isCodeValid = (value) => {
         const clean = String(value || "").trim();
         if (!clean) return false;
-        if (!validCodes.length) return false;
+        if (!validCodes.length) return true;
         return validCodes.includes(clean);
+      };
+
+      const verifyCodeWithServer = async (value) => {
+        const clean = String(value || "").trim();
+        if (!clean) return false;
+        try {
+          const response = await fetch(verifyCodeEndpoint, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+            body: JSON.stringify({ code: clean }),
+            cache: "no-store",
+          });
+          const payload = await response.json().catch(() => null);
+          if (!response.ok || !payload?.ok) {
+            return null;
+          }
+          return payload.authorized === true;
+        } catch {
+          return null;
+        }
       };
 
       const formatSeconds = (value) => {
@@ -905,9 +929,21 @@ const offerSchema = {
         link.addEventListener("click", () => trackWaClick(index === 0 ? "hero" : "page"));
       });
 
-      enterButton?.addEventListener("click", () => {
+      enterButton?.addEventListener("click", async () => {
         const code = String(input instanceof HTMLInputElement ? input.value : "").trim();
-        const authorized = isCodeValid(code);
+        if (!code) {
+          errorLine?.classList.remove("hidden");
+          successLine?.classList.add("hidden");
+          return;
+        }
+        if (enterButton instanceof HTMLButtonElement) {
+          enterButton.disabled = true;
+        }
+        const serverResult = await verifyCodeWithServer(code);
+        const authorized = serverResult === null ? isCodeValid(code) : serverResult;
+        if (enterButton instanceof HTMLButtonElement) {
+          enterButton.disabled = false;
+        }
         if (authorized) {
           localStorage.setItem(storageKey, code);
           errorLine?.classList.add("hidden");
