@@ -66,6 +66,7 @@ export async function onRequestGet(context) {
     const seenAt = String(entry?.seenAt || "");
     return {
       id: `${entry?.phone || "guest"}-${seenAt || index}`,
+      memberName: String(entry?.memberName || ""),
       phone: String(entry?.phone || "ללא טלפון"),
       ipFingerprint: String(entry?.ipFingerprint || "לא זמין"),
       path: String(entry?.path || "/"),

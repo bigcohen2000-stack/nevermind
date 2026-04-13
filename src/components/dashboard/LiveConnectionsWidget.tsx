@@ -2,6 +2,7 @@
 
 type LiveConnection = {
   id: string;
+  memberName: string;
   phone: string;
   ipFingerprint: string;
   path: string;
@@ -89,7 +90,9 @@ export default function LiveConnectionsWidget({ endpoint }: Props) {
               <>
                 <div>
                   <p className="text-xs text-black/45">חבר</p>
-                  <p className="mt-1 text-sm text-[#1A1A1A]">{item.phone}</p>
+                  <p className="mt-1 text-sm text-[#1A1A1A]">
+                    {item.memberName ? `${item.memberName} · ${item.phone}` : item.phone}
+                  </p>
                 </div>
                 <div>
                   <p className="text-xs text-black/45">מזהה רשת</p>

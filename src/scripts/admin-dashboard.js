@@ -1,4 +1,4 @@
-import {
+﻿import {
   bindAdminDraftPersistence,
   buildAdminApiUrl,
   buildAdminAuthHeaders,
@@ -7,7 +7,7 @@ import {
 
 const formatDateTime = (value) => {
   const date = new Date(value || "");
-  if (Number.isNaN(date.getTime())) return "לא זמין";
+  if (Number.isNaN(date.getTime())) return "׳׳ ׳–׳׳™׳";
   return date.toLocaleString("he-IL", {
     day: "numeric",
     month: "short",
@@ -20,11 +20,11 @@ const formatDateTime = (value) => {
 const normalizeMemberSearch = (value) => String(value ?? "").replace(/\D/g, "");
 
 const formatMemberStatus = (member) => {
-  if (!member) return "לא ידוע";
-  if (member.isActive) return "פעיל";
-  if (member.status === "blocked") return "חסום";
-  if (member.status === "paused") return "מושהה";
-  return "לא פעיל";
+  if (!member) return "׳׳ ׳™׳“׳•׳¢";
+  if (member.isActive) return "׳₪׳¢׳™׳";
+  if (member.status === "blocked") return "׳—׳¡׳•׳";
+  if (member.status === "paused") return "׳׳•׳©׳”׳”";
+  return "׳׳ ׳₪׳¢׳™׳";
 };
 
 const renderItems = (root, items, renderItem, emptyMessage) => {
@@ -108,7 +108,7 @@ const initAdminDashboard = () => {
   if (!viaProxy) {
     if (errorEl instanceof HTMLElement) {
       errorEl.textContent =
-        "הניהול הזה עובד רק דרך Cloudflare Access ופרוקסי השרת.";
+        "׳”׳ ׳™׳”׳•׳ ׳”׳–׳” ׳¢׳•׳‘׳“ ׳¨׳§ ׳“׳¨׳ Cloudflare Access ׳•׳₪׳¨׳•׳§׳¡׳™ ׳”׳©׳¨׳×.";
       errorEl.classList.remove("hidden");
     }
     if (loadingEl instanceof HTMLElement) loadingEl.classList.add("hidden");
@@ -117,7 +117,7 @@ const initAdminDashboard = () => {
 
   if (!overviewEndpoint || !memberEndpoint || !resetEndpoint || !addMemberEndpoint) {
     if (errorEl instanceof HTMLElement) {
-      errorEl.textContent = "חסרה כתובת API לניהול המועדון. בדוק את הגדרות הפרוקסי והחיבור ל-worker.";
+      errorEl.textContent = "׳—׳¡׳¨׳” ׳›׳×׳•׳‘׳× API ׳׳ ׳™׳”׳•׳ ׳”׳׳•׳¢׳“׳•׳. ׳‘׳“׳•׳§ ׳׳× ׳”׳’׳“׳¨׳•׳× ׳”׳₪׳¨׳•׳§׳¡׳™ ׳•׳”׳—׳™׳‘׳•׳¨ ׳-worker.";
       errorEl.classList.remove("hidden");
     }
     if (loadingEl instanceof HTMLElement) loadingEl.classList.add("hidden");
@@ -145,9 +145,9 @@ const initAdminDashboard = () => {
   };
 
   const buildMemberShareMessage = ({ phone, password, fullName, mode = "created" }) => {
-    const nameLine = fullName ? `היי ${fullName},\n` : "היי,\n";
-    const intro = mode === "reset" ? "עדכנתי לך עכשיו את הגישה ל-NeverMind." : "פתחתי לך עכשיו גישה ל-NeverMind.";
-    return `${nameLine}${intro}\nשם משתמש: ${phone}\nסיסמה: ${password}\nכניסה: ${loginUrl}\nאחרי הכניסה ייפתחו כל התכנים והמאמרים של חברי המועדון.`;
+    const nameLine = fullName ? `׳”׳™׳™ ${fullName},\n` : "׳”׳™׳™,\n";
+    const intro = mode === "reset" ? "׳¢׳“׳›׳ ׳×׳™ ׳׳ ׳¢׳›׳©׳™׳• ׳׳× ׳”׳’׳™׳©׳” ׳-NeverMind." : "׳₪׳×׳—׳×׳™ ׳׳ ׳¢׳›׳©׳™׳• ׳’׳™׳©׳” ׳-NeverMind.";
+    return `${nameLine}${intro}\n׳©׳ ׳׳©׳×׳׳©: ${phone}\n׳¡׳™׳¡׳׳”: ${password}\n׳›׳ ׳™׳¡׳”: ${loginUrl}\n׳׳—׳¨׳™ ׳”׳›׳ ׳™׳¡׳” ׳™׳™׳₪׳×׳—׳• ׳›׳ ׳”׳×׳›׳ ׳™׳ ׳•׳”׳׳׳׳¨׳™׳ ׳©׳ ׳—׳‘׳¨׳™ ׳”׳׳•׳¢׳“׳•׳.`;
   };
 
   const showError = (message) => {
@@ -164,7 +164,7 @@ const initAdminDashboard = () => {
 
   const setLoading = (active, message) => {
     if (loadingEl instanceof HTMLElement) {
-      loadingEl.textContent = message || "טוען נתוני מועדון...";
+      loadingEl.textContent = message || "׳˜׳•׳¢׳ ׳ ׳×׳•׳ ׳™ ׳׳•׳¢׳“׳•׳...";
       loadingEl.classList.toggle("hidden", !active);
     }
     if (contentEl instanceof HTMLElement) {
@@ -173,7 +173,7 @@ const initAdminDashboard = () => {
   };
 
   const handleUnauthorized = () => {
-    showError("השרת לא אישר את הבקשה. בדוק את Cloudflare Access על /dashboard/, /api/dashboard/ ו־/api/club-admin/.");
+    showError("׳”׳©׳¨׳× ׳׳ ׳׳™׳©׳¨ ׳׳× ׳”׳‘׳§׳©׳”. ׳‘׳“׳•׳§ ׳׳× Cloudflare Access ׳¢׳ /dashboard/, /api/dashboard/ ׳•ײ¾/api/club-admin/.");
     setLoading(false);
   };
 
@@ -198,8 +198,8 @@ const initAdminDashboard = () => {
     if (memberEmptyEl instanceof HTMLElement) {
       memberEmptyEl.classList.toggle("hidden", matches.length > 0);
       memberEmptyEl.textContent = rawQuery
-        ? "לא מצאנו חבר שמתאים לחיפוש הזה."
-        : "אפשר להתחיל לכתוב טלפון או שם, או לבחור מהרשימה האחרונה.";
+        ? "׳׳ ׳׳¦׳׳ ׳• ׳—׳‘׳¨ ׳©׳׳×׳׳™׳ ׳׳—׳™׳₪׳•׳© ׳”׳–׳”."
+        : "׳׳₪׳©׳¨ ׳׳”׳×׳—׳™׳ ׳׳›׳×׳•׳‘ ׳˜׳׳₪׳•׳ ׳׳• ׳©׳, ׳׳• ׳׳‘׳—׳•׳¨ ׳׳”׳¨׳©׳™׳׳” ׳”׳׳—׳¨׳•׳ ׳”.";
     }
 
     renderItems(
@@ -209,7 +209,7 @@ const initAdminDashboard = () => {
         const row = createRow(`
           <div class="flex items-start justify-between gap-3">
             <div class="space-y-1 text-right">
-              <p class="text-sm font-semibold text-[var(--nm-fg)]">${escapeHtml(member.memberName || "חבר")}</p>
+              <p class="text-sm font-semibold text-[var(--nm-fg)]">${escapeHtml(member.memberName || "׳—׳‘׳¨")}</p>
               <p class="text-xs leading-6 text-[color-mix(in_srgb,var(--nm-fg)_58%,var(--nm-bg))]">${escapeHtml(member.phone)}</p>
             </div>
             <span class="rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] px-3 py-1 text-xs font-semibold text-[var(--nm-fg)]">${escapeHtml(formatMemberStatus(member))}</span>
@@ -221,7 +221,7 @@ const initAdminDashboard = () => {
         });
         return row;
       },
-      rawQuery ? "לא מצאנו חבר מתאים." : "רשימת החברים תופיע כאן."
+      rawQuery ? "׳׳ ׳׳¦׳׳ ׳• ׳—׳‘׳¨ ׳׳×׳׳™׳." : "׳¨׳©׳™׳׳× ׳”׳—׳‘׳¨׳™׳ ׳×׳•׳₪׳™׳¢ ׳›׳׳."
     );
   };
 
@@ -231,10 +231,10 @@ const initAdminDashboard = () => {
 
     memberCardEl.innerHTML = `
       <div class="space-y-2 text-right">
-        <p class="text-lg font-semibold text-[var(--nm-fg)]">${escapeHtml(member.memberName || "חבר")}</p>
-        <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_64%,var(--nm-bg))]">${escapeHtml(member.phone)} · ${escapeHtml(formatMemberStatus(member))}</p>
-        <p class="text-xs leading-6 text-[color-mix(in_srgb,var(--nm-fg)_54%,var(--nm-bg))]">גישה עד ${escapeHtml(member.expiresAt ? formatDateTime(member.expiresAt) : "לא ידוע")}</p>
-        <p class="text-xs leading-6 text-[color-mix(in_srgb,var(--nm-fg)_54%,var(--nm-bg))]">כניסה אחרונה ${escapeHtml(member.lastLoginAt ? formatDateTime(member.lastLoginAt) : "לא ידוע")}</p>
+        <p class="text-lg font-semibold text-[var(--nm-fg)]">${escapeHtml(member.memberName || "׳—׳‘׳¨")}</p>
+        <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_64%,var(--nm-bg))]">${escapeHtml(member.phone)} ֲ· ${escapeHtml(formatMemberStatus(member))}</p>
+        <p class="text-xs leading-6 text-[color-mix(in_srgb,var(--nm-fg)_54%,var(--nm-bg))]">׳’׳™׳©׳” ׳¢׳“ ${escapeHtml(member.expiresAt ? formatDateTime(member.expiresAt) : "׳׳ ׳™׳“׳•׳¢")}</p>
+        <p class="text-xs leading-6 text-[color-mix(in_srgb,var(--nm-fg)_54%,var(--nm-bg))]">׳›׳ ׳™׳¡׳” ׳׳—׳¨׳•׳ ׳” ${escapeHtml(member.lastLoginAt ? formatDateTime(member.lastLoginAt) : "׳׳ ׳™׳“׳•׳¢")}</p>
       </div>
     `;
 
@@ -251,7 +251,7 @@ const initAdminDashboard = () => {
     if (!normalizedPhone) return;
     selectedMemberPhone = normalizedPhone;
     if (memberCardEl instanceof HTMLElement) {
-      memberCardEl.textContent = "טוען כרטיס חבר...";
+      memberCardEl.textContent = "׳˜׳•׳¢׳ ׳›׳¨׳˜׳™׳¡ ׳—׳‘׳¨...";
     }
 
     try {
@@ -265,7 +265,7 @@ const initAdminDashboard = () => {
         return;
       }
       if (!response.ok || !payload || payload.ok !== true) {
-        showError(payload?.error ? String(payload.error) : "לא הצלחנו לטעון את פרטי החבר.");
+        showError(payload?.error ? String(payload.error) : "׳׳ ׳”׳¦׳׳—׳ ׳• ׳׳˜׳¢׳•׳ ׳׳× ׳₪׳¨׳˜׳™ ׳”׳—׳‘׳¨.");
         return;
       }
 
@@ -275,18 +275,18 @@ const initAdminDashboard = () => {
         Array.isArray(payload.timeline) ? payload.timeline : [],
         (item) =>
           createRow(`
-            <p class="text-sm font-semibold text-[var(--nm-fg)]">${escapeHtml(item.title || "פעילות")}</p>
+            <p class="text-sm font-semibold text-[var(--nm-fg)]">${escapeHtml(item.title || "׳₪׳¢׳™׳׳•׳×")}</p>
             <p class="mt-1 text-xs leading-6 text-[color-mix(in_srgb,var(--nm-fg)_65%,var(--nm-bg))]">${escapeHtml(formatDateTime(item.at))}</p>
             <p class="mt-1 text-xs leading-6 text-[color-mix(in_srgb,var(--nm-fg)_56%,var(--nm-bg))]">${escapeHtml(item.detail || "")}</p>
           `, item.kind === "flag" ? "tint" : "white"),
-        "עדיין אין פעילות מתועדת לחבר הזה."
+        "׳¢׳“׳™׳™׳ ׳׳™׳ ׳₪׳¢׳™׳׳•׳× ׳׳×׳•׳¢׳“׳× ׳׳—׳‘׳¨ ׳”׳–׳”."
       );
 
       if (memberSearchInput instanceof HTMLInputElement) {
         memberSearchInput.value = normalizedPhone;
       }
     } catch {
-      showError("לא הצלחנו לטעון את ציר הפעילות של החבר.");
+      showError("׳׳ ׳”׳¦׳׳—׳ ׳• ׳׳˜׳¢׳•׳ ׳׳× ׳¦׳™׳¨ ׳”׳₪׳¢׳™׳׳•׳× ׳©׳ ׳”׳—׳‘׳¨.");
     }
   };
 
@@ -312,7 +312,7 @@ const initAdminDashboard = () => {
     if (summaryDeep instanceof HTMLElement) summaryDeep.textContent = String(stats.pageViewBeacons ?? pageViewBeacons.length ?? 0);
     if (summaryIntegrity instanceof HTMLElement) summaryIntegrity.textContent = String(stats.integrityReports ?? integrityReports.length ?? 0);
     if (summaryLastIntegrity instanceof HTMLElement) {
-      summaryLastIntegrity.textContent = stats.lastIntegrityAt ? formatDateTime(stats.lastIntegrityAt) : "לא זמין";
+      summaryLastIntegrity.textContent = stats.lastIntegrityAt ? formatDateTime(stats.lastIntegrityAt) : "׳׳ ׳–׳׳™׳";
     }
 
     renderItems(
@@ -320,12 +320,12 @@ const initAdminDashboard = () => {
       integrityReports,
       (item) =>
         createRow(`
-          <p class="text-sm font-semibold text-[var(--nm-fg)]">${escapeHtml(item.pageTitle || item.pagePath || item.pageUrl || "עמוד ללא כותרת")}</p>
+          <p class="text-sm font-semibold text-[var(--nm-fg)]">${escapeHtml(item.pageTitle || item.pagePath || item.pageUrl || "׳¢׳׳•׳“ ׳׳׳ ׳›׳•׳×׳¨׳×")}</p>
           <p class="mt-1 text-xs leading-6 text-[color-mix(in_srgb,var(--nm-fg)_65%,var(--nm-bg))]">${escapeHtml(formatDateTime(item.reportedAt))} &middot; ${escapeHtml(item.pagePath || item.pageUrl || "/")}</p>
-          <p class="mt-2 text-xs leading-6 text-[color-mix(in_srgb,var(--nm-fg)_58%,var(--nm-bg))]">${escapeHtml(item.selectedText || item.note || item.message || "הערה כללית ללא טקסט מסומן")}</p>
-          <p class="mt-1 text-[11px] leading-6 text-[color-mix(in_srgb,var(--nm-fg)_48%,var(--nm-bg))]">${escapeHtml(item.reporterFingerprint || "ללא מזהה")}</p>
+          <p class="mt-2 text-xs leading-6 text-[color-mix(in_srgb,var(--nm-fg)_58%,var(--nm-bg))]">${escapeHtml(item.selectedText || item.note || item.message || "׳”׳¢׳¨׳” ׳›׳׳׳™׳× ׳׳׳ ׳˜׳§׳¡׳˜ ׳׳¡׳•׳׳")}</p>
+          <p class="mt-1 text-[11px] leading-6 text-[color-mix(in_srgb,var(--nm-fg)_48%,var(--nm-bg))]">${escapeHtml(item.reporterFingerprint || "׳׳׳ ׳׳–׳”׳”")}</p>
         `),
-      "עדיין אין הערות מהאתר. ברגע שמבקר ישלח תיקון מתוך עמוד, הוא יופיע כאן."
+      "׳¢׳“׳™׳™׳ ׳׳™׳ ׳”׳¢׳¨׳•׳× ׳׳”׳׳×׳¨. ׳‘׳¨׳’׳¢ ׳©׳׳‘׳§׳¨ ׳™׳©׳׳— ׳×׳™׳§׳•׳ ׳׳×׳•׳ ׳¢׳׳•׳“, ׳”׳•׳ ׳™׳•׳₪׳™׳¢ ׳›׳׳."
     );
 
     renderItems(
@@ -333,11 +333,11 @@ const initAdminDashboard = () => {
       recentLogins,
       (item) =>
         createRow(`
-          <p class="text-sm font-semibold text-[var(--nm-fg)]">${escapeHtml(item.phone || "ללא טלפון")}</p>
-          <p class="mt-1 text-xs leading-6 text-[color-mix(in_srgb,var(--nm-fg)_65%,var(--nm-bg))]">${escapeHtml(formatDateTime(item.seenAt))} · ${escapeHtml(item.path || "/")}</p>
-          <p class="mt-1 text-xs leading-6 text-[color-mix(in_srgb,var(--nm-fg)_52%,var(--nm-bg))]">${escapeHtml(item.ipFingerprint || "ללא מזהה")} &middot; ${escapeHtml(item.userAgent || "ללא דפדפן")}</p>
+          <p class="text-sm font-semibold text-[var(--nm-fg)]">${escapeHtml(item.memberName ? `${item.memberName} · ${item.phone || "׳׳׳ ׳˜׳׳₪׳•׳"}` : item.phone || "׳׳׳ ׳˜׳׳₪׳•׳")}</p>
+          <p class="mt-1 text-xs leading-6 text-[color-mix(in_srgb,var(--nm-fg)_65%,var(--nm-bg))]">${escapeHtml(formatDateTime(item.seenAt))} ֲ· ${escapeHtml(item.path || "/")}</p>
+          <p class="mt-1 text-xs leading-6 text-[color-mix(in_srgb,var(--nm-fg)_52%,var(--nm-bg))]">${escapeHtml(item.ipFingerprint || "׳׳׳ ׳׳–׳”׳”")} &middot; ${escapeHtml(item.userAgent || "׳׳׳ ׳“׳₪׳“׳₪׳")}</p>
         `),
-      "עדיין אין כניסות מתועדות בחלון האחרון."
+      "׳¢׳“׳™׳™׳ ׳׳™׳ ׳›׳ ׳™׳¡׳•׳× ׳׳×׳•׳¢׳“׳•׳× ׳‘׳—׳׳•׳ ׳”׳׳—׳¨׳•׳."
     );
 
     renderItems(
@@ -346,13 +346,13 @@ const initAdminDashboard = () => {
       (item) =>
         createRow(
           `
-            <p class="text-sm font-semibold text-[var(--nm-fg)]">${escapeHtml(item.phone || "ללא טלפון")}</p>
-            <p class="mt-1 text-xs leading-6 text-[color-mix(in_srgb,var(--nm-fg)_65%,var(--nm-bg))]">סומן ב-${escapeHtml(formatDateTime(item.flaggedAt))}</p>
-            <p class="mt-1 text-xs leading-6 text-[color-mix(in_srgb,var(--nm-fg)_52%,var(--nm-bg))]">${escapeHtml(item.memberIpCount || 0)} מזהי IP לחבר &middot; ${escapeHtml(item.passwordIpCount || 0)} מזהי IP לסיסמה</p>
+            <p class="text-sm font-semibold text-[var(--nm-fg)]">${escapeHtml(item.memberName ? `${item.memberName} · ${item.phone || "׳׳׳ ׳˜׳׳₪׳•׳"}` : item.phone || "׳׳׳ ׳˜׳׳₪׳•׳")}</p>
+            <p class="mt-1 text-xs leading-6 text-[color-mix(in_srgb,var(--nm-fg)_65%,var(--nm-bg))]">׳¡׳•׳׳ ׳‘-${escapeHtml(formatDateTime(item.flaggedAt))}</p>
+            <p class="mt-1 text-xs leading-6 text-[color-mix(in_srgb,var(--nm-fg)_52%,var(--nm-bg))]">${escapeHtml(item.memberIpCount || 0)} ׳׳–׳”׳™ IP ׳׳—׳‘׳¨ &middot; ${escapeHtml(item.passwordIpCount || 0)} ׳׳–׳”׳™ IP ׳׳¡׳™׳¡׳׳”</p>
           `,
           "tint"
         ),
-      "כרגע אין התראות חריגות פתוחות."
+      "׳›׳¨׳’׳¢ ׳׳™׳ ׳”׳×׳¨׳׳•׳× ׳—׳¨׳™׳’׳•׳× ׳₪׳×׳•׳—׳•׳×."
     );
 
     renderItems(
@@ -362,9 +362,9 @@ const initAdminDashboard = () => {
         createRow(`
           <p class="text-sm font-semibold text-[var(--nm-fg)]">${escapeHtml(item.path || "/")}</p>
           <p class="mt-1 text-xs leading-6 text-[color-mix(in_srgb,var(--nm-fg)_65%,var(--nm-bg))]">${escapeHtml(formatDateTime(item.seenAt))}</p>
-          <p class="mt-1 text-xs leading-6 text-[color-mix(in_srgb,var(--nm-fg)_52%,var(--nm-bg))]">${escapeHtml(item.ipFingerprint || "ללא מזהה")}</p>
+          <p class="mt-1 text-xs leading-6 text-[color-mix(in_srgb,var(--nm-fg)_52%,var(--nm-bg))]">${escapeHtml(item.ipFingerprint || "׳׳׳ ׳׳–׳”׳”")}</p>
         `),
-      "עדיין אין תצפיות תוכן. אחרי כניסה של חבר ופתיחת מאמר תחת /articles/ יופיעו כאן שורות חדשות."
+      "׳¢׳“׳™׳™׳ ׳׳™׳ ׳×׳¦׳₪׳™׳•׳× ׳×׳•׳›׳. ׳׳—׳¨׳™ ׳›׳ ׳™׳¡׳” ׳©׳ ׳—׳‘׳¨ ׳•׳₪׳×׳™׳—׳× ׳׳׳׳¨ ׳×׳—׳× /articles/ ׳™׳•׳₪׳™׳¢׳• ׳›׳׳ ׳©׳•׳¨׳•׳× ׳—׳“׳©׳•׳×."
     );
 
     if (memberSearchInput instanceof HTMLInputElement && selectedMemberPhone && !memberSearchInput.value) {
@@ -381,7 +381,7 @@ const initAdminDashboard = () => {
 
   const loadOverview = async () => {
     clearError();
-    setLoading(true, "מזקק את נתוני המועדון...");
+    setLoading(true, "׳׳–׳§׳§ ׳׳× ׳ ׳×׳•׳ ׳™ ׳”׳׳•׳¢׳“׳•׳...");
     try {
       const response = await fetch(overviewEndpoint, {
         headers: buildAdminAuthHeaders({ Accept: "application/json" }),
@@ -393,12 +393,12 @@ const initAdminDashboard = () => {
         return;
       }
       if (response.status === 429) {
-        showError(payload?.error ? String(payload.error) : "יותר מדי בקשות. נסה שוב בעוד רגע.");
+        showError(payload?.error ? String(payload.error) : "׳™׳•׳×׳¨ ׳׳“׳™ ׳‘׳§׳©׳•׳×. ׳ ׳¡׳” ׳©׳•׳‘ ׳‘׳¢׳•׳“ ׳¨׳’׳¢.");
         setLoading(false);
         return;
       }
       if (!response.ok || !payload || payload.ok !== true) {
-        showError(payload?.error ? String(payload.error) : "השרת לא החזיר נתוני ניהול.");
+        showError(payload?.error ? String(payload.error) : "׳”׳©׳¨׳× ׳׳ ׳”׳—׳–׳™׳¨ ׳ ׳×׳•׳ ׳™ ׳ ׳™׳”׳•׳.");
         setLoading(false);
         return;
       }
@@ -406,7 +406,7 @@ const initAdminDashboard = () => {
       renderOverview(payload);
       setLoading(false);
     } catch {
-      showError("השרת לא ענה. אפשר לרענן ולנסות שוב.");
+      showError("׳”׳©׳¨׳× ׳׳ ׳¢׳ ׳”. ׳׳₪׳©׳¨ ׳׳¨׳¢׳ ׳ ׳•׳׳ ׳¡׳•׳× ׳©׳•׳‘.");
       setLoading(false);
     }
   };
@@ -426,12 +426,12 @@ const initAdminDashboard = () => {
       const phone = String(formData.get("phone") ?? "").trim();
       const newPassword = String(formData.get("newPassword") ?? "").trim();
       if (!phone || !newPassword) {
-        showError("צריך טלפון וסיסמה חדשה.");
+        showError("׳¦׳¨׳™׳ ׳˜׳׳₪׳•׳ ׳•׳¡׳™׳¡׳׳” ׳—׳“׳©׳”.");
         return;
       }
       pendingReset = { phone, newPassword };
       if (confirmText instanceof HTMLElement) {
-        confirmText.textContent = `האם לאפס עכשיו את הסיסמה של ${phone}`;
+        confirmText.textContent = `׳”׳׳ ׳׳׳₪׳¡ ׳¢׳›׳©׳™׳• ׳׳× ׳”׳¡׳™׳¡׳׳” ׳©׳ ${phone}`;
       }
       openDialog();
     };
@@ -458,7 +458,7 @@ const initAdminDashboard = () => {
         phoneField.select();
       }
       if (resetStatus instanceof HTMLElement) {
-        resetStatus.textContent = `הטלפון ${selectedMemberPhone} הועבר לטופס האיפוס.`;
+        resetStatus.textContent = `׳”׳˜׳׳₪׳•׳ ${selectedMemberPhone} ׳”׳•׳¢׳‘׳¨ ׳׳˜׳•׳₪׳¡ ׳”׳׳™׳₪׳•׳¡.`;
       }
     };
     fillResetButton.addEventListener("click", onFillReset);
@@ -487,11 +487,11 @@ const initAdminDashboard = () => {
       if (!statusEl) return;
 
       if (!phone || !password) {
-        setStatus("צריך טלפון וסיסמה.");
+        setStatus("׳¦׳¨׳™׳ ׳˜׳׳₪׳•׳ ׳•׳¡׳™׳¡׳׳”.");
         return;
       }
 
-      const loadingText = "מוסיף חבר...";
+      const loadingText = "׳׳•׳¡׳™׳£ ׳—׳‘׳¨...";
       setStatus(loadingText);
 
       if (submitBtn instanceof HTMLButtonElement) {
@@ -516,15 +516,15 @@ const initAdminDashboard = () => {
           return;
         }
         if (response.status === 429) {
-          setStatus(payload?.error ? String(payload.error) : "יותר מדי בקשות. נסה שוב בעוד רגע.");
+          setStatus(payload?.error ? String(payload.error) : "׳™׳•׳×׳¨ ׳׳“׳™ ׳‘׳§׳©׳•׳×. ׳ ׳¡׳” ׳©׳•׳‘ ׳‘׳¢׳•׳“ ׳¨׳’׳¢.");
           return;
         }
         if (!response.ok || !payload || payload.ok !== true) {
-          setStatus(payload?.error ? String(payload.error) : "השרת לא אישר את הבקשה.");
+          setStatus(payload?.error ? String(payload.error) : "׳”׳©׳¨׳× ׳׳ ׳׳™׳©׳¨ ׳׳× ׳”׳‘׳§׳©׳”.");
           return;
         }
 
-        setStatus(`נוסף חבר: ${payload.phone}`);
+        setStatus(`׳ ׳•׳¡׳£ ׳—׳‘׳¨: ${payload.phone}`);
         setShareMessage(
           buildMemberShareMessage({
             phone: payload.phone || phone,
@@ -532,12 +532,12 @@ const initAdminDashboard = () => {
             fullName,
             mode: "created",
           }),
-          "נוצרה הודעה מוכנה להעתקה."
+          "׳ ׳•׳¦׳¨׳” ׳”׳•׳“׳¢׳” ׳׳•׳›׳ ׳” ׳׳”׳¢׳×׳§׳”."
         );
         addMemberForm.reset();
         await loadOverview();
       } catch {
-        setStatus("השרת לא ענה. נסה שוב.");
+        setStatus("׳”׳©׳¨׳× ׳׳ ׳¢׳ ׳”. ׳ ׳¡׳” ׳©׳•׳‘.");
       } finally {
         if (submitBtn instanceof HTMLButtonElement) {
           submitBtn.disabled = false;
@@ -553,16 +553,16 @@ const initAdminDashboard = () => {
   if (copyShareButton instanceof HTMLButtonElement) {
     const onCopyShare = async () => {
       if (!(shareMessageField instanceof HTMLTextAreaElement) || !shareMessageField.value.trim()) {
-        setShareStatus("עוד אין הודעה מוכנה להעתקה.");
+        setShareStatus("׳¢׳•׳“ ׳׳™׳ ׳”׳•׳“׳¢׳” ׳׳•׳›׳ ׳” ׳׳”׳¢׳×׳§׳”.");
         return;
       }
       try {
         await navigator.clipboard.writeText(shareMessageField.value);
-        setShareStatus("ההודעה הועתקה.");
+        setShareStatus("׳”׳”׳•׳“׳¢׳” ׳”׳•׳¢׳×׳§׳”.");
       } catch {
         shareMessageField.focus();
         shareMessageField.select();
-        setShareStatus("לא הצלחנו להעתיק אוטומטית. סימנו את הטקסט כדי שתוכל להעתיק.");
+        setShareStatus("׳׳ ׳”׳¦׳׳—׳ ׳• ׳׳”׳¢׳×׳™׳§ ׳׳•׳˜׳•׳׳˜׳™׳×. ׳¡׳™׳׳ ׳• ׳׳× ׳”׳˜׳§׳¡׳˜ ׳›׳“׳™ ׳©׳×׳•׳›׳ ׳׳”׳¢׳×׳™׳§.");
       }
     };
     copyShareButton.addEventListener("click", onCopyShare);
@@ -573,9 +573,9 @@ const initAdminDashboard = () => {
     const onCopyLoginLink = async () => {
       try {
         await navigator.clipboard.writeText(loginUrl);
-        setShareStatus("קישור הכניסה הועתק.");
+        setShareStatus("׳§׳™׳©׳•׳¨ ׳”׳›׳ ׳™׳¡׳” ׳”׳•׳¢׳×׳§.");
       } catch {
-        setShareStatus("לא הצלחנו להעתיק את הקישור אוטומטית.");
+        setShareStatus("׳׳ ׳”׳¦׳׳—׳ ׳• ׳׳”׳¢׳×׳™׳§ ׳׳× ׳”׳§׳™׳©׳•׳¨ ׳׳•׳˜׳•׳׳˜׳™׳×.");
       }
     };
     copyLoginLinkButton.addEventListener("click", onCopyLoginLink);
@@ -592,7 +592,7 @@ const initAdminDashboard = () => {
     const onApprove = async () => {
       if (!pendingReset) return;
       confirmApprove.disabled = true;
-      window.__nmSetButtonLoading?.(confirmApprove, "מעדכן סיסמה...");
+      window.__nmSetButtonLoading?.(confirmApprove, "׳׳¢׳“׳›׳ ׳¡׳™׳¡׳׳”...");
       try {
         const response = await fetch(resetEndpoint, {
           method: "POST",
@@ -608,15 +608,15 @@ const initAdminDashboard = () => {
           return;
         }
         if (response.status === 429) {
-          showError(payload?.error ? String(payload.error) : "יותר מדי בקשות. נסה שוב בעוד רגע.");
+          showError(payload?.error ? String(payload.error) : "׳™׳•׳×׳¨ ׳׳“׳™ ׳‘׳§׳©׳•׳×. ׳ ׳¡׳” ׳©׳•׳‘ ׳‘׳¢׳•׳“ ׳¨׳’׳¢.");
           return;
         }
         if (!response.ok || !payload || payload.ok !== true) {
-          showError(payload?.error ? String(payload.error) : "השרת לא עדכן את הסיסמה.");
+          showError(payload?.error ? String(payload.error) : "׳”׳©׳¨׳× ׳׳ ׳¢׳“׳›׳ ׳׳× ׳”׳¡׳™׳¡׳׳”.");
           return;
         }
         if (resetStatus instanceof HTMLElement) {
-          resetStatus.textContent = `הסיסמה של ${pendingReset.phone} עודכנה ב-${formatDateTime(payload.updatedAt)}`;
+          resetStatus.textContent = `׳”׳¡׳™׳¡׳׳” ׳©׳ ${pendingReset.phone} ׳¢׳•׳“׳›׳ ׳” ׳‘-${formatDateTime(payload.updatedAt)}`;
         }
         setShareMessage(
           buildMemberShareMessage({
@@ -625,7 +625,7 @@ const initAdminDashboard = () => {
             fullName: "",
             mode: "reset",
           }),
-          "הודעת האיפוס מוכנה להעתקה."
+          "׳”׳•׳“׳¢׳× ׳”׳׳™׳₪׳•׳¡ ׳׳•׳›׳ ׳” ׳׳”׳¢׳×׳§׳”."
         );
         if (resetForm instanceof HTMLFormElement) {
           const passwordField = resetForm.elements.namedItem("newPassword");
@@ -637,7 +637,7 @@ const initAdminDashboard = () => {
         window.__nmHapticSuccess?.();
         await loadOverview();
       } catch {
-        showError("השרת לא ענה. אפשר לנסות שוב.");
+        showError("׳”׳©׳¨׳× ׳׳ ׳¢׳ ׳”. ׳׳₪׳©׳¨ ׳׳ ׳¡׳•׳× ׳©׳•׳‘.");
       } finally {
         confirmApprove.disabled = false;
         window.__nmClearButtonLoading?.(confirmApprove);
@@ -657,3 +657,4 @@ const initAdminDashboard = () => {
 
 document.addEventListener("astro:page-load", initAdminDashboard);
 initAdminDashboard();
+

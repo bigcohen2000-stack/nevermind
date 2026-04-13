@@ -28,6 +28,12 @@ type AdminAddMemberRequest = {
   expiresAt?: string;
 };
 
+type SharedAccessLogRequest = {
+  phone?: string;
+  fullName?: string;
+  path?: string;
+};
+
 type StoredMember = {
   memberName?: string;
   phone?: string;
@@ -45,6 +51,7 @@ type ActivityEntry = {
   seenAt: string;
   path: string;
   phone: string;
+  memberName?: string;
   userAgent: string;
 };
 
@@ -387,6 +394,10 @@ export default {
       return handleAdminAddMember(request, env, corsHeaders);
     }
 
+    if (request.method === "POST" && url.pathname === "/admin/shared-access-log") {
+      return handleAdminSharedAccessLog(request, env, corsHeaders);
+    }
+
     if (request.method === "GET" && url.pathname === "/member/progress") {
       const ip = readClientIp(request);
       const ipHash = await sha256Hex(`${env.CLUB_IP_PEPPER}:${ip}`);
@@ -488,6 +499,7 @@ export default {
       seenAt: nowIso,
       path,
       phone,
+      memberName: String(member.memberName ?? fallbackName ?? "").trim() || "חבר",
       userAgent,
     };
 
@@ -726,6 +738,58 @@ async function handleAdminResetPassword(request: Request, env: Env, headers: Hea
   );
 }
 
+async function handleAdminSharedAccessLog(request: Request, env: Env, headers: Headers): Promise<Response> {
+  const auth = await requireAdminAuth(request, env, headers);
+  if (auth instanceof Response) return auth;
+
+  let payload: SharedAccessLogRequest | null = null;
+  try {
+    payload = (await request.json()) as SharedAccessLogRequest;
+  } catch {
+    return json({ ok: false, error: "הבקשה לא נקראה כמו שצריך." }, 400, headers);
+  }
+
+  const phone = normalizePhone(payload?.phone ?? "");
+  const memberName = String(payload?.fullName ?? "").trim().slice(0, 80);
+  const path = String(payload?.path ?? "/me/unlock/").trim().slice(0, 500);
+
+  if (!phone || memberName.length < 2) {
+    return json({ ok: false, error: "צריך שם וטלפון תקינים." }, 400, headers);
+  }
+
+  const nowIso = new Date().toISOString();
+  const forwardedIp = String(request.headers.get("x-nm-client-ip") ?? "").trim();
+  const forwardedUserAgent = String(request.headers.get("x-nm-client-ua") ?? "").trim();
+  const rawIp = forwardedIp || readClientIp(request);
+  const ipHash = await sha256Hex(`${env.CLUB_IP_PEPPER}:${rawIp}`);
+  const userAgent = (forwardedUserAgent || String(request.headers.get("user-agent") ?? "")).slice(0, 240);
+
+  const memberActivityKey = `activity:member:${phone}`;
+  const memberActivity = await readActivity(env.CLUB_ACTIVITY, memberActivityKey);
+  const nextEntry: ActivityEntry = {
+    ipHash,
+    seenAt: nowIso,
+    path: path.startsWith("/") ? path : "/me/unlock/",
+    phone,
+    memberName,
+    userAgent,
+  };
+  const nextMemberActivity = appendActivity(memberActivity, nextEntry);
+
+  await env.CLUB_ACTIVITY.put(memberActivityKey, JSON.stringify(nextMemberActivity));
+
+  return json(
+    {
+      ok: true,
+      phone,
+      memberName,
+      lastLoginAt: nowIso,
+    },
+    200,
+    headers
+  );
+}
+
 function isLoginPath(pathname: string): boolean {
   return pathname === "/" || pathname === "/auth/login";
 }
@@ -935,6 +999,7 @@ async function readRecentLogins(namespace: KVNamespace): Promise<Array<Record<st
     .slice(0, RECENT_LOGIN_LIMIT)
     .map((entry) => ({
       phone: entry.phone,
+      memberName: typeof entry.memberName === "string" ? entry.memberName : "",
       seenAt: entry.seenAt,
       path: entry.path,
       userAgent: entry.userAgent,

@@ -38,7 +38,8 @@ const {
 <script>
   document.addEventListener("astro:page-load", () => {
     const gates = document.querySelectorAll("[data-role-gate]");
-    const accessStatusUrl = new URL("./api/access-status", window.location.href);
+    const accessStatusUrl = new URL("/api/admin/access-status", window.location.origin);
+    accessStatusUrl.searchParams.set("returnTo", window.location.href);
     const defaultChallengeUrl = `/cdn-cgi/access/login?redirect_url=${encodeURIComponent(window.location.href)}`;
     const defaultSwitchIdentityUrl = `/cdn-cgi/access/logout?returnTo=${encodeURIComponent(defaultChallengeUrl)}`;
 

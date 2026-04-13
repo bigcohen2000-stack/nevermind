@@ -1,9 +1,22 @@
 import { isDashboardAuthorized, json, readAccessEmail, readAllowedAdminEmails } from "../../_lib/club-admin.js";
 
+function readReturnTarget(request) {
+  const requestUrl = new URL(request.url);
+  const raw = String(requestUrl.searchParams.get("returnTo") ?? "").trim();
+  if (!raw) return null;
+  try {
+    const parsed = new URL(raw);
+    if (parsed.origin !== requestUrl.origin) return null;
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
 function buildAccessUrls(request) {
   const requestUrl = new URL(request.url);
-  const protectedPath = requestUrl.pathname.replace(/\/api\/access-status\/?$/, "/");
-  const protectedUrl = new URL(protectedPath, requestUrl.origin).toString();
+  const returnTarget = readReturnTarget(request);
+  const protectedUrl = returnTarget?.toString() ?? new URL("/", requestUrl.origin).toString();
   const challengeUrl = `${requestUrl.origin}/cdn-cgi/access/login?redirect_url=${encodeURIComponent(protectedUrl)}`;
   const switchIdentityUrl = `${requestUrl.origin}/cdn-cgi/access/logout?returnTo=${encodeURIComponent(challengeUrl)}`;
 
