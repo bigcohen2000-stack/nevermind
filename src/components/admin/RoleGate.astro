@@ -40,8 +40,8 @@ const {
     const gates = document.querySelectorAll("[data-role-gate]");
     const accessStatusUrl = new URL("/api/admin/access-status", window.location.origin);
     accessStatusUrl.searchParams.set("returnTo", window.location.href);
-    const defaultChallengeUrl = `/cdn-cgi/access/login?redirect_url=${encodeURIComponent(window.location.href)}`;
-    const defaultSwitchIdentityUrl = `/cdn-cgi/access/logout?returnTo=${encodeURIComponent(defaultChallengeUrl)}`;
+    const defaultChallengeUrl = window.location.href;
+    const defaultSwitchIdentityUrl = window.location.href;
 
     const accessStatusPromise = fetch(accessStatusUrl, {
       headers: { accept: "application/json" },
@@ -104,7 +104,7 @@ const {
           const challengeUrl = retryLink.getAttribute("data-access-challenge-url");
           if (challengeUrl == null || challengeUrl.length === 0) return;
           event.preventDefault();
-          window.location.assign(retryLink.href);
+          window.location.assign(challengeUrl);
         });
       }
     });

@@ -29,7 +29,7 @@ walk(distDir);
 
 const hrefRegex = /href\s*=\s*"([^"]+)"/g;
 const ignoredPrefixes = ["http://", "https://", "mailto:", "tel:", "javascript:"];
-const ignoredPathPrefixes = ["/_astro/", "/fonts/", "/pagefind/"];
+const ignoredPathPrefixes = ["/_astro/", "/fonts/", "/pagefind/", "/cdn-cgi/access/"];
 const ignoredPathExtensions = [
   ".css",
   ".js",

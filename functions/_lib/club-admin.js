@@ -13,12 +13,7 @@ function readAllowedAdminEmails(env) {
     .split(",")
     .map((value) => value.trim().toLowerCase())
     .filter(Boolean);
-
-  if (configured.length > 0) {
-    return configured;
-  }
-
-  return ["bigcohen2000@gmail.com"];
+  return configured;
 }
 
 function readAccessEmail(request) {
@@ -35,7 +30,8 @@ function readAccessEmail(request) {
 
 function isAuthorizedAccessEmail(request, env) {
   const email = readAccessEmail(request);
-  return email.length > 0 && readAllowedAdminEmails(env).includes(email);
+  const allowedEmails = readAllowedAdminEmails(env);
+  return email.length > 0 && allowedEmails.length > 0 && allowedEmails.includes(email);
 }
 
 function isDashboardAuthorized(request, env) {

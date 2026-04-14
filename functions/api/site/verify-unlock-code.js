@@ -1,3 +1,5 @@
+import { resolveUnlockAccess } from "../../_lib/unlock-access.js";
+
 function json(payload, status = 200) {
   return new Response(JSON.stringify(payload), {
     status,
@@ -6,25 +8,6 @@ function json(payload, status = 200) {
       "Cache-Control": "no-store",
     },
   });
-}
-
-function readCodesFromEnv(env) {
-  const raw = String(env.PUBLIC_DASHBOARD_CODES ?? env.NEXT_PUBLIC_DASHBOARD_CODES ?? "").trim();
-  if (!raw) return [];
-  return raw
-    .split(",")
-    .map((item) => item.trim())
-    .filter(Boolean);
-}
-
-function isAuthorizedCode(code, env) {
-  const clean = String(code ?? "").trim();
-  if (!clean) return false;
-  const codes = readCodesFromEnv(env);
-  if (codes.length > 0) {
-    return codes.includes(clean);
-  }
-  return true;
 }
 
 export async function onRequestPost(context) {
@@ -40,12 +23,10 @@ export async function onRequestPost(context) {
     return json({ ok: true, authorized: false, reason: "empty_code" });
   }
 
-  const configured = readCodesFromEnv(context.env).length > 0;
-  const authorized = isAuthorizedCode(code, context.env);
+  const access = resolveUnlockAccess(code, context.env);
   return json({
     ok: true,
-    authorized,
-    mode: configured ? "strict" : "open",
+    authorized: access.authorized,
+    mode: access.mode,
   });
 }
-

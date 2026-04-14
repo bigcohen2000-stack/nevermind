@@ -1,154 +1,51 @@
-interface Env {
-  CLUB_MEMBERS: KVNamespace;
-  CLUB_ACTIVITY: KVNamespace;
-  CLUB_IP_PEPPER: string;
-  /** מפתח שירות לפרוקסי Pages (כותרת X-NM-Admin-Service). אופציונלי. */
-  ADMIN_SERVICE_KEY?: string;
-  /** כינוי ל־ADMIN_SERVICE_KEY (אותו ערך כמו ב־Pages). */
-  NM_CLUB_ADMIN_SERVICE_KEY?: string;
-  ALLOWED_ORIGINS?: string;
-}
-
-type LoginRequest = {
-  phone?: string;
-  password?: string;
-  path?: string;
-  fullName?: string;
-};
-
-type AdminResetPasswordRequest = {
-  phone?: string;
-  newPassword?: string;
-};
-
-type AdminAddMemberRequest = {
-  phone?: string;
-  password?: string;
-  fullName?: string;
-  expiresAt?: string;
-};
-
-type SharedAccessLogRequest = {
-  phone?: string;
-  fullName?: string;
-  path?: string;
-};
-
-type StoredMember = {
-  memberName?: string;
-  phone?: string;
-  passwordHash?: string;
-  expiresAt?: string;
-  status?: "active" | "paused" | "blocked";
-  passwordGroup?: string;
-  lastLoginAt?: string;
-  lastIpHash?: string;
-  flaggedAt?: string;
-};
-
-type ActivityEntry = {
-  ipHash: string;
-  seenAt: string;
-  path: string;
-  phone: string;
-  memberName?: string;
-  userAgent: string;
-};
-
-type FraudFlagEntry = {
-  phone: string;
-  flaggedAt: string;
-  memberIpCount?: number;
-  passwordIpCount?: number;
-  lastPath?: string;
-};
-
-/** Deep File: צפיות בדפים אחרי כניסה (בלי טלפון בגוף). */
-type DeepPageBeacon = {
-  path: string;
-  seenAt: string;
-  ipHash: string;
-};
-
-type IntegrityReportEntry = {
-  pageUrl: string;
-  pagePath: string;
-  pageTitle?: string;
-  selectedText?: string;
-  note?: string;
-  message?: string;
-  reportedAt: string;
-  reporterFingerprint: string;
-  reporterAgent?: string;
-};
-
-type AdminMemberSummary = {
-  phone: string;
-  memberName: string;
-  status: "active" | "paused" | "blocked";
-  expiresAt: string;
-  lastLoginAt: string;
-  lastIpFingerprint: string;
-  isActive: boolean;
-  flaggedAt?: string;
-};
-
-type AdminMemberTimelineItem = {
-  id: string;
-  kind: "login" | "flag" | "membership";
-  at: string;
-  title: string;
-  detail: string;
-};
-
-type MemberProgressStored = {
-  articlesRead: string[];
-  secondsRead: number;
-  updatedAt: string;
-  lastIpPrefix?: string;
-};
-
-type ProgressTokenPayload = {
-  typ: "progress";
-  phone: string;
-  exp: number;
-};
-
-const DEFAULT_ALLOWED_ORIGINS = [
-  "https://www.nevermind.co.il",
-  "https://nevermind.co.il",
-  "http://localhost:4321",
-];
-const MEMBER_PASSWORD_PBKDF2_ITERATIONS = 180000;
-const LOGIN_WINDOW_MS = 6 * 60 * 60 * 1000;
-const MAX_ACTIVITY_ENTRIES = 12;
-const RECENT_LOGIN_LIMIT = 24;
-const FRAUD_FLAG_LIMIT = 24;
-const KV_LIST_LIMIT = 1000;
-const CLUB_MEMBER_DEFAULT_EXPIRES_DAYS = 365;
-const DEEP_PAGE_VIEWS_KEY = "deep:page_views";
-const MAX_DEEP_PAGE_VIEWS = 200;
-const INTEGRITY_REPORTS_KEY = "feedback:integrity_reports";
-const MAX_INTEGRITY_REPORTS = 120;
-const PROGRESS_TOKEN_MAX_MS = 30 * 24 * 60 * 60 * 1000;
-
-async function checkRateLimit(
-  env: Env,
-  ipHash: string,
-  routeTag: string,
-  maxPerWindow: number,
-  windowSec: number,
-  corsHeaders: Headers
-): Promise<Response | null> {
-  const key = `rl:${ipHash}:${routeTag}`;
-  const raw = await env.CLUB_ACTIVITY.get(key);
-  const count = raw ? Number.parseInt(raw, 10) || 0 : 0;
-  if (count >= maxPerWindow) {
-    return json({ ok: false, error: "יותר מדי בקשות. נסה שוב בעוד רגע.", errorCode: "rate_limited" }, 429, corsHeaders);
-  }
-  await env.CLUB_ACTIVITY.put(key, String(count + 1), { expirationTtl: windowSec });
-  return null;
-}
+import {
+  CLUB_MEMBER_DEFAULT_EXPIRES_DAYS,
+  DEEP_PAGE_VIEWS_KEY,
+  INTEGRITY_REPORTS_KEY,
+  MAX_DEEP_PAGE_VIEWS,
+  MAX_INTEGRITY_REPORTS,
+  PROGRESS_TOKEN_MAX_MS,
+  appendActivity,
+  checkRateLimit,
+  countDistinctIps,
+  createCorsHeaders,
+  createPasswordHash,
+  decodeBase64Url,
+  encodeBase64Url,
+  getPasswordHashVersion,
+  isExpired,
+  json,
+  normalizePhone,
+  readClientIp,
+  requireAdminAuth,
+  sha256Hex,
+  timingSafeEqual,
+  verifyPassword,
+} from "./shared";
+import {
+  buildMemberTimeline,
+  listKvKeys,
+  readActivity,
+  readDeepPageBeaconList,
+  readFraudFlags,
+  readIntegrityReports,
+  readMemberSummaries,
+  readRecentLogins,
+} from "./admin-data";
+import type {
+  ActivityEntry,
+  AdminAddMemberRequest,
+  AdminResetPasswordRequest,
+  DeepPageBeacon,
+  Env,
+  FraudFlagEntry,
+  IntegrityReportEntry,
+  LoginRequest,
+  MemberProgressStored,
+  ProgressTokenPayload,
+  SharedAccessLogRequest,
+  StoredMember,
+} from "./types";
 
 async function createProgressToken(env: Env, phone: string, membershipExpiresAt: string): Promise<string> {
   const memberExpiryMs = Date.parse(membershipExpiresAt);
@@ -787,328 +684,6 @@ async function handleAdminSharedAccessLog(request: Request, env: Env, headers: H
     },
     200,
     headers
-  );
-}
-
-function isLoginPath(pathname: string): boolean {
-  return pathname === "/" || pathname === "/auth/login";
-}
-
-function createCorsHeaders(request: Request, env: Env): Headers {
-  const headers = new Headers({
-    "Access-Control-Allow-Methods": "POST, OPTIONS, GET",
-    "Access-Control-Allow-Headers": "Content-Type, Authorization, X-NM-Admin-Service",
-    "Access-Control-Max-Age": "86400",
-    "Content-Type": "application/json; charset=utf-8",
-    Vary: "Origin",
-    "Cache-Control": "no-store",
-  });
-  const allowedOrigin = resolveAllowedOrigin(request, env);
-  if (allowedOrigin) {
-    headers.set("Access-Control-Allow-Origin", allowedOrigin);
-  }
-  return headers;
-}
-
-function resolveAllowedOrigin(request: Request, env: Env): string | null {
-  const origin = request.headers.get("Origin");
-  const configured = String(env.ALLOWED_ORIGINS ?? "")
-    .split(",")
-    .map((value) => value.trim())
-    .filter(Boolean);
-  const allowedOrigins = configured.length > 0 ? configured : DEFAULT_ALLOWED_ORIGINS;
-  if (!origin) {
-    return allowedOrigins[0] ?? null;
-  }
-  return allowedOrigins.includes(origin) ? origin : null;
-}
-
-function json(payload: unknown, status: number, headers: Headers): Response {
-  return new Response(JSON.stringify(payload), { status, headers });
-}
-
-function normalizePhone(raw: string): string {
-  const digits = String(raw ?? "").replace(/\D/g, "");
-  if (!digits) return "";
-  if (digits.startsWith("972") && digits.length === 12) {
-    return `0${digits.slice(3)}`;
-  }
-  return digits;
-}
-
-function isExpired(expiresAt: string): boolean {
-  const timestamp = Date.parse(expiresAt);
-  return Number.isNaN(timestamp) || timestamp < Date.now();
-}
-
-function readClientIp(request: Request): string {
-  const headerValue =
-    request.headers.get("cf-connecting-ip") ??
-    request.headers.get("x-forwarded-for") ??
-    request.headers.get("x-real-ip") ??
-    "";
-  const first = String(headerValue).split(",")[0]?.trim();
-  return first || "unknown";
-}
-
-async function verifyPassword(password: string, passwordHash: string): Promise<boolean> {
-  const [version, first, second, third] = String(passwordHash ?? "").split("$");
-  if (version === "v1" && first && second) {
-    const actualHash = await sha256Hex(`${first}:${password}`);
-    return timingSafeEqual(actualHash, second);
-  }
-  if (version === "v2" && first && second && third) {
-    const iterations = Number.parseInt(first, 10);
-    if (!Number.isFinite(iterations) || iterations < 100000) {
-      return false;
-    }
-    const actualHash = await pbkdf2Sha256Hex(password, second, iterations);
-    return timingSafeEqual(actualHash, third);
-  }
-  return false;
-}
-
-async function createPasswordHash(password: string): Promise<string> {
-  const salt = randomHex(16);
-  const digest = await pbkdf2Sha256Hex(password, salt, MEMBER_PASSWORD_PBKDF2_ITERATIONS);
-  return `v2$${MEMBER_PASSWORD_PBKDF2_ITERATIONS}$${salt}$${digest}`;
-}
-
-function getPasswordHashVersion(passwordHash: string): "v1" | "v2" | "unknown" {
-  if (String(passwordHash ?? "").startsWith("v1$")) return "v1";
-  if (String(passwordHash ?? "").startsWith("v2$")) return "v2";
-  return "unknown";
-}
-
-function randomHex(bytes: number): string {
-  const buffer = new Uint8Array(bytes);
-  crypto.getRandomValues(buffer);
-  return Array.from(buffer)
-    .map((value) => value.toString(16).padStart(2, "0"))
-    .join("");
-}
-
-async function sha256Hex(input: string): Promise<string> {
-  const buffer = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(input));
-  return Array.from(new Uint8Array(buffer))
-    .map((byte) => byte.toString(16).padStart(2, "0"))
-    .join("");
-}
-
-async function pbkdf2Sha256Hex(password: string, saltHex: string, iterations: number): Promise<string> {
-  const baseKey = await crypto.subtle.importKey("raw", new TextEncoder().encode(password), "PBKDF2", false, ["deriveBits"]);
-  const derivedBits = await crypto.subtle.deriveBits(
-    {
-      name: "PBKDF2",
-      salt: hexToBytes(saltHex),
-      iterations,
-      hash: "SHA-256",
-    },
-    baseKey,
-    256
-  );
-  return Array.from(new Uint8Array(derivedBits))
-    .map((byte) => byte.toString(16).padStart(2, "0"))
-    .join("");
-}
-
-function hexToBytes(value: string): Uint8Array {
-  const normalized = String(value ?? "").trim();
-  if (!normalized || normalized.length % 2 !== 0) {
-    return new Uint8Array();
-  }
-  const bytes = new Uint8Array(normalized.length / 2);
-  for (let index = 0; index < normalized.length; index += 2) {
-    const byte = Number.parseInt(normalized.slice(index, index + 2), 16);
-    bytes[index / 2] = Number.isFinite(byte) ? byte : 0;
-  }
-  return bytes;
-}
-
-function timingSafeEqual(left: string, right: string): boolean {
-  if (left.length !== right.length) return false;
-  let mismatch = 0;
-  for (let index = 0; index < left.length; index += 1) {
-    mismatch |= left.charCodeAt(index) ^ right.charCodeAt(index);
-  }
-  return mismatch === 0;
-}
-
-async function readActivity(namespace: KVNamespace, key: string): Promise<ActivityEntry[]> {
-  const entries = await namespace.get<ActivityEntry[]>(key, "json");
-  if (!Array.isArray(entries)) return [];
-  return entries.filter((entry) => entry && typeof entry.ipHash === "string" && typeof entry.seenAt === "string");
-}
-
-function appendActivity(entries: ActivityEntry[], nextEntry: ActivityEntry): ActivityEntry[] {
-  const cutoff = Date.now() - LOGIN_WINDOW_MS;
-  const recentEntries = entries.filter((entry) => {
-    const timestamp = Date.parse(entry.seenAt);
-    return !Number.isNaN(timestamp) && timestamp >= cutoff;
-  });
-  recentEntries.push(nextEntry);
-  return recentEntries.slice(-MAX_ACTIVITY_ENTRIES);
-}
-
-function countDistinctIps(entries: ActivityEntry[]): number {
-  return new Set(entries.map((entry) => entry.ipHash)).size;
-}
-
-async function requireAdminAuth(request: Request, env: Env, headers: Headers): Promise<true | Response> {
-  const serviceSecret = String(env.ADMIN_SERVICE_KEY ?? env.NM_CLUB_ADMIN_SERVICE_KEY ?? "").trim();
-  const serviceHeader = String(request.headers.get("x-nm-admin-service") ?? "").trim();
-  if (serviceSecret && serviceHeader) {
-    if (timingSafeEqual(serviceHeader, serviceSecret)) {
-      return true;
-    }
-  }
-  return json({ ok: false, error: "נדרש מפתח שירות פנימי לניהול." }, 401, headers);
-}
-
-function encodeBase64Url(input: string): string {
-  return btoa(input).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
-}
-
-function decodeBase64Url(input: string): string {
-  const normalized = input.replace(/-/g, "+").replace(/_/g, "/");
-  const padding = normalized.length % 4 === 0 ? "" : "=".repeat(4 - (normalized.length % 4));
-  return atob(`${normalized}${padding}`);
-}
-
-async function listKvKeys(namespace: KVNamespace, prefix: string): Promise<string[]> {
-  let cursor: string | undefined;
-  const keys: string[] = [];
-
-  do {
-    const page = await namespace.list({ prefix, cursor, limit: KV_LIST_LIMIT });
-    keys.push(...page.keys.map((entry) => entry.name));
-    cursor = page.list_complete ? undefined : page.cursor;
-  } while (cursor);
-
-  return keys;
-}
-
-async function readRecentLogins(namespace: KVNamespace): Promise<Array<Record<string, string>>> {
-  const keys = await listKvKeys(namespace, "activity:member:");
-  const entries = await Promise.all(keys.map((key) => namespace.get<ActivityEntry[]>(key, "json")));
-
-  return entries
-    .flatMap((list) => (Array.isArray(list) ? list : []))
-    .filter((entry) => entry && typeof entry.seenAt === "string")
-    .sort((left, right) => Date.parse(right.seenAt) - Date.parse(left.seenAt))
-    .slice(0, RECENT_LOGIN_LIMIT)
-    .map((entry) => ({
-      phone: entry.phone,
-      memberName: typeof entry.memberName === "string" ? entry.memberName : "",
-      seenAt: entry.seenAt,
-      path: entry.path,
-      userAgent: entry.userAgent,
-      ipFingerprint: entry.ipHash.slice(0, 8),
-    }));
-}
-
-async function readMemberSummaries(namespace: KVNamespace): Promise<AdminMemberSummary[]> {
-  const keys = await listKvKeys(namespace, "member:");
-  const members = await Promise.all(keys.map((key) => namespace.get<StoredMember>(key, "json")));
-
-  return members
-    .filter((entry): entry is StoredMember => Boolean(entry && typeof entry.phone === "string"))
-    .map((entry) => {
-      const expiresAt = String(entry.expiresAt ?? "").trim();
-      const lastLoginAt = String(entry.lastLoginAt ?? "").trim();
-      const status = String(entry.status ?? "active") as AdminMemberSummary["status"];
-      const isActive = Boolean(expiresAt) && !isExpired(expiresAt) && status === "active";
-      return {
-        phone: String(entry.phone ?? "").trim(),
-        memberName: String(entry.memberName ?? "חבר").trim() || "חבר",
-        status,
-        expiresAt,
-        lastLoginAt,
-        lastIpFingerprint: String(entry.lastIpHash ?? "").slice(0, 8),
-        isActive,
-        flaggedAt: String(entry.flaggedAt ?? "").trim() || undefined,
-      } satisfies AdminMemberSummary;
-    })
-    .sort((left, right) => {
-      const leftLast = Date.parse(left.lastLoginAt || left.expiresAt || "1970-01-01T00:00:00.000Z");
-      const rightLast = Date.parse(right.lastLoginAt || right.expiresAt || "1970-01-01T00:00:00.000Z");
-      return rightLast - leftLast;
-    })
-    .slice(0, 160);
-}
-
-function buildMemberTimeline(member: StoredMember, activity: ActivityEntry[]): AdminMemberTimelineItem[] {
-  const items: AdminMemberTimelineItem[] = [];
-  const expiresAt = String(member.expiresAt ?? "").trim();
-  const status = String(member.status ?? "active").trim() || "active";
-
-  if (expiresAt) {
-    items.push({
-      id: `membership:${expiresAt}`,
-      kind: "membership",
-      at: expiresAt,
-      title: status === "active" ? "חברות פעילה" : "חברות דורשת בדיקה",
-      detail: status === "active" ? `הגישה פתוחה עד ${expiresAt}` : `סטטוס נוכחי: ${status}`,
-    });
-  }
-
-  if (member.flaggedAt) {
-    items.push({
-      id: `flag:${member.flaggedAt}`,
-      kind: "flag",
-      at: member.flaggedAt,
-      title: "נפתח Flag",
-      detail: "זוהה דפוס כניסה שדורש בדיקה ידנית.",
-    });
-  }
-
-  for (const entry of activity) {
-    items.push({
-      id: `login:${entry.seenAt}:${entry.ipHash}`,
-      kind: "login",
-      at: entry.seenAt,
-      title: "כניסה של חבר",
-      detail: `${entry.path || "/"} • ${entry.userAgent || "דפדפן לא זוהה"}`,
-    });
-  }
-
-  return items
-    .sort((left, right) => Date.parse(right.at) - Date.parse(left.at))
-    .slice(0, 12);
-}
-
-async function readFraudFlags(namespace: KVNamespace): Promise<FraudFlagEntry[]> {
-  const keys = await listKvKeys(namespace, "flag:");
-  const entries = await Promise.all(keys.map((key) => namespace.get<FraudFlagEntry>(key, "json")));
-
-  return entries
-    .filter((entry): entry is FraudFlagEntry => Boolean(entry && typeof entry.phone === "string" && typeof entry.flaggedAt === "string"))
-    .sort((left, right) => Date.parse(right.flaggedAt) - Date.parse(left.flaggedAt))
-    .slice(0, FRAUD_FLAG_LIMIT);
-}
-
-async function readDeepPageBeaconList(namespace: KVNamespace): Promise<DeepPageBeacon[]> {
-  const raw = await namespace.get<DeepPageBeacon[]>(DEEP_PAGE_VIEWS_KEY, "json");
-  if (!Array.isArray(raw)) return [];
-  return raw.filter(
-    (entry) =>
-      entry &&
-      typeof entry.path === "string" &&
-      typeof entry.seenAt === "string" &&
-      typeof entry.ipHash === "string"
-  );
-}
-
-async function readIntegrityReports(namespace: KVNamespace): Promise<IntegrityReportEntry[]> {
-  const raw = await namespace.get<IntegrityReportEntry[]>(INTEGRITY_REPORTS_KEY, "json");
-  if (!Array.isArray(raw)) return [];
-  return raw.filter(
-    (entry) =>
-      entry &&
-      typeof entry.pageUrl === "string" &&
-      typeof entry.pagePath === "string" &&
-      typeof entry.reportedAt === "string" &&
-      typeof entry.reporterFingerprint === "string"
   );
 }
 

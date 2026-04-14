@@ -9,6 +9,8 @@ interface ImportMetaEnv {
   readonly PUBLIC_WHATSAPP_NUMBER?: string;
   readonly NEXT_PUBLIC_WHATSAPP_NUMBER?: string;
   readonly PUBLIC_CONTACT_EMAIL?: string;
+  readonly PUBLIC_UNLOCK_ACCESS_MODE?: string;
+  readonly NEXT_PUBLIC_UNLOCK_ACCESS_MODE?: string;
 }
 
 interface ImportMeta {
@@ -24,6 +26,18 @@ type NmClubSession = {
   liveStatus?: string;
 };
 
+type NmUnlockClientConfig = {
+  validCodesRaw: string;
+  unlockAccessModeRaw: string;
+  verifyCodeEndpoint: string;
+  sharedAccessSessionEndpoint: string;
+  premiumSessionHours: number;
+  whatsAppHref: string;
+  joinOfferHref: string;
+  launchOfferPrice: number;
+  pulseEndpoint: string;
+};
+
 interface Window {
   __nmArticleCleanup?: () => void;
   __nmAnnounce?: (message: string) => void;
@@ -36,6 +50,7 @@ interface Window {
   __nmLayoutCleanup?: () => void;
   __nmAdminLoginCleanup?: () => void;
   __nmAdminDashboardCleanup?: () => void;
+  __nmUnlockCleanup?: () => void;
   __nmMountHcaptcha?: (form: HTMLFormElement) => () => void;
   __nmHcaptchaOk?: (form: HTMLFormElement) => boolean;
   __nmHcaptchaGlobalsRegistered?: boolean;
@@ -53,6 +68,7 @@ interface Window {
     title?: string;
     url?: string;
   }) => void;
+  __NM_UNLOCK_CONFIG__?: NmUnlockClientConfig;
   __nmReportConnectivityIssue?: (message: string) => void;
   __nmClearConnectivityIssue?: () => void;
   nmTrackEvent?: (name: string, params?: Record<string, unknown>) => void;

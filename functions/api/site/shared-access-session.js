@@ -1,25 +1,7 @@
 import { fetchClubWorkerJson, json } from "../../_lib/club-admin.js";
+import { resolveUnlockAccess } from "../../_lib/unlock-access.js";
 
 const SHARED_SESSION_HOURS = 168;
-
-function readCodesFromEnv(env) {
-  const raw = String(env.PUBLIC_DASHBOARD_CODES ?? env.NEXT_PUBLIC_DASHBOARD_CODES ?? "").trim();
-  if (!raw) return [];
-  return raw
-    .split(",")
-    .map((item) => item.trim())
-    .filter(Boolean);
-}
-
-function isAuthorizedCode(code, env) {
-  const clean = String(code ?? "").trim();
-  if (!clean) return false;
-  const codes = readCodesFromEnv(env);
-  if (codes.length > 0) {
-    return codes.includes(clean);
-  }
-  return true;
-}
 
 function normalizePhone(raw) {
   const digits = String(raw ?? "").replace(/\D/g, "");
@@ -58,7 +40,8 @@ export async function onRequestPost(context) {
     return json({ ok: false, error: "missing_code" }, 400);
   }
 
-  if (!isAuthorizedCode(code, env)) {
+  const access = resolveUnlockAccess(code, env);
+  if (!access.authorized) {
     return json({ ok: false, error: "invalid_code" }, 401);
   }
 
@@ -101,4 +84,3 @@ export async function onRequestPost(context) {
     mode: "shared_code",
   });
 }
-
