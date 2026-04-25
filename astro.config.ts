@@ -10,6 +10,8 @@ import matter from "gray-matter";
 import remarkGlossaryLinks from "./src/plugins/remark-glossary-links";
 import rehypeGlossaryPreviews from "./src/plugins/rehype-glossary-previews";
 import { premiumMdxStripPlugin } from "./src/vite-plugins/premium-mdx-strip";
+import siteSettings from "./src/config/siteSettings.json";
+import { isPathIndexable } from "./src/lib/indexability";
 
 const articlesDir = path.resolve("src/content/articles");
 const viteCacheBase =
@@ -46,6 +48,7 @@ function articlePathToLastmod(): Map<string, string> {
 }
 
 const articleLastmodByPath = articlePathToLastmod();
+const allowIndexing = (siteSettings as { seo?: { allowIndexing?: boolean } }).seo?.allowIndexing !== false;
 
 export default defineConfig({
   site: "https://www.nevermind.co.il",
@@ -94,11 +97,7 @@ export default defineConfig({
           }
           return "/";
         })();
-        if (pathname === "/404") return false;
-        if (pathname.startsWith("/admin")) return false;
-        if (pathname.startsWith("/dashboard")) return false;
-        if (pathname === "/premium-access") return false;
-        return true;
+        return isPathIndexable(pathname, allowIndexing);
       },
       serialize: (item) => {
         const rawUrl =

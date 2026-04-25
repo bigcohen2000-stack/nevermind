@@ -47,9 +47,9 @@ const difficultyLabel: Record<DifficultyKey, string> = {
 };
 
 const difficultyBadgeClass: Record<DifficultyKey, string> = {
-  beginner: "border-[#c8e6d8] bg-[#f3faf6] text-[#2a4d3d]",
-  advanced: "border-[#b9d4ea] bg-[#f0f7fc] text-[#254a63]",
-  deep: "border-[#d9d2ea] bg-[#f6f3fb] text-[#3f355b]",
+  beginner: "border-[var(--nm-badge-beginner-border)] bg-[var(--nm-badge-beginner-bg)] text-[var(--nm-badge-beginner-text)]",
+  advanced: "border-[var(--nm-badge-advanced-border)] bg-[var(--nm-badge-advanced-bg)] text-[var(--nm-badge-advanced-text)]",
+  deep: "border-[var(--nm-badge-deep-border)] bg-[var(--nm-badge-deep-bg)] text-[var(--nm-badge-deep-text)]",
 };
 
 const articleHref = getCanonicalArticleHref({ slug });
@@ -60,7 +60,7 @@ const articleHref = getCanonicalArticleHref({ slug });
   data-tags={tagsCsv}
   data-difficulty={difficultyKey}
   data-premium={isPremium ? "true" : "false"}
-  class="group relative flex h-full flex-col overflow-hidden rounded-[1.85rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/88 p-5 text-right shadow-[0_20px_55px_rgba(26,26,26,0.05)] transition duration-300 hover:border-[color-mix(in_srgb,var(--nm-accent)_28%,transparent)] hover:shadow-[0_24px_70px_rgba(26,26,26,0.08)]"
+  class="group relative flex h-full flex-col overflow-hidden rounded-[var(--nm-radius-md)] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/88 p-5 text-right shadow-[var(--nm-shadow-md)] transition duration-300 hover:border-[color-mix(in_srgb,var(--nm-accent)_28%,transparent)] hover:shadow-[0_24px_70px_rgba(26,26,26,0.08)]"
 >
   <div class="absolute inset-inline-start-4 inset-block-start-4 z-10 flex items-center gap-2">
     <button
@@ -82,7 +82,7 @@ const articleHref = getCanonicalArticleHref({ slug });
     <span class:list={["inline-flex items-center rounded-full border px-2.5 py-1 text-[0.72rem] font-semibold", difficultyBadgeClass[difficultyKey]]}>
       {difficultyLabel[difficultyKey]}
     </span>
-    <span class="inline-flex items-center rounded-full border border-[#e5e1dc] bg-[#faf9f7] px-2.5 py-1 text-[0.72rem] font-medium text-[#5a5652]">
+    <span class="inline-flex items-center rounded-full border border-[var(--nm-reading-border)] bg-[var(--nm-reading-bg)] px-2.5 py-1 text-[0.72rem] font-medium text-[var(--nm-reading-text)]">
       {readingMinutes} דקות קריאה
     </span>
     {mindShiftIntensity != null && mindShiftIntensity >= 1 && mindShiftIntensity <= 5 ? (
@@ -103,7 +103,7 @@ const articleHref = getCanonicalArticleHref({ slug });
     ) : null}
     {freshnessDate ? (
       <time
-        class="inline-flex items-center rounded-full border border-[#e5e1dc] bg-[#faf9f7] px-2 py-1 text-[0.65rem] font-medium text-[#5a5652]"
+        class="inline-flex items-center rounded-full border border-[var(--nm-reading-border)] bg-[var(--nm-reading-bg)] px-2 py-1 text-[0.65rem] font-medium text-[var(--nm-reading-text)]"
         datetime={freshnessDate}
         title={`${freshnessLabel} ${freshnessDate}`}
       >

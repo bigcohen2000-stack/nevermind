@@ -1,7 +1,10 @@
 import {
+  ACTIVE_NOW_WINDOW_MS,
+  buildSharedIdentityKey,
   DEEP_PAGE_VIEWS_KEY,
   INTEGRITY_REPORTS_KEY,
   KV_LIST_LIMIT,
+  normalizeIdentityName,
   readActivity,
   isExpired,
 } from "./shared";
@@ -32,21 +35,48 @@ export async function listKvKeys(namespace: KVNamespace, prefix: string): Promis
 }
 
 export async function readRecentLogins(namespace: KVNamespace): Promise<Array<Record<string, string>>> {
-  const keys = await listKvKeys(namespace, "activity:member:");
-  const entries = await Promise.all(keys.map((key) => namespace.get<ActivityEntry[]>(key, "json")));
+  const [memberKeys, sharedKeys] = await Promise.all([
+    listKvKeys(namespace, "activity:member:"),
+    listKvKeys(namespace, "activity:shared:"),
+  ]);
+  const entries = await Promise.all(
+    [...memberKeys, ...sharedKeys].map((key) => namespace.get<ActivityEntry[]>(key, "json"))
+  );
 
-  return entries
+  const activeCutoff = Date.now() - ACTIVE_NOW_WINDOW_MS;
+  const latestByIdentity = new Map<string, ActivityEntry>();
+
+  entries
     .flatMap((list) => (Array.isArray(list) ? list : []))
     .filter((entry) => entry && typeof entry.seenAt === "string")
     .sort((left, right) => Date.parse(right.seenAt) - Date.parse(left.seenAt))
+    .forEach((entry) => {
+      const phone = String(entry.phone ?? "").trim();
+      const memberName = normalizeIdentityName(entry.memberName ?? "");
+      const identityKey =
+        String(entry.identityKey ?? "").trim() ||
+        (entry.source === "SHARED" ? buildSharedIdentityKey(memberName, phone) : `member:${phone}`);
+      if (!identityKey || latestByIdentity.has(identityKey)) return;
+      latestByIdentity.set(identityKey, entry);
+    });
+
+  return [...latestByIdentity.values()]
     .slice(0, RECENT_LOGIN_LIMIT)
     .map((entry) => ({
-      phone: entry.phone,
-      memberName: typeof entry.memberName === "string" ? entry.memberName : "",
+      phone: String(entry.phone ?? "").trim(),
+      memberName: normalizeIdentityName(entry.memberName ?? ""),
       seenAt: entry.seenAt,
       path: entry.path,
       userAgent: entry.userAgent,
       ipFingerprint: entry.ipHash.slice(0, 8),
+      source: String(entry.source === "SHARED" ? "SHARED" : "LIVE"),
+      identityKey:
+        String(entry.identityKey ?? "").trim() ||
+        (entry.source === "SHARED"
+          ? buildSharedIdentityKey(normalizeIdentityName(entry.memberName ?? ""), String(entry.phone ?? "").trim())
+          : `member:${String(entry.phone ?? "").trim()}`),
+      eventType: String(entry.eventType === "heartbeat" ? "heartbeat" : "login"),
+      activeNow: Date.parse(entry.seenAt) >= activeCutoff ? "true" : "false",
     }));
 }
 

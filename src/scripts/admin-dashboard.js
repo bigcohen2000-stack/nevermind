@@ -19,12 +19,28 @@ const formatDateTime = (value) => {
 
 const normalizeMemberSearch = (value) => String(value ?? "").replace(/\D/g, "");
 
+const publishOverview = (payload) => {
+  if (typeof window === "undefined") return;
+  window.__NM_ADMIN_OVERVIEW__ = payload ?? null;
+  window.dispatchEvent(new CustomEvent("nm-admin-overview", { detail: payload ?? null }));
+};
+
 const formatMemberStatus = (member) => {
   if (!member) return "לא ידוע";
   if (member.isActive) return "פעיל";
   if (member.status === "blocked") return "חסום";
   if (member.status === "paused") return "מושהה";
   return "לא פעיל";
+};
+
+const formatAccessSource = (item) => {
+  if (String(item?.source || "").toUpperCase() === "SHARED") return "Shared Code";
+  return "Password Member";
+};
+
+const formatAccessStatus = (item) => {
+  if (String(item?.activeNow || "").toLowerCase() === "true") return "מחובר עכשיו";
+  return "נראה לאחרונה";
 };
 
 const renderItems = (root, items, renderItem, emptyMessage) => {
@@ -59,6 +75,27 @@ const createRow = (html, tone = "white") => {
   return row;
 };
 
+const pruneAdminPanels = (root) => {
+  if (!(root instanceof HTMLElement)) return;
+
+  ['deep', 'last-integrity'].forEach((key) => {
+    const stat = root.querySelector(`[data-admin-stat="${key}"]`);
+    const card = stat instanceof HTMLElement ? stat.closest("article") : null;
+    if (card instanceof HTMLElement) {
+      card.remove();
+    }
+  });
+
+  root.querySelectorAll("h4").forEach((heading) => {
+    if (!(heading instanceof HTMLElement)) return;
+    if (!String(heading.textContent || "").includes("איך זה עובד")) return;
+    const section = heading.closest("section");
+    if (section instanceof HTMLElement) {
+      section.remove();
+    }
+  });
+};
+
 const initAdminDashboard = () => {
   window.__nmAdminDashboardCleanup?.();
 
@@ -73,6 +110,9 @@ const initAdminDashboard = () => {
   const loadingEl = root.querySelector("[data-admin-loading]");
   const errorEl = root.querySelector("[data-admin-error]");
   const contentEl = root.querySelector("[data-admin-content]");
+  const accessRowsEl = root.querySelector("[data-admin-access-rows]");
+  const accessEmptyEl = root.querySelector("[data-admin-access-empty]");
+  const accessCountEl = root.querySelector("[data-admin-access-count]");
   const recentLoginsEl = root.querySelector("[data-admin-recent-logins]");
   const fraudFlagsEl = root.querySelector("[data-admin-fraud-flags]");
   const pageBeaconsEl = root.querySelector("[data-admin-page-beacons]");
@@ -130,6 +170,8 @@ const initAdminDashboard = () => {
   const cleanups = [];
   const loginUrl = new URL("/me/unlock/", window.location.origin).toString();
 
+  pruneAdminPanels(root);
+
   const setShareStatus = (message) => {
     if (!(shareStatus instanceof HTMLElement)) return;
     shareStatus.textContent = message;
@@ -172,8 +214,10 @@ const initAdminDashboard = () => {
     }
   };
 
-  const handleUnauthorized = () => {
-    showError("השרת לא אישר את הבקשה. בדוק את Cloudflare Access על /dashboard/, /api/dashboard/ ו־/api/club-admin/.");
+const handleUnauthorized = () => {
+    showError(
+      "השרת חסם את בקשת הניהול. בדוק ש-Cloudflare Access מגן גם על /dashboard/*, גם על /dashboard/api/*, וגם על /api/club-admin/*. אם הוגדרו מיילים מורשים ב-NM_ADMIN_ACCESS_EMAILS או ADMIN_ACCESS_EMAILS, ודא שגם bigcohen2000@gmail.com נמצא שם."
+    );
     setLoading(false);
   };
 
@@ -299,6 +343,8 @@ const initAdminDashboard = () => {
   };
 
   const renderOverview = (payload) => {
+    publishOverview(payload);
+
     const stats = payload?.stats || {};
     memberSummaries = Array.isArray(payload?.members) ? payload.members : [];
     const recentLogins = Array.isArray(payload?.recentLogins) ? payload.recentLogins : [];
@@ -313,6 +359,37 @@ const initAdminDashboard = () => {
     if (summaryIntegrity instanceof HTMLElement) summaryIntegrity.textContent = String(stats.integrityReports ?? integrityReports.length ?? 0);
     if (summaryLastIntegrity instanceof HTMLElement) {
       summaryLastIntegrity.textContent = stats.lastIntegrityAt ? formatDateTime(stats.lastIntegrityAt) : "לא זמין";
+    }
+
+    if (accessCountEl instanceof HTMLElement) {
+      accessCountEl.textContent = `${recentLogins.length} רשומות`;
+    }
+    if (accessRowsEl instanceof HTMLElement) {
+      accessRowsEl.innerHTML = "";
+      recentLogins.forEach((item) => {
+        const row = document.createElement("tr");
+        row.className = "align-top";
+        row.innerHTML = `
+          <td class="px-4 py-3 font-semibold text-[var(--nm-fg)]">${escapeHtml(item.memberName || "ללא שם")}</td>
+          <td class="px-4 py-3 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">${escapeHtml(item.phone || "ללא טלפון")}</td>
+          <td class="px-4 py-3">
+            <span class="inline-flex rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-2.5 py-1 text-[11px] font-semibold text-[var(--nm-fg)]">${escapeHtml(formatAccessSource(item))}</span>
+          </td>
+          <td class="px-4 py-3">
+            <span class="inline-flex rounded-full px-2.5 py-1 text-[11px] font-semibold ${
+              String(item?.activeNow || "").toLowerCase() === "true"
+                ? "bg-[color-mix(in_srgb,var(--nm-accent)_12%,transparent)] text-[var(--nm-accent)]"
+                : "bg-[var(--nm-surface-muted)] text-[var(--nm-fg)]"
+            }">${escapeHtml(formatAccessStatus(item))}</span>
+          </td>
+          <td class="px-4 py-3 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">${escapeHtml(formatDateTime(item.seenAt))}</td>
+          <td class="px-4 py-3 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">${escapeHtml(item.path || "/")}</td>
+        `;
+        accessRowsEl.appendChild(row);
+      });
+    }
+    if (accessEmptyEl instanceof HTMLElement) {
+      accessEmptyEl.classList.toggle("hidden", recentLogins.length > 0);
     }
 
     renderItems(
@@ -651,6 +728,7 @@ const initAdminDashboard = () => {
   loadOverview();
 
   window.__nmAdminDashboardCleanup = () => {
+    publishOverview(null);
     cleanups.forEach((cleanup) => cleanup());
   };
 };

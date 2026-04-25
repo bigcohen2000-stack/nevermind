@@ -21,7 +21,6 @@ import {
   premiumTags,
   preJoinFaq,
 } from "../../data/methodology/metadata";
-import { getCanonicalArticleHref, getCanonicalArticleSlug } from "../../lib/articles";
 
 const joinHref = "/premium-access/";
 const quietJoinHref = "/premium-access/";
@@ -35,8 +34,7 @@ const previewArticles = [...articleEntries]
   })
   .slice(0, 4)
   .map((entry) => ({
-    slug: getCanonicalArticleSlug(entry),
-    href: getCanonicalArticleHref(entry),
+    slug: entry.slug,
     title: entry.data.title,
     excerpt: String(entry.data.description || "").trim(),
   }));
@@ -114,7 +112,7 @@ const faqForPage = [
             זה עובד כמו אפליקציה רגילה. נכנסים מהר, חוזרים בדיוק לאיפה שהיית, ונשארים קרובים לתוכן.
           </p>
           <div class="flex flex-wrap justify-end gap-3 pt-1">
-            <button id="about-install-app" type="button" class="inline-flex min-h-[48px] items-center justify-center rounded-full bg-[var(--nm-inverse)] px-6 py-3 text-sm font-semibold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-inverse-hover)]">
+            <button id="about-install-app" type="button" hidden class="inline-flex min-h-[48px] items-center justify-center rounded-full bg-[var(--nm-inverse)] px-6 py-3 text-sm font-semibold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-inverse-hover)]">
               התקנה
             </button>
             <a href="/me/" class="inline-flex min-h-[48px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_14%,transparent)] px-5 py-3 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]">
@@ -346,6 +344,10 @@ const faqForPage = [
     (() => {
       const installButton = document.getElementById("about-install-app");
       const helpLine = document.getElementById("about-install-help");
+
+      window.addEventListener("beforeinstallprompt", () => {
+        if (installButton instanceof HTMLButtonElement) installButton.hidden = false;
+      });
 
       installButton?.addEventListener("click", () => {
         const nativeInstallButton = document.getElementById("nm-pwa-install-action");

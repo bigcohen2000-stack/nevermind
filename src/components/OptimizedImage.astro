@@ -9,7 +9,7 @@ interface Props {
 }
 
 const { src, alt, placeholder, class: className, width, height } = Astro.props;
-const imgId = `img-${Math.random().toString(36).slice(2, 11)}`;
+const imgId = `img-${Math.random().toString(36).substr(2, 9)}`;
 ---
 
 <div class="lazy-image-container" style={`aspect-ratio: ${width && height ? width / height : 'auto'};`}>

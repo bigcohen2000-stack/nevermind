@@ -1,32 +1,79 @@
-<section id="club-admin" data-club-admin-root class="space-y-6 rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 p-6 shadow-[0_24px_70px_rgba(26,26,26,0.06)]">
+<section
+  id="club-admin"
+  data-club-admin-root
+  class="space-y-6 rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 p-6 shadow-[0_24px_70px_rgba(26,26,26,0.06)]"
+>
   <header class="space-y-3">
     <p class="text-sm font-semibold uppercase tracking-[0.22em] text-[var(--nm-accent)]">ניהול חברים</p>
     <h2 class="text-[clamp(1.8rem,1.5rem+1vw,2.4rem)] font-semibold text-[var(--nm-fg)]">ניהול מועדון החברים</h2>
     <p class="max-w-3xl text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
-      כאן רואים את מנגנון הגישה, את התנועה של החברים, את דגלי הבקרה ואת מה שבאמת נשמר במועדון. כל חבר נשמר ב־CLUB_MEMBERS וכל פעילות קצרה נשמרת ב־CLUB_ACTIVITY.
+      כאן רואים את מצב הגישה בפועל: מי נכנס עכשיו, מי נראה לאחרונה, ואיזה נתיב נפתח אחרי הכניסה.
     </p>
   </header>
 
-  <div data-admin-loading class="rounded-[1.4rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-4 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]" aria-live="polite">
+  <div
+    data-admin-loading
+    class="rounded-[1.4rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-4 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]"
+    aria-live="polite"
+  >
     טוען נתוני מועדון...
   </div>
-  <p data-admin-error class="hidden rounded-[1.4rem] border border-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)] bg-[var(--nm-tint)] px-4 py-3 text-sm font-semibold text-[var(--nm-fg)]" role="alert"></p>
+  <p
+    data-admin-error
+    class="hidden rounded-[1.4rem] border border-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)] bg-[var(--nm-tint)] px-4 py-3 text-sm font-semibold text-[var(--nm-fg)]"
+    role="alert"
+  ></p>
 
   <div data-admin-content class="hidden space-y-6">
-    <div class="grid gap-4 lg:grid-cols-2">
-      <article class="rounded-[1.4rem] border border-[color-mix(in_srgb,var(--nm-accent)_18%,transparent)] bg-[var(--nm-tint)] px-4 py-4 text-right">
-        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">מנהל בלבד</p>
-        <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
-          העמוד הזה מיועד רק לך. מכאן פותחים גישה, בודקים מי פעיל, מאפסים סיסמה ורואים את מצב החברים בלי לצאת למסך אחר.
+    <section
+      class="space-y-4 rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-accent)_14%,transparent)] bg-[var(--nm-tint)] p-5"
+      data-admin-access-table-card
+    >
+      <header class="space-y-1">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div class="space-y-1">
+            <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">גישה חיה</p>
+            <h3 class="text-xl font-semibold text-[var(--nm-fg)]">מי מחובר עכשיו ומי נראה לאחרונה</h3>
+          </div>
+          <span
+            data-admin-access-count
+            class="rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/85 px-3 py-1 text-xs font-semibold text-[var(--nm-fg)]"
+          >
+            0 רשומות
+          </span>
+        </div>
+        <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+          כאן רואים יחד משתמשי קוד משותף וחברי סיסמה אישית. קודם מסתכלים מי בפנים, מתי נכנס,
+          ומאיזה נתיב. כל מה שמעבר לזה עבר לאזור מתקדם.
         </p>
-      </article>
-      <article class="rounded-[1.4rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] px-4 py-4 text-right">
-        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">מה נפתח לחבר</p>
-        <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
-          אחרי פתיחת גישה החבר נכנס דרך הטלפון והסיסמה שלו, רואה את אזור החבר, ומקבל גישה לתוכן שנעול למועדון.
-        </p>
-      </article>
-    </div>
+      </header>
+
+      <div class="overflow-x-auto rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/92">
+        <table class="min-w-full divide-y divide-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] text-right text-sm">
+          <thead class="bg-[var(--nm-surface-muted)] text-[color-mix(in_srgb,var(--nm-fg)_62%,var(--nm-bg))]">
+            <tr>
+              <th scope="col" class="px-4 py-3 font-semibold">שם</th>
+              <th scope="col" class="px-4 py-3 font-semibold">טלפון</th>
+              <th scope="col" class="px-4 py-3 font-semibold">סוג גישה</th>
+              <th scope="col" class="px-4 py-3 font-semibold">סטטוס</th>
+              <th scope="col" class="px-4 py-3 font-semibold">נראה לאחרונה</th>
+              <th scope="col" class="px-4 py-3 font-semibold">נתיב אחרון</th>
+            </tr>
+          </thead>
+          <tbody data-admin-access-rows class="divide-y divide-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)]"></tbody>
+        </table>
+      </div>
+
+      <p data-admin-access-empty class="hidden text-xs leading-6 text-[color-mix(in_srgb,var(--nm-fg)_58%,var(--nm-bg))]">
+        ברגע שמישהו יפתח גישה או ייכנס עם סיסמה, הרשומה שלו תופיע כאן.
+      </p>
+      <p class="text-xs leading-6 text-[color-mix(in_srgb,var(--nm-fg)_56%,var(--nm-bg))]">
+        אם הטבלה נשארת ריקה עם שגיאת הרשאה, הבעיה בדרך כלל אינה בחבר עצמו אלא ב-Cloudflare Access.
+        צריך להגן גם על <span dir="ltr">/dashboard/*</span>, גם על <span dir="ltr">/dashboard/api/*</span>, וגם על
+        <span dir="ltr">/api/club-admin/*</span>.
+      </p>
+    </section>
+
     <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-6">
       <article class="rounded-[1.4rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] px-4 py-4">
         <p class="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--nm-accent)]">חברים</p>
@@ -37,18 +84,18 @@
         <p data-admin-stat="recent" class="mt-3 text-3xl font-semibold text-[var(--nm-fg)]">0</p>
       </article>
       <article class="rounded-[1.4rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] px-4 py-4">
-        <p class="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--nm-accent)]">Fraud Flags</p>
+        <p class="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--nm-accent)]">התראות בקרה</p>
         <p data-admin-stat="flags" class="mt-3 text-3xl font-semibold text-[var(--nm-fg)]">0</p>
       </article>
       <article class="rounded-[1.4rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] px-4 py-4">
-        <p class="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--nm-accent)]">Deep File</p>
+        <p class="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--nm-accent)]">צפיות בתוכן</p>
         <p data-admin-stat="deep" class="mt-3 text-3xl font-semibold text-[var(--nm-fg)]">0</p>
-        <p class="mt-1 text-xs text-[color-mix(in_srgb,var(--nm-fg)_52%,var(--nm-bg))]">צפיות במאמרים</p>
+        <p class="mt-1 text-xs text-[color-mix(in_srgb,var(--nm-fg)_52%,var(--nm-bg))]">ביקורים במאמרים ואזורים סגורים</p>
       </article>
       <article class="rounded-[1.4rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] px-4 py-4">
-        <p class="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--nm-accent)]">דיווחי דיוק</p>
+        <p class="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--nm-accent)]">הערות דיוק</p>
         <p data-admin-stat="integrity" class="mt-3 text-3xl font-semibold text-[var(--nm-fg)]">0</p>
-        <p class="mt-1 text-xs text-[color-mix(in_srgb,var(--nm-fg)_52%,var(--nm-bg))]">הערות שהגיעו מהאתר</p>
+        <p class="mt-1 text-xs text-[color-mix(in_srgb,var(--nm-fg)_52%,var(--nm-bg))]">דיווחים שהגיעו מתוך האתר</p>
       </article>
       <article class="rounded-[1.4rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] px-4 py-4">
         <p class="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--nm-accent)]">דיווח אחרון</p>
@@ -61,7 +108,8 @@
         <header class="space-y-1">
           <h3 class="text-xl font-semibold text-[var(--nm-fg)]">חיפוש חבר</h3>
           <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_64%,var(--nm-bg))]">
-            כותבים טלפון או שם, בוחרים חבר מהרשימה, ורואים מיד מצב גישה, כניסות אחרונות וקיצור לאיפוס סיסמה.
+            כותבים טלפון או שם, בוחרים חבר מהרשימה, ורואים מיד מצב גישה, כניסות אחרונות וקיצור
+            לאיפוס סיסמה.
           </p>
         </header>
         <label class="block space-y-2" for="admin-member-search">
@@ -78,7 +126,7 @@
         </label>
         <ul data-admin-member-results class="space-y-3"></ul>
         <p data-admin-member-empty class="text-xs leading-6 text-[color-mix(in_srgb,var(--nm-fg)_56%,var(--nm-bg))]">
-          ברגע שנטען את רשימת החברים, אפשר יהיה לחפש כאן בלי לצאת מהמסך.
+          ברגע שתיטען רשימת החברים, אפשר יהיה לחפש כאן בלי לצאת מהמסך.
         </p>
       </section>
 
@@ -86,200 +134,289 @@
         <header class="space-y-1">
           <h3 class="text-xl font-semibold text-[var(--nm-fg)]">כרטיס חבר וציר פעילות</h3>
           <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_64%,var(--nm-bg))]">
-            אחרי בחירה של חבר רואים סטטוס נוכחי, תוקף גישה, כניסות אחרונות, וקיצור לבדיקה איך נראים מסכי החבר והאורח.
+            אחרי בחירת חבר רואים סטטוס נוכחי, תוקף גישה, כניסות אחרונות וקיצורי תצוגה.
           </p>
         </header>
-        <div data-admin-member-card class="rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 px-4 py-4 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_62%,var(--nm-bg))]">
+        <div
+          data-admin-member-card
+          class="rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 px-4 py-4 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_62%,var(--nm-bg))]"
+        >
           בחר חבר מהרשימה כדי לראות כאן את הפרטים.
         </div>
         <div class="flex flex-wrap justify-end gap-2">
-          <button type="button" data-admin-fill-reset class="inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-4 py-2 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]">למלא את טופס האיפוס</button>
-          <a href="/me/" target="_blank" rel="noreferrer" data-admin-view-member class="inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-4 py-2 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]">תצוגת חבר</a>
-          <a href="/me/unlock/" target="_blank" rel="noreferrer" data-admin-view-unlock class="inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-4 py-2 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]">תצוגת אורח</a>
+          <button
+            type="button"
+            data-admin-fill-reset
+            class="inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-4 py-2 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]"
+          >
+            למלא את טופס האיפוס
+          </button>
+          <a
+            href="/me/"
+            target="_blank"
+            rel="noreferrer"
+            data-admin-view-member
+            class="inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-4 py-2 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]"
+          >
+            תצוגת חבר
+          </a>
+          <a
+            href="/me/unlock/"
+            target="_blank"
+            rel="noreferrer"
+            data-admin-view-unlock
+            class="inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-4 py-2 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]"
+          >
+            תצוגת אורח
+          </a>
         </div>
         <ul data-admin-member-timeline class="space-y-3"></ul>
       </section>
     </div>
 
-    <div class="grid gap-6 xl:grid-cols-[minmax(0,1fr)_24rem]">
-      <section class="space-y-4 rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-5">
-        <header class="space-y-1">
-          <h3 class="text-xl font-semibold text-[var(--nm-fg)]">הערות שהגיעו מהאתר</h3>
-          <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_64%,var(--nm-bg))]">
-            כל דיווח שנשלח מתוך עמודי האתר נשמר כאן עם הקישור, הקטע שסומן, וטביעת רשת מקוצרת. כך אפשר לעבור על שגיאות או ניסוחים לא מדויקים בלי לחפש במייל.
-          </p>
-        </header>
-        <ul data-admin-integrity-reports class="space-y-3"></ul>
-      </section>
-
-      <section class="space-y-4 rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-5">
-        <header class="space-y-1">
-          <h3 class="text-xl font-semibold text-[var(--nm-fg)]">Deep File</h3>
-          <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_64%,var(--nm-bg))]">
-            אחרי כניסה פעילה של חבר, גלישה לעמוד מאמר שולחת ביקון חד פעמי לטאב. נשמרים נתיב, זמן, וטביעת IP מקוצרת. אין טלפון בשורה הזו.
-          </p>
-        </header>
-        <ul data-admin-page-beacons class="space-y-3"></ul>
-      </section>
-    </div>
-
-    <div class="grid gap-6 xl:grid-cols-[minmax(0,1fr)_24rem]">
-      <section class="space-y-4 rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-5">
-        <header class="space-y-1">
-          <h3 class="text-xl font-semibold text-[var(--nm-fg)]">כניסות אחרונות</h3>
-          <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_64%,var(--nm-bg))]">זהו רצף הכניסות האחרון שנשמר ב-CLUB_ACTIVITY.</p>
-        </header>
-        <ul data-admin-recent-logins class="space-y-3"></ul>
-      </section>
-
-      <section class="space-y-4 rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-5">
-        <header class="space-y-1">
-          <h3 class="text-xl font-semibold text-[var(--nm-fg)]">איפוס סיסמה</h3>
-          <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_64%,var(--nm-bg))]">בוחרים חבר, כותבים סיסמה חדשה, וה-worker מחליף את ה-hash.</p>
-        </header>
-
-        <form data-admin-reset-form class="space-y-4" novalidate>
-          <label class="block space-y-2" for="admin-reset-phone">
-            <span class="text-sm font-semibold text-[var(--nm-fg)]">טלפון חבר</span>
-            <input
-              id="admin-reset-phone"
-              name="phone"
-              type="tel"
-              autocomplete="tel"
-              inputmode="numeric" pattern="[0-9]*"
-              class="min-h-[44px] w-full rounded-[1rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-white px-4 py-3 text-sm text-[var(--nm-fg)] outline-none transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-red)]"
-              placeholder="0500000000"
-            />
-          </label>
-
-          <label class="block space-y-2" for="admin-reset-password">
-            <span class="text-sm font-semibold text-[var(--nm-fg)]">סיסמה חדשה</span>
-            <input
-              id="admin-reset-password"
-              name="newPassword"
-              type="password"
-              autocomplete="new-password"
-              class="min-h-[44px] w-full rounded-[1rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-white px-4 py-3 text-sm text-[var(--nm-fg)] outline-none transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-red)]"
-            />
-          </label>
-
-          <button
-            type="submit"
-            class="inline-flex min-h-[44px] items-center justify-center rounded-full bg-[var(--nm-inverse)] px-5 py-2.5 text-sm font-semibold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-inverse-hover)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-red)]"
-          >
-            לאפס סיסמה
-          </button>
-          <p data-admin-reset-status class="text-xs leading-6 text-[color-mix(in_srgb,var(--nm-fg)_60%,var(--nm-bg))]" aria-live="polite"></p>
-        </form>
-
-        <div class="mt-8 border-t border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] pt-6">
-          <header class="space-y-1">
-            <h3 class="text-xl font-semibold text-[var(--nm-fg)]">הוספת חבר חדש</h3>
+    <section class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-5">
+      <details class="group" data-admin-password-tools>
+        <summary class="flex cursor-pointer list-none items-center justify-between gap-3 text-right marker:content-none [&::-webkit-details-marker]:hidden">
+          <div class="space-y-1">
+            <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">כלי סיסמה אישית</p>
+            <h3 class="text-xl font-semibold text-[var(--nm-fg)]">איפוס סיסמה, הוספת חבר, והודעה מוכנה לשליחה</h3>
             <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_64%,var(--nm-bg))]">
-              כותבים טלפון, סיסמה, ואם רוצים גם שם מלא. החבר החדש יופיע מיד במנגנון הגישה.
+              הכלים האלה נשארים זמינים, אבל הם לא החלק הראשי במסך. פותחים רק כשבאמת צריך.
             </p>
-          </header>
-
-          <form data-admin-add-member-form class="mt-4 space-y-4" novalidate>
-            <label class="block space-y-2" for="admin-add-fullname">
-              <span class="text-sm font-semibold text-[var(--nm-fg)]">שם מלא (אופציונלי)</span>
-              <input
-                id="admin-add-fullname"
-                name="fullName"
-                type="text"
-                autocomplete="name"
-                class="min-h-[44px] w-full rounded-[1rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-white px-4 py-3 text-sm text-[var(--nm-fg)] outline-none transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-red)]"
-                placeholder="שם שיופיע"
-              />
-            </label>
-
-            <label class="block space-y-2" for="admin-add-phone">
-              <span class="text-sm font-semibold text-[var(--nm-fg)]">טלפון חבר</span>
-              <input
-                id="admin-add-phone"
-                name="phone"
-                type="tel"
-                autocomplete="tel"
-                inputmode="numeric" pattern="[0-9]*"
-                class="min-h-[44px] w-full rounded-[1rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-white px-4 py-3 text-sm text-[var(--nm-fg)] outline-none transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-red)]"
-                placeholder="0500000000"
-                required
-              />
-            </label>
-
-            <label class="block space-y-2" for="admin-add-password">
-              <span class="text-sm font-semibold text-[var(--nm-fg)]">סיסמה</span>
-              <input
-                id="admin-add-password"
-                name="password"
-                type="password"
-                autocomplete="new-password"
-                class="min-h-[44px] w-full rounded-[1rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-white px-4 py-3 text-sm text-[var(--nm-fg)] outline-none transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-red)]"
-                placeholder="סיסמה חדשה"
-                required
-                minlength="4"
-                maxlength="128"
-              />
-            </label>
-
-            <button
-              type="submit"
-              class="inline-flex min-h-[44px] w-full items-center justify-center rounded-full bg-[var(--nm-accent)] px-5 py-2.5 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-red)]"
-            >
-              הוסף חבר
-            </button>
-
-            <p data-admin-add-member-status class="text-xs leading-6 text-[color-mix(in_srgb,var(--nm-fg)_60%,var(--nm-bg))]" aria-live="polite"></p>
-          </form>
-
-          <div class="mt-4 space-y-3 rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-4">
-            <div class="space-y-1 text-right">
-              <h4 class="text-base font-semibold text-[var(--nm-fg)]">הודעה מוכנה לחבר</h4>
-              <p class="text-xs leading-6 text-[color-mix(in_srgb,var(--nm-fg)_62%,var(--nm-bg))]">
-                אחרי פתיחת חשבון או איפוס סיסמה, תופיע כאן הודעה מוכנה להעתקה עם שם המשתמש, הסיסמה וקישור הכניסה.
-              </p>
-            </div>
-            <textarea data-admin-share-message readonly class="min-h-[140px] w-full rounded-[1rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-white px-4 py-3 text-sm leading-7 text-[var(--nm-fg)] outline-none" placeholder="אחרי פעולה על חבר, תופיע כאן הודעה מוכנה לשליחה."></textarea>
-            <div class="flex flex-wrap justify-end gap-2">
-              <button type="button" data-admin-copy-login-link class="inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-4 py-2 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-white">העתקת קישור כניסה</button>
-              <button type="button" data-admin-copy-share class="inline-flex min-h-[44px] items-center justify-center rounded-full bg-[var(--nm-inverse)] px-4 py-2 text-sm font-semibold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-inverse-hover)]">העתקת הודעה</button>
-            </div>
-            <p data-admin-share-status class="text-xs leading-6 text-[color-mix(in_srgb,var(--nm-fg)_60%,var(--nm-bg))]" aria-live="polite"></p>
           </div>
+          <span class="rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] px-3 py-1 text-xs font-semibold text-[var(--nm-fg)] transition group-open:rotate-45">+</span>
+        </summary>
+
+        <div class="mt-5 grid gap-6 xl:grid-cols-[minmax(0,1fr)_24rem]">
+          <section class="space-y-4 rounded-[1.4rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/88 p-5">
+            <header class="space-y-1">
+              <h4 class="text-lg font-semibold text-[var(--nm-fg)]">איפוס סיסמה</h4>
+              <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_64%,var(--nm-bg))]">
+                בוחרים חבר, כותבים סיסמה חדשה, וה-worker מחליף את ה-hash.
+              </p>
+            </header>
+
+            <form data-admin-reset-form class="space-y-4" novalidate>
+              <label class="block space-y-2" for="admin-reset-phone">
+                <span class="text-sm font-semibold text-[var(--nm-fg)]">טלפון חבר</span>
+                <input
+                  id="admin-reset-phone"
+                  name="phone"
+                  type="tel"
+                  autocomplete="tel"
+                  inputmode="numeric"
+                  pattern="[0-9]*"
+                  class="min-h-[44px] w-full rounded-[1rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-white px-4 py-3 text-sm text-[var(--nm-fg)] outline-none transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-red)]"
+                  placeholder="0500000000"
+                />
+              </label>
+
+              <label class="block space-y-2" for="admin-reset-password">
+                <span class="text-sm font-semibold text-[var(--nm-fg)]">סיסמה חדשה</span>
+                <input
+                  id="admin-reset-password"
+                  name="newPassword"
+                  type="password"
+                  autocomplete="new-password"
+                  class="min-h-[44px] w-full rounded-[1rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-white px-4 py-3 text-sm text-[var(--nm-fg)] outline-none transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-red)]"
+                />
+              </label>
+
+              <button
+                type="submit"
+                class="inline-flex min-h-[44px] items-center justify-center rounded-full bg-[var(--nm-inverse)] px-5 py-2.5 text-sm font-semibold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-inverse-hover)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-red)]"
+              >
+                לאפס סיסמה
+              </button>
+              <p data-admin-reset-status class="text-xs leading-6 text-[color-mix(in_srgb,var(--nm-fg)_60%,var(--nm-bg))]" aria-live="polite"></p>
+            </form>
+          </section>
+
+          <section class="space-y-4 rounded-[1.4rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/88 p-5">
+            <header class="space-y-1">
+              <h4 class="text-lg font-semibold text-[var(--nm-fg)]">הוספת חבר חדש</h4>
+              <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_64%,var(--nm-bg))]">
+                כותבים טלפון, סיסמה, ואם רוצים גם שם מלא. החבר החדש יופיע מיד במנגנון הגישה.
+              </p>
+            </header>
+
+            <form data-admin-add-member-form class="space-y-4" novalidate>
+              <label class="block space-y-2" for="admin-add-fullname">
+                <span class="text-sm font-semibold text-[var(--nm-fg)]">שם מלא (אופציונלי)</span>
+                <input
+                  id="admin-add-fullname"
+                  name="fullName"
+                  type="text"
+                  autocomplete="name"
+                  class="min-h-[44px] w-full rounded-[1rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-white px-4 py-3 text-sm text-[var(--nm-fg)] outline-none transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-red)]"
+                  placeholder="שם שיופיע"
+                />
+              </label>
+
+              <label class="block space-y-2" for="admin-add-phone">
+                <span class="text-sm font-semibold text-[var(--nm-fg)]">טלפון חבר</span>
+                <input
+                  id="admin-add-phone"
+                  name="phone"
+                  type="tel"
+                  autocomplete="tel"
+                  inputmode="numeric"
+                  pattern="[0-9]*"
+                  class="min-h-[44px] w-full rounded-[1rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-white px-4 py-3 text-sm text-[var(--nm-fg)] outline-none transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-red)]"
+                  placeholder="0500000000"
+                  required
+                />
+              </label>
+
+              <label class="block space-y-2" for="admin-add-password">
+                <span class="text-sm font-semibold text-[var(--nm-fg)]">סיסמה</span>
+                <input
+                  id="admin-add-password"
+                  name="password"
+                  type="password"
+                  autocomplete="new-password"
+                  class="min-h-[44px] w-full rounded-[1rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-white px-4 py-3 text-sm text-[var(--nm-fg)] outline-none transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-red)]"
+                  placeholder="סיסמה חדשה"
+                  required
+                  minlength="4"
+                  maxlength="128"
+                />
+              </label>
+
+              <button
+                type="submit"
+                class="inline-flex min-h-[44px] w-full items-center justify-center rounded-full bg-[var(--nm-accent)] px-5 py-2.5 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-red)]"
+              >
+                הוסף חבר
+              </button>
+
+              <p data-admin-add-member-status class="text-xs leading-6 text-[color-mix(in_srgb,var(--nm-fg)_60%,var(--nm-bg))]" aria-live="polite"></p>
+            </form>
+          </section>
         </div>
-      </section>
-    </div>
 
-    <div class="grid gap-6 xl:grid-cols-[minmax(0,1fr)_24rem]">
-      <section class="space-y-4 rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-5">
-        <header class="space-y-1">
-          <h3 class="text-xl font-semibold text-[var(--nm-fg)]">Fraud Flags</h3>
-          <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_64%,var(--nm-bg))]">כאן רואים איפה אותה סיסמה או אותו חבר הופיעו מכמה מזהי IP בחלון קצר.</p>
-        </header>
-        <ul data-admin-fraud-flags class="space-y-3"></ul>
-      </section>
+        <div class="mt-6 space-y-3 rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-4">
+          <div class="space-y-1 text-right">
+            <h4 class="text-base font-semibold text-[var(--nm-fg)]">הודעה מוכנה לחבר</h4>
+            <p class="text-xs leading-6 text-[color-mix(in_srgb,var(--nm-fg)_62%,var(--nm-bg))]">
+              אחרי פתיחת חשבון או איפוס סיסמה, תופיע כאן הודעה מוכנה להעתקה עם שם המשתמש,
+              הסיסמה וקישור הכניסה.
+            </p>
+          </div>
+          <textarea
+            data-admin-share-message
+            readonly
+            class="min-h-[140px] w-full rounded-[1rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-white px-4 py-3 text-sm leading-7 text-[var(--nm-fg)] outline-none"
+            placeholder="אחרי פעולה על חבר, תופיע כאן הודעה מוכנה לשליחה."
+          ></textarea>
+          <div class="flex flex-wrap justify-end gap-2">
+            <button
+              type="button"
+              data-admin-copy-login-link
+              class="inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-4 py-2 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-white"
+            >
+              העתקת קישור כניסה
+            </button>
+            <button
+              type="button"
+              data-admin-copy-share
+              class="inline-flex min-h-[44px] items-center justify-center rounded-full bg-[var(--nm-inverse)] px-4 py-2 text-sm font-semibold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-inverse-hover)]"
+            >
+              העתקת הודעה
+            </button>
+          </div>
+          <p data-admin-share-status class="text-xs leading-6 text-[color-mix(in_srgb,var(--nm-fg)_60%,var(--nm-bg))]" aria-live="polite"></p>
+        </div>
+      </details>
+    </section>
 
-      <section class="space-y-4 rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-5">
-        <header class="space-y-1">
-          <h3 class="text-xl font-semibold text-[var(--nm-fg)]">איך זה עובד</h3>
-          <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_64%,var(--nm-bg))]">הסבר קצר כדי שלא תצטרך לזכור את כל החלקים בעל פה.</p>
-          <a
-            href="/club/"
-            class="mt-1 inline-flex w-fit items-center rounded-full bg-white/70 px-3 py-1 text-sm font-semibold text-[var(--nm-accent)] underline underline-offset-4 hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nm-accent)]"
-          >
-            גרסה ציבורית
-          </a>
-        </header>
-        <ol class="space-y-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
-          <li class="rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 px-4 py-3">CLUB_MEMBERS שומר את פרטי החבר, תוקף הגישה, וה-hash של הסיסמה.</li>
-          <li class="rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 px-4 py-3">CLUB_ACTIVITY שומר שורות קצרות של כניסה: טלפון, זמן, נתיב, ודפדפן.</li>
-          <li class="rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 px-4 py-3">אם אותו hash מופיע ממזהי IP שונים מהר מדי, ה־worker יוצר flag לבקרה.</li>
-        </ol>
-      </section>
-    </div>
+    <details class="group rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-5">
+      <summary class="flex cursor-pointer list-none items-center justify-between gap-3 text-right marker:content-none [&::-webkit-details-marker]:hidden">
+        <div class="space-y-1">
+          <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">מתקדם</p>
+          <h3 class="text-xl font-semibold text-[var(--nm-fg)]">ביקורים, התראות, ודיווחים מהאתר</h3>
+          <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_64%,var(--nm-bg))]">
+            כאן נשאר כל מה שלא צריך לשבת בחזית: דיווחים, ביקונים, התראות בקרה ותזכורת קצרה על
+            שכבות האחסון.
+          </p>
+        </div>
+        <span class="rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] px-3 py-1 text-xs font-semibold text-[var(--nm-fg)] transition group-open:rotate-45">+</span>
+      </summary>
+
+      <div class="mt-5 space-y-6">
+        <div class="grid gap-6 xl:grid-cols-[minmax(0,1fr)_24rem]">
+          <section class="space-y-4 rounded-[1.4rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/88 p-5">
+            <header class="space-y-1">
+              <h4 class="text-lg font-semibold text-[var(--nm-fg)]">הערות שהגיעו מהאתר</h4>
+              <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_64%,var(--nm-bg))]">
+                כל דיווח שנשלח מתוך עמודי האתר נשמר כאן עם הקישור, הקטע שסומן וחתימת רשת
+                מקוצרת.
+              </p>
+            </header>
+            <ul data-admin-integrity-reports class="space-y-3"></ul>
+          </section>
+
+          <section class="space-y-4 rounded-[1.4rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/88 p-5">
+            <header class="space-y-1">
+              <h4 class="text-lg font-semibold text-[var(--nm-fg)]">צפיות בתוכן</h4>
+              <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_64%,var(--nm-bg))]">
+                אחרי כניסה פעילה של חבר, גלישה למאמר שולחת ביקון חד-פעמי לטאב. נשמרים נתיב, זמן
+                וחתימת IP מקוצרת.
+              </p>
+            </header>
+            <ul data-admin-page-beacons class="space-y-3"></ul>
+          </section>
+        </div>
+
+        <section class="hidden">
+          <ul data-admin-recent-logins class="space-y-3"></ul>
+        </section>
+
+        <div class="grid gap-6 xl:grid-cols-[minmax(0,1fr)_24rem]">
+          <section class="space-y-4 rounded-[1.4rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/88 p-5">
+            <header class="space-y-1">
+              <h4 class="text-lg font-semibold text-[var(--nm-fg)]">התראות בקרה</h4>
+              <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_64%,var(--nm-bg))]">
+                כאן רואים איפה אותה סיסמה או אותו חבר הופיעו ממספר מזהי IP בחלון קצר.
+              </p>
+            </header>
+            <ul data-admin-fraud-flags class="space-y-3"></ul>
+          </section>
+
+          <section class="space-y-4 rounded-[1.4rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/88 p-5">
+            <header class="space-y-1">
+              <h4 class="text-lg font-semibold text-[var(--nm-fg)]">תזכורת למבנה הגישה</h4>
+              <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_64%,var(--nm-bg))]">
+                תזכורת קצרה בלבד, אם צריך להבין מאיפה מגיעים הנתונים ומה מפעיל את ההתראות.
+              </p>
+              <a
+                href="/club/"
+                class="mt-1 inline-flex w-fit items-center rounded-full bg-white/70 px-3 py-1 text-sm font-semibold text-[var(--nm-accent)] underline underline-offset-4 hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nm-accent)]"
+              >
+                גרסה ציבורית
+              </a>
+            </header>
+            <ol class="space-y-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
+              <li class="rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 px-4 py-3">
+                שכבת החברים שומרת את פרטי החבר, תוקף הגישה והסיסמה האישית בצורה מוצפנת.
+              </li>
+              <li class="rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 px-4 py-3">
+                שכבת הפעילות שומרת גם כניסות של חברי סיסמה וגם heartbeat של קוד משותף, עם זהויות נפרדות.
+              </li>
+              <li class="rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 px-4 py-3">
+                אם אותו מזהה גישה מופיע ממספר כתובות רשת שונות מהר מדי, המערכת פותחת התראת בקרה לבדיקה.
+              </li>
+            </ol>
+          </section>
+        </div>
+      </div>
+    </details>
   </div>
 
-  <dialog data-admin-reset-dialog class="rounded-[1.4rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-0 text-right shadow-[0_24px_80px_rgba(26,26,26,0.18)] backdrop:bg-black/30">
+  <dialog
+    data-admin-reset-dialog
+    class="rounded-[1.4rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-0 text-right shadow-[0_24px_80px_rgba(26,26,26,0.18)] backdrop:bg-black/30"
+  >
     <div data-modal-panel class="w-[min(100vw-2rem,28rem)] space-y-4 p-5">
       <header class="space-y-2">
         <p class="text-sm font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">אישור פעולה</p>
@@ -287,8 +424,20 @@
       </header>
       <p data-admin-reset-confirm-text class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]"></p>
       <div class="flex flex-wrap justify-end gap-3">
-        <button type="button" data-admin-reset-cancel class="inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-4 py-2 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]">חזור</button>
-        <button type="button" data-admin-reset-approve class="inline-flex min-h-[44px] items-center justify-center rounded-full bg-[var(--nm-accent)] px-4 py-2 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]">לאשר איפוס</button>
+        <button
+          type="button"
+          data-admin-reset-cancel
+          class="inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-4 py-2 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]"
+        >
+          חזור
+        </button>
+        <button
+          type="button"
+          data-admin-reset-approve
+          class="inline-flex min-h-[44px] items-center justify-center rounded-full bg-[var(--nm-accent)] px-4 py-2 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]"
+        >
+          לאשר איפוס
+        </button>
       </div>
     </div>
   </dialog>

@@ -1,5 +1,6 @@
 import { fetchClubWorkerJson, json } from "../../_lib/club-admin.js";
 import { sendResendEmail } from "../../_lib/resend.js";
+import { checkRateLimit, rateLimitResponse } from "../../_lib/rate-limit.js";
 
 function readString(source, key, max = 2000) {
   return String(source?.[key] ?? "").replace(/\s+/g, " ").trim().slice(0, max);
@@ -69,6 +70,9 @@ function buildIntegrityMailText(payload, message) {
 
 export async function onRequestPost(context) {
   const { request, env } = context;
+
+  const rl = checkRateLimit(request, "integrity_report", { max: 5, windowMs: 60_000 });
+  if (!rl.ok) return rateLimitResponse(rl.retryAfter);
 
   let payload;
   try {

@@ -69,52 +69,11 @@ const prefillEncoded = encodeURIComponent(leadMessage);
 }
 
 {variant === "fab" && (
-  <script is:inline>
+  <script>
     document.addEventListener("astro:page-load", () => {
-      if (window.__nmWhatsappCleanup) {
-        window.__nmWhatsappCleanup();
-      }
-
-      const whatsappButton = document.querySelector("[data-whatsapp]");
-      const base = whatsappButton?.getAttribute("data-wa-base") ?? "";
-      const prefillAttr = whatsappButton?.getAttribute("data-wa-prefill") ?? "";
-
-      const waScrollThresholdPx = 400;
-      const updateWhatsappVisibility = () => {
-        if (!whatsappButton) return;
-        const y = window.scrollY || document.documentElement.scrollTop || 0;
-        const shouldShow = y > waScrollThresholdPx;
-
-        whatsappButton.classList.toggle("opacity-100", shouldShow);
-        whatsappButton.classList.toggle("pointer-events-auto", shouldShow);
-      };
-
-      const updateWhatsappHref = () => {
-        if (!whatsappButton || !base) return;
-        let message = "";
-        try {
-          message = prefillAttr ? decodeURIComponent(prefillAttr) : "";
-        } catch {
-          message = "";
-        }
-        if (!message) {
-          const rawTitle = document.title ? document.title.split("|")[0].trim() : "NeverMind";
-          const pageTitle = rawTitle || "NeverMind";
-          message = `[Lead | Source: ${pageTitle}]\nמחשבה אחת נקייה, ישר לוואטסאפ`;
-        }
-        const encoded = encodeURIComponent(message);
-        whatsappButton.setAttribute("href", `${base}?text=${encoded}`);
-      };
-
-      updateWhatsappHref();
-      document.addEventListener("scroll", updateWhatsappVisibility, { passive: true });
-      window.addEventListener("resize", updateWhatsappVisibility, { passive: true });
-      updateWhatsappVisibility();
-
-      window.__nmWhatsappCleanup = () => {
-        document.removeEventListener("scroll", updateWhatsappVisibility);
-        window.removeEventListener("resize", updateWhatsappVisibility);
-      };
+      import("../lib/whatsapp-button").then(({ initWhatsAppButton }) => {
+        initWhatsAppButton();
+      });
     });
   </script>
 )}

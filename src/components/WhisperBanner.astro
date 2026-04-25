@@ -21,7 +21,7 @@ const dismissKey = "nm-whisper-banner-dismissed-at";
     <a
       data-whisper-cta
       href={banner.ctaHref}
-      class="inline-flex min-h-[40px] shrink-0 items-center justify-center rounded-full border border-[#1A1A1A]/10 bg-[#1A1A1A] px-4 py-2 text-sm font-semibold text-[#FAFAF8] transition hover:bg-[#2A2A2A] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D42B2B]"
+      class="inline-flex min-h-[44px] shrink-0 items-center justify-center rounded-full border border-[#1A1A1A]/10 bg-[#1A1A1A] px-4 py-2 text-sm font-semibold text-[#FAFAF8] transition hover:bg-[#2A2A2A] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
     >
       {banner.ctaLabel}
     </a>
@@ -29,7 +29,7 @@ const dismissKey = "nm-whisper-banner-dismissed-at";
       type="button"
       data-whisper-close
       aria-label="סגור את הודעת הפס העליון"
-      class="absolute left-4 top-1/2 inline-flex -translate-y-1/2 items-center justify-center rounded-full border border-[#1A1A1A]/10 bg-white/70 px-2.5 py-1 text-xs font-semibold text-[#1A1A1A]/72 transition-colors duration-200 hover:bg-white hover:text-[#1A1A1A] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D42B2B]"
+      class="absolute left-4 top-1/2 inline-flex -translate-y-1/2 items-center justify-center rounded-full border border-[#1A1A1A]/10 bg-white/70 px-2.5 py-1 text-xs font-semibold text-[#1A1A1A]/72 transition-colors duration-200 hover:bg-white hover:text-[#1A1A1A] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
     >
       סגור
     </button>
@@ -39,6 +39,7 @@ const dismissKey = "nm-whisper-banner-dismissed-at";
 <script is:inline>
   document.addEventListener("astro:page-load", () => {
     const STORAGE_KEY = "nm-site-settings-overrides";
+    const CLUB_SESSION_KEY = "nm_club_session";
     const banner = document.querySelector("[data-whisper-banner]");
     const body = document.body;
     if (!(banner instanceof HTMLElement) || !body) {
@@ -79,6 +80,42 @@ const dismissKey = "nm-whisper-banner-dismissed-at";
       })(),
     };
 
+    const readClubSession = () => {
+      try {
+        const raw = window.localStorage.getItem(CLUB_SESSION_KEY);
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        if (!parsed || typeof parsed !== "object") return null;
+        const memberName = String(parsed.memberName || "").trim();
+        const expiresAt = String(parsed.expiresAt || "").trim();
+        const expiresTs = Date.parse(expiresAt);
+        if (!memberName || !Number.isFinite(expiresTs) || expiresTs <= Date.now()) {
+          window.localStorage.removeItem(CLUB_SESSION_KEY);
+          return null;
+        }
+        return {
+          memberName,
+          expiresAt: new Date(expiresTs).toISOString(),
+        };
+      } catch {
+        return null;
+      }
+    };
+
+    const buildPersonalizedBanner = () => {
+      const session = readClubSession();
+      if (!session) return null;
+      const hour = new Date().getHours();
+      const greeting =
+        hour < 5 ? "לילה שקט" : hour < 12 ? "בוקר טוב" : hour < 18 ? "צהריים טובים" : "ערב טוב";
+      return {
+        message: `ברוכים הבאים ${session.memberName}. ${greeting}. אזור הלמידה פתוח כאן עכשיו.`,
+        ctaLabel: "לאזור האישי",
+        ctaHref: "/me/",
+        forceShow: true,
+      };
+    };
+
     const hideBanner = (persist, dismissWindowMs) => {
       banner.style.display = "none";
       body.dataset.whisperBannerState = "hidden";
@@ -104,17 +141,27 @@ const dismissKey = "nm-whisper-banner-dismissed-at";
         ...defaults,
         ...override,
       };
+      const personalized = buildPersonalizedBanner();
       const contextualOffer = findContextualOffer();
 
       const dismissHours = Math.max(1, Number(current.dismissHours || 24));
       const dismissWindowMs = dismissHours * 60 * 60 * 1000;
       banner.dataset.dismissWindow = String(dismissWindowMs);
-      messageNode.textContent = contextualOffer?.message || current.message || defaults.message;
-      ctaNode.textContent = contextualOffer?.ctaLabel || current.ctaLabel || defaults.ctaLabel;
-      ctaNode.href = contextualOffer?.ctaHref || current.ctaHref || defaults.ctaHref || "/";
+      messageNode.textContent =
+        personalized?.message || contextualOffer?.message || current.message || defaults.message;
+      ctaNode.textContent =
+        personalized?.ctaLabel || contextualOffer?.ctaLabel || current.ctaLabel || defaults.ctaLabel;
+      ctaNode.href =
+        personalized?.ctaHref || contextualOffer?.ctaHref || current.ctaHref || defaults.ctaHref || "/";
 
       if (!current.enabled) {
         hideBanner(false, dismissWindowMs);
+        return;
+      }
+
+      if (personalized?.forceShow) {
+        banner.style.display = "block";
+        body.dataset.whisperBannerState = "shown";
         return;
       }
 
@@ -144,6 +191,11 @@ const dismissKey = "nm-whisper-banner-dismissed-at";
     };
 
     window.addEventListener("nm-site-settings-updated", onSettingsUpdated);
+    window.addEventListener("nm-club-session-changed", onSettingsUpdated);
+    window.addEventListener("storage", (event) => {
+      if (event.key === CLUB_SESSION_KEY || event.key === dismissKey || event.key === null) {
+        applyBannerSettings();
+      }
+    });
   });
 </script>
-

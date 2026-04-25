@@ -15,7 +15,7 @@ const carouselPool = [...sortedArticles].sort(() => Math.random() - 0.5).slice(0
 const formsEnabled = MAIL_DELIVERY_ENABLED;
 
 const siteUpdates = [
-  { label: "קביעת שיחה", href: "/book/" },
+  { label: "קביעת שיחה", href: "/personal-consultation/" },
   { label: "יצירת קשר", href: "/contact/" },
   { label: "שאלות ותשובות", href: "/about/#nm-about-faq" },
   { label: "ספרייה מובנית", href: "/library/" },
@@ -34,7 +34,7 @@ const siteUpdates = [
     <p class="text-[clamp(1rem,0.95rem+0.35vw,1.25rem)] leading-[1.75] text-[var(--nm-fg)]/68">
       בלי רעש מיותר. רק לבדוק מה פתוח, מה זמין, ולאן כדאי להמשיך מכאן.
     </p>
-    <a href={whatsappGroupUrl} target="_blank" rel="noreferrer" class="rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/80 px-6 py-3 text-[clamp(0.95rem,0.9rem+0.3vw,1.1rem)] text-[var(--nm-fg)] transition hover:bg-white">
+    <a href={whatsappGroupUrl} target="_blank" rel="noreferrer" aria-label="לעדכונים שקטים בוואטסאפ (נפתח בטאב חדש)" class="rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/80 px-6 py-3 text-[clamp(0.95rem,0.9rem+0.3vw,1.1rem)] text-[var(--nm-fg)] transition hover:bg-white">
       לעדכונים שקטים בוואטסאפ
     </a>
   </section>
@@ -81,6 +81,7 @@ const siteUpdates = [
     </h2>
     <form id="contact-form" data-contact-form data-nm-antispam class="space-y-4 rounded-3xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/80 p-6" action="/api/forms/submit" method="POST">
       <input type="hidden" name="subject" value="פנייה מעמוד מה קורה כאן עכשיו" />
+      <input type="hidden" name="page" value="now" />
       <input type="text" name="botcheck" class="hidden" tabindex="-1" autocomplete="off" aria-hidden="true" />
       <FormAntispamFields />
       <FloatingInput client:load id="name" name="name" label="שם" required dir="rtl" />
@@ -163,7 +164,7 @@ const siteUpdates = [
       const onSubmit = async (event) => {
         event.preventDefault();
         if (submitButton instanceof HTMLElement) {
-          window.__nmSetButtonLoading?.(submitButton, "מזקק את המנגנון...");
+          window.__nmSetButtonLoading?.(submitButton, "שולח דרך האתר...");
         }
 
         const formData = new FormData(form);
@@ -197,7 +198,7 @@ const siteUpdates = [
           const payload = await response.json().catch(() => null);
           if (response.ok && payload?.success === true) {
             form.reset();
-            showStatus("השאלה נקלטה. נחזור אליך בהקדם.");
+            showStatus("ההודעה נשלחה דרך האתר. נחזור אליך בהקדם.");
             window.__nmClearConnectivityIssue?.();
             window.__nmHapticSuccess?.();
             window.__nmAnnounce?.("השאלה נקלטה");
@@ -208,13 +209,13 @@ const siteUpdates = [
               : errorCode.includes("hcaptcha") || errorCode.includes("mandatory")
                 ? "צריך להשלים את האימות לפני השליחה."
                 : errorCode.includes("missing_mail_delivery_config")
-                  ? "שרת המייל עדיין לא הוגדר בפריסה."
-                  : "השרת לא אישר קבלה. אפשר לנסות שוב או פשוט לשלוח לנו הודעה בוואטסאפ.";
+                  ? "שרת המייל עדיין לא הוגדר בפריסה. אפשר לעבור לוואטסאפ כגיבוי."
+                  : "השליחה דרך האתר לא אושרה. אפשר לנסות שוב או לעבור לוואטסאפ.";
             showStatus(message);
             window.__nmReportConnectivityIssue?.(message);
           }
         } catch {
-          const message = "השרת לא אישר קבלה. אפשר לנסות שוב או פשוט לשלוח לנו הודעה בוואטסאפ.";
+          const message = "השליחה דרך האתר לא עברה. אפשר לנסות שוב או לעבור לוואטסאפ.";
           showStatus(message);
           window.__nmReportConnectivityIssue?.(message);
         } finally {

@@ -59,7 +59,7 @@ export function DirectLink({ whatsAppNumber, fallbackEmail, className = "" }: Di
     <button
       type="button"
       onClick={handleClick}
-      className={`group inline-flex items-center justify-center gap-2 rounded-full bg-[#25D366] px-[1.25rem] py-[0.75rem] text-[0.95rem] font-semibold leading-normal text-white shadow-[0_10px_24px_rgba(37,211,102,0.22)] transition-all duration-200 [transition-timing-function:ease] hover:-translate-y-0.5 hover:bg-[#1FAE55] hover:shadow-[0_14px_28px_rgba(37,211,102,0.28)] active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#25D366] ${className}`.trim()}
+      className={`group inline-flex items-center justify-center gap-2 rounded-full bg-[var(--nm-whatsapp)] px-[1.25rem] py-[0.75rem] text-[0.95rem] font-semibold leading-normal text-white shadow-[0_10px_24px_rgba(37,211,102,0.22)] transition-all duration-200 [transition-timing-function:ease] hover:-translate-y-0.5 hover:bg-[var(--nm-whatsapp-hover)] hover:shadow-[0_14px_28px_rgba(37,211,102,0.28)] active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nm-whatsapp)] ${className}`.trim()}
       aria-label="יש לך מחשבה על זה? בוא נדבר בוואטסאפ"
     >
       <svg

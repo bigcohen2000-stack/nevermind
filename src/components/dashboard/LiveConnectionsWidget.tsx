@@ -25,6 +25,110 @@ type Props = {
   endpoint: string;
 };
 
+type OverviewEntry = {
+  memberName?: string;
+  phone?: string;
+  ipFingerprint?: string;
+  path?: string;
+  userAgent?: string;
+  seenAt?: string;
+};
+
+type OverviewPayload = {
+  ok?: boolean;
+  recentLogins?: OverviewEntry[];
+};
+
+function readOverviewPayload(): OverviewPayload | null {
+  if (typeof window === "undefined") return null;
+  const payload = window.__NM_ADMIN_OVERVIEW__;
+  return payload && payload.ok === true ? payload : null;
+}
+
+function formatDevice(userAgent: string) {
+  const value = String(userAgent || "").toLowerCase();
+  if (!value) return "דפדפן לא מזוהה";
+
+  const platform = value.includes("iphone") || value.includes("ios")
+    ? "iPhone"
+    : value.includes("android")
+      ? "Android"
+      : value.includes("mac os") || value.includes("macintosh")
+        ? "Mac"
+        : value.includes("windows")
+          ? "Windows"
+          : value.includes("linux")
+            ? "Linux"
+            : "מכשיר";
+
+  const browser = value.includes("edg/")
+    ? "Edge"
+    : value.includes("chrome/") && !value.includes("edg/")
+      ? "Chrome"
+      : value.includes("safari/") && !value.includes("chrome/")
+        ? "Safari"
+        : value.includes("firefox/")
+          ? "Firefox"
+          : "דפדפן";
+
+  return `${platform} · ${browser}`;
+}
+
+function buildStatus(pathname: string) {
+  const path = String(pathname || "").trim();
+  if (path.startsWith("/admin")) return "כניסת מנהל";
+  if (path.startsWith("/me")) return "אזור אישי";
+  if (path.startsWith("/articles/")) return "קריאת תוכן";
+  if (path.startsWith("/dashboard")) return "בקרה פנימית";
+  return "גישה פעילה";
+}
+
+function minutesAgo(value: string) {
+  const time = Date.parse(String(value || ""));
+  if (!Number.isFinite(time)) return null;
+  return Math.max(0, Math.round((Date.now() - time) / 60000));
+}
+
+function isRecent(seenAt: string, minutesWindow: number) {
+  const time = Date.parse(String(seenAt || ""));
+  if (!Number.isFinite(time)) return false;
+  return Date.now() - time <= minutesWindow * 60 * 1000;
+}
+
+function mapOverviewToPayload(source: OverviewPayload): Payload {
+  const recentLogins = Array.isArray(source?.recentLogins) ? source.recentLogins : [];
+  const items = recentLogins.slice(0, 8).map((entry, index) => {
+    const seenAt = String(entry?.seenAt || "");
+    return {
+      id: `${entry?.phone || "guest"}-${seenAt || index}`,
+      memberName: String(entry?.memberName || ""),
+      phone: String(entry?.phone || "ללא טלפון"),
+      ipFingerprint: String(entry?.ipFingerprint || "לא זמין"),
+      path: String(entry?.path || "/"),
+      device: formatDevice(String(entry?.userAgent || "")),
+      authStatus: buildStatus(String(entry?.path || "")),
+      seenAt,
+      minutesAgo: minutesAgo(seenAt),
+    };
+  });
+
+  const uniqueActive = new Set(
+    recentLogins
+      .filter((entry) => isRecent(String(entry?.seenAt || ""), 20))
+      .map((entry) => String(entry?.phone || entry?.ipFingerprint || ""))
+      .filter(Boolean),
+  );
+
+  return {
+    ok: true,
+    source: "worker:club_activity:fallback",
+    generatedAt: new Date().toISOString(),
+    totalActive: uniqueActive.size,
+    totalRecent: recentLogins.length,
+    items,
+  };
+}
+
 export default function LiveConnectionsWidget({ endpoint }: Props) {
   const [payload, setPayload] = useState<Payload | null>(null);
   const [error, setError] = useState("");
@@ -32,30 +136,65 @@ export default function LiveConnectionsWidget({ endpoint }: Props) {
   useEffect(() => {
     let cancelled = false;
 
+    const applyOverview = (overview: OverviewPayload | null) => {
+      if (!overview || overview.ok !== true || cancelled) return false;
+      setPayload(mapOverviewToPayload(overview));
+      setError("");
+      return true;
+    };
+
     const load = async () => {
+      if (applyOverview(readOverviewPayload())) {
+        return;
+      }
+
       try {
         const response = await fetch(endpoint, { headers: { accept: "application/json" }, cache: "no-store" });
         const data = (await response.json()) as Payload;
         if (!response.ok || !data?.ok) {
-          throw new Error("failed");
+          throw new Error("primary_failed");
         }
         if (!cancelled) {
           setPayload(data);
           setError("");
         }
       } catch {
-        if (!cancelled) {
-          setError("לא הצלחנו למשוך נתוני חיבורים כרגע");
+        try {
+          const fallbackResponse = await fetch("/dashboard/api/club-admin/admin/overview", {
+            headers: { accept: "application/json" },
+            cache: "no-store",
+          });
+          const fallbackData = (await fallbackResponse.json()) as OverviewPayload;
+          if (!fallbackResponse.ok || fallbackData?.ok !== true) {
+            throw new Error("fallback_failed");
+          }
+          if (!cancelled) {
+            setPayload(mapOverviewToPayload(fallbackData));
+            setError("");
+          }
+        } catch {
+          if (!cancelled) {
+            setError(
+              "לא הצלחנו למשוך כרגע את נתוני החיבורים. בדרך כלל זו חסימה של Cloudflare Access. צריך להגן גם על /dashboard/* וגם על /dashboard/api/*, ולוודא שהמייל שלך מורשה."
+            );
+          }
         }
       }
     };
 
+    const onOverview = (event: Event) => {
+      const detail = (event as CustomEvent<OverviewPayload | null>).detail;
+      applyOverview(detail ?? null);
+    };
+
     void load();
     const timer = window.setInterval(load, 15000);
+    window.addEventListener("nm-admin-overview", onOverview as EventListener);
 
     return () => {
       cancelled = true;
       window.clearInterval(timer);
+      window.removeEventListener("nm-admin-overview", onOverview as EventListener);
     };
   }, [endpoint]);
 

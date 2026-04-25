@@ -6,13 +6,6 @@ function readConfig(): NmUnlockClientConfig | null {
   return window.__NM_UNLOCK_CONFIG__ ?? null;
 }
 
-function parseCodes(validCodesRaw: string): string[] {
-  return String(validCodesRaw || "")
-    .split(",")
-    .map((code) => code.trim())
-    .filter(Boolean);
-}
-
 function isExplicitPublicMode(rawMode: string): boolean {
   return String(rawMode || "").trim().toLowerCase() === PUBLIC_UNLOCK_MODE;
 }
@@ -59,11 +52,12 @@ function initUnlockPage() {
   const sessionBar = document.querySelector('[data-progress="session"]');
   const articlesCard = document.querySelector('[data-stat="articles"]');
 
-  const validCodes = parseCodes(config.validCodesRaw);
   const explicitPublicMode = isExplicitPublicMode(config.unlockAccessModeRaw);
 
   const storageKey = "nm_access_code";
+  const verifiedCodeStorageKey = "nm_access_code_verified";
   const clubSessionStorageKey = "nm_club_session";
+  const premiumSessionStorageKey = "nm-premium-access";
   const LS_LOG = "nm_article_open_log";
   const LS_SECONDS = "nm_reading_seconds_local";
   const LS_STREAK = "nm_dashboard_streak";
@@ -85,6 +79,7 @@ function initUnlockPage() {
     return {
       memberName,
       phone: String(club?.phone || "").trim(),
+      identityKey: String(club?.identityKey || "").trim(),
       expiresAt: new Date(expiresTs).toISOString(),
       lastLoginAt: String(club?.lastLoginAt || "").trim(),
       liveStatus: String(club?.liveStatus || "SHARED").trim() || "SHARED",
@@ -92,16 +87,16 @@ function initUnlockPage() {
   };
 
   const hasPremiumSession = () => {
-    const premium = readJson<Record<string, unknown>>("nm-premium-access");
+    const premium = readJson<Record<string, unknown>>(premiumSessionStorageKey);
     const premiumExpiry = Date.parse(String(premium?.expiresAt || ""));
     return (Number.isFinite(premiumExpiry) && premiumExpiry > Date.now()) || Boolean(readClubSession());
   };
 
-  const isCodeValid = (value: string) => {
-    const clean = String(value || "").trim();
-    if (!clean) return false;
-    if (validCodes.length > 0) return validCodes.includes(clean);
-    return explicitPublicMode;
+  const hasAcceptedCode = () => {
+    if (explicitPublicMode) return true;
+    const storedCode = String(localStorage.getItem(storageKey) || "").trim();
+    if (!storedCode) return false;
+    return String(localStorage.getItem(verifiedCodeStorageKey) || "").trim() === storedCode;
   };
 
   const verifyCodeWithServer = async (value: string) => {
@@ -151,6 +146,7 @@ function initUnlockPage() {
     const nextSession = {
       memberName: String(payload?.memberName || "").trim(),
       phone: String(payload?.phone || "").trim(),
+      identityKey: String(payload?.identityKey || "").trim(),
       expiresAt: String(payload?.expiresAt || fallbackExpiry).trim() || fallbackExpiry,
       lastLoginAt: String(payload?.lastLoginAt || nowIso).trim() || nowIso,
       liveStatus: String(payload?.liveStatus || "SHARED").trim() || "SHARED",
@@ -257,7 +253,7 @@ function initUnlockPage() {
     if (joinCopy instanceof HTMLElement) {
       joinCopy.textContent = authorized
         ? unlockTone.join.activeCopy
-        : unlockTone.join.inactiveCopy(config.launchOfferPrice);
+        : unlockTone.join.inactiveCopy();
     }
     if (joinDot instanceof HTMLElement) {
       joinDot.style.background = authorized ? "#4B6055" : "#D42B2B";
@@ -273,7 +269,7 @@ function initUnlockPage() {
         joinOffer.removeAttribute("rel");
       } else {
         joinOffer.href = config.joinOfferHref;
-        joinOffer.textContent = unlockTone.join.inactiveCta(config.launchOfferPrice);
+        joinOffer.textContent = unlockTone.join.inactiveCta();
         joinOffer.setAttribute("target", "_blank");
         joinOffer.setAttribute("rel", "noopener noreferrer");
       }
@@ -301,10 +297,10 @@ function initUnlockPage() {
   };
 
   const syncAuthorizedState = () => {
-    const storedCode = localStorage.getItem(storageKey) || "";
-    const codeAccepted = isCodeValid(storedCode);
+    const codeAccepted = hasAcceptedCode();
     const clubSession = readClubSession();
-    const authorized = Boolean(clubSession) || hasPremiumSession();
+    const premiumSession = hasPremiumSession();
+    const authorized = Boolean(clubSession) || premiumSession;
     const shouldCollectIdentity = codeAccepted && !authorized;
 
     shell?.setAttribute("data-authorized", authorized ? "true" : "false");
@@ -382,20 +378,22 @@ function initUnlockPage() {
       enterButton.disabled = true;
     }
     const serverResult = await verifyCodeWithServer(code);
-    const authorized = serverResult === null ? isCodeValid(code) : serverResult;
+    const authorized = serverResult === true || (serverResult === null && explicitPublicMode);
     if (enterButton instanceof HTMLButtonElement) {
       enterButton.disabled = false;
     }
     if (authorized) {
       localStorage.setItem(storageKey, code);
+      localStorage.setItem(verifiedCodeStorageKey, code);
       errorLine?.classList.add("hidden");
+      if (input instanceof HTMLInputElement) {
+        input.value = "";
+      }
       setIdentityMessage("");
       syncAuthorizedState();
-      if (!readClubSession() && identityNameInput instanceof HTMLInputElement) {
-        window.setTimeout(() => identityNameInput.focus(), 30);
-      }
       return;
     }
+    localStorage.removeItem(verifiedCodeStorageKey);
     errorLine?.classList.remove("hidden");
     successLine?.classList.add("hidden");
     toggleIdentityPanel(false);
@@ -426,7 +424,7 @@ function initUnlockPage() {
     const fullName = String(identityNameInput instanceof HTMLInputElement ? identityNameInput.value : "").trim();
     const phone = String(identityPhoneInput instanceof HTMLInputElement ? identityPhoneInput.value : "").replace(/\D/g, "");
 
-    if (!code || !isCodeValid(code)) {
+    if (!code) {
       errorLine?.classList.remove("hidden");
       successLine?.classList.add("hidden");
       setIdentityMessage(unlockTone.session.missingPersonalCode, "error");
@@ -473,6 +471,7 @@ function initUnlockPage() {
         throw new Error("shared_access_save_failed");
       }
 
+      localStorage.removeItem(premiumSessionStorageKey);
       setIdentityMessage(unlockTone.session.saved(saved.memberName), "success");
       errorLine?.classList.add("hidden");
       syncAuthorizedState();
@@ -508,7 +507,8 @@ function initUnlockPage() {
   if (logoutButton instanceof HTMLElement) {
     const onLogout = () => {
       localStorage.removeItem(storageKey);
-      localStorage.removeItem("nm-premium-access");
+      localStorage.removeItem(verifiedCodeStorageKey);
+      localStorage.removeItem(premiumSessionStorageKey);
       localStorage.removeItem(clubSessionStorageKey);
       toggleIdentityPanel(false);
       setIdentityMessage("");

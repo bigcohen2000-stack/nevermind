@@ -1,4 +1,12 @@
 import { ARTICLE_TAG_WHITELIST, ARTICLE_TAG_WHITELIST_SET } from "../data/article-tags.js";
+import {
+  GENERATOR_EXTRA_BLOCKLIST,
+  buildArticleArtifacts,
+  buildCursorPackage,
+  buildStructuredArticlePrompt,
+  findBlockedPhrases,
+  parseStructuredArticleJson,
+} from "../lib/article-generator.js";
 import { ROBOTIC_BLOCKLIST, SENSITIVE_TOPIC_WARNING, validateAndClassify } from "../utils/contentValidator.js";
 
 const wizardGlobal = globalThis;
@@ -162,6 +170,15 @@ function runPreflight(data) {
     warnings.push(`הטיוטה מעל ${WORD_WARN} מילים. שקול רמת עומק מתקדמים או עומק.`);
   }
 
+  for (const [index, item] of (data.relatedVideos || []).entries()) {
+    if (!item.title.trim()) {
+      warnings.push(`חסרה כותרת לסרטון נוסף ${index + 1}.`);
+    }
+    if (!item.youtubeId.trim() || !YOUTUBE_ID_RE.test(item.youtubeId.trim())) {
+      warnings.push(`מזהה YouTube לא תקין בסרטון נוסף ${index + 1}.`);
+    }
+  }
+
   return warnings;
 }
 
@@ -175,6 +192,35 @@ function fieldValue(id) {
 
 function fieldTrim(id) {
   return fieldValue(id).trim();
+}
+
+function buildQuickQuestionPayload(topic) {
+  const cleanTopic = String(topic || "").trim();
+  const looksLikeLoveTopic = /אהבה|זוגיות|אחר/.test(cleanTopic);
+  return {
+    topic: cleanTopic,
+    audience: looksLikeLoveTopic ? "קוראים מנוסים" : "קוראים מנוסים",
+    aha: `חשוף את ההנחה הסמויה ואת מנגנון השורש שמסתתרים מאחורי השאלה: ${cleanTopic}`,
+    bottomLine: "סיים בשורה חדה שמחזירה את הקורא לעובדה ולא לאגו שלו.",
+    inversionNote: "ההיפוך חייב להראות התבוננות לפני הנחה ולפרק את הסיפור שהקורא הדביק למציאות.",
+    isPremium: false,
+    difficultyLevel: "advanced",
+    slug: "",
+    questionForSchema: cleanTopic,
+    imageAlt: `ייצוג חזותי פשוט וישיר של המתח או הסתירה שמסתתרים בתוך השאלה: ${cleanTopic}`,
+    mindShiftIntensity: "4",
+    summary: `פירוק לוגי, ישיר ונטול רגש עודף של השאלה: ${cleanTopic}`,
+    tone: "חד",
+    points: "",
+    length: "עמוק",
+    tags: looksLikeLoveTopic ? "אהבה אמיתית, אהבה ללא תנאים, אהבה טהורה" : "",
+    youtubeId: "",
+    videoTopicKey: looksLikeLoveTopic ? "love" : "",
+    videoTopicLabel: looksLikeLoveTopic ? "צפייה וחקירה: מנגנון האהבה" : "",
+    videoSectionIntro: looksLikeLoveTopic ? "כאן אפשר להתחיל בקטעים הפתוחים, ואז להמשיך לשכבת מועדון על אותו מנגנון." : "",
+    relatedVideos: [],
+    body: "",
+  };
 }
 
 function yq(s) {
@@ -355,7 +401,7 @@ function isWizardFieldTarget(target) {
   }
 
   const element = target.closest(
-    "#wiz-topic, #wiz-aha, #wiz-question-schema, #wiz-image-alt, #wiz-bottom-line, #wiz-inversion, #wiz-slug, #wiz-summary, #wiz-points, #wiz-tags, #wiz-youtube, #wiz-body, #wiz-output, #wiz-external-mdx, #wiz-claim-inversion"
+    "#wiz-topic, #wiz-aha, #wiz-question-schema, #wiz-image-alt, #wiz-bottom-line, #wiz-inversion, #wiz-slug, #wiz-summary, #wiz-points, #wiz-tags, #wiz-youtube, #wiz-video-topic-key, #wiz-body, #wiz-output, #wiz-external-mdx, #wiz-video-topic-label, #wiz-video-topic-intro, #wiz-related-video-1-title, #wiz-related-video-1-id, #wiz-related-video-2-title, #wiz-related-video-2-id, #wiz-related-video-3-title, #wiz-related-video-3-id"
   );
   return Boolean(element);
 }
@@ -388,7 +434,6 @@ function setupArticleWizard() {
   let current = 1;
   let draftRestored = false;
   let externalValidated = false;
-  let selectedClaim = "";
   let focusMode = false;
 
   const progress = document.getElementById("wizard-progress");
@@ -397,6 +442,19 @@ function setupArticleWizard() {
   const preflightEl = document.getElementById("wiz-preflight");
   const blockersEl = document.getElementById("wiz-blockers");
 
+  const collectRelatedVideos = () => {
+    return [1, 2, 3]
+      .map((index) => {
+        const rawId = fieldTrim(`wiz-related-video-${index}-id`);
+        const youtubeId = extractYoutubeId(rawId) || (YOUTUBE_ID_RE.test(rawId) ? rawId : "");
+        return {
+          youtubeId,
+          title: fieldTrim(`wiz-related-video-${index}-title`),
+        };
+      })
+      .filter((item) => item.youtubeId && item.title);
+  };
+
   const collectData = () => {
     const audience = document.getElementById("wiz-audience");
     const isPremium = document.getElementById("wiz-is-premium");
@@ -404,6 +462,7 @@ function setupArticleWizard() {
     const mindShift = document.getElementById("wiz-mind-shift");
     const tone = document.getElementById("wiz-tone");
     const length = document.getElementById("wiz-length");
+    const videoTopicKey = document.getElementById("wiz-video-topic-key");
     const tagsRaw = fieldTrim("wiz-tags");
     const tags = sanitizeTagsFromCsv(tagsRaw);
     const ytRaw = fieldTrim("wiz-youtube");
@@ -427,6 +486,10 @@ function setupArticleWizard() {
       length: length instanceof HTMLSelectElement ? length.value : "",
       tags,
       youtubeId: youtubeParsed,
+      videoTopicKey: videoTopicKey instanceof HTMLSelectElement ? videoTopicKey.value : "",
+      videoTopicLabel: fieldTrim("wiz-video-topic-label"),
+      videoSectionIntro: fieldTrim("wiz-video-topic-intro"),
+      relatedVideos: collectRelatedVideos(),
       body: fieldValue("wiz-body"),
     };
   };
@@ -450,6 +513,7 @@ function setupArticleWizard() {
   };
 
   let paintTagChips = () => {};
+  let syncVideoTopicMeta = () => {};
 
   const initTagChips = () => {
     const container = document.getElementById("wiz-tag-chips");
@@ -503,6 +567,48 @@ function setupArticleWizard() {
     );
 
     paintTagChips();
+  };
+
+  const initVideoTopicSelect = () => {
+    const select = document.getElementById("wiz-video-topic-key");
+    const meta = document.getElementById("wiz-video-topic-meta");
+    if (!(select instanceof HTMLSelectElement) || !(meta instanceof HTMLElement)) {
+      return;
+    }
+    const topics = Array.isArray(window.__NM_WIZARD_BOOT?.videoTopicsForWizard) ? window.__NM_WIZARD_BOOT.videoTopicsForWizard : [];
+    const currentValue = select.value;
+    while (select.options.length > 1) {
+      select.remove(1);
+    }
+    for (const topic of topics) {
+      const option = document.createElement("option");
+      option.value = topic.key;
+      option.textContent = topic.label;
+      select.appendChild(option);
+    }
+    if (currentValue) {
+      select.value = currentValue;
+    }
+
+    syncVideoTopicMeta = () => {
+      const selected = topics.find((topic) => topic.key === select.value);
+      if (!selected) {
+        meta.textContent = "אם בוחרים נושא קיים, המאמר יוכל לשלוף ממנו סרטונים ופלייליסטים בלי למלא הכול ידנית.";
+        return;
+      }
+      meta.textContent = `${selected.label}: ${selected.publicCount} פריטים פתוחים` + (selected.memberCount > 0 ? ` ו-${selected.memberCount} שכבות לחברים.` : ".");
+    };
+
+    select.addEventListener(
+      "change",
+      () => {
+        syncVideoTopicMeta();
+        onWizardFieldActivity();
+      },
+      { signal },
+    );
+
+    syncVideoTopicMeta();
   };
 
   const fillLatestInternalList = () => {
@@ -730,10 +836,77 @@ Follow the brand identity: zero fluff, focus on thought-shifts, NeverMind voice 
 קח את הפרומפט הזה ותייצר פלט MDX מלא. אל תסיר שדות חובה. אל תכניס ניסוח רובוטי. החזר רק קובץ אחד להדבקה.`;
   };
 
+  const buildStructuredPromptFromWizard = () => {
+    const data = collectData();
+    const blockedWords = [...ROBOTIC_BLOCKLIST, ...GENERATOR_EXTRA_BLOCKLIST];
+    return buildStructuredArticlePrompt(data, { blockedWords });
+  };
+
+  const buildQuickPromptFromQuestion = () => {
+    const topic = fieldTrim("wiz-topic") || fieldTrim("wiz-question-schema");
+    if (!topic) {
+      return { ok: false, prompt: "", error: "כדי לבנות פרומפט מהיר צריך לפחות שאלה או נושא אחד בשדה הראשי." };
+    }
+    const blockedWords = [...ROBOTIC_BLOCKLIST, ...GENERATOR_EXTRA_BLOCKLIST];
+    const quickData = buildQuickQuestionPayload(topic);
+    return {
+      ok: true,
+      prompt: buildStructuredArticlePrompt(quickData, { blockedWords }),
+      error: "",
+    };
+  };
+
+  const buildArtifactFromState = () => {
+    const data = collectData();
+    const blockers = runBlockingChecks(data);
+    if (blockers.length > 0) {
+      return { data, errors: blockers, warnings: [], artifact: null, parsedExternal: null };
+    }
+
+    const external = fieldTrim("wiz-external-mdx");
+    if (!external) {
+      const artifact = buildArticleArtifacts(data);
+      return { data, errors: [], warnings: artifact.warnings, artifact, parsedExternal: null };
+    }
+
+    const parsedExternal = parseStructuredArticleJson(external);
+    if (parsedExternal.errors.length > 0 || !parsedExternal.payload) {
+      return { data, errors: parsedExternal.errors, warnings: parsedExternal.warnings, artifact: null, parsedExternal };
+    }
+
+    const artifact = buildArticleArtifacts(data, parsedExternal.payload);
+    const blockedWords = [...ROBOTIC_BLOCKLIST, ...GENERATOR_EXTRA_BLOCKLIST];
+    const blockedPhrases = findBlockedPhrases(artifact.bodyText, blockedWords);
+    const warnings = [...artifact.warnings];
+    const errors = [];
+
+    if (blockedPhrases.length > 0) {
+      errors.push(`נמצאו מילים חסומות בפלט: ${blockedPhrases.join(", ")}`);
+    }
+
+    return { data, errors, warnings, artifact, parsedExternal };
+  };
+
   const onCopyPackage = async () => {
     const saveStatus = document.getElementById("wiz-save-status");
+    const state = buildArtifactFromState();
+    const packageText = state.artifact
+      ? buildCursorPackage(state.artifact)
+      : `# Cursor Article Package
+
+Target file: src/content/articles/${state.data.slug.trim() || "draft-article"}.mdx
+Hero image path: public/assets/images/articles/${state.data.slug.trim() || "draft-article"}.webp
+Action:
+1. Send the prompt below to the external model.
+2. Paste the JSON response back into the generator.
+3. Let the generator build the final MDX locally.
+
+\`\`\`text
+${buildStructuredPromptFromWizard()}
+\`\`\`
+`;
     try {
-      await navigator.clipboard.writeText(buildQuickPackage());
+      await navigator.clipboard.writeText(packageText);
       if (saveStatus instanceof HTMLElement) {
         saveStatus.textContent = "חבילת יצירה מהירה הועתקה. אפשר להדביק במודל חיצוני.";
       }
@@ -749,6 +922,41 @@ Follow the brand identity: zero fluff, focus on thought-shifts, NeverMind voice 
     const result = document.getElementById("wiz-external-result");
     const saveStatus = document.getElementById("wiz-save-status");
     if (!(result instanceof HTMLElement)) return;
+    const output = document.getElementById("wiz-output");
+    const state = buildArtifactFromState();
+
+    externalValidated = state.errors.length === 0 && Boolean(state.artifact);
+    if (state.errors.length > 0 || !state.artifact) {
+      result.classList.remove("hidden");
+      result.textContent = ["חסימות:", ...state.errors.map((item) => `• ${item}`)].join("\n");
+      if (saveStatus instanceof HTMLElement) {
+        saveStatus.textContent = "יש חסימות לפני בניית ה־MDX.";
+      }
+      return;
+    }
+
+    if (output instanceof HTMLTextAreaElement) {
+      output.value = state.artifact.mdx;
+    }
+
+    result.classList.remove("hidden");
+    result.textContent =
+      state.warnings.length > 0
+        ? ["אזהרות:", ...state.warnings.map((item) => `• ${item}`)].join("\n")
+        : "אין אזהרות.";
+
+    if (saveStatus instanceof HTMLElement) {
+      saveStatus.textContent = "ה־JSON נוקה והפך ל־MDX מוכן.";
+    }
+
+    const currentGithubLink = document.getElementById("wiz-open-github");
+    if (currentGithubLink instanceof HTMLAnchorElement && state.artifact.slug) {
+      const fileName = `${state.artifact.slug}.mdx`;
+      const current = new URL(currentGithubLink.href);
+      current.searchParams.set("filename", fileName);
+      currentGithubLink.href = current.toString();
+    }
+    return;
 
     const check = validateExternalMdx(external);
     externalValidated = check.errors.length === 0;
@@ -774,6 +982,11 @@ Follow the brand identity: zero fluff, focus on thought-shifts, NeverMind voice 
   };
 
   const onInvertClaim = () => {
+    const saveStatus = document.getElementById("wiz-save-status");
+    if (saveStatus instanceof HTMLElement) {
+      saveStatus.textContent = "בדיקת ההיפוך הידנית כבר לא נדרשת. ה־JSON החדש חייב לכלול היפוך בתוך הפלט.";
+    }
+    return;
     const wrap = document.getElementById("wiz-inversion-wrap");
     const source = document.getElementById("wiz-claim-source");
     if (!(wrap instanceof HTMLElement) || !(source instanceof HTMLElement)) return;
@@ -809,7 +1022,7 @@ Follow the brand identity: zero fluff, focus on thought-shifts, NeverMind voice 
       return;
     }
     const text = out instanceof HTMLTextAreaElement ? out.value.trim() : "";
-    body.textContent = text || "(ריק - לחץ קודם על לזקק למאמר)";
+    body.textContent = text || "(ריק - לחץ קודם על בניית הפלט)";
     dialog.showModal();
   };
 
@@ -830,12 +1043,82 @@ Follow the brand identity: zero fluff, focus on thought-shifts, NeverMind voice 
     if (!(output instanceof HTMLTextAreaElement)) {
       return;
     }
+    output.value = buildStructuredPromptFromWizard();
+    const saveStatus = document.getElementById("wiz-save-status");
+    if (saveStatus instanceof HTMLElement) {
+      saveStatus.textContent = "נבנה JSON מונחה למודל חיצוני. השלב הבא הוא להדביק כאן את פלט ה-JSON כדי להפוך אותו ל-MDX סופי.";
+    }
+    return;
     output.value = buildPrompt();
+  };
+
+  const onGenerateQuick = async () => {
+    const output = document.getElementById("wiz-output");
+    const saveStatus = document.getElementById("wiz-save-status");
+    const quickButton = document.getElementById("wiz-generate-quick");
+    if (!(output instanceof HTMLTextAreaElement)) {
+      return;
+    }
+    const quick = buildQuickPromptFromQuestion();
+    if (!quick.ok) {
+      if (saveStatus instanceof HTMLElement) {
+        saveStatus.textContent = quick.error;
+      }
+      return;
+    }
+    output.value = quick.prompt;
+    try {
+      await navigator.clipboard.writeText(quick.prompt);
+      if (quickButton instanceof HTMLButtonElement) {
+        const original = quickButton.textContent || "פרומפט מהיר";
+        quickButton.textContent = "הועתק";
+        window.setTimeout(() => {
+          quickButton.textContent = original;
+        }, 1800);
+      }
+      if (saveStatus instanceof HTMLElement) {
+        saveStatus.textContent = "נבנה פרומפט מהיר משאלה בלבד והועתק ללוח. אפשר להדביק אותו ישירות במנוע AI חיצוני.";
+      }
+    } catch {
+      if (saveStatus instanceof HTMLElement) {
+        saveStatus.textContent = "נבנה פרומפט מהיר משאלה בלבד. אפשר להעתיק אותו מהפלט.";
+      }
+    }
   };
 
   const onCopyAllMdx = async () => {
     const copyBtn = document.getElementById("wiz-copy-all-mdx");
     const saveStatus = document.getElementById("wiz-save-status");
+    const state = buildArtifactFromState();
+    if (state.errors.length > 0 || !state.artifact) {
+      if (saveStatus instanceof HTMLElement) {
+        saveStatus.textContent = ["לא ניתן להעתיק לפני תיקון:", ...state.errors.map((item) => `• ${item}`)].join("\n");
+      }
+      return;
+    }
+    const finalText = state.artifact.mdx;
+    const output = document.getElementById("wiz-output");
+    if (output instanceof HTMLTextAreaElement) {
+      output.value = finalText;
+    }
+    try {
+      await navigator.clipboard.writeText(finalText);
+      if (copyBtn instanceof HTMLButtonElement) {
+        const originalText = copyBtn.textContent || "העתק MDX";
+        copyBtn.textContent = "הועתק";
+        window.setTimeout(() => {
+          copyBtn.textContent = originalText;
+        }, 2000);
+      }
+      if (saveStatus instanceof HTMLElement) {
+        saveStatus.textContent = "קוד MDX סופי הועתק ללוח.";
+      }
+    } catch {
+      if (saveStatus instanceof HTMLElement) {
+        saveStatus.textContent = "לא ניתן להעתיק כרגע.";
+      }
+    }
+    return;
     const data = collectData();
     const blockers = runBlockingChecks(data);
     if (blockers.length > 0) {
@@ -904,6 +1187,7 @@ Follow the brand identity: zero fluff, focus on thought-shifts, NeverMind voice 
     const mindShift = document.getElementById("wiz-mind-shift");
     const tone = document.getElementById("wiz-tone");
     const length = document.getElementById("wiz-length");
+    const videoTopicKey = document.getElementById("wiz-video-topic-key");
 
     try {
       const raw = localStorage.getItem(storageKey);
@@ -935,7 +1219,19 @@ Follow the brand identity: zero fluff, focus on thought-shifts, NeverMind voice 
       if (length instanceof HTMLSelectElement) length.value = normalizeLengthValue(data.length ?? "קצר");
       setFieldValue("wiz-tags", String(data.tags ?? ""));
       setFieldValue("wiz-youtube", String(data.youtubeId ?? ""));
+      if (videoTopicKey instanceof HTMLSelectElement) {
+        videoTopicKey.value = String(data.videoTopicKey ?? "");
+      }
+      setFieldValue("wiz-video-topic-label", String(data.videoTopicLabel ?? ""));
+      setFieldValue("wiz-video-topic-intro", String(data.videoSectionIntro ?? ""));
+      const relatedVideos = Array.isArray(data.relatedVideos) ? data.relatedVideos : [];
+      for (const index of [1, 2, 3]) {
+        const item = relatedVideos[index - 1] || {};
+        setFieldValue(`wiz-related-video-${index}-title`, String(item.title ?? ""));
+        setFieldValue(`wiz-related-video-${index}-id`, String(item.youtubeId ?? ""));
+      }
       setFieldValue("wiz-body", String(data.body ?? ""));
+      syncVideoTopicMeta();
     } catch {
       /* ignore */
     }
@@ -966,7 +1262,19 @@ Follow the brand identity: zero fluff, focus on thought-shifts, NeverMind voice 
   };
 
   initTagChips();
+  initVideoTopicSelect();
   fillLatestInternalList();
+
+  const generateButton = document.getElementById("wiz-generate");
+  if (generateButton instanceof HTMLButtonElement && !document.getElementById("wiz-generate-quick")) {
+    const quickButton = document.createElement("button");
+    quickButton.type = "button";
+    quickButton.id = "wiz-generate-quick";
+    quickButton.className =
+      "inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-transparent px-6 py-3 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]";
+    quickButton.textContent = "פרומפט מהיר משאלה בלבד";
+    generateButton.insertAdjacentElement("afterend", quickButton);
+  }
 
   const ytEl = document.getElementById("wiz-youtube");
   if (ytEl instanceof HTMLInputElement) {
@@ -1044,7 +1352,7 @@ Follow the brand identity: zero fluff, focus on thought-shifts, NeverMind voice 
       }
 
       const button = target.closest(
-        "#wiz-next, #wiz-back, #wiz-generate, #wiz-copy-all-mdx, #wiz-save, #wiz-download-mdx, #wiz-copy-package, #wiz-validate-external, #wiz-invert-claim, #wiz-focus-toggle, #wiz-mobile-preview",
+        "#wiz-next, #wiz-back, #wiz-generate, #wiz-generate-quick, #wiz-copy-all-mdx, #wiz-save, #wiz-download-mdx, #wiz-copy-package, #wiz-validate-external, #wiz-invert-claim, #wiz-focus-toggle, #wiz-mobile-preview",
       );
       if (!button || !root.contains(button)) {
         return;
@@ -1054,6 +1362,7 @@ Follow the brand identity: zero fluff, focus on thought-shifts, NeverMind voice 
       if (button.id === "wiz-back") goBack();
       else if (button.id === "wiz-next") goNext();
       else if (button.id === "wiz-generate") onGenerate();
+      else if (button.id === "wiz-generate-quick") void onGenerateQuick();
       else if (button.id === "wiz-copy-all-mdx") void onCopyAllMdx();
       else if (button.id === "wiz-save") void onSave();
       else if (button.id === "wiz-copy-package") void onCopyPackage();
@@ -1070,6 +1379,30 @@ Follow the brand identity: zero fluff, focus on thought-shifts, NeverMind voice 
     const saveStatus = document.getElementById("wiz-save-status");
     const data = collectData();
     persistDraft();
+    const state = buildArtifactFromState();
+    if (state.errors.length > 0 || !state.artifact) {
+      if (saveStatus instanceof HTMLElement) {
+        saveStatus.textContent = ["לא ניתן להוריד לפני תיקון:", ...state.errors.map((item) => `• ${item}`)].join("\n");
+      }
+      return;
+    }
+
+    const finalRaw = state.artifact.mdx;
+    const finalSlug = state.artifact.slug || data.slug.trim() || "draft-article";
+    const finalBlob = new Blob([finalRaw], { type: "text/markdown;charset=utf-8" });
+    const finalUrl = URL.createObjectURL(finalBlob);
+    const finalAnchor = document.createElement("a");
+    finalAnchor.href = finalUrl;
+    finalAnchor.download = `${finalSlug}.mdx`;
+    finalAnchor.rel = "noopener";
+    document.body.appendChild(finalAnchor);
+    finalAnchor.click();
+    finalAnchor.remove();
+    window.setTimeout(() => URL.revokeObjectURL(finalUrl), 1500);
+    if (saveStatus instanceof HTMLElement) {
+      saveStatus.textContent = "קובץ MDX סופי הורד.";
+    }
+    return;
     const external = fieldValue("wiz-external-mdx").trim();
     const inversion = fieldTrim("wiz-claim-inversion");
     if (!external) {

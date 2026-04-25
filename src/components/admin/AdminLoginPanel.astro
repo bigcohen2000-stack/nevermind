@@ -1,0 +1,169 @@
+---
+interface Props {
+  onLoginSuccess?: string;
+}
+
+const { onLoginSuccess = "/admin/" } = Astro.props;
+---
+
+<section
+  class="flex min-h-screen items-center justify-center bg-[var(--nm-bg)] px-4 py-8"
+  dir="rtl"
+>
+  <div class="w-full max-w-md space-y-6">
+    <!-- Logo / Branding -->
+    <div class="space-y-2 text-center">
+      <p class="text-sm font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">
+        לוח בקרה
+      </p>
+      <h1 class="text-2xl font-semibold text-[var(--nm-fg)]">NeverMind Admin</h1>
+      <p class="text-sm text-[color-mix(in_srgb,var(--nm-fg)_65%,var(--nm-bg))]">
+        הכנס את קודך כדי להיכנס לניהול
+      </p>
+    </div>
+
+    <!-- Login Form -->
+    <form
+      id="admin-login-form"
+      class="space-y-4 rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 p-6 shadow-sm"
+      novalidate
+    >
+      <!-- Code Input -->
+      <div class="space-y-2">
+        <label
+          for="admin-code"
+          class="block text-sm font-semibold text-[var(--nm-fg)]"
+        >
+          קוד גישה
+        </label>
+        <input
+          id="admin-code"
+          type="text"
+          name="code"
+          required
+          placeholder="הקוד שקיבלת"
+          autocomplete="off"
+          maxlength="20"
+          class="w-full rounded-lg border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-white px-4 py-3 text-right text-[var(--nm-fg)] placeholder-[color-mix(in_srgb,var(--nm-fg)_45%,var(--nm-bg))] transition focus:border-[var(--nm-accent)] focus:outline-none focus:ring-2 focus:ring-[color-mix(in_srgb,var(--nm-accent)_20%,transparent)]"
+        />
+      </div>
+
+      <!-- Phone Input (Optional) -->
+      <div class="space-y-2">
+        <label
+          for="admin-phone"
+          class="block text-sm font-semibold text-[var(--nm-fg)]"
+        >
+          טלפון (אופציונלי)
+        </label>
+        <input
+          id="admin-phone"
+          type="tel"
+          name="phone"
+          placeholder="+972501234567"
+          autocomplete="tel"
+          class="w-full rounded-lg border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-white px-4 py-3 text-right text-[var(--nm-fg)] placeholder-[color-mix(in_srgb,var(--nm-fg)_45%,var(--nm-bg))] transition focus:border-[var(--nm-accent)] focus:outline-none focus:ring-2 focus:ring-[color-mix(in_srgb,var(--nm-accent)_20%,transparent)]"
+        />
+      </div>
+
+      <!-- Error Message -->
+      <div
+        id="admin-error"
+        class="hidden rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-right text-sm text-red-800"
+        role="alert"
+      >
+        <p id="admin-error-text" class="font-semibold"></p>
+      </div>
+
+      <!-- Loading State -->
+      <div id="admin-loading" class="hidden animate-pulse space-y-2">
+        <div class="h-10 rounded-lg bg-gray-200"></div>
+      </div>
+
+      <!-- Submit Button -->
+      <button
+        id="admin-submit"
+        type="submit"
+        class="w-full rounded-lg bg-[var(--nm-accent)] px-4 py-3 text-center font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)] focus:outline-none focus:ring-2 focus:ring-[var(--nm-accent)] focus:ring-offset-2 disabled:opacity-50"
+      >
+        כניסה
+      </button>
+    </form>
+
+    <!-- Info -->
+    <div class="rounded-lg border border-[color-mix(in_srgb,var(--nm-accent)_20%,transparent)] bg-[color-mix(in_srgb,var(--nm-accent)_6%,var(--nm-bg))] px-4 py-3 text-right text-sm text-[var(--nm-fg)]">
+      <p>
+        <span class="font-semibold">טיפ:</span>
+        קוד הגישה יישמר בדפדפן שלך למשך שבוע. התנתק על מחשב ציבורי.
+      </p>
+    </div>
+  </div>
+</section>
+
+<script define:vars={{ onLoginSuccess }}>
+  import { AdminAuth } from "../../lib/admin-auth";
+
+  document.addEventListener("astro:page-load", () => {
+    const form = document.getElementById("admin-login-form");
+    const codeInput = document.getElementById("admin-code");
+    const phoneInput = document.getElementById("admin-phone");
+    const submitBtn = document.getElementById("admin-submit");
+    const errorDiv = document.getElementById("admin-error");
+    const errorText = document.getElementById("admin-error-text");
+    const loadingDiv = document.getElementById("admin-loading");
+
+    if (!form || !submitBtn) return;
+
+    const showError = (msg) => {
+      if (errorText) errorText.textContent = msg;
+      errorDiv?.classList.remove("hidden");
+      if (loadingDiv) loadingDiv.classList.add("hidden");
+      submitBtn.disabled = false;
+    };
+
+    const hideError = () => {
+      errorDiv?.classList.add("hidden");
+    };
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      hideError();
+
+      const code = codeInput?.value?.trim() || "";
+      const phone = phoneInput?.value?.trim() || "";
+
+      if (!code) {
+        showError("חסר קוד גישה.");
+        return;
+      }
+
+      if (code.length < 4) {
+        showError("קוד קצר מדי.");
+        return;
+      }
+
+      submitBtn.disabled = true;
+      if (loadingDiv) loadingDiv.classList.remove("hidden");
+
+      try {
+        // In a real app, you'd validate against a backend
+        // For now, we simulate a successful login with any valid code
+        const user = {
+          id: code,
+          code: code,
+          phone: phone || "unknown",
+          role: code === "admin" ? "admin" : "editor",
+          lastLogin: Date.now(),
+        };
+
+        AdminAuth.login(user);
+        window.location.href = onLoginSuccess || "/admin/";
+      } catch (err) {
+        showError("שגיאה בכניסה. נסה שוב.");
+      }
+    });
+
+    // Auto-focus code input
+    if (codeInput) codeInput.focus();
+  });
+</script>

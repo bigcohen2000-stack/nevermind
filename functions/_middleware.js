@@ -1,5 +1,6 @@
 const CANONICAL_HOST = "www.nevermind.co.il";
 const APEX_HOST = "nevermind.co.il";
+const PRIVATE_API_PREFIXES = ["/api/admin", "/api/dashboard", "/api/club-admin", "/api/site"];
 
 function shouldRedirectToCanonical(url) {
   if (url.hostname !== APEX_HOST) return false;
@@ -13,6 +14,19 @@ function shouldRedirectToCanonical(url) {
   );
 }
 
+function withApiSecurityHeaders(pathname, response) {
+  if (!pathname.startsWith("/api/")) return response;
+  const headers = new Headers(response.headers);
+  headers.set("X-Robots-Tag", "noindex, nofollow, noarchive, nosnippet");
+  const isPrivateApi = PRIVATE_API_PREFIXES.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));
+  headers.set("Cache-Control", isPrivateApi ? "private, no-store" : "no-store");
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  });
+}
+
 export async function onRequest(context) {
   const url = new URL(context.request.url);
 
@@ -21,6 +35,7 @@ export async function onRequest(context) {
     return Response.redirect(url.toString(), 302);
   }
 
-  return context.next();
+  const response = await context.next();
+  return withApiSecurityHeaders(url.pathname, response);
 }
 

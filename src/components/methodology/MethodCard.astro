@@ -8,7 +8,7 @@ interface Props {
 const { title, items, class: className = "" } = Astro.props;
 ---
 
-<div class={`rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 p-6 shadow-[0_20px_60px_rgba(26,26,26,0.05)] ${className}`}>
+<div class={`rounded-[var(--nm-radius-lg)] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 p-6 shadow-[var(--nm-shadow-md)] ${className}`}>
   <h3 class="text-[clamp(1.45rem,1.3rem+0.6vw,1.95rem)] font-semibold">{title}</h3>
   <ul class="mt-4 space-y-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))]">
     {items.map((item) => (

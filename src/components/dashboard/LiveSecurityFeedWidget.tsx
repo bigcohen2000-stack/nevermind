@@ -29,6 +29,18 @@ type Props = {
   endpoint: string;
 };
 
+type OverviewFraudFlag = {
+  phone?: string;
+  memberIpCount?: number;
+  passwordIpCount?: number;
+  flaggedAt?: string;
+};
+
+type OverviewPayload = {
+  ok?: boolean;
+  fraudFlags?: OverviewFraudFlag[];
+};
+
 function severityClass(value: Alarm["severity"]): string {
   if (value === "high") return "border-[#D42B2B]/25 bg-[#D42B2B]/8 text-[#D42B2B]";
   if (value === "medium") return "border-amber-600/20 bg-amber-600/10 text-amber-800";
@@ -41,14 +53,96 @@ function severityLabel(value: Alarm["severity"]): string {
   return "נמוך";
 }
 
+function attemptsForFlag(item: OverviewFraudFlag) {
+  return Math.max(Number(item?.memberIpCount) || 1, Number(item?.passwordIpCount) || 1);
+}
+
+function severityFromCounts(item: OverviewFraudFlag): Alarm["severity"] {
+  const peak = Math.max(Number(item?.memberIpCount) || 0, Number(item?.passwordIpCount) || 0);
+  if (peak >= 3) return "high";
+  if (peak >= 2) return "medium";
+  return "low";
+}
+
+function noteForFlag(item: OverviewFraudFlag) {
+  const memberCount = Number(item?.memberIpCount) || 0;
+  const passwordCount = Number(item?.passwordIpCount) || 0;
+  if (passwordCount >= 3) return "אותה סיסמה הופיעה מכמה כתובות רשת בחלון קצר";
+  if (memberCount >= 2) return "אותו חבר הופיע מכמה כתובות רשת קרובות בזמן";
+  return "נרשם דפוס שדורש בדיקה ידנית";
+}
+
+function readOverviewPayload(): OverviewPayload | null {
+  if (typeof window === "undefined") return null;
+  const payload = window.__NM_ADMIN_OVERVIEW__;
+  return payload && payload.ok === true ? payload : null;
+}
+
+function mapOverviewToPayload(source: OverviewPayload): Payload {
+  const fraudFlags = Array.isArray(source?.fraudFlags) ? source.fraudFlags : [];
+  const alarms = fraudFlags.slice(0, 5).map((item) => ({
+    phone: String(item?.phone || "ללא זיהוי"),
+    attempts: attemptsForFlag(item),
+    severity: severityFromCounts(item),
+  }));
+
+  const events = fraudFlags.length
+    ? fraudFlags.slice(0, 8).map((item, index) => {
+        const attempts = attemptsForFlag(item);
+        const severity = severityFromCounts(item);
+        return {
+          id: `${item?.phone || "flag"}-${item?.flaggedAt || index}`,
+          phone: String(item?.phone || "ללא זיהוי"),
+          createdAt: String(item?.flaggedAt || new Date().toISOString()),
+          label: attempts >= 3 ? "דפוס גישה חריג" : "בדיקת גישה חוזרת",
+          note: noteForFlag(item),
+          attempts,
+          severity,
+          isAlarm: severity === "high",
+        };
+      })
+    : [
+        {
+          id: "quiet-window",
+          phone: "המערכת",
+          createdAt: new Date().toISOString(),
+          label: "אין Flag פתוח כרגע",
+          note: "לא זוהו דפוסים חריגים בנתוני המועדון הפעילים",
+          attempts: 0,
+          severity: "low" as const,
+          isAlarm: false,
+        },
+      ];
+
+  return {
+    ok: true,
+    source: "worker:club_activity:fallback",
+    generatedAt: new Date().toISOString(),
+    alarms,
+    events,
+  };
+}
+
 export default function LiveSecurityFeedWidget({ endpoint }: Props) {
   const [payload, setPayload] = useState<Payload | null>(null);
   const [error, setError] = useState("");
 
   useEffect(() => {
     let cancelled = false;
+    let timer: number | null = null;
+
+    const applyOverview = (overview: OverviewPayload | null) => {
+      if (!overview || overview.ok !== true || cancelled) return false;
+      setPayload(mapOverviewToPayload(overview));
+      setError("");
+      return true;
+    };
 
     const load = async () => {
+      if (applyOverview(readOverviewPayload())) {
+        return;
+      }
+
       try {
         const response = await fetch(endpoint, { headers: { accept: "application/json" }, cache: "no-store" });
         const data = (await response.json()) as Payload;
@@ -61,17 +155,39 @@ export default function LiveSecurityFeedWidget({ endpoint }: Props) {
         }
       } catch {
         if (!cancelled) {
-          setError("לא הצלחנו לעדכן את פיד האבטחה כרגע");
+          setError(payload ? "" : "כרגע אין נתון חי זמין. כשה־worker יחזיר flags, הם יופיעו כאן.");
         }
       }
     };
 
+    const schedule = () => {
+      if (timer) window.clearInterval(timer);
+      if (document.visibilityState === "hidden") return;
+      timer = window.setInterval(load, 30000);
+    };
+
+    const onOverview = (event: Event) => {
+      const detail = (event as CustomEvent<OverviewPayload | null>).detail;
+      applyOverview(detail ?? null);
+    };
+
+    const onVisibilityChange = () => {
+      schedule();
+      if (document.visibilityState === "visible") {
+        void load();
+      }
+    };
+
     void load();
-    const timer = window.setInterval(load, 12000);
+    schedule();
+    window.addEventListener("nm-admin-overview", onOverview as EventListener);
+    document.addEventListener("visibilitychange", onVisibilityChange);
 
     return () => {
       cancelled = true;
-      window.clearInterval(timer);
+      if (timer) window.clearInterval(timer);
+      window.removeEventListener("nm-admin-overview", onOverview as EventListener);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
     };
   }, [endpoint]);
 
@@ -90,7 +206,7 @@ export default function LiveSecurityFeedWidget({ endpoint }: Props) {
         ) : null}
       </div>
 
-      {error ? <p className="rounded-[22px] border border-[#D42B2B]/18 bg-[#D42B2B]/6 px-4 py-3 text-sm text-[#D42B2B]">{error}</p> : null}
+      {error ? <p className="rounded-[22px] border border-black/10 bg-black/4 px-4 py-3 text-sm text-black/62">{error}</p> : null}
 
       <div className="space-y-3">
         {(payload?.events ?? Array.from({ length: 4 })).map((event, index) => (

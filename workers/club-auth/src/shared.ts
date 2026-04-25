@@ -15,6 +15,7 @@ export const MAX_DEEP_PAGE_VIEWS = 200;
 export const INTEGRITY_REPORTS_KEY = "feedback:integrity_reports";
 export const MAX_INTEGRITY_REPORTS = 120;
 export const PROGRESS_TOKEN_MAX_MS = 30 * 24 * 60 * 60 * 1000;
+export const ACTIVE_NOW_WINDOW_MS = 20 * 60 * 1000;
 
 export async function checkRateLimit(
   env: Env,
@@ -74,6 +75,22 @@ export function normalizePhone(raw: string): string {
     return `0${digits.slice(3)}`;
   }
   return digits;
+}
+
+export function normalizeIdentityName(raw: string): string {
+  return String(raw ?? "")
+    .trim()
+    .replace(/\s+/g, " ")
+    .slice(0, 80);
+}
+
+export function buildSharedIdentityKey(fullName: string, phone: string): string {
+  const normalizedName = normalizeIdentityName(fullName)
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}]+/gu, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 60);
+  return `shared:${normalizedName || "member"}:${phone}`;
 }
 
 export function isExpired(expiresAt: string): boolean {

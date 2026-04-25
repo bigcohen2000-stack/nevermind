@@ -24,6 +24,7 @@ type NmClubSession = {
   lastLoginAt?: string;
   fraudFlag?: boolean;
   liveStatus?: string;
+  identityKey?: string;
 };
 
 type NmUnlockClientConfig = {
@@ -36,6 +37,32 @@ type NmUnlockClientConfig = {
   joinOfferHref: string;
   launchOfferPrice: number;
   pulseEndpoint: string;
+};
+
+type NmClubOverviewLogin = {
+  memberName?: string;
+  phone?: string;
+  ipFingerprint?: string;
+  path?: string;
+  userAgent?: string;
+  seenAt?: string;
+  source?: string;
+  identityKey?: string;
+  eventType?: string;
+  activeNow?: string;
+};
+
+type NmClubOverviewFraudFlag = {
+  phone?: string;
+  memberIpCount?: number;
+  passwordIpCount?: number;
+  flaggedAt?: string;
+};
+
+type NmClubOverviewPayload = {
+  ok?: boolean;
+  recentLogins?: NmClubOverviewLogin[];
+  fraudFlags?: NmClubOverviewFraudFlag[];
 };
 
 interface Window {
@@ -68,6 +95,7 @@ interface Window {
     title?: string;
     url?: string;
   }) => void;
+  __NM_ADMIN_OVERVIEW__?: NmClubOverviewPayload | null;
   __NM_UNLOCK_CONFIG__?: NmUnlockClientConfig;
   __nmReportConnectivityIssue?: (message: string) => void;
   __nmClearConnectivityIssue?: () => void;

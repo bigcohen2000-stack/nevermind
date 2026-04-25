@@ -30,6 +30,8 @@ export type SharedAccessLogRequest = {
   phone?: string;
   fullName?: string;
   path?: string;
+  identityKey?: string;
+  eventType?: "login" | "heartbeat";
 };
 
 export type StoredMember = {
@@ -51,6 +53,9 @@ export type ActivityEntry = {
   phone: string;
   memberName?: string;
   userAgent: string;
+  source?: "LIVE" | "SHARED";
+  identityKey?: string;
+  eventType?: "login" | "heartbeat";
 };
 
 export type FraudFlagEntry = {

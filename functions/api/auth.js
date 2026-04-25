@@ -1,4 +1,4 @@
-﻿const GITHUB_AUTHORIZE_URL = "https://github.com/login/oauth/authorize";
+const GITHUB_AUTHORIZE_URL = "https://github.com/login/oauth/authorize";
 
 function buildCookie(name, value, options = {}) {
   const parts = [`${name}=${value}`];
@@ -14,7 +14,13 @@ export async function onRequestGet(context) {
   const { request, env } = context;
 
   if (!env.GITHUB_CLIENT_ID || !env.GITHUB_CLIENT_SECRET) {
-    return new Response("Missing GITHUB_CLIENT_ID or GITHUB_CLIENT_SECRET", { status: 500 });
+    return new Response("Admin OAuth is misconfigured: missing GITHUB_CLIENT_ID or GITHUB_CLIENT_SECRET.", {
+      status: 503,
+      headers: {
+        "content-type": "text/plain; charset=utf-8",
+        "cache-control": "no-store",
+      },
+    });
   }
 
   const url = new URL(request.url);

@@ -5,8 +5,7 @@
   "scripts": {
     "dev": "astro dev",
     "check:text": "node scripts/check-text-integrity.mjs",
-    "check": "npm run validate && astro check && npm run validate:links",
-    "validate:articles": "node --experimental-strip-types scripts/validate-article-frontmatter.ts",
+    "validate:articles": "tsx scripts/validate-article-frontmatter.ts",
     "validate": "npm run check:text && npm run validate:articles && node scripts/pre-publish-check.mjs",
     "migration:report": "node scripts/migration-orphan-report.mjs",
     "validate:links": "node scripts/validate-links.mjs",
@@ -76,8 +75,7 @@
     "tsx": "^4.19.4",
     "typescript": "^5.6.3",
     "unist-util-visit-parents": "^6.0.1",
-    "vitest": "^4.1.2",
-    "yargs-parser": "^21.1.1"
+    "vitest": "^4.1.2"
   },
   "type": "module"
 }

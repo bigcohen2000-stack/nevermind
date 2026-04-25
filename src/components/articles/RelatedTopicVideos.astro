@@ -1,0 +1,257 @@
+---
+import { getVideoTopic } from "../../data/video-topics";
+import VideoPlayer from "../VideoPlayer.astro";
+
+interface LegacyVideoItem {
+  youtubeId: string;
+  title: string;
+  locked?: boolean;
+}
+
+interface MediaItem {
+  type?: "video" | "playlist";
+  youtubeId?: string;
+  url?: string;
+  title: string;
+  locked?: boolean;
+}
+
+interface Props {
+  topicKey?: string;
+  videos?: LegacyVideoItem[];
+  items?: MediaItem[];
+  topicLabel?: string;
+  intro?: string;
+  isPremium?: boolean;
+  lockPlaylist?: boolean;
+  premiumPlaylistUrl?: string;
+  premiumPlaylistTitle?: string;
+  premiumPlaylistIntro?: string;
+}
+
+const {
+  topicKey = "",
+  videos = [],
+  items = [],
+  topicLabel = "",
+  intro = "",
+  isPremium = false,
+  lockPlaylist,
+  premiumPlaylistUrl = "",
+  premiumPlaylistTitle = "פלייליסט ההמשך לחברי המועדון",
+  premiumPlaylistIntro = "יש כאן רצף וידאו נוסף שמעמיק את אותו מנגנון. הוא נפתח רק עם גישה פעילה למועדון.",
+} = Astro.props as Props;
+
+const topic = getVideoTopic(topicKey);
+
+const normalizeVideo = (item: LegacyVideoItem): MediaItem | null => {
+  const youtubeId = String(item?.youtubeId || "").trim();
+  const title = String(item?.title || "").trim();
+  if (!youtubeId || !title) return null;
+  return {
+    type: "video",
+    youtubeId,
+    title,
+    locked: item?.locked === true,
+  };
+};
+
+const normalizeMedia = (item: MediaItem): MediaItem | null => {
+  const type = item?.type === "playlist" ? "playlist" : "video";
+  const title = String(item?.title || "").trim();
+  const youtubeId = String(item?.youtubeId || "").trim();
+  const url = String(item?.url || "").trim();
+  if (!title) return null;
+  if (type === "video" && !youtubeId) return null;
+  if (type === "playlist" && !url) return null;
+  return {
+    type,
+    title,
+    youtubeId,
+    url,
+    locked: item?.locked === true,
+  };
+};
+
+const shouldLockPlaylist = typeof lockPlaylist === "boolean" ? lockPlaylist : isPremium;
+
+const legacyItems: MediaItem[] = Array.isArray(videos)
+  ? videos.map(normalizeVideo).filter((item): item is MediaItem => item !== null)
+  : [];
+
+const suppliedItems: MediaItem[] = Array.isArray(items)
+  ? items.map(normalizeMedia).filter((item): item is MediaItem => item !== null)
+  : [];
+
+const topicItems: MediaItem[] = Array.isArray(topic?.items)
+  ? topic.items
+      .map((item) =>
+        normalizeMedia({
+          type: item.type,
+          youtubeId: item.youtubeId,
+          url: item.url,
+          title: item.title,
+          locked: item.access === "members",
+        }),
+      )
+      .filter((item): item is MediaItem => item !== null)
+  : [];
+
+const allItems = [...suppliedItems, ...legacyItems, ...topicItems];
+
+if (premiumPlaylistUrl) {
+  allItems.push({
+    type: "playlist",
+    title: premiumPlaylistTitle,
+    url: premiumPlaylistUrl,
+    locked: shouldLockPlaylist,
+  });
+}
+
+const resolvedTopicLabel = topicLabel || topic?.label || "עוד סרטונים בנושא";
+const resolvedIntro =
+  intro ||
+  topic?.intro ||
+  "אם המאמר הזה נוגע באותו מנגנון, אפשר להמשיך מכאן לעוד פירוקים קצרים וישירים.";
+
+const publicItems = allItems.filter((item) => item.locked !== true).slice(0, 8);
+const lockedItems = allItems.filter((item) => item.locked === true).slice(0, 8);
+const hasLockedItems = lockedItems.length > 0;
+---
+
+{
+  publicItems.length || lockedItems.length ? (
+    <section
+      class="mt-8 rounded-[1.75rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/88 px-5 py-6 shadow-[0_14px_28px_rgba(26,26,26,0.03)]"
+      data-related-topic-videos
+      data-related-topic-has-locked={hasLockedItems ? "true" : "false"}
+    >
+      <div class="space-y-2">
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">וידאו</p>
+        <h2 class="nm-title-balance text-xl font-semibold text-[var(--nm-fg)]">{resolvedTopicLabel}</h2>
+        <p class="nm-copy-balanced max-w-3xl text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">{resolvedIntro}</p>
+      </div>
+
+      {hasLockedItems ? (
+        <div class="mt-4 rounded-[1.35rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-5 py-5" data-related-topic-locked-note>
+          <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_76%,var(--nm-bg))]">
+            יש כאן שכבת המשך על אותו נושא. מה שפתוח נשאר פתוח לכולם. מה שנעול מופיע רק אחרי גישה פעילה למועדון.
+          </p>
+          <div class="mt-4 flex flex-wrap justify-end gap-3">
+            <a
+              href="/premium-access/"
+              class="inline-flex min-h-[44px] items-center justify-center rounded-full bg-[var(--nm-accent)] px-5 py-2.5 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]"
+            >
+              בדקו את הגישה
+            </a>
+          </div>
+        </div>
+      ) : null}
+
+      {publicItems.length ? (
+        <div class="mt-5 grid gap-4 md:grid-cols-2" data-related-topic-public-grid>
+          {publicItems.map((item) =>
+            item?.type === "playlist" ? (
+              <div class="space-y-3 rounded-[1.35rem] border border-[color-mix(in_srgb,var(--nm-accent)_18%,transparent)] bg-[var(--nm-tint)] p-4">
+                <p class="text-sm font-semibold text-[var(--nm-fg)]">{item.title}</p>
+                <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">{premiumPlaylistIntro}</p>
+                <div class="flex justify-end">
+                  <a
+                    href={item.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="inline-flex min-h-[44px] items-center justify-center rounded-full bg-[var(--nm-accent)] px-5 py-2.5 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]"
+                  >
+                    לפתוח פלייליסט
+                  </a>
+                </div>
+              </div>
+            ) : (
+              <div class="space-y-3 rounded-[1.35rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-4">
+                <p class="text-sm font-semibold text-[var(--nm-fg)]">{item.title}</p>
+                <VideoPlayer youtubeId={item.youtubeId || ""} title={item.title} />
+              </div>
+            ),
+          )}
+        </div>
+      ) : null}
+
+      {lockedItems.length ? (
+        <div class="mt-5 hidden grid gap-4 md:grid-cols-2" data-related-topic-locked-grid>
+          {lockedItems.map((item) =>
+            item?.type === "playlist" ? (
+              <div class="space-y-3 rounded-[1.35rem] border border-[color-mix(in_srgb,var(--nm-accent)_18%,transparent)] bg-[var(--nm-bg-canvas)] p-4">
+                <div class="flex items-start justify-between gap-3">
+                  <p class="text-sm font-semibold text-[var(--nm-fg)]">{item.title}</p>
+                  <span class="rounded-full border border-[color-mix(in_srgb,var(--nm-accent)_18%,transparent)] px-2.5 py-1 text-[11px] font-semibold text-[var(--nm-accent)]">נעול</span>
+                </div>
+                <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">{premiumPlaylistIntro}</p>
+                <div class="flex justify-end">
+                  <a
+                    href={item.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="inline-flex min-h-[44px] items-center justify-center rounded-full bg-[var(--nm-accent)] px-5 py-2.5 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]"
+                  >
+                    לפתוח פלייליסט
+                  </a>
+                </div>
+              </div>
+            ) : (
+              <div class="space-y-3 rounded-[1.35rem] border border-[color-mix(in_srgb,var(--nm-accent)_18%,transparent)] bg-[var(--nm-bg-canvas)] p-4">
+                <div class="flex items-start justify-between gap-3">
+                  <p class="text-sm font-semibold text-[var(--nm-fg)]">{item.title}</p>
+                  <span class="rounded-full border border-[color-mix(in_srgb,var(--nm-accent)_18%,transparent)] px-2.5 py-1 text-[11px] font-semibold text-[var(--nm-accent)]">נעול</span>
+                </div>
+                <VideoPlayer youtubeId={item.youtubeId || ""} title={item.title} />
+              </div>
+            ),
+          )}
+        </div>
+      ) : null}
+
+      {hasLockedItems ? (
+        <script is:inline>
+          (() => {
+            const KEY = "nm_club_session";
+            const readClub = () => {
+              try {
+                const raw = window.localStorage.getItem(KEY);
+                if (!raw) return null;
+                const data = JSON.parse(raw);
+                if (!data || typeof data !== "object") return null;
+                const expiresAt = String(data.expiresAt || "").trim();
+                if (!expiresAt) return null;
+                const ts = Date.parse(expiresAt);
+                if (Number.isNaN(ts) || ts < Date.now()) return null;
+                return data;
+              } catch {
+                return null;
+              }
+            };
+
+            const apply = () => {
+              const root = document.querySelector("[data-related-topic-videos]");
+              if (!(root instanceof HTMLElement)) return;
+              const lockedNote = root.querySelector("[data-related-topic-locked-note]");
+              const lockedGrid = root.querySelector("[data-related-topic-locked-grid]");
+              const unlocked = readClub() !== null;
+              if (lockedGrid instanceof HTMLElement) {
+                lockedGrid.classList.toggle("hidden", !unlocked);
+              }
+              if (lockedNote instanceof HTMLElement) {
+                lockedNote.classList.toggle("hidden", unlocked);
+              }
+            };
+
+            apply();
+            window.addEventListener("nm-club-session-changed", apply);
+            window.addEventListener("storage", (event) => {
+              if (event.key === KEY || event.key === null) apply();
+            });
+          })();
+        </script>
+      ) : null}
+    </section>
+  ) : null
+}

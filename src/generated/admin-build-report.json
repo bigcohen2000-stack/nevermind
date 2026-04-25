@@ -1,10 +1,10 @@
 {
-  "generatedAt": "2026-04-14T14:52:49.256Z",
+  "generatedAt": "2026-04-25T15:20:19.159Z",
   "stage": "postbuild",
   "readability": {
-    "articleCount": 21,
+    "articleCount": 40,
     "averageScore": 98,
-    "clearCount": 21,
+    "clearCount": 40,
     "goodCount": 0,
     "denseCount": 0,
     "hardest": [
@@ -20,6 +20,39 @@
         "longRatio": 2
       },
       {
+        "slug": "body-language-facial-expressions-logical-analysis",
+        "title": "איך לשלוט בשפת גוף ובמימיקת פנים? הפירוק הלוגי של הזיוף",
+        "href": "/articles/body-language-facial-expressions-logical-analysis/",
+        "score": 98,
+        "label": "צלול",
+        "words": 379,
+        "sentences": 30,
+        "avgSentence": 12.6,
+        "longRatio": 0
+      },
+      {
+        "slug": "child-eats-fruits-vegetables-logical-analysis",
+        "title": "איך לחנך ילד לאכול פירות וירקות? הפירוק הלוגי של אשליית השליטה בצלחת",
+        "href": "/articles/child-eats-fruits-vegetables-logical-analysis/",
+        "score": 98,
+        "label": "צלול",
+        "words": 408,
+        "sentences": 31,
+        "avgSentence": 13.2,
+        "longRatio": 1.2
+      },
+      {
+        "slug": "child-refuses-to-brush-teeth-logical-analysis",
+        "title": "איך לגרום לילד לצחצח שיניים? הפירוק הלוגי של אשליית הכפייה",
+        "href": "/articles/child-refuses-to-brush-teeth-logical-analysis/",
+        "score": 98,
+        "label": "צלול",
+        "words": 400,
+        "sentences": 32,
+        "avgSentence": 12.5,
+        "longRatio": 1
+      },
+      {
         "slug": "conscious-vs-subconscious-myth",
         "title": "מודע ותת-מודע: האם באמת יש הבדל? 🧠",
         "href": "/articles/conscious-vs-subconscious-myth/",
@@ -31,57 +64,24 @@
         "longRatio": 0.6
       },
       {
-        "slug": "fear-vs-story-kids",
-        "title": "פחד או סיפור? (הסבר לילדים) 🎈",
-        "href": "/articles/fear-vs-story-kids/",
+        "slug": "emotional-eating-logical-analysis",
+        "title": "אכילה רגשית: איך לזהות ולהתמודד בלי כוח רצון",
+        "href": "/articles/emotional-eating-logical-analysis/",
         "score": 98,
         "label": "צלול",
-        "words": 118,
-        "sentences": 13,
-        "avgSentence": 9.1,
-        "longRatio": 0.8
-      },
-      {
-        "slug": "feeling-alone",
-        "title": "מה אם אני מרגיש לבד? 🌑",
-        "href": "/articles/feeling-alone/",
-        "score": 98,
-        "label": "צלול",
-        "words": 119,
-        "sentences": 14,
-        "avgSentence": 8.5,
-        "longRatio": 0
-      },
-      {
-        "slug": "free-will-mechanics",
-        "title": "בחירה חופשית: האם אנחנו באמת מחליטים? 🎲",
-        "href": "/articles/free-will-mechanics/",
-        "score": 98,
-        "label": "צלול",
-        "words": 138,
-        "sentences": 11,
-        "avgSentence": 12.5,
-        "longRatio": 0.7
-      },
-      {
-        "slug": "good-and-evil",
-        "title": "טוב ורע: האם הם באמת נפרדים",
-        "href": "/articles/good-and-evil/",
-        "score": 98,
-        "label": "צלול",
-        "words": 132,
-        "sentences": 12,
-        "avgSentence": 11,
-        "longRatio": 0.8
+        "words": 372,
+        "sentences": 42,
+        "avgSentence": 8.9,
+        "longRatio": 0.5
       }
     ]
   },
   "build": {
-    "htmlPages": 144,
+    "htmlPages": 169,
     "rssReady": true,
     "internalLinks": {
       "ok": true,
-      "checkedAt": "2026-04-14T14:52:49.286Z"
+      "checkedAt": "2026-04-25T15:20:19.189Z"
     }
   }
 }

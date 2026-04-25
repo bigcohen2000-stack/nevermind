@@ -1,0 +1,31 @@
+# NeverMind Workspace Cursor Rules
+
+1. ALWAYS read `docs/ARCHITECTURE.md` before making routing or structural changes.
+2. Use `RoleGate` for all admin/dashboard content protection.
+   - Admin and dashboard pages under `/admin/*` and `/dashboard/*` must wrap with `src/components/admin/RoleGate.astro`.
+3. Use `FloatingInput` for form fields across public and admin forms.
+   - Maintain consistent input appearance and behavior.
+   - Prefer `FloatingInput` in `src/components/ui/FloatingInput.tsx` and avoid ad-hoc form fields unless there is a strong reason.
+4. Keep the frontend minimal and weightless.
+   - Prefer static generation.
+   - Only hydrate React when required (`client:idle`, `client:load`, etc.).
+   - Avoid unnecessary client-side bundles, extra state, and unused dependencies.
+5. Respect Cloudflare environment limitations.
+   - Do not use Node-only APIs in edge middleware or worker-facing code.
+   - Keep `functions/_middleware.js` and worker code edge-compatible.
+   - Keep service worker and PWA code small and isolated in `public/admin-sw.js` / `public/admin-manifest.json`.
+6. Centralize indexing and robots decisions.
+   - Use `src/lib/indexability.ts` and `isPathIndexable()` for SEO/indexing logic.
+   - Do not duplicate path-blocking rules in multiple places.
+7. Use `Layout.astro` and `ArticleLayout.astro` for standard page scaffolding.
+   - Avoid page-specific layout duplication when a shared layout already exists.
+8. Use `StaticRedirectPage` and migration maps for legacy routing.
+   - Preserve legacy URIs through `src/data/migration-map` and `public/_redirects`.
+   - Legacy blog routes should remain managed by `BLOG_REDIRECTS`.
+9. Keep content schema authoritative in `src/content.config.ts`.
+   - Update article/migration data in the collection schema, not by patching markup elsewhere.
+10. Avoid bloat in shared UI.
+    - Keep components reusable and focused.
+    - Do not introduce heavy, page-specific styling or markup unless necessary.
+11. Document architecture changes.
+    - If you modify routes, security, or indexing behavior, update `docs/ARCHITECTURE.md`.

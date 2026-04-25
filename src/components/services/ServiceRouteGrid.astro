@@ -1,0 +1,65 @@
+---
+type ServiceRouteItem = {
+  href: string;
+  title: string;
+  body: string;
+};
+
+const {
+  title = "עוד מסלולי בדיקה",
+  intro = "לא חייבים להישאר באותו מסלול. בוחרים את המסגרת לפי סוג הבדיקה שצריך עכשיו.",
+  items = [
+    {
+      href: "/personal-consultation/",
+      title: "ייעוץ אישי",
+      body: "כשיש תקיעות אחת שצריך לפרק בלי לעטוף את כל החיים מסביבה.",
+    },
+    {
+      href: "/services/couples/",
+      title: "ייעוץ זוגי",
+      body: "כשהקונפליקט יושב בתוך קשר ולא רק בתוך הראש של אדם אחד.",
+    },
+    {
+      href: "/services/studio/",
+      title: "אולפן",
+      body: "כשרוצים מרחב חי, קצב אחר, או דינמיקה קבוצתית קטנה במקום שיחה רגילה.",
+    },
+    {
+      href: "/services/archive/",
+      title: "מנוי ארכיון",
+      body: "כשרוצים לחקור לבד, לחזור לטקסטים, ולנוע בקצב אישי בלי לקבוע שיחה.",
+    },
+    {
+      href: "/services/therapists/",
+      title: "למטפלים ומאמנים",
+      body: "כשהעומס הוא לא רק אישי אלא מקצועי, והצורך הוא לוגיקה קלינית לפני עוד טכניקה.",
+    },
+    {
+      href: "/services/",
+      title: "כל הייעוצים",
+      body: "עמוד השער שמרכז את כל המסלולים, המחירים והבדלי המבנה ביניהם.",
+    },
+  ] as ServiceRouteItem[],
+} = Astro.props;
+---
+
+<section class="space-y-5 rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/92 p-6 shadow-[0_18px_50px_rgba(26,26,26,0.04)]">
+  <div class="space-y-2 text-right">
+    <p class="text-sm font-semibold text-[var(--nm-accent)]">מסלולים</p>
+    <h2 class="nm-title-balance text-[clamp(1.6rem,1.35rem+0.8vw,2.3rem)] font-semibold text-[var(--nm-fg)]">{title}</h2>
+    <p class="nm-copy-balanced max-w-3xl text-sm leading-8 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">{intro}</p>
+  </div>
+
+  <div class="nm-card-grid-comfort nm-card-grid-comfort--2up xl:grid-cols-3">
+    {items.map((item: ServiceRouteItem) => (
+      <a
+        href={item.href}
+        class="group rounded-[1.35rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-5 text-right transition hover:-translate-y-0.5 hover:border-[color-mix(in_srgb,var(--nm-accent)_28%,transparent)] hover:shadow-[0_18px_44px_rgba(26,26,26,0.05)]"
+      >
+        <p class="nm-title-balance text-base font-semibold text-[var(--nm-fg)]">{item.title}</p>
+        <p class="nm-copy-balanced mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">{item.body}</p>
+        <span class="mt-4 inline-flex items-center text-sm font-semibold text-[var(--nm-accent)]">לעבור למסלול</span>
+      </a>
+    ))}
+  </div>
+</section>

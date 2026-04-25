@@ -1,17 +1,12 @@
-﻿---
+---
 import { getCollection } from "astro:content";
 import ClubAdminPanel from "../../components/admin/ClubAdminPanel.astro";
 import RoleGate from "../../components/admin/RoleGate.astro";
 import ContentHealthWidget from "../../components/dashboard/ContentHealthWidget";
-import DashboardCard from "../../components/dashboard/DashboardCard.astro";
 import DashboardCommandBar from "../../components/dashboard/DashboardCommandBar";
 import DashboardNav from "../../components/dashboard/DashboardNav.astro";
-import HelpText from "../../components/dashboard/HelpText.astro";
-import ImageAutomationGuide from "../../components/dashboard/ImageAutomationGuide.astro";
 import LiveConnectionsWidget from "../../components/dashboard/LiveConnectionsWidget";
 import LiveSecurityFeedWidget from "../../components/dashboard/LiveSecurityFeedWidget";
-import MechanismCard from "../../components/dashboard/MechanismCard.astro";
-import SystemSettingsPanel from "../../components/dashboard/SystemSettingsPanel.astro";
 import SystemHealthWidget from "../../components/dashboard/SystemHealthWidget";
 import Layout from "../../layouts/Layout.astro";
 import buildReport from "../../generated/admin-build-report.json";
@@ -27,26 +22,26 @@ const overview = buildDashboardOverviewSummary(contentHealthItems);
 const searchIndex = buildDashboardSearchIndex(contentHealthItems);
 
 const pageTitle = "דשבורד ניהול";
-const pageDescription = "דשבורד ניהול פנימי עם חיפוש מהיר, מצב אתר, בקרה על תוכן ואבטחה.";
+const pageDescription = "דשבורד ניהול פנימי עם גישה לחברים, בקרה על תוכן ובריאות מערכת.";
 
 const overviewCards = [
   {
-    label: "מאמרים במערכת",
+    label: "מאמרים פעילים",
     value: String(overview.totalArticles),
-    helper: "כל התוכן הפעיל",
+    helper: "כל מה שכבר חי באתר",
   },
   {
     label: "דורשים טיפול",
     value: String(overview.criticalArticles),
-    helper: "נטישה גבוהה או עדכון ישן",
+    helper: "תוכן שדורש החלטה עכשיו",
   },
   {
     label: "במעקב",
     value: String(overview.watchArticles),
-    helper: "כדאי לרענן בקרוב",
+    helper: "כדאי לבדוק בקרוב",
   },
   {
-    label: "תקינים",
+    label: "יציבים",
     value: String(overview.healthyArticles),
     helper: "תוכן שמחזיק טוב כרגע",
   },
@@ -54,28 +49,22 @@ const overviewCards = [
 
 const managerQuickLinks = [
   {
-    title: "חיפוש חבר מהיר",
-    description: "קפיצה ישירה לאזור ניהול החברים, איתור לפי טלפון וציר פעילות בלי לפתוח מסך נוסף.",
-    href: "#access",
-    cta: "לעבור לניהול חברים",
-  },
-  {
     title: "תצוגת חבר",
-    description: "בדיקה מהירה של מה שחבר פעיל רואה בפועל, בלי לצאת מהדשבורד ובלי לשנות סשן אמיתי.",
+    description: "לראות מה חבר רואה בפועל, בלי לצאת למסך אחר.",
     href: "/me/",
     cta: "לפתוח תצוגת חבר",
   },
   {
-    title: "תצוגת טרום חיבור",
-    description: "בדיקה של מסך האורח וההצטרפות לפני שחבר נכנס עם טלפון וסיסמה.",
+    title: "מסך הכניסה",
+    description: "בדיקה של זרימת האורח והכניסה השקטה לפני שיש גישה פעילה.",
     href: "/me/unlock/",
-    cta: "לפתוח תצוגת אורח",
+    cta: "לפתוח את מסך הכניסה",
   },
   {
-    title: "סטטוס פריסה",
-    description: "מעבר מהיר לדוח הבריאות כדי לראות אם Pages, Worker, טפסים וקישורים מסונכרנים.",
-    href: "#system-health",
-    cta: "לבדוק פריסה",
+    title: "מאמר חדש",
+    description: "מעבר מהיר למסך היצירה החדש והמקוצר של מאמרים.",
+    href: "/admin/generator/",
+    cta: "לפתוח את המחולל",
   },
 ];
 ---
@@ -86,192 +75,136 @@ const managerQuickLinks = [
       <main class="mx-auto max-w-7xl px-4 pb-16 pt-8 lg:px-6">
         <DashboardCommandBar client:load index={searchIndex} />
 
-      <div class="grid gap-6 lg:grid-cols-[15rem_minmax(0,1fr)]">
-        <DashboardNav />
+        <div class="grid gap-6 lg:grid-cols-[15rem_minmax(0,1fr)]">
+          <DashboardNav />
 
-        <div class="space-y-8">
-          <section id="overview" class="space-y-4">
-            <div class="overflow-hidden rounded-[32px] border-[0.5px] border-[rgba(26,26,26,0.1)] bg-[radial-gradient(circle_at_top_left,_rgba(212,43,43,0.16),_transparent_34%),linear-gradient(135deg,#ffffff_0%,#f4f2ed_100%)] p-6 shadow-[0_24px_70px_rgba(26,26,26,0.06)] dark:border-[rgba(250,250,248,0.12)] dark:bg-[radial-gradient(circle_at_top_left,_rgba(212,43,43,0.18),_transparent_30%),linear-gradient(135deg,rgba(255,255,255,0.06)_0%,rgba(255,255,255,0.02)_100%)]">
-              <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#D42B2B] dark:text-[#ff8a8a]">דשבורד</p>
-              <div class="mt-3 grid gap-5 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] lg:items-end">
-                <div class="space-y-3 text-right">
-                  <h1 class="text-[clamp(2rem,1.55rem+1.6vw,3.2rem)] font-semibold leading-tight text-[#1A1A1A] dark:text-[#FAFAF8]">מצב האתר עכשיו</h1>
-                  <p class="max-w-3xl text-sm leading-7 text-[#1A1A1A]/62 dark:text-[#FAFAF8]/64">
-                    דשבורד פנימי למנהל בלבד, עם חיפוש מהיר, בקרה על חיבורים, פיד אבטחה, בריאות תוכן וזרימת עבודה קצרה לבדיקת מנויים, פריסה ומערכת.
-                  </p>
-                  <div class="flex flex-wrap gap-2 pt-1 text-xs">
-                    <span class="inline-flex items-center rounded-full border-[0.5px] border-[rgba(212,43,43,0.18)] bg-[rgba(212,43,43,0.08)] px-3 py-1 font-medium text-[#D42B2B] dark:border-[rgba(212,43,43,0.22)] dark:bg-[rgba(212,43,43,0.12)] dark:text-[#ff8a8a]">מנהל בלבד</span>
-                    <span class="inline-flex items-center rounded-full border-[0.5px] border-[rgba(26,26,26,0.1)] bg-white/70 px-3 py-1 font-medium text-[#1A1A1A]/72 dark:border-[rgba(250,250,248,0.12)] dark:bg-[rgba(255,255,255,0.05)] dark:text-[#FAFAF8]/72">Cloudflare Access למייל bigcohen2000@gmail.com</span>
-                    <span class="inline-flex items-center rounded-full border-[0.5px] border-[rgba(26,26,26,0.1)] bg-white/70 px-3 py-1 font-medium text-[#1A1A1A]/72 dark:border-[rgba(250,250,248,0.12)] dark:bg-[rgba(255,255,255,0.05)] dark:text-[#FAFAF8]/72">החבר לא רואה את המסך הזה</span>
-                  </div>
-                  <div class="flex flex-wrap items-center justify-between gap-3">
-                    <HelpText text="למה: כל אזור מסביר מה הוא מודד, איך הנתון מחושב, ומה יקרה אחרי פעולה. כך אפשר לעבוד מהר בלי לנחש מה עומד מאחורי כל כרטיס." />
-                    <MechanismCard
-                      title="איך הדשבורד מתועד"
-                      summary="שכבת ההסבר מחוברת ישירות לפונקציות שמזינות את הנתונים, כדי שהתיעוד יישאר נאמן ללוגיקה ולא יהיה טקסט שיווקי מנותק."
-                      details={[
-                        "בריאות תוכן נקבעת מתוך updatedDate, pubDate, ימים מהעדכון ו־bounceRate יציב לפי slug.",
-                        "הדשבורד משלב נתוני תוכן מקומיים עם נתוני מועדון אמיתיים מה־worker, כך שהממשק נשאר נאמן למה שבאמת קורה במערכת.",
-                      ]}
-                    />
-                  </div>
-                </div>
-                <div class="grid gap-3 sm:grid-cols-2">
-                  {overviewCards.map((card) => (
-                    <div class="rounded-[24px] border-[0.5px] border-[rgba(26,26,26,0.1)] bg-white/84 p-4 backdrop-blur-sm dark:border-[rgba(250,250,248,0.12)] dark:bg-[rgba(255,255,255,0.05)]">
-                      <p class="text-xs text-[#1A1A1A]/45 dark:text-[#FAFAF8]/48">{card.label}</p>
-                      <p class="mt-2 text-3xl font-semibold text-[#1A1A1A] dark:text-[#FAFAF8]">{card.value}</p>
-                      <p class="mt-1 text-xs text-[#1A1A1A]/42 dark:text-[#FAFAF8]/46">{card.helper}</p>
+          <div class="space-y-8">
+            <section id="overview" class="space-y-5">
+              <div class="rounded-[32px] border-[0.5px] border-[rgba(26,26,26,0.1)] bg-[radial-gradient(circle_at_top_left,_rgba(212,43,43,0.14),_transparent_34%),linear-gradient(135deg,#ffffff_0%,#f4f2ed_100%)] p-6 shadow-[0_24px_70px_rgba(26,26,26,0.06)] dark:border-[rgba(250,250,248,0.12)] dark:bg-[radial-gradient(circle_at_top_left,_rgba(212,43,43,0.16),_transparent_30%),linear-gradient(135deg,rgba(255,255,255,0.06)_0%,rgba(255,255,255,0.02)_100%)]">
+                <div class="grid gap-5 xl:grid-cols-[minmax(0,1.35fr)_minmax(0,0.95fr)] xl:items-end">
+                  <div class="space-y-3 text-right">
+                    <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#D42B2B] dark:text-[#ff8a8a]">דשבורד</p>
+                    <h1 class="nm-title-balance text-[clamp(2rem,1.55rem+1.6vw,3.2rem)] font-semibold leading-tight text-[#1A1A1A] dark:text-[#FAFAF8]">
+                      מסך שליטה קצר במקום תיעוד טכני
+                    </h1>
+                    <p class="nm-copy-balanced max-w-3xl text-sm leading-7 text-[#1A1A1A]/62 dark:text-[#FAFAF8]/64">
+                      מכאן מנהלים את שלושת הדברים שבאמת חשובים: מי נכנס, מה דורש עדכון בתוכן, ומה במערכת פתוח או חסר. כל שאר שכבות ההסבר ירדו לאזורים משניים.
+                    </p>
+                    <div class="flex flex-wrap gap-2 pt-1 text-xs">
+                      <span class="inline-flex items-center rounded-full border-[0.5px] border-[rgba(212,43,43,0.18)] bg-[rgba(212,43,43,0.08)] px-3 py-1 font-medium text-[#D42B2B] dark:border-[rgba(212,43,43,0.22)] dark:bg-[rgba(212,43,43,0.12)] dark:text-[#ff8a8a]">מנהל בלבד</span>
+                      <span class="inline-flex items-center rounded-full border-[0.5px] border-[rgba(26,26,26,0.1)] bg-white/70 px-3 py-1 font-medium text-[#1A1A1A]/72 dark:border-[rgba(250,250,248,0.12)] dark:bg-[rgba(255,255,255,0.05)] dark:text-[#FAFAF8]/72">גישה דרך Cloudflare Access</span>
+                      <span class="inline-flex items-center rounded-full border-[0.5px] border-[rgba(26,26,26,0.1)] bg-white/70 px-3 py-1 font-medium text-[#1A1A1A]/72 dark:border-[rgba(250,250,248,0.12)] dark:bg-[rgba(255,255,255,0.05)] dark:text-[#FAFAF8]/72">Shared code + שם + טלפון</span>
                     </div>
-                  ))}
+                  </div>
+
+                  <div class="grid gap-3 sm:grid-cols-2">
+                    {overviewCards.map((card) => (
+                      <article class="rounded-[24px] border-[0.5px] border-[rgba(26,26,26,0.1)] bg-white/84 p-4 backdrop-blur-sm dark:border-[rgba(250,250,248,0.12)] dark:bg-[rgba(255,255,255,0.05)]">
+                        <p class="text-xs text-[#1A1A1A]/45 dark:text-[#FAFAF8]/48">{card.label}</p>
+                        <p class="mt-2 text-3xl font-semibold text-[#1A1A1A] dark:text-[#FAFAF8]">{card.value}</p>
+                        <p class="mt-1 text-xs text-[#1A1A1A]/42 dark:text-[#FAFAF8]/46">{card.helper}</p>
+                      </article>
+                    ))}
+                  </div>
                 </div>
               </div>
-            </div>
-          </section>
 
-          <section id="manager-actions" class="grid gap-6 xl:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]">
-            <div class="rounded-[32px] border-[0.5px] border-[rgba(26,26,26,0.1)] bg-white/84 p-5 shadow-[0_24px_70px_rgba(26,26,26,0.05)] dark:border-[rgba(250,250,248,0.12)] dark:bg-[rgba(255,255,255,0.05)]">
-              <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#D42B2B] dark:text-[#ff8a8a]">מנהל בלבד</p>
-              <h2 class="mt-2 text-2xl font-semibold text-[#1A1A1A] dark:text-[#FAFAF8]">גישה סגורה, עבודה מהירה</h2>
-              <p class="mt-3 text-sm leading-7 text-[#1A1A1A]/64 dark:text-[#FAFAF8]/64">
-                העמוד הזה מיועד רק לניהול הראשי. חברי המועדון לא רואים אותו. כאן מחפשים חברים, פותחים גישה, בודקים תצוגת חבר ומוודאים שאין פער בין האתר, ה־worker והנתונים החיים.
-              </p>
-              <HelpText text="מה חשוב עכשיו: להגן ב־Cloudflare Access על /admin/* ועל /dashboard/*, ולוודא שגם /api/dashboard/* ו־/api/club-admin/* סגורים לאותו מייל." />
-            </div>
-            <div class="grid gap-4 sm:grid-cols-2">
-              {managerQuickLinks.map((item) => (
-                <article class="rounded-[24px] border-[0.5px] border-[rgba(26,26,26,0.1)] bg-white/84 p-4 shadow-[0_18px_50px_rgba(26,26,26,0.05)] dark:border-[rgba(250,250,248,0.12)] dark:bg-[rgba(255,255,255,0.05)]">
-                  <h3 class="text-base font-semibold text-[#1A1A1A] dark:text-[#FAFAF8]">{item.title}</h3>
-                  <p class="mt-2 text-sm leading-7 text-[#1A1A1A]/64 dark:text-[#FAFAF8]/64">{item.description}</p>
-                  <a href={item.href} class="mt-4 inline-flex items-center rounded-full border-[0.5px] border-[rgba(26,26,26,0.1)] bg-[#FAFAF8] px-4 py-2 text-sm font-semibold text-[#1A1A1A] transition hover:border-[rgba(212,43,43,0.22)] hover:text-[#D42B2B] dark:border-[rgba(250,250,248,0.12)] dark:bg-[rgba(255,255,255,0.05)] dark:text-[#FAFAF8]">{item.cta}</a>
-                </article>
-              ))}
-            </div>
-          </section>
-
-          <section class="grid gap-6 xl:grid-cols-2">
-            <section id="connections">
-              <DashboardCard
-                eyebrow="מדדים ובקרה"
-                title="תנועת חברים חיה"
-                description="נתוני חיבורים אמיתיים מתוך CLUB_ACTIVITY של המועדון, בלי שכבת דמה ובלי ניחוש."
-                sublabel="מקור: worker nm-club-auth דרך CLUB_ACTIVITY ופרוקסי השרת"
-                helpText="למה: הכרטיס מרכז חיבורים אמיתיים של חברי המועדון, כדי לראות מי פעיל, מאיזה נתיב, ובאיזה דפדפן. איך: השרת מושך את overview של המועדון, גוזר חלון פעילות של עשרים דקות, ומציג את החיבורים האחרונים בלי לייצר נתונים מדומים."
-                mechanismTitle="מאחורי הקלעים של תנועת החברים"
-                mechanismSummary="functions/api/dashboard/live-connections.js דורש גישת Access לדשבורד, מושך את /admin/overview מה־worker בעזרת מפתח שירות, וממיר recentLogins לטבלה קריאה."
-                mechanismDetails={[
-                  "המקור הוא recentLogins אמיתי שנשמר ב־CLUB_ACTIVITY אחרי כניסה של חבר.",
-                  "הסיכום העליון מחשב כמה חברים נראו בחלון של עשרים הדקות האחרונות, והרשימה עצמה מציגה את שמונת החיבורים האחרונים."
-                ]}
-              >
-                <LiveConnectionsWidget client:load endpoint="/dashboard/api/dashboard/live-connections" />
-              </DashboardCard>
-            </section>
-
-            <section id="security-feed">
-              <DashboardCard
-                eyebrow="מדדים ובקרה"
-                title="פיד אבטחה חי"
-                description="הפיד נבנה ישירות מתוך Fraud Flags של המועדון ומציג רק אירועים אמיתיים שדורשים בדיקה."
-                sublabel="מקור: worker nm-club-auth דרך CLUB_ACTIVITY ופרוקסי השרת"
-                helpText="למה: הכרטיס מבליט דפוסים חריגים בלי להיכנס ל־KV ידנית. איך: השרת מושך fraudFlags אמיתיים, גוזר חומרה לפי כמות כתובות רשת שחזרו על עצמן, ומסמן אזעקה רק כשהדפוס כבר ברור."
-                mechanismTitle="מאחורי הקלעים של פיד האבטחה"
-                mechanismSummary="functions/api/dashboard/security-feed.js מושך fraudFlags אמיתיים מה־worker, ממיר אותם ל־alarms ול־events, ושומר על תיאור עובדתי של מה שקרה."
-                mechanismDetails={[
-                  "החומרה נגזרת מכמות כתובות הרשת לחבר או לסיסמה: 1 נמוך, 2 בינוני, 3 ומעלה גבוה.",
-                  "אם אין Flags פתוחים, הפיד מחזיר שורת שקט אחת במקום להמציא אירועים."
-                ]}
-              >
-                <LiveSecurityFeedWidget client:load endpoint="/dashboard/api/dashboard/security-feed" />
-              </DashboardCard>
-            </section>
-          </section>
-
-          <section id="content-health">
-            <DashboardCard
-              eyebrow="תוכן ומאמרים"
-              title="בריאות התוכן"
-              description="ברירת צבע אדומה כאשר bounceRate גבוה מ־70 או כשעברו יותר מ־90 יום מהעדכון האחרון."
-              helpText="למה: הכרטיס ממיין קודם את המקומות שדורשים החלטה מערכתית. איך: בריאות כל מאמר נבנית מתוך updatedDate או pubDate, חישוב ימים מהעדכון, ו־bounceRate יציב שנגזר מה־slug עם הטיית freshness."
-              mechanismTitle="מאחורי הקלעים של חישוב הבריאות"
-              mechanismSummary="buildDashboardContentHealth מסנן drafts, בוחר updatedDate או pubDate, מחשב daysSinceUpdate, מוסיף freshnessBias ל־bounceRate יציב, ואז קובע tone לפי ספים קבועים."
-              mechanismDetails={[
-                "critical כאשר bounceRate גבוה מ־70 או daysSinceUpdate גבוה מ־90.",
-                "watch כאשר bounceRate גבוה מ־60 או daysSinceUpdate גבוה מ־45.",
-                "ok כאשר המאמר מתחת לשני הספים הללו."
-              ]}
-            >
-              <div class="mb-4 space-y-3">
-                <HelpText text="מקרא צבעים: אדום מצביע על נטישה גבוהה או על תוכן ישן, אפור מצביע על אזור מעקב, וירוק מצביע על תוכן יציב. הרשימה עצמה כבר ממוינת כך שהפריטים הדחופים נמצאים קודם." />
-                <div class="flex flex-wrap gap-2 text-xs">
-                  <span class="inline-flex items-center rounded-full border-[0.5px] border-[rgba(212,43,43,0.18)] bg-[rgba(212,43,43,0.08)] px-3 py-1 font-medium text-[#D42B2B] dark:border-[rgba(212,43,43,0.22)] dark:bg-[rgba(212,43,43,0.12)] dark:text-[#ff8a8a]">אדום: bounceRate מעל 70 או יותר מ־90 ימים</span>
-                  <span class="inline-flex items-center rounded-full border-[0.5px] border-[rgba(26,26,26,0.1)] bg-[rgba(26,26,26,0.04)] px-3 py-1 font-medium text-[#1A1A1A]/72 dark:border-[rgba(250,250,248,0.12)] dark:bg-[rgba(255,255,255,0.05)] dark:text-[#FAFAF8]/72">אפור: bounceRate מעל 60 או יותר מ־45 ימים</span>
-                  <span class="inline-flex items-center rounded-full border-[0.5px] border-[rgba(5,150,105,0.18)] bg-[rgba(5,150,105,0.08)] px-3 py-1 font-medium text-[rgb(5,120,90)] dark:border-[rgba(16,185,129,0.2)] dark:bg-[rgba(16,185,129,0.12)] dark:text-[rgb(110,231,183)]">ירוק: כל השאר</span>
-                </div>
+              <div class="grid gap-4 lg:grid-cols-3">
+                {managerQuickLinks.map((item) => (
+                  <article class="rounded-[24px] border-[0.5px] border-[rgba(26,26,26,0.1)] bg-white/84 p-4 shadow-[0_18px_50px_rgba(26,26,26,0.05)] dark:border-[rgba(250,250,248,0.12)] dark:bg-[rgba(255,255,255,0.05)]">
+                    <h2 class="nm-title-balance text-base font-semibold text-[#1A1A1A] dark:text-[#FAFAF8]">{item.title}</h2>
+                    <p class="nm-copy-balanced mt-2 text-sm leading-7 text-[#1A1A1A]/64 dark:text-[#FAFAF8]/64">{item.description}</p>
+                    <a href={item.href} class="mt-4 inline-flex items-center rounded-full border-[0.5px] border-[rgba(26,26,26,0.1)] bg-[#FAFAF8] px-4 py-2 text-sm font-semibold text-[#1A1A1A] transition hover:border-[rgba(212,43,43,0.22)] hover:text-[#D42B2B] dark:border-[rgba(250,250,248,0.12)] dark:bg-[rgba(255,255,255,0.05)] dark:text-[#FAFAF8]">{item.cta}</a>
+                  </article>
+                ))}
               </div>
-              <ContentHealthWidget client:load items={contentHealthItems} />
-            </DashboardCard>
-          </section>
+            </section>
 
-          <section id="access" class="space-y-4">
-            <div class="rounded-[32px] border-[0.5px] border-[rgba(26,26,26,0.1)] bg-white/84 p-5 shadow-[0_24px_70px_rgba(26,26,26,0.05)] dark:border-[rgba(250,250,248,0.12)] dark:bg-[rgba(255,255,255,0.05)]">
-              <div class="mb-4 space-y-2">
-                <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#D42B2B] dark:text-[#ff8a8a]">ניהול גישה</p>
-                <h2 class="text-2xl font-semibold text-[#1A1A1A] dark:text-[#FAFAF8]">ניהול חברים</h2>
-                <HelpText text="למה: אזור הגישה נשאר תפעולי גם בזמן ריפקטור. איך: ה־panel הקיים ממשיך לעבוד מול worker ו־proxy, והדשבורד החדש עוטף אותו עם שפה ברורה יותר מבלי לשנות את פעולות הליבה." />
+            <section id="access" class="space-y-4">
+              <div class="space-y-2">
+                <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#D42B2B] dark:text-[#ff8a8a]">גישה וחברים</p>
+                <h2 class="text-2xl font-semibold text-[#1A1A1A] dark:text-[#FAFAF8]">מי מחובר, מי נראה לאחרונה, ואיפה צריך להתערב</h2>
+                <p class="text-sm leading-7 text-[#1A1A1A]/64 dark:text-[#FAFAF8]/64">
+                  זה אזור הניהול הראשי. מכאן מחפשים חבר, רואים סטטוס גישה, ובודקים את הציר האחרון בלי להיכנס למסכי עזר מיותרים.
+                </p>
               </div>
               <ClubAdminPanel />
-            </div>
-          </section>
+            </section>
 
-          <section id="image-automation">
-            <DashboardCard
-              eyebrow="תוכן ומאמרים"
-              title="זרימת תמונות"
-              description="המרה מסודרת ל־webp, שם קובץ נקי, ונתיב אחיד ל־assets/images בלי תלות בכתיבה בזמן ריצה."
-              helpText="למה: זו נקודת הכניסה לעריכת תמונות בלי תקלות שם קובץ, בלי פורמטים כפולים, ובלי חיפוש ידני אחרי assets. מה קורה אחר כך: הנתיב שחוזר מהסקריפט יכול להיכנס ישירות ל־content או ל־Generator."
-            >
-              <ImageAutomationGuide />
-            </DashboardCard>
-          </section>
+            <section id="content-health" class="space-y-4">
+              <div class="flex flex-wrap items-end justify-between gap-4">
+                <div class="space-y-2">
+                  <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#D42B2B] dark:text-[#ff8a8a]">תוכן</p>
+                  <h2 class="text-2xl font-semibold text-[#1A1A1A] dark:text-[#FAFAF8]">מה דורש עדכון, רענון או פתיחה</h2>
+                  <p class="text-sm leading-7 text-[#1A1A1A]/64 dark:text-[#FAFAF8]/64">
+                    כאן רואים קודם את המאמרים שדורשים החלטה. אם צריך לפתוח מאמר חדש, ממשיכים מכאן ישר למחולל המקוצר.
+                  </p>
+                </div>
+                <a
+                  href="/admin/generator/"
+                  class="inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-white px-5 py-2.5 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]"
+                >
+                  לפתוח מאמר חדש
+                </a>
+              </div>
 
-          <section id="system-health">
-            <DashboardCard
-              eyebrow="הגדרות מערכת"
-              title="בריאות מערכת"
-              description="כאן מרוכזים מצב Cloudflare, בדיקת מובייל, פערי חיפוש, דוח build אחרון וחיבורי ה־worker."
-              helpText="למה: זו נקודת בקרה אחת על מה שנשבר בשקט ועל מה שעדיין לא מחובר. איך: הנתונים נמשכים מ־Pages Functions, מ־Cloudflare GraphQL, מדוח build סטטי ומיומן החיפושים בלי תוצאות."
-              mechanismTitle="מאחורי הקלעים של בדיקות הבריאות"
-              mechanismSummary="/api/dashboard/system-health בודק חיבור worker וסודות סביבה, /api/site/pulse מושך ספירת תנועה חיה מ־Cloudflare, /api/admin/psi מריץ בדיקת מובייל לפי דרישה, ו־/api/log-search-gap מחזיר חיפושים שלא מצאו התאמה."
-              mechanismDetails={[
-                "ה־runtime health בודק Worker, Resend, hCaptcha, Cloudflare ויכולת משיכה של מוני תנועה.",
-                "דוח ה־build שומר קריאות ממוצעת של כל המאמרים, מספר עמודי HTML וסטטוס בדיקת קישורים פנימיים.",
-                "בדיקת המובייל רצה רק בלחיצה, כדי לא לייצר קריאות מיותרות."
-              ]}
-            >
-              <SystemHealthWidget
-                client:load
-                endpoint="/dashboard/api/dashboard/system-health"
-                initialBuildReport={buildReport}
-                pulseEndpoint="/dashboard/api/site/pulse"
-                psiEndpoint="/dashboard/api/admin/psi?strategy=mobile"
-                gapsEndpoint="/dashboard/api/log-search-gap"
-              />
-            </DashboardCard>
-          </section>
+              <div class="rounded-[32px] border-[0.5px] border-[rgba(26,26,26,0.1)] bg-white/84 p-5 shadow-[0_24px_70px_rgba(26,26,26,0.05)] dark:border-[rgba(250,250,248,0.12)] dark:bg-[rgba(255,255,255,0.05)]">
+                <ContentHealthWidget client:load items={contentHealthItems} />
+              </div>
+            </section>
 
-          <section id="settings">
-            <DashboardCard
-              eyebrow="הגדרות מערכת"
-              title="הגדרות קלאודפלייר"
-              description="הקשחות שצריך להשלים בדשבורד של Cloudflare כדי לשמור על סביבת ניהול סגורה ונקייה מאינדוקס."
-              helpText="למה: גם UI נקי צריך גבולות מערכת ברורים. איך: Access, noindex ו־Full strict הם השכבות ששומרות על הדשבורד פרטי, מאובטח ויציב."
-            >
-              <SystemSettingsPanel />
-            </DashboardCard>
-          </section>
+            <section id="system-health" class="space-y-4">
+              <div class="space-y-2">
+                <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#D42B2B] dark:text-[#ff8a8a]">מערכת</p>
+                <h2 class="text-2xl font-semibold text-[#1A1A1A] dark:text-[#FAFAF8]">האם הבסיס סגור, ומה עוד פתוח</h2>
+                <p class="text-sm leading-7 text-[#1A1A1A]/64 dark:text-[#FAFAF8]/64">
+                  בריאות מערכת נשארת כאן כלוח מצב קצר: מה פעיל, מה דורש אימות, ומה אופציונלי בלבד.
+                </p>
+              </div>
+
+              <div class="rounded-[32px] border-[0.5px] border-[rgba(26,26,26,0.1)] bg-white/84 p-5 shadow-[0_24px_70px_rgba(26,26,26,0.05)] dark:border-[rgba(250,250,248,0.12)] dark:bg-[rgba(255,255,255,0.05)]">
+                <SystemHealthWidget
+                  client:visible
+                  endpoint="/dashboard/api/dashboard/system-health"
+                  initialBuildReport={buildReport}
+                  pulseEndpoint="/dashboard/api/site/pulse"
+                  psiEndpoint="/dashboard/api/admin/psi?strategy=mobile"
+                  gapsEndpoint="/dashboard/api/log-search-gap"
+                />
+              </div>
+
+              <details class="group rounded-[24px] border-[0.5px] border-[rgba(26,26,26,0.1)] bg-white/84 p-5 shadow-[0_18px_50px_rgba(26,26,26,0.05)] dark:border-[rgba(250,250,248,0.12)] dark:bg-[rgba(255,255,255,0.05)]">
+                <summary class="flex cursor-pointer list-none items-center justify-between gap-4 text-right [&::-webkit-details-marker]:hidden">
+                  <div class="space-y-1">
+                    <p class="text-sm font-semibold text-[var(--nm-accent)]">בקרה מתקדמת</p>
+                    <p class="text-sm leading-7 text-[#1A1A1A]/64 dark:text-[#FAFAF8]/64">
+                      חיבורים חיים ופיד חריגות נשארים כאן רק למקרה שבאמת צריך לבדוק אותם.
+                    </p>
+                  </div>
+                  <span class="rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] px-3 py-1 text-xs font-semibold text-[var(--nm-fg)] transition group-open:rotate-45">+</span>
+                </summary>
+
+                <div class="mt-5 grid gap-6 xl:grid-cols-2">
+                  <div class="rounded-[24px] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[#FAFAF8] p-4">
+                    <h3 class="text-lg font-semibold text-[#1A1A1A]">תנועת חברים</h3>
+                    <p class="mt-1 text-sm leading-7 text-[#1A1A1A]/58">אם הנתון יציב, רואים מי הופיע עכשיו. אם לא, זה נשאר כאן ולא שובר את הדשבורד הראשי.</p>
+                    <div class="mt-4">
+                      <LiveConnectionsWidget client:visible endpoint="/dashboard/api/dashboard/live-connections" />
+                    </div>
+                  </div>
+
+                  <div id="security-feed" class="rounded-[24px] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[#FAFAF8] p-4">
+                    <h3 class="text-lg font-semibold text-[#1A1A1A]">פיד חריגות</h3>
+                    <p class="mt-1 text-sm leading-7 text-[#1A1A1A]/58">פיד זה נשאר משני. אם אין ערך ניהולי מיידי, לא צריך לראות אותו קודם.</p>
+                    <div class="mt-4">
+                      <LiveSecurityFeedWidget client:visible endpoint="/dashboard/api/dashboard/security-feed" />
+                    </div>
+                  </div>
+                </div>
+              </details>
+            </section>
+          </div>
         </div>
-      </div>
       </main>
     </div>
   </RoleGate>
@@ -280,5 +213,3 @@ const managerQuickLinks = [
     import "../../scripts/admin-dashboard.js";
   </script>
 </Layout>
-
-

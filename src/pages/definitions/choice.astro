@@ -1,16 +1,49 @@
 ---
 import Layout from "../../layouts/Layout.astro";
+import RelatedTopicVideos from "../../components/articles/RelatedTopicVideos.astro";
 ---
 
 <Layout
   title="מה זה חופש בחירה?"
-  description="הגדרה קצרה לחופש בחירה."
+  description="הגדרה ישירה לחופש בחירה, למה התחושה הזו נראית אמיתית, ואיפה בדיוק נשברת אשליית השליטה."
   breadcrumbCurrentLabel="מה זה חופש בחירה?"
 >
   <section class="mx-auto max-w-3xl space-y-4 px-4 py-16 text-right text-[var(--nm-fg)]">
     <h1 class="text-[clamp(1.7rem,1.4rem+1.2vw,2.5rem)] font-light">מה זה חופש בחירה?</h1>
     <p class="leading-8 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
-      חופש בחירה מתחיל כשאתה רואה שיש לך יותר מאפשרות אחת. ואז בוחר צעד קטן שמתאים למה שנכון עכשיו.
+      חופש בחירה, במובן התרבותי המקובל, הוא האמונה שהאדם יכול לעמוד מעל כל הנתונים שהפעילו אותו, ולבחור באופן חופשי לחלוטין מה לעשות. זאת ההגדרה שאנשים אוהבים. זאת גם ההגדרה שנשברת ראשונה מול המציאות.
     </p>
+    <p class="leading-8 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+      אם באותו רגע היו בך אותם פחדים, אותם זיכרונות, אותה גנטיקה, אותה עייפות ואותו לחץ, לא הייתה שום סיבה מתמטית שתבחר אחרת. התחושה שאתה בוחר נולדת אחרי הפלט, לא לפניו.
+    </p>
+
+    <section class="space-y-3 rounded-[1.5rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/80 px-5 py-5 shadow-sm">
+      <h2 class="text-xl font-semibold">מה חשוב להבין כאן</h2>
+      <ul class="space-y-2 pr-5 text-[color-mix(in_srgb,var(--nm-fg)_76%,var(--nm-bg))]">
+        <li>בחירה חופשית אינה תחושה. היא טענה לוגית על איך המציאות פועלת.</li>
+        <li>חרטה ואשמה נשענות על האמונה שהעבר היה יכול לפלוט תוצאה אחרת עם אותם נתונים.</li>
+        <li>כשהאשליה הזאת נופלת, נשארת אחריות פונקציונלית: להבין מה הפעיל את המנגנון ומה לשנות מכאן.</li>
+      </ul>
+    </section>
+
+    <div class="rounded-[1.5rem] border border-[color-mix(in_srgb,var(--nm-accent)_16%,transparent)] bg-[var(--nm-tint)] px-5 py-5">
+      <p class="text-sm font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">העמקה</p>
+      <h2 class="mt-2 text-xl font-semibold">המאמר המלא על בחירה חופשית</h2>
+      <p class="mt-2 leading-8 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+        אם המושג הזה כבר פתח אצלך חרטה, אשמה או כעס על עצמך ועל אחרים, המאמר המלא מפרק את מנגנון הבחירה עד השורש.
+      </p>
+      <a
+        href="/articles/free-will-mechanics/"
+        class="mt-4 inline-flex min-h-[44px] items-center justify-center rounded-full bg-[var(--nm-accent)] px-5 py-2.5 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]"
+      >
+        למאמר המלא
+      </a>
+    </div>
+
+    <RelatedTopicVideos
+      topicKey="free-will"
+      topicLabel="עוד וידאו על בחירה חופשית"
+      intro="אם המושג הזה נגע בנקודה חיה, כאן אפשר להמשיך לעוד שני סרטונים פתוחים לפני שנכנסים לרצף המלא."
+    />
   </section>
 </Layout>

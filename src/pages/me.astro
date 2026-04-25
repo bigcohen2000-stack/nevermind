@@ -3,7 +3,7 @@ import Layout from "../layouts/Layout.astro";
 ---
 
 <Layout title="האזור האישי" description="כאן אפשר לראות גישה פעילה, מועדפים, הערות אישיות, והיסטוריית קריאה.">
-  <section class="mx-auto max-w-5xl space-y-8 px-4 pb-20 text-right text-[var(--nm-fg)]">
+  <section id="main-content" class="mx-auto max-w-5xl space-y-8 px-4 pb-20 text-right text-[var(--nm-fg)]">
     <header class="rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/88 px-6 py-8 shadow-[0_20px_60px_rgba(26,26,26,0.05)]">
       <p class="text-sm font-semibold text-[var(--nm-accent)]">האזור האישי</p>
       <h1 class="mt-3 text-[clamp(2rem,1.6rem+1.4vw,3rem)] font-semibold">מקום אחד לרצף אישי.</h1>
@@ -21,8 +21,8 @@ import Layout from "../layouts/Layout.astro";
             <p data-member-preview-copy class="max-w-3xl text-sm leading-[1.8] text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">המסך הזה מציג בדיקה שקטה של חוויית החבר, בלי לשנות את ההתחברות על המכשיר שלך.</p>
           </div>
           <div class="flex flex-wrap justify-end gap-2 text-xs">
-            <span data-member-preview-status class="rounded-full border border-[color-mix(in_srgb,var(--nm-accent)_20%,transparent)] bg-white/80 px-3 py-1.5 font-semibold text-[var(--nm-fg)]">טוען מצב</span>
-            <span data-member-preview-meta class="rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/72 px-3 py-1.5 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">הטלפון יופיע כאן</span>
+            <span data-member-preview-status class="rounded-full border border-[color-mix(in_srgb,var(--nm-accent)_20%,transparent)] bg-white/80 px-3 py-1.5 font-semibold text-[var(--nm-fg)]">בודק חיבור...</span>
+            <span data-member-preview-meta class="rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/72 px-3 py-1.5 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">ייטען בקרוב</span>
           </div>
         </div>
         <a href="/me/" class="inline-flex min-h-[44px] items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-white px-4 py-2 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]">לצאת מתצוגה</a>
@@ -37,7 +37,7 @@ import Layout from "../layouts/Layout.astro";
       </p>
       <div class="mt-5 flex flex-wrap justify-end gap-3">
         <a href="/me/unlock/" class="inline-flex min-h-[44px] items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-white px-5 py-3 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]">יש לך קוד אישי</a>
-        <a href="/me/unlock/" class="inline-flex min-h-[44px] items-center rounded-full bg-[var(--nm-accent)] px-5 py-3 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]">בקשה להצטרף לחודש ראשון</a>
+        <a href="/me/unlock/" class="inline-flex min-h-[44px] items-center rounded-full bg-[var(--nm-accent)] px-5 py-3 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]">לבקש קוד גישה</a>
         <a href="/services/" class="inline-flex min-h-[44px] items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-white px-5 py-3 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]">לבדוק מסלולים</a>
       </div>
     </section>
@@ -55,15 +55,15 @@ import Layout from "../layouts/Layout.astro";
         <div class="mt-4 grid gap-3 md:grid-cols-3">
           <article class="rounded-[1.3rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 px-4 py-4">
             <p class="text-xs font-semibold text-[var(--nm-accent)]">טלפון</p>
-            <p class="mt-2 text-sm leading-[1.7] text-[var(--nm-fg)]" data-me-phone>לא זמין</p>
+            <p class="mt-2 text-sm leading-[1.7] text-[var(--nm-fg)]" data-me-phone>עדיין לא זמין</p>
           </article>
           <article class="rounded-[1.3rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 px-4 py-4">
             <p class="text-xs font-semibold text-[var(--nm-accent)]">חברות פעילה עד</p>
-            <p class="mt-2 text-sm leading-[1.7] text-[var(--nm-fg)]" data-me-expiry>לא ידוע</p>
+            <p class="mt-2 text-sm leading-[1.7] text-[var(--nm-fg)]" data-me-expiry>עדיין לא זמין</p>
           </article>
           <article class="rounded-[1.3rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 px-4 py-4">
             <p class="text-xs font-semibold text-[var(--nm-accent)]">התחברות אחרונה</p>
-            <p class="mt-2 text-sm leading-[1.7] text-[var(--nm-fg)]" data-me-last-login>לא ידוע</p>
+            <p class="mt-2 text-sm leading-[1.7] text-[var(--nm-fg)]" data-me-last-login>עדיין לא זמין</p>
           </article>
         </div>
       </div>
@@ -177,7 +177,8 @@ import Layout from "../layouts/Layout.astro";
 
         const favorites = Array.isArray(readJson(favoritesKey)) ? readJson(favoritesKey) : [];
         const history = Array.isArray(readJson(historyKey)) ? readJson(historyKey) : [];
-        const notes = String(window.localStorage.getItem(notesKey) || "");
+        let notes = "";
+        try { notes = String(window.localStorage.getItem(notesKey) || ""); } catch { /* private browsing */ }
 
         const favoritesList = document.querySelector("[data-me-favorites-list]");
         const favoritesEmpty = document.querySelector("[data-me-favorites-empty]");
@@ -210,7 +211,7 @@ import Layout from "../layouts/Layout.astro";
           };
           updateStatus(notes);
           notesField.addEventListener("input", () => {
-            window.localStorage.setItem(notesKey, notesField.value);
+            try { window.localStorage.setItem(notesKey, notesField.value); } catch { /* private browsing */ }
             updateStatus(notesField.value);
           });
         }

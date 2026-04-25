@@ -25,33 +25,8 @@ const coreConcepts = published
   .filter((a) => a.data.hubPosition === "core")
   .sort((a, b) => hubOrder(a) - hubOrder(b));
 
-const latestPinned = published
-  .filter((a) => a.data.hubPosition === "latest")
-  .sort((a, b) => hubOrder(a) - hubOrder(b))
-  .slice(0, 6);
-
-/** מניעת כפילות slug אם אותו מאמר גם ב־latest וגם ראשון בזרם הכרונולוגי */
-function uniqueBySlug(entries: typeof published) {
-  const seen = new Set<string>();
-  const out: typeof published = [];
-  for (const e of entries) {
-    if (seen.has(e.slug)) continue;
-    seen.add(e.slug);
-    out.push(e);
-  }
-  return out;
-}
-
-const latestDisplay =
-  latestPinned.length > 0
-    ? (() => {
-        const pinnedSlugs = new Set(latestPinned.map((a) => a.slug));
-        const rest = published.filter((a) => !pinnedSlugs.has(a.slug));
-        return uniqueBySlug([...latestPinned, ...rest]).slice(0, 6);
-      })()
-    : published.slice(0, 6);
-
-const latestHasPinned = latestPinned.length > 0;
+const newestSlug = published[0]?.slug ?? "";
+const latestDisplay = published.slice(0, 6);
 
 type LatestPoolItem = {
   slug: string;
@@ -59,6 +34,8 @@ type LatestPoolItem = {
   description: string;
   pub: string;
   tags: string[];
+  isPremium: boolean;
+  isNewest: boolean;
 };
 
 const latestPool: LatestPoolItem[] = published.map((a) => ({
@@ -67,6 +44,8 @@ const latestPool: LatestPoolItem[] = published.map((a) => ({
   description: a.data.description,
   pub: new Date(a.data.pubDate).toISOString(),
   tags: Array.isArray(a.data.tags) ? a.data.tags : [],
+  isPremium: a.data.isPremium === true,
+  isNewest: a.slug === newestSlug,
 }));
 
 const topicOptions = Array.from(new Set(latestPool.flatMap((i) => i.tags))).sort((a, b) =>
@@ -299,11 +278,7 @@ function formatHeDate(d: Date) {
       </div>
 
       <p class="text-right text-xs text-[color-mix(in_srgb,var(--nm-fg)_48%,var(--nm-bg))]">
-        {
-          latestHasPinned
-            ? "המאמרים המסומנים latest מופיעים ראשון. השאר משלים עד שישה לפי תאריך."
-            : "ברירת מחדל: שישה אחרונים לפי תאריך פרסום. אפשר לערבב או לסנן לפי תגית מהרשימה."
-        }
+        ברירת מחדל: החדש ביותר תמיד ראשון. אפשר לערבב או לסנן לפי תגית מהרשימה.
       </p>
 
       <div
@@ -312,15 +287,29 @@ function formatHeDate(d: Date) {
       >
       <ul id="blog-latest-list" class="grid gap-4 md:grid-cols-2 xl:grid-cols-3" role="list">
         {
-          latestDisplay.map((article) => (
+          latestDisplay.map((article, index) => (
             <li data-article-slug={article.slug} class="min-h-0">
               <article class="flex h-full min-h-[11rem] flex-col rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_6%,transparent)] bg-[var(--nm-surface-muted)] p-5 text-right md:min-h-[12rem] md:p-6">
-                <time
-                  class="text-xs font-medium text-[color-mix(in_srgb,var(--nm-fg)_52%,var(--nm-bg))]"
-                  datetime={new Date(article.data.pubDate).toISOString()}
-                >
-                  {formatHeDate(new Date(article.data.pubDate))}
-                </time>
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                  <time
+                    class="text-xs font-medium text-[color-mix(in_srgb,var(--nm-fg)_52%,var(--nm-bg))]"
+                    datetime={new Date(article.data.pubDate).toISOString()}
+                  >
+                    {formatHeDate(new Date(article.data.pubDate))}
+                  </time>
+                  <div class="flex flex-wrap justify-end gap-2">
+                    {index === 0 ? (
+                      <span class="inline-flex items-center rounded-full bg-[color-mix(in_srgb,var(--nm-accent)_12%,white)] px-3 py-1 text-[11px] font-semibold text-[var(--nm-accent)]">
+                        🆕 חדש
+                      </span>
+                    ) : null}
+                    {article.data.isPremium === true ? (
+                      <span class="inline-flex items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-white/90 px-3 py-1 text-[11px] font-semibold text-[var(--nm-fg)]">
+                        🔒 נעול
+                      </span>
+                    ) : null}
+                  </div>
+                </div>
                 <h3 class="mt-2 text-lg font-semibold leading-snug text-[var(--nm-fg)]">
                   <a
                     href={getCanonicalArticleHref(article)}
@@ -402,15 +391,27 @@ function formatHeDate(d: Date) {
 
       function cardHtml(item) {
         const href = "/articles/" + esc(item.slug) + "/";
+        const badges =
+          '<div class="flex flex-wrap justify-end gap-2">' +
+          (item.isNewest
+            ? '<span class="inline-flex items-center rounded-full bg-[color-mix(in_srgb,var(--nm-accent)_12%,white)] px-3 py-1 text-[11px] font-semibold text-[var(--nm-accent)]">🆕 חדש</span>'
+            : "") +
+          (item.isPremium
+            ? '<span class="inline-flex items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-white/90 px-3 py-1 text-[11px] font-semibold text-[var(--nm-fg)]">🔒 נעול</span>'
+            : "") +
+          "</div>";
         return (
           '<li data-article-slug="' +
           esc(item.slug) +
           '" class="min-h-0"><article class="flex h-full min-h-[11rem] flex-col rounded-2xl border border-[color-mix(in_srgb,var(--nm-fg)_6%,transparent)] bg-[var(--nm-surface-muted)] p-5 text-right md:min-h-[12rem] md:p-6">' +
+          '<div class="flex flex-wrap items-center justify-between gap-2">' +
           '<time class="text-xs font-medium text-[color-mix(in_srgb,var(--nm-fg)_52%,var(--nm-bg))]" datetime="' +
           esc(item.pub) +
           '">' +
           esc(formatHe(item.pub)) +
           "</time>" +
+          badges +
+          "</div>" +
           '<h3 class="mt-2 text-lg font-semibold leading-snug text-[var(--nm-fg)]">' +
           '<a href="' +
           href +

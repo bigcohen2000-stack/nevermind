@@ -1,4 +1,4 @@
-﻿---
+---
 import "@fontsource-variable/assistant/wght.css";
 import "@fontsource/heebo/index.css";
 import "../styles/global.css";
@@ -22,7 +22,6 @@ import {
   breadcrumbTrailToJsonLd,
 } from "../lib/site-breadcrumbs";
 import { GOOGLE_SITE_VERIFICATION } from "../data/migration-map";
-import { getArticleYoutubeId } from "../lib/articles";
 
 type StagingBannerCfg = { enabled?: boolean; message?: string };
 type BrandCfg = {
@@ -401,7 +400,7 @@ const faqSchema =
       }
     : null;
 
-const youtubeIdRaw = getArticleYoutubeId(frontmatter) ?? "";
+const youtubeIdRaw = typeof frontmatter?.youtubeId === "string" ? frontmatter.youtubeId.trim() : "";
 const videoSummaryPointsForSchema = Array.isArray(frontmatter?.videoSummaryPoints)
   ? frontmatter.videoSummaryPoints.map((p: string) => String(p).trim()).filter(Boolean)
   : [];
@@ -532,9 +531,15 @@ const socialLinks = [
     <link rel="alternate" hreflang="he-IL" href={canonicalURL} />
     <link rel="alternate" hreflang="he" href={canonicalURL} />
     <link rel="alternate" hreflang="x-default" href={canonicalURL} />
+    <link rel="dns-prefetch" href="https://api.web3forms.com" />
+    {clubWebhookUrl ? <link rel="preconnect" href={new URL(clubWebhookUrl).origin} crossorigin /> : null}
+
     <link rel="icon" href={iconPath} type="image/svg+xml" />
     <link rel="apple-touch-icon" href={iconPath} />
     <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="preload" as="font" href="/fonts/assistant-hebrew-wght-normal.woff2" type="font/woff2" crossorigin />
+    <link rel="preload" as="font" href="/fonts/assistant-latin-ext-wght-normal.woff2" type="font/woff2" crossorigin />
+    <link rel="preload" as="font" href="/fonts/assistant-latin-wght-normal.woff2" type="font/woff2" crossorigin />
     <meta name="theme-color" content={pwaThemeColor} />
     <meta name="color-scheme" content="light dark" />
     <meta name="mobile-web-app-capable" content="yes" />
@@ -845,7 +850,7 @@ const socialLinks = [
             הזהות האמיתית שלך מתחילה איפה שהשם שלך נגמר
           </p>
 
-          <div class="flex flex-wrap items-center justify-start gap-3 gap-y-2 text-sm sm:justify-end">
+          <nav class="flex flex-wrap items-center justify-start gap-3 gap-y-2 text-sm sm:justify-end" aria-label="פעולות מהירות">
             {emailUser && emailDomain ? (
               <button
                 type="button"
@@ -881,7 +886,7 @@ const socialLinks = [
             >
               מחירון
             </a>
-          </div>
+          </nav>
 
           <div class="hidden flex-wrap items-center justify-start gap-2 sm:flex sm:justify-end">
             {socialLinks.map(({ label, href, mark }) => (
@@ -932,6 +937,7 @@ const socialLinks = [
     </button>
 
     <WhatsAppButton
+      client:idle
       phone={appConfig.contact.whatsAppNumber}
       tags={waTags}
       articleTitle={waArticleTitle}
@@ -1200,6 +1206,7 @@ const socialLinks = [
         document.addEventListener("astro:page-load", onAfterSwap);
 
         const NM_CLUB_STORAGE_KEY = "nm_club_session";
+        const NM_ADMIN_STORAGE_KEY = "nm_admin_session";
         const NM_FAVORITES_STORAGE_KEY = "nm_favorites";
         const NM_HISTORY_STORAGE_KEY = "nm_watch_history";
         const readJsonStorage = (key) => {
@@ -1241,6 +1248,31 @@ const socialLinks = [
             lastLoginAt,
           };
         };
+        const nmReadAdminSession = () => {
+          const data = readJsonStorage(NM_ADMIN_STORAGE_KEY);
+          if (!data || typeof data !== "object") return null;
+          const role = typeof data.role === "string" ? data.role.trim() : "";
+          const token = typeof data.token === "string" ? data.token.trim() : "";
+          const expiresAt = typeof data.expiresAt === "string" ? data.expiresAt.trim() : "";
+          const loggedInAt = typeof data.loggedInAt === "string" ? data.loggedInAt.trim() : "";
+          const label = typeof data.label === "string" ? data.label.trim() : "Admin";
+          if (role !== "admin" || !token || !expiresAt) return null;
+          const expiresTs = Date.parse(expiresAt);
+          if (Number.isNaN(expiresTs) || expiresTs < Date.now()) {
+            try {
+              window.localStorage.removeItem(NM_ADMIN_STORAGE_KEY);
+            } catch {
+            }
+            return null;
+          }
+          return {
+            role,
+            token,
+            expiresAt: new Date(expiresTs).toISOString(),
+            loggedInAt,
+            label: label || "Admin",
+          };
+        };
         const nmFormatMemberDate = (value) => {
           const date = new Date(value || "");
           if (Number.isNaN(date.getTime())) return "";
@@ -1261,6 +1293,12 @@ const socialLinks = [
           const strip = document.querySelector("[data-nm-premium-strip]");
           const textEl = strip?.querySelector(".nm-premium-strip-text");
           if (!(strip instanceof HTMLElement) || !(textEl instanceof HTMLElement)) return;
+          const adminSession = nmReadAdminSession();
+          if (adminSession) {
+            const lastLogin = nmFormatMemberDateTime(adminSession.loggedInAt);
+            textEl.textContent = lastLogin ? `ADMIN · כניסה אחרונה ${lastLogin}` : "ADMIN · גישת ניהול פעילה";
+            return;
+          }
           const session = nmReadClubSession();
           if (!session) {
             textEl.textContent = "";
@@ -1275,6 +1313,7 @@ const socialLinks = [
           textEl.textContent = parts.join(" · ");
         };
         const nmSyncHeaderAuth = () => {
+          const adminSession = nmReadAdminSession();
           const memberSession = nmReadClubSession();
           const loginLink = document.querySelector("[data-nm-auth-login]");
           const memberLink = document.querySelector("[data-nm-auth-me]");
@@ -1282,9 +1321,9 @@ const socialLinks = [
           const logoutButton = document.querySelector("[data-nm-auth-logout]");
           const memberSummaryEl = memberLink?.querySelector("[data-nm-auth-summary]");
           const adminSummaryEl = adminLink?.querySelector("[data-nm-auth-admin-summary]");
-          const memberActive = Boolean(memberSession);
-          const adminActive = false;
-          const active = memberActive;
+          const memberActive = Boolean(memberSession) && !adminSession;
+          const adminActive = Boolean(adminSession);
+          const active = memberActive || adminActive;
           if (loginLink instanceof HTMLElement) {
             loginLink.classList.toggle("hidden", active);
             loginLink.toggleAttribute("hidden", active);
@@ -1307,23 +1346,33 @@ const socialLinks = [
               : "LIVE";
           }
           if (adminSummaryEl instanceof HTMLElement) {
-            adminSummaryEl.textContent = "Admin";
+            adminSummaryEl.textContent = adminSession ? ["Admin", adminSession.label].filter(Boolean).join(" · ") : "Admin";
           }
         };
         const nmSyncPremiumUi = () => {
+          const adminSession = nmReadAdminSession();
           const memberSession = nmReadClubSession();
           document.body.classList.toggle("is-premium", Boolean(memberSession));
-          document.body.classList.remove("is-admin");
+          document.body.classList.toggle("is-admin", Boolean(adminSession));
           nmSyncPremiumStripText();
           nmSyncHeaderAuth();
         };
         window.__nmReadClubSession = nmReadClubSession;
+        window.__nmReadAdminSession = nmReadAdminSession;
         window.__nmClearClubSession = () => {
           try {
             window.localStorage.removeItem(NM_CLUB_STORAGE_KEY);
           } catch {
           }
           window.dispatchEvent(new CustomEvent("nm-club-session-changed"));
+          nmSyncPremiumUi();
+        };
+        window.__nmClearAdminSession = () => {
+          try {
+            window.localStorage.removeItem(NM_ADMIN_STORAGE_KEY);
+          } catch {
+          }
+          window.dispatchEvent(new CustomEvent("nm-admin-session-changed"));
           nmSyncPremiumUi();
         };
         const readFavorites = () => {
@@ -1398,8 +1447,10 @@ const socialLinks = [
           const trigger = target.closest("[data-nm-auth-logout]");
           if (!(trigger instanceof HTMLButtonElement)) return;
           event.preventDefault();
+          const hasAdminSession = typeof window.__nmReadAdminSession === "function" && Boolean(window.__nmReadAdminSession());
+          window.__nmClearAdminSession?.();
           window.__nmClearClubSession?.();
-          window.__nmAnnounce?.("היציאה נשמרה על המכשיר הזה.");
+          window.__nmAnnounce?.(hasAdminSession ? "יציאת הניהול נשמרה על המכשיר הזה." : "היציאה נשמרה על המכשיר הזה.");
         };
         const onNmPageLoadSync = () => {
           nmSyncPremiumUi();
@@ -1416,6 +1467,7 @@ const socialLinks = [
           if (
             e.key === null ||
             e.key === NM_CLUB_STORAGE_KEY ||
+            e.key === NM_ADMIN_STORAGE_KEY ||
             e.key === NM_FAVORITES_STORAGE_KEY ||
             e.key === NM_HISTORY_STORAGE_KEY
           ) {
@@ -1425,6 +1477,7 @@ const socialLinks = [
         };
         window.addEventListener("storage", onNmClubStorage);
         window.addEventListener("nm-club-session-changed", nmSyncPremiumUi);
+        window.addEventListener("nm-admin-session-changed", nmSyncPremiumUi);
         window.addEventListener("nm-club-session-changed", syncFavoriteButtons);
 
         const formatAvailabilityDateHebrew = (isoString) => {
@@ -1712,6 +1765,7 @@ const socialLinks = [
           window.removeEventListener("scroll", onHeaderScroll);
           window.removeEventListener("storage", onNmClubStorage);
           window.removeEventListener("nm-club-session-changed", nmSyncPremiumUi);
+          window.removeEventListener("nm-admin-session-changed", nmSyncPremiumUi);
           window.removeEventListener("nm-club-session-changed", syncFavoriteButtons);
           if (backBtn instanceof HTMLElement) {
             backBtn.removeEventListener("click", onBackToTopClick);

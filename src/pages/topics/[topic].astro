@@ -2,11 +2,43 @@
 import Layout from "../../layouts/Layout.astro";
 import appConfig from "../../config/appConfig.json";
 import { DirectLink } from "../../components/ui/DirectLink";
+import RelatedTopicVideos from "../../components/articles/RelatedTopicVideos.astro";
+import { getCollection } from "astro:content";
 
-const topicMap = {
+type TopicKey =
+  | "freedom"
+  | "thought-mechanics"
+  | "self"
+  | "clarity"
+  | "choice"
+  | "real-nothing"
+  | "love";
+
+type TopicConfig = {
+  label: string;
+  tag?: string;
+  description: string;
+  opposite?: {
+    href: string;
+    title: string;
+    description: string;
+  };
+  resources?: Array<{
+    href: string;
+    title: string;
+    description: string;
+    kind?: string;
+  }>;
+  videoTopicKey?: string;
+  videoLabel?: string;
+  videoIntro?: string;
+};
+
+const topicMap: Record<TopicKey, TopicConfig> = {
   freedom: {
     label: "חופש",
     tag: "חופש",
+    description: "מאמרים שמנסים לראות מה נשאר כשמפסיקים לבלבל בין שליטה לבין חופש.",
     opposite: {
       href: "/topics/self/",
       title: "הצד השני: העצמי",
@@ -16,6 +48,7 @@ const topicMap = {
   "thought-mechanics": {
     label: "מכניקת מחשבה",
     tag: "מכניקת מחשבה",
+    description: "כאן מפרקים איך מחשבה נבנית, איך היא מתעקמת, ואיך היא מתחפשת לעובדה.",
     opposite: {
       href: "/topics/clarity/",
       title: "הצד השני: בהירות",
@@ -25,128 +58,199 @@ const topicMap = {
   self: {
     label: "העצמי",
     tag: "העצמי",
+    description: "מאמרים על הדמות, הזהות והצורך להחזיק גרסה קבועה של עצמך.",
     opposite: {
       href: "/topics/freedom/",
       title: "הצד השני: חופש",
       description: "אם העצמי נצמד לדמות, חופש מתחיל במקום שבו הדמות כבר לא חייבת לשלוט בכל תגובה.",
     },
+    videoTopicKey: "self",
+    videoLabel: "צפייה וחקירה: מי אני ופירוק הזהות",
+    videoIntro: "למי שרוצה להישאר על אותו ציר, כאן נפתחת שכבת המשך על זהות, דמות והאשליה של 'אני' קבוע.",
   },
   clarity: {
     label: "בהירות",
     tag: "בהירות",
+    description: "מאמרים שמנסים להוריד רעש, לא כדי להרגיע אלא כדי לראות נכון יותר.",
     opposite: {
       href: "/topics/thought-mechanics/",
       title: "הצד השני: מכניקת מחשבה",
-      description: "אם בהירות היא ראייה נקייה, מכניקת מחשבה היא המבנה שמסביר איך הראייה הזאת מתערפלת.",
+      description: "אם בהירות היא ראייה נקייה, מכניקת מחשבה מסבירה איך הראייה הזאת מתערפלת.",
     },
   },
   choice: {
     label: "בחירה",
     tag: "בחירה",
+    description: "כאן בודקים איפה בחירה היא עובדה, ואיפה היא רק סיפור שאומרים אחרי הפלט.",
     opposite: {
       href: "/topics/thought-mechanics/",
       title: "הצד השני: מכניקת מחשבה",
       description: "אם בחירה היא אפשרות חיה, מכניקת מחשבה מראה מה הופך אותה לאוטומטית ומצומצמת.",
     },
   },
-} as const;
-
-type TopicKey = keyof typeof topicMap;
-type ArticleModule = {
-  frontmatter?: {
-    title?: string;
-    description?: string;
-    tags?: string[];
-    draft?: boolean;
-  };
+  "real-nothing": {
+    label: "כלום אמיתי",
+    tag: "כלום אמיתי",
+    description: "מאמרים שמנסים לפרק את מושג הכלום בלי להפוך אותו לעוד צורה.",
+    opposite: {
+      href: "/topics/clarity/",
+      title: "הצד השני: בהירות",
+      description: "אם כלום אמיתי מפרק את הצורך בצורה, בהירות מראה מה נשאר כשמפסיקים להעמיד פנים שההגדרה היא האמת.",
+    },
+    videoTopicKey: "real-nothing",
+    videoLabel: "צפייה וחקירה: כלום אמיתי",
+    videoIntro: "כאן הרצף נשאר על אותו ציר: כמה קטעים פתוחים, והמשך עמוק יותר למי שכבר בפנים.",
+  },
+  love: {
+    label: "אהבה אמיתית",
+    tag: "אהבה אמיתית",
+    description: "כאן בודקים איך אהבה נקשרת לתחושה טובה, לרצון, ולפחד לאבד את מה שמחבר אותך לטוב הזה.",
+    opposite: {
+      href: "/topics/self/",
+      title: "הצד השני: העצמי",
+      description: "אם אהבה אמיתית מפרקת נפרדות, העצמי מנסה כל הזמן להחזיר גבולות, דרישות ותלות.",
+    },
+    resources: [
+      {
+        href: "/definitions/love/",
+        title: "מה זו אהבה באמת",
+        description: "עמוד המושג שמפריד בין נתון, פירוש ותלות.",
+        kind: "מושג",
+      },
+      {
+        href: "/articles/true-love-logic-mechanism/",
+        title: "מהי אהבה אמיתית - המאמר המלא",
+        description: "פירוק לוגי של אשליית הרגש ושל הפחד מאובדן.",
+        kind: "מאמר ליבה",
+      },
+      {
+        href: "/articles/illusion-of-other-logical-analysis/",
+        title: "האשליה של האחר",
+        description: "פירוק אשליית הנפרדות בין אני לבין מי שמולי.",
+        kind: "מאמר משלים",
+      },
+      {
+        href: "/articles/root-of-desire/",
+        title: "שורש הרצון",
+        description: "השלב שקודם לאהבה המותנית: איזה חיסרון מנסים למלא דרך האחר.",
+        kind: "מאמר משלים",
+      },
+      {
+        href: "/book/",
+        title: "אהבה ב-20 עמודים",
+        description: "ספר קצר ומרוכז למי שרוצה פירוק ישיר של אהבה, זוגיות ושורש הרצון.",
+        kind: "ספר",
+      },
+    ],
+    videoTopicKey: "love",
+    videoLabel: "צפייה וחקירה: מנגנון האהבה",
+    videoIntro: "מה שמכנים אהבה הוא לעיתים הקשר למה שעושה טוב בפנים. כאן בודקים אם זו אהבה, רצון או תלות.",
+  },
 };
 
 export async function getStaticPaths() {
-  return ["freedom", "thought-mechanics", "self", "clarity", "choice"].map((topic) => ({
+  return (["freedom", "thought-mechanics", "self", "clarity", "choice", "real-nothing", "love"] as const).map((topic) => ({
     params: { topic },
     props: { topic },
   }));
 }
 
 const { topic } = Astro.props as { topic: TopicKey };
-const topicInfo = topicMap[topic] ?? { label: "נושא", tag: "" };
+const topicInfo = topicMap[topic];
 
-const articleEntries = import.meta.glob("../../content/articles/**/*.mdx");
-const allArticles = (
-  await Promise.all(
-    Object.entries(articleEntries).map(async ([path, loader]) => {
-      const mod = (await loader()) as ArticleModule;
-      const frontmatter = mod.frontmatter ?? {};
-      if (frontmatter.draft === true) {
-        return null;
-      }
-
-      const slug = path
-        .replace("../../content/articles/", "")
-        .replace(/\.mdx$/, "");
-      const tags = Array.isArray(frontmatter.tags) ? frontmatter.tags : [];
-
-      return {
-        slug: `articles/${slug}`,
-        title: frontmatter.title ?? "מאמר",
-        description: frontmatter.description ?? "",
-        tags,
-      };
-    })
-  )
-).filter((article): article is NonNullable<typeof article> => article !== null);
-
+const allArticles = await getCollection("articles", ({ data }) => data.draft !== true);
 const articles = topicInfo.tag
-  ? allArticles.filter((article) => article.tags.includes(topicInfo.tag))
+  ? allArticles
+      .filter((entry) => Array.isArray(entry.data.tags) && entry.data.tags.includes(topicInfo.tag as string))
+      .map((entry) => ({
+        href: `/articles/${entry.slug}/`,
+        title: entry.data.title,
+        description: entry.data.description,
+      }))
   : [];
 ---
+
 <Layout
   title={topicInfo.label}
-  description={`מאמרים בנושא ${topicInfo.label}`}
+  description={topicInfo.description}
   breadcrumbCurrentLabel={topicInfo.label}
 >
-  <section class="space-y-8">
+  <section class="mx-auto max-w-5xl space-y-8 px-4 py-14 text-right text-[var(--nm-fg)]">
     <header class="space-y-3">
-      <p class="text-[clamp(0.85rem,0.8rem+0.2vw,1rem)] text-[color-mix(in_srgb,var(--nm-fg)_50%,var(--nm-bg))]">נושא</p>
-      <h1 class="text-[clamp(2.1rem,1.6rem+2vw,3.1rem)] font-semibold text-[var(--nm-fg)]">{topicInfo.label}</h1>
-      <p class="text-[clamp(1rem,0.95rem+0.35vw,1.3rem)] text-[var(--nm-fg)]/65">מאמרים שמסכמים את המהות בלי רעש.</p>
+      <p class="text-sm font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">נושא</p>
+      <h1 class="text-[clamp(2rem,1.55rem+1.8vw,3.3rem)] font-semibold">{topicInfo.label}</h1>
+      <p class="max-w-3xl text-[clamp(1rem,0.95rem+0.35vw,1.2rem)] leading-8 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
+        {topicInfo.description}
+      </p>
     </header>
 
-    {topicInfo.opposite && (
-      <aside class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-accent)_18%,transparent)] bg-[var(--nm-tint)] p-6 text-right shadow-[0_16px_40px_rgba(212,43,43,0.08)]">
-        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">הצד השני של המטבע</p>
-        <h2 class="mt-3 text-2xl font-semibold text-[var(--nm-fg)]">{topicInfo.opposite.title}</h2>
+    {topicInfo.opposite ? (
+      <aside class="rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-accent)_18%,transparent)] bg-[var(--nm-tint)] p-6 shadow-[0_16px_40px_rgba(212,43,43,0.08)]">
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">הצד השני של אותו מנגנון</p>
+        <h2 class="mt-3 text-2xl font-semibold">{topicInfo.opposite.title}</h2>
         <p class="mt-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">{topicInfo.opposite.description}</p>
-        <a href={topicInfo.opposite.href} class="mt-5 inline-flex items-center rounded-full border border-[color-mix(in_srgb,var(--nm-accent)_18%,transparent)] bg-white px-4 py-2 text-sm font-semibold text-[var(--nm-accent)] transition hover:bg-[var(--nm-tint)]">
+        <a
+          href={topicInfo.opposite.href}
+          class="mt-5 inline-flex min-h-[44px] items-center rounded-full border border-[color-mix(in_srgb,var(--nm-accent)_18%,transparent)] bg-white px-4 py-2 text-sm font-semibold text-[var(--nm-accent)] transition hover:bg-[var(--nm-tint)]"
+        >
           לעבור לצד השני
         </a>
       </aside>
-    )}
+    ) : null}
 
-    {articles.length > 0 ? (
-      <div class="grid gap-6 md:grid-cols-2">
-        {articles.map((article) => (
-          <a href={`/${article.slug}`} class="flex h-full flex-col justify-between rounded-3xl border border-white/70 bg-white/70 p-6 shadow-sm backdrop-blur-md transition-transform duration-300 hover:scale-[1.01] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color-mix(in_srgb,var(--nm-fg)_22%,transparent)]">
-            <div class="space-y-3">
-              <h2 class="text-[clamp(1.2rem,1.05rem+0.6vw,1.6rem)] font-semibold text-[var(--nm-fg)]">{article.title}</h2>
-              {article.description && <p class="text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] text-[var(--nm-fg)]/65">{article.description}</p>}
-            </div>
-            <span class="mt-6 text-[clamp(0.85rem,0.8rem+0.2vw,1rem)] text-[color-mix(in_srgb,var(--nm-fg)_45%,var(--nm-bg))]">לקריאה שקטה</span>
-          </a>
-        ))}
-      </div>
-    ) : (
-      <div class="rounded-3xl border border-white/70 bg-white/70 p-10 text-center text-[clamp(1rem,0.95rem+0.35vw,1.3rem)] text-[var(--nm-fg)]/65 shadow-sm backdrop-blur-md">
-        זה נושא שנפתח לאט. בקרוב יופיע כאן שקט חדש.
-      </div>
-    )}
+    {topicInfo.resources?.length ? (
+      <section class="space-y-4">
+        <h2 class="text-[clamp(1.35rem,1.2rem+0.7vw,2rem)] font-semibold">נקודות כניסה לנושא</h2>
+        <div class="grid gap-4 md:grid-cols-2">
+          {topicInfo.resources.slice(0, 10).map((resource) => (
+            <a
+              href={resource.href}
+              class="flex h-full flex-col justify-between rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/85 p-5 shadow-sm transition hover:border-[color-mix(in_srgb,var(--nm-accent)_20%,transparent)]"
+            >
+              <div class="space-y-2">
+                {resource.kind ? (
+                  <p class="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--nm-accent)]">{resource.kind}</p>
+                ) : null}
+                <h3 class="nm-title-balance text-lg font-semibold">{resource.title}</h3>
+                <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">{resource.description}</p>
+              </div>
+              <span class="mt-5 text-sm font-semibold text-[var(--nm-accent)]">להמשך קריאה</span>
+            </a>
+          ))}
+        </div>
+      </section>
+    ) : null}
 
-    <div class="flex justify-end pt-6" aria-label="פתיחת שיחה אחרי קריאה">
-      <DirectLink
-        client:load
-        whatsAppNumber={appConfig.contact.whatsAppNumber}
-        fallbackEmail={appConfig.contact.email}
+    {articles.length ? (
+      <section class="space-y-4">
+        <h2 class="text-[clamp(1.35rem,1.2rem+0.7vw,2rem)] font-semibold">מאמרים תחת הנושא</h2>
+        <div class="grid gap-4 md:grid-cols-2">
+          {articles.slice(0, 10).map((article) => (
+            <a
+              href={article.href}
+              class="flex h-full flex-col justify-between rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/85 p-5 shadow-sm transition hover:border-[color-mix(in_srgb,var(--nm-accent)_20%,transparent)]"
+            >
+              <div class="space-y-2">
+                <h3 class="nm-title-balance text-lg font-semibold">{article.title}</h3>
+                <p class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">{article.description}</p>
+              </div>
+              <span class="mt-5 text-sm font-semibold text-[var(--nm-accent)]">להמשך קריאה</span>
+            </a>
+          ))}
+        </div>
+      </section>
+    ) : null}
+
+    {topicInfo.videoTopicKey ? (
+      <RelatedTopicVideos
+        topicKey={topicInfo.videoTopicKey}
+        topicLabel={topicInfo.videoLabel}
+        intro={topicInfo.videoIntro}
       />
+    ) : null}
+
+    <div class="flex justify-end pt-2">
+      <DirectLink client:load whatsAppNumber={appConfig.contact.whatsAppNumber} fallbackEmail={appConfig.contact.email} />
     </div>
   </section>
 </Layout>

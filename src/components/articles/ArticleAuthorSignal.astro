@@ -1,0 +1,36 @@
+---
+interface Props {
+  author?: string;
+}
+
+const { author = "השם לא משנה" } = Astro.props as Props;
+---
+
+<section
+  class="mt-5 rounded-[1.5rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[color-mix(in_srgb,var(--nm-surface-muted)_82%,white)] px-5 py-5 text-right shadow-[0_14px_28px_rgba(26,26,26,0.03)]"
+  aria-label="מאת"
+>
+  <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">מאת</p>
+  <p class="mt-2 text-sm font-semibold leading-7 text-[var(--nm-fg)]">
+    <span class="rounded-full bg-white/80 px-2 py-1">"{author}"</span>
+    <span class="mx-2 text-[color-mix(in_srgb,var(--nm-fg)_26%,transparent)]" aria-hidden="true">•</span>
+    ייעוץ אישי, זוגי ועסקי בשיטת NEVERMIND
+  </p>
+  <p class="mt-3 max-w-3xl text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+    אני לא יודע מי קורא את המאמר הזה. אני כן יודע שאתה יכול לבדוק אם מה שאני מסביר כאן עומד מול המציאות שלך.
+  </p>
+  <div class="mt-4 flex flex-wrap justify-end gap-3">
+    <a
+      href="/services/"
+      class="inline-flex min-h-[44px] items-center justify-center rounded-full bg-[var(--nm-accent)] px-5 py-2.5 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]"
+    >
+      ייעוץ אישי, זוגי ועסקי
+    </a>
+    <a
+      href="/articles/"
+      class="inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-5 py-2.5 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-white/80"
+    >
+      לעוד מאמרים
+    </a>
+  </div>
+</section>

@@ -207,7 +207,7 @@ const webhookUrl = (import.meta.env.PUBLIC_NM_CLUB_WEBHOOK_URL ?? "").trim();
     }
 
     if (!webhookUrl) {
-      hintEl.textContent = "כדי להפעיל כניסה צריך להגדיר PUBLIC_NM_CLUB_WEBHOOK_URL בפריסה. השרת הוא זה שבודק את הסיסמה.";
+      hintEl.textContent = "הכניסה לחברי המועדון לא זמינה כרגע מהעמוד הזה. אם צריך, אפשר לבקש מאיתנו קישור פעיל ונשלח אותו.";
       hintEl.classList.remove("hidden");
       submitBtn.disabled = true;
     }
@@ -230,7 +230,7 @@ const webhookUrl = (import.meta.env.PUBLIC_NM_CLUB_WEBHOOK_URL ?? "").trim();
       event.preventDefault();
       clearError();
       if (!webhookUrl) {
-        showError("אין כתובת אימות מוגדרת.");
+        showError("הכניסה לא זמינה כרגע מהעמוד הזה.");
         return;
       }
 

@@ -22,12 +22,12 @@ const verifyCodeEndpoint = "/api/site/verify-unlock-code";
 const sharedAccessSessionEndpoint = "/api/site/shared-access-session";
 const premiumSessionHours = Number(appConfig.premiumAccess?.sessionHours ?? 168);
 const whatsAppDigits = String(whatsAppNumber || "").replace(/\D/g, "");
-const whatsAppMessage = "היי, הגעתי מהלוח האישי. רוצה להצטרף למועדון ולהישאר בחיבור פעיל.";
+const whatsAppMessage = "היי, הגעתי לעמוד הכניסה השקטה. צריך קוד גישה או בדיקה שהגישה נפתחת כמו שצריך.";
 const whatsAppHref = whatsAppDigits
   ? `https://wa.me/${whatsAppDigits}?text=${encodeURIComponent(whatsAppMessage)}`
   : "/contact/";
 const launchOfferPrice = 175;
-const joinOfferMessage = `היי, הגעתי מהלוח האישי. אני רוצה להצטרף לחודש ראשון במחיר השקה של ${launchOfferPrice} ש"ח.`;
+const joinOfferMessage = "היי, הגעתי לעמוד הכניסה השקטה. אין לי קוד גישה פעיל ואני צריך עזרה בפתיחת הגישה.";
 const joinOfferHref = whatsAppDigits
   ? `https://wa.me/${whatsAppDigits}?text=${encodeURIComponent(joinOfferMessage)}`
   : "/contact/?source=unlock-launch";
@@ -92,16 +92,16 @@ const previewLinks = [
 
 const clubBenefits = [
   {
-    title: "מועדון והטבות",
-    body: "כאן אתה מקבל גישה קרובה יותר, קצב אישי, ותחושה שאתה כבר בבית.",
+    title: "קוד אחד ברור",
+    body: "לא צריך מערכת משתמשים כבדה. יש קוד גישה אחד, והוא רק פותח את השלב הבא.",
   },
   {
-    title: "עד 10,000 שעות מחכות לך",
-    body: "כתיבה, קריאה ושיחות שנבנו כדי לעזור לך להישאר צלול גם ביום רגיל.",
+    title: "זיהוי קצר פעם אחת",
+    body: "אחרי שהקוד מזוהה, שומרים שם וטלפון. זה מה שקושר את המכשיר שלך לגישה עצמה.",
   },
   {
-    title: "זה עדיין חינם בשבילך",
-    body: "אפשר להתחיל משיחה קצרה, בלי טופס ארוך ובלי לחץ מיותר.",
+    title: "גישה שנשארת",
+    body: "מהרגע שהשלב הזה הושלם, אין צורך לחזור על אותו טקס בכל כניסה מחדש.",
   },
 ];
 
@@ -109,17 +109,17 @@ const faqItems = [
   {
     question: "מה קורה אם הקוד לא זוהה",
     answer:
-      "העמוד נשאר פתוח, אתה עדיין בבית, ואפשר להמשיך למאמרים או לדבר איתי ישירות בוואטסאפ.",
+      "בודקים שאין רווחים מיותרים. אם הקוד עדיין לא מזוהה, מבקשים קוד מעודכן בוואטסאפ או דרך דף הקשר.",
   },
   {
-    question: "מה מקבלים במועדון",
+    question: "למה צריך גם שם וטלפון",
     answer:
-      "גישה קרובה יותר לתוכן, המשך למידה מסודר, ושיחה ישירה כשצריך כיוון קצר.",
+      "כי הקוד רק מוכיח שמותר לפתוח את השלב הבא. השם והטלפון שומרים את הגישה במכשיר הזה כדי שלא תצטרך להיכנס מחדש.",
   },
   {
-    question: "האם זה עדיין חינם בשבילי",
+    question: "אין לי קוד. מה עושים",
     answer:
-      "כן. כאן מתחילים ברכות, בודקים התאמה, ורק אז מחליטים אם רוצים להישאר בחיבור.",
+      "פונים בוואטסאפ או דרך דף הקשר, מקבלים קוד, ואז משלימים את שני השלבים בעמוד הזה.",
   },
 ];
 
@@ -146,12 +146,12 @@ const personSchema = {
 const offerSchema = {
   "@context": "https://schema.org",
   "@type": "Offer",
-  name: "מועדון NeverMind חינם",
+  name: "גישה שמורה ל-NeverMind",
   url: "https://www.nevermind.co.il/me/unlock/",
   price: "0",
   priceCurrency: "ILS",
   availability: "https://schema.org/InStock",
-  description: "מועדון NeverMind חינם עם חיבור פעיל, גישה פתוחה למאמרים ושיחה ישירה בוואטסאפ.",
+  description: "עמוד כניסה שקטה עם קוד גישה, שם וטלפון, ושמירה של הגישה במכשיר.",
   seller: {
     "@type": "Organization",
     name: "NeverMind",
@@ -161,33 +161,33 @@ const offerSchema = {
 ---
 
 <Layout
-  title="ברוך הבא ל-NeverMind - גם בלי קוד"
-  description="מועדון NeverMind חינם + חיבור פעיל. גם בלי קוד, אתה כבר בבית: מאמרים, חשיבה צלולה, שיטת ההיפוכים ושיחה ישירה בוואטסאפ."
+  title="כניסה שקטה ל-NeverMind"
+  description="יש לך קוד גישה? פותחים אותו בשני צעדים קצרים: קוד, ואז שם וטלפון. אחר כך הגישה נשמרת במכשיר."
   faqItems={faqItems}
-  breadcrumbCurrentLabel="ברוך הבא ל-NeverMind - גם בלי קוד"
+  breadcrumbCurrentLabel="כניסה שקטה ל-NeverMind"
 >
   <script is:inline type="application/ld+json" set:html={jsonLdForInlineScript(personSchema)} />
   <script is:inline type="application/ld+json" set:html={jsonLdForInlineScript(offerSchema)} />
 
-  <section class="unlock-shell mx-auto max-w-6xl px-4 pb-24 pt-12 text-right text-[#1A1A1A] sm:px-6 lg:px-8">
+  <section id="main-content" class="unlock-shell mx-auto max-w-6xl px-4 pb-24 pt-12 text-right text-[#1A1A1A] sm:px-6 lg:px-8">
     <header class="unlock-rise grid gap-6 rounded-[2rem] border border-[rgba(26,26,26,0.08)] bg-[linear-gradient(135deg,rgba(255,255,255,0.94),rgba(242,245,242,0.92),rgba(250,250,248,0.98))] p-6 shadow-[0_24px_80px_rgba(67,82,72,0.06)] md:p-8 lg:grid-cols-[minmax(0,1.2fr)_22rem] lg:items-center" style="--delay: 20ms;">
       <div class="space-y-6">
         <div class="flex flex-wrap justify-end gap-2 text-[0.75rem] font-semibold text-[rgba(26,26,26,0.62)]">
-          <span class="rounded-full border border-[rgba(88,108,97,0.16)] bg-[rgba(88,108,97,0.08)] px-3 py-1.5">אתה כבר בבית</span>
-          <span class="rounded-full border border-[rgba(88,108,97,0.16)] bg-[rgba(88,108,97,0.08)] px-3 py-1.5">זה עדיין חינם בשבילך</span>
-          <span class="rounded-full border border-[rgba(88,108,97,0.16)] bg-[rgba(88,108,97,0.08)] px-3 py-1.5">חיבור פעיל</span>
+          <span class="rounded-full border border-[rgba(88,108,97,0.16)] bg-[rgba(88,108,97,0.08)] px-3 py-1.5">קוד גישה</span>
+          <span class="rounded-full border border-[rgba(88,108,97,0.16)] bg-[rgba(88,108,97,0.08)] px-3 py-1.5">שם וטלפון</span>
+          <span class="rounded-full border border-[rgba(88,108,97,0.16)] bg-[rgba(88,108,97,0.08)] px-3 py-1.5">שמירה במכשיר</span>
         </div>
 
         <div class="space-y-4">
-          <p class="text-sm font-semibold tracking-[0.16em] text-[rgba(26,26,26,0.46)]">אזור אישי</p>
+          <p class="text-sm font-semibold tracking-[0.16em] text-[rgba(26,26,26,0.46)]">כניסה שקטה</p>
           <h1 class="max-w-3xl text-[clamp(2.4rem,1.9rem+2.5vw,4.8rem)] font-semibold leading-[1.02] tracking-[-0.04em]">
-            ברוך הבא ל-NeverMind - גם בלי קוד
+            פותחים גישה בשני צעדים קצרים
           </h1>
           <p class="max-w-2xl text-[1.06rem] leading-8 text-[rgba(26,26,26,0.72)]">
-            גם אם הקוד לא נפתח, הדלת כאן נשארת פתוחה. אתה כבר בבית, זה עדיין חינם בשבילך, וכאן כבר מרגישים את השקט.
+            קודם מזינים את קוד הגישה. אחר כך משאירים שם וטלפון פעם אחת, כדי שהמכשיר הזה יישאר מחובר ולא תצטרך להיכנס מחדש בכל פעם.
           </p>
           <p class="max-w-2xl text-[1rem] leading-8 text-[rgba(26,26,26,0.66)]">
-            יש כאן טעימה מהספרייה, מאמרים פתוחים, והזמנה אחת פשוטה לדבר. רוצה להישאר בחיבור.
+            זה לא ניהול משתמשים כבד, לא מיילים, ולא טופס הרשמה ארוך. רק זיהוי קצר ששומר את הגישה שלך בצורה נקייה.
           </p>
         </div>
 
@@ -199,10 +199,10 @@ const offerSchema = {
             data-wa-link
             class="inline-flex min-h-[64px] w-full items-center justify-center rounded-full bg-[#5E7468] px-8 text-center text-lg font-semibold text-[#FAFAF8] shadow-[0_18px_40px_rgba(94,116,104,0.28)] transition hover:-translate-y-0.5 hover:bg-[#50655A] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#5E7468] sm:w-auto sm:min-w-[24rem] sm:text-xl"
           >
-            בוא נדבר בוואטסאפ - זה מרגיש כמו בית
+            צריך קוד או עזרה? דברו איתי בוואטסאפ
           </a>
           <p class="text-sm text-[rgba(26,26,26,0.58)]">
-            זה עדיין חינם בשבילך. אם וואטסאפ לא נפתח, אפשר לעבור גם ל<a href="/contact/" class="font-semibold underline underline-offset-4">דף קשר</a>.
+            אם אין לך קוד עדיין, או אם משהו לא נפתח כמו שצריך, אפשר לעבור גם ל<a href="/contact/" class="font-semibold underline underline-offset-4">דף קשר</a>.
           </p>
         </div>
 
@@ -285,10 +285,10 @@ const offerSchema = {
         <section class="unlock-rise rounded-[1.75rem] border border-[rgba(26,26,26,0.1)] bg-white/88 p-6 shadow-[0_18px_48px_rgba(67,82,72,0.05)]" style="--delay: 180ms;">
           <div class="flex items-start justify-between gap-4">
             <div class="space-y-2">
-              <p class="text-sm font-semibold text-[rgba(26,26,26,0.46)]">מועדון והטבות</p>
-              <h2 class="text-[clamp(1.6rem,1.4rem+0.8vw,2.3rem)] font-semibold tracking-[-0.03em]">החלק שמרגיש כמו בית</h2>
+              <p class="text-sm font-semibold text-[rgba(26,26,26,0.46)]">איך זה עובד</p>
+              <h2 class="text-[clamp(1.6rem,1.4rem+0.8vw,2.3rem)] font-semibold tracking-[-0.03em]">שלוש נקודות שמסדרות את כל הכניסה</h2>
             </div>
-            <span class="rounded-full border border-[rgba(94,116,104,0.15)] bg-[rgba(94,116,104,0.08)] px-3 py-1.5 text-xs font-semibold text-[#4B6055]">אתה כבר בבית</span>
+            <span class="rounded-full border border-[rgba(94,116,104,0.15)] bg-[rgba(94,116,104,0.08)] px-3 py-1.5 text-xs font-semibold text-[#4B6055]">בלי סיבוך מיותר</span>
           </div>
           <div class="mt-5 grid gap-3 md:grid-cols-3">
             {clubBenefits.map((benefit) => (
@@ -299,9 +299,9 @@ const offerSchema = {
             ))}
           </div>
           <div class="mt-5 rounded-[1.4rem] border border-[rgba(94,116,104,0.12)] bg-[rgba(94,116,104,0.08)] p-4">
-            <p class="text-sm font-semibold text-[#4B6055]">כאן כבר מרגישים את השקט</p>
+            <p class="text-sm font-semibold text-[#4B6055]">זה כל ההיגיון של המסך הזה</p>
             <p class="mt-2 text-sm leading-7 text-[rgba(26,26,26,0.7)]">
-              אין כאן הרשמה ארוכה. יש שיחה אחת קצרה, חיבור פעיל, ודרך פשוטה להישאר קרוב למה שעוזר לך.
+              אין כאן הרשמה ארוכה, אין מיילים, ואין עומס מיותר. רק בדיקת קוד, זיהוי קצר, ושמירה של הגישה במקום אחד.
             </p>
           </div>
         </section>
@@ -311,7 +311,7 @@ const offerSchema = {
             <p class="text-sm font-semibold text-[rgba(26,26,26,0.46)]">טעימה מהדרך</p>
             <h2 class="text-[clamp(1.45rem,1.3rem+0.7vw,2rem)] font-semibold tracking-[-0.03em]">מאמרים שאפשר לפתוח כבר עכשיו</h2>
             <p class="text-sm leading-7 text-[rgba(26,26,26,0.66)]">
-              גם בלי קוד, יש לך על מה להישען. יש כאן {totalArticles} מאמרים פתוחים, וזה עדיין חינם בשבילך. העדכון האחרון היה ב-{latestUpdate}.
+              גם בלי קוד, יש לך {totalArticles} מאמרים פתוחים שאפשר לקרוא כבר עכשיו. העדכון האחרון היה ב-{latestUpdate}.
             </p>
           </div>
           <div class="mt-5 grid gap-3 sm:grid-cols-2">
@@ -375,7 +375,7 @@ const offerSchema = {
             </span>
           </div>
           <p class="mt-4 text-sm leading-7 text-[rgba(26,26,26,0.68)]" data-join-copy>
-            אפשר לפתוח חודש ראשון במחיר השקה של 175 ש"ח, להיכנס בשקט, ולקבל גישה למה שנשמר לחברים.
+            כדי לפתוח את התוכן הסגור צריך קוד גישה. אם אין לך קוד, מבקשים אחד, ואז משלימים כאן שם וטלפון פעם אחת.
           </p>
           <div class="mt-5 flex flex-wrap justify-end gap-3">
             <a
@@ -385,14 +385,14 @@ const offerSchema = {
               rel="noopener noreferrer"
               class="inline-flex min-h-[52px] items-center justify-center rounded-full bg-[#1A1A1A] px-6 text-sm font-semibold text-[#FAFAF8] transition hover:bg-[#2A2A2A]"
             >
-              בקשה להצטרף לחודש ראשון ב-175 ש"ח
+              לבקש קוד גישה
             </a>
             <a href="/services/" class="inline-flex min-h-[52px] items-center justify-center rounded-full border border-[rgba(26,26,26,0.12)] px-5 text-sm font-semibold text-[#1A1A1A] transition hover:bg-[rgba(26,26,26,0.04)]">
-              לבדוק מה נפתח בפנים
+              לראות מה נפתח בפנים
             </a>
           </div>
           <p class="mt-3 text-xs leading-6 text-[rgba(26,26,26,0.5)]">
-            הנורה הופכת לירוקה ברגע שיש חיבור פעיל במכשיר הזה.
+            הנורה הופכת לירוקה רק אחרי שהקוד נבדק והזיהוי נשמר במכשיר הזה.
           </p>
         </section>
 
@@ -401,46 +401,46 @@ const offerSchema = {
             <p class="text-sm font-semibold text-[rgba(26,26,26,0.46)]">קוד אישי</p>
             <h2 class="text-[1.5rem] font-semibold tracking-[-0.03em]">כניסה שקטה למי שכבר קיבל קוד</h2>
             <p class="text-sm leading-7 text-[rgba(26,26,26,0.68)]">
-              אם יש לך קוד, אפשר לפתוח כאן את הדלת. אם לא, אתה עדיין בבית ויכול להמשיך ישר לוואטסאפ.
-            </p>
-          </div>
-          <div class="mt-5 space-y-3">
-            <label class="sr-only" for="unlock-code-input">הכנס קוד אישי</label>
-            <input
-              id="unlock-code-input"
-              type="password"
-              autocomplete="off"
-              placeholder="הכנס קוד אישי"
-              class="min-h-[54px] w-full rounded-full border border-[rgba(26,26,26,0.12)] bg-[#FAFAF8] px-5 text-right text-base outline-none transition placeholder:text-[rgba(26,26,26,0.32)] focus:border-[rgba(94,116,104,0.34)]"
-            />
+                אם יש לך קוד גישה, מזינים אותו כאן. ברגע שהוא מזוהה, נשאר רק שם וטלפון כדי לשמור את הכניסה במכשיר הזה.
+              </p>
+            </div>
+            <div class="mt-5 space-y-3">
+              <label class="sr-only" for="unlock-code-input">הכנס קוד גישה</label>
+              <input
+                id="unlock-code-input"
+                type="password"
+                autocomplete="off"
+                placeholder="הכנס קוד גישה"
+                class="min-h-[54px] w-full rounded-full border border-[rgba(26,26,26,0.12)] bg-[#FAFAF8] px-5 text-right text-base outline-none transition placeholder:text-[rgba(26,26,26,0.32)] focus:border-[rgba(94,116,104,0.34)]"
+              />
             <button
               id="unlock-enter"
               type="button"
               class="inline-flex min-h-[54px] w-full items-center justify-center rounded-full border border-[rgba(26,26,26,0.12)] bg-[#1A1A1A] px-6 text-base font-semibold text-[#FAFAF8] transition hover:bg-[#2A2A2A] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#1A1A1A]"
             >
-              פתח לי את הדלת
-            </button>
-            <p id="unlock-error" class="hidden text-sm leading-7 text-[#8E4E4E]">
-              הקוד לא זוהה עדיין. אפשר לדבר איתי ישירות ולקבל כיוון קצר.
-            </p>
-            <p id="unlock-success" class="hidden text-sm leading-7 text-[#4B6055]">
-              הקוד זוהה. אתה כבר בפנים.
-            </p>
-            <div id="unlock-identity-panel" class="hidden rounded-[1.35rem] border border-[rgba(26,26,26,0.1)] bg-[rgba(250,250,248,0.92)] p-4">
-              <div class="space-y-2">
-                <p class="text-sm font-semibold text-[rgba(26,26,26,0.56)]">רק כדי לזהות את הכניסה</p>
-                <p class="text-sm leading-7 text-[rgba(26,26,26,0.68)]">
-                  אחרי שהקוד נפתח, נשמור שם וטלפון כדי שאדע מי נכנס ומתי.
-                </p>
-              </div>
-              <div class="mt-4 grid gap-3">
+                בדוק קוד
+              </button>
+              <p id="unlock-error" class="hidden text-sm leading-7 text-[#8E4E4E]">
+                הקוד לא זוהה. בדוק שאין רווחים בתחילה או בסוף, או בקש קוד מעודכן בוואטסאפ.
+              </p>
+              <p id="unlock-success" class="hidden text-sm leading-7 text-[#4B6055]">
+                הקוד זוהה. נשאר רק שלב אחד: שם וטלפון.
+              </p>
+              <div id="unlock-identity-panel" class="hidden rounded-[1.35rem] border border-[rgba(26,26,26,0.1)] bg-[rgba(250,250,248,0.92)] p-4">
+                <div class="space-y-2">
+                  <p class="text-sm font-semibold text-[rgba(26,26,26,0.56)]">שלב 2: שומרים את הגישה</p>
+                  <p class="text-sm leading-7 text-[rgba(26,26,26,0.68)]">
+                    אחרי שהקוד נפתח, נשמור שם וטלפון פעם אחת. זה מה שיגרום למכשיר הזה להישאר מחובר לתוכן הסגור.
+                  </p>
+                </div>
+                <div class="mt-4 grid gap-3">
                 <label class="space-y-2">
                   <span class="block text-sm font-semibold text-[rgba(26,26,26,0.72)]">שם</span>
                   <input
                     id="unlock-fullname-input"
                     type="text"
                     autocomplete="name"
-                    placeholder="איך לקרוא לך"
+                      placeholder="השם שיופיע אצלך בגישה"
                     class="min-h-[52px] w-full rounded-[1.1rem] border border-[rgba(26,26,26,0.12)] bg-white px-4 text-right text-base outline-none transition placeholder:text-[rgba(26,26,26,0.32)] focus:border-[rgba(94,116,104,0.34)]"
                   />
                 </label>
@@ -460,8 +460,8 @@ const offerSchema = {
                   type="button"
                   class="inline-flex min-h-[52px] w-full items-center justify-center rounded-full border border-[rgba(26,26,26,0.12)] bg-[#5E7468] px-6 text-base font-semibold text-[#FAFAF8] transition hover:bg-[#50655A] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#5E7468]"
                 >
-                  להיכנס ולשמור זיהוי
-                </button>
+                    שמור גישה והמשך
+                  </button>
                 <p id="unlock-identity-status" class="hidden text-sm leading-7 text-[#4B6055]"></p>
               </div>
             </div>
@@ -526,10 +526,10 @@ const offerSchema = {
     <section class="unlock-rise mt-6 text-center" style="--delay: 360ms;">
       <p class="text-sm font-semibold text-[rgba(26,26,26,0.48)]">אתה כבר בבית</p>
       <p class="mx-auto mt-3 max-w-2xl text-[clamp(1.2rem,1.05rem+0.6vw,1.65rem)] font-semibold leading-8 tracking-[-0.03em]">
-        רוצה להישאר בחיבור
+        אין לך קוד או שמשהו עדיין לא נפתח
       </p>
       <p class="mx-auto mt-3 max-w-2xl text-sm leading-7 text-[rgba(26,26,26,0.64)]">
-        שיחה אחת קצרה בוואטסאפ מספיקה כדי להבין אם המועדון מתאים לך עכשיו.
+        שיחה קצרה בוואטסאפ מספיקה כדי לבדוק אם הקוד תקין, אם צריך קוד חדש, או אם משהו בכניסה נתקע בדרך.
       </p>
       <a
         href={whatsAppHref}
@@ -538,7 +538,7 @@ const offerSchema = {
         data-wa-link
         class="mt-5 inline-flex min-h-[62px] items-center justify-center rounded-full bg-[#5E7468] px-8 text-lg font-semibold text-[#FAFAF8] shadow-[0_18px_40px_rgba(94,116,104,0.28)] transition hover:-translate-y-0.5 hover:bg-[#50655A]"
       >
-        בוא נדבר בוואטסאפ - זה עדיין חינם בשבילך
+        בוא נדבר בוואטסאפ
       </a>
     </section>
   </section>
@@ -711,10 +711,9 @@ const offerSchema = {
 
     <script
     is:inline
-    define:vars={{ validCodesRaw, unlockAccessModeRaw, verifyCodeEndpoint, sharedAccessSessionEndpoint, premiumSessionHours, whatsAppHref, joinOfferHref, launchOfferPrice, pulseEndpoint }}
+    define:vars={{ unlockAccessModeRaw, verifyCodeEndpoint, sharedAccessSessionEndpoint, premiumSessionHours, whatsAppHref, joinOfferHref, launchOfferPrice, pulseEndpoint }}
   >
     window.__NM_UNLOCK_CONFIG__ = {
-      validCodesRaw,
       unlockAccessModeRaw,
       verifyCodeEndpoint,
       sharedAccessSessionEndpoint,

@@ -1,5 +1,210 @@
 ---
-import StaticRedirectPage from "../../../components/StaticRedirectPage.astro";
+import Layout from "../../../layouts/Layout.astro";
+import ServiceRouteGrid from "../../../components/services/ServiceRouteGrid.astro";
+import RelatedTopicVideos from "../../../components/articles/RelatedTopicVideos.astro";
+
+const faqItems = [
+  {
+    question: "האם ייעוץ זוגי כאן נועד להציל כל קשר?",
+    answer:
+      "לא. זה לא עמוד שמבטיח להציל קשר בכל מחיר. בודקים אם אתם נאבקים על אהבה, על שליטה, על צדק או על פחד מאובדן, ורק אז אפשר לראות מה נכון לעשות.",
+  },
+  {
+    question: "האם חייבים להגיע שני בני הזוג?",
+    answer:
+      "לא. זה לא תנאי לוגי. לפעמים המנגנון שמחזיק את התקיעות יושב קודם כל באופן שבו אתה קורא את המציאות, גם אם הצד השני עוד לא מוכן להיכנס לבדיקה.",
+  },
+  {
+    question: "האם המטרה כאן היא ללמד תקשורת נכונה?",
+    answer:
+      "לא. זה לא שיעור בניסוח עדין יותר. אם הפירוש הפנימי נשאר מעוות, גם משפטים יפים יהפכו לעוד דרך להסתיר מאבק. קודם מפרקים את ההנחה, אחר כך הדיבור מתיישר.",
+  },
+];
 ---
 
-<StaticRedirectPage to="/personal-consultation/" title="Redirecting..." message="This page has moved." />
+<Layout
+  title="ייעוץ זוגי | מה באמת הורס את הקשר?"
+  description="ייעוץ זוגי בשיטת NeverMind מפרק מריבות, פחד ותלות דרך הפרדה בין נתון, פירוש ותגובה. לא שיפור דינמיקה. בדיקת שורש."
+  faqItems={faqItems}
+  breadcrumbCurrentLabel="ייעוץ זוגי"
+>
+  <section class="mx-auto max-w-5xl space-y-10 px-4 pb-24 pt-12 text-right text-[var(--nm-fg)]">
+    <header class="space-y-5 rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/92 px-6 py-8 shadow-[0_24px_80px_rgba(26,26,26,0.06)] md:px-8">
+      <p class="text-sm font-semibold tracking-[0.18em] text-[var(--nm-accent)]">אישי וזוגי</p>
+      <h1 class="nm-title-balance text-[clamp(2.2rem,1.7rem+1.7vw,3.5rem)] font-semibold leading-[1.08]">
+        ייעוץ זוגי בשיטת NeverMind
+      </h1>
+      <p class="nm-copy-balanced max-w-4xl text-[clamp(1rem,0.96rem+0.25vw,1.12rem)] leading-8 text-[color-mix(in_srgb,var(--nm-fg)_74%,var(--nm-bg))]">
+        ייעוץ זוגי בשיטת NeverMind הוא פירוק אנליטי של מריבה, קנאה, פחד ותלות בלי ללטף את הסיפור. במקום לדבר על "תקשורת", "הכלה" או "עבודה על הקשר", בודקים מה קרה בפועל, איזה פירוש הולבש עליו, ואיזה מנגנון מחזיק את התקיעות.
+      </p>
+      <div class="flex flex-wrap justify-end gap-3">
+        <a
+          href="/personal-consultation/"
+          class="inline-flex min-h-[46px] items-center justify-center rounded-full bg-[var(--nm-accent)] px-5 py-3 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]"
+        >
+          שיחה אישית לפני פירוק זוגי
+        </a>
+        <a
+          href="/definitions/love/"
+          class="inline-flex min-h-[46px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-5 py-3 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]"
+        >
+          מה זו אהבה באמת
+        </a>
+      </div>
+    </header>
+
+    <section class="space-y-5 rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/92 p-6 shadow-[0_18px_50px_rgba(26,26,26,0.04)]">
+      <h2 class="nm-title-balance text-[clamp(1.6rem,1.35rem+0.8vw,2.3rem)] font-semibold">הכשל הלוגי</h2>
+      <div class="grid gap-4 md:grid-cols-2">
+        <article class="rounded-[1.3rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-4">
+          <h3 class="text-base font-semibold">השגיאה של בלבול בין כאב לבין הוכחה לאהבה</h3>
+          <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+            אתה מניח שאם זה כואב, זה עמוק. בפועל, הרבה כאב זוגי נובע מאחיזה, לא מאהבה.
+          </p>
+        </article>
+        <article class="rounded-[1.3rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-4">
+          <h3 class="text-base font-semibold">השגיאה של הצורך להיות צודק במקום לראות מה קורה</h3>
+          <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+            ברגע שהצדק חשוב יותר מהאמת, בן הזוג הופך ליריב והקשר הופך לזירה.
+          </p>
+        </article>
+        <article class="rounded-[1.3rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-4">
+          <h3 class="text-base font-semibold">השגיאה של קריאת פחד בשם "מחויבות"</h3>
+          <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+            הרבה פעמים מה שנראה כמו מאבק על הקשר הוא בכלל פחד לפגוש ריק, בדידות או אובדן שליטה.
+          </p>
+        </article>
+        <article class="rounded-[1.3rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-4">
+          <h3 class="text-base font-semibold">השגיאה של הפיכת בן הזוג למקור הערך העצמי</h3>
+          <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+            אם כל תזוזה שלו נקראת כהוכחה למה אתה שווה, אתה כבר לא רואה אדם. אתה רואה מד ערך.
+          </p>
+        </article>
+        <article class="rounded-[1.3rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-4 md:col-span-2">
+          <h3 class="text-base font-semibold">השגיאה של ערבוב בין עובדה, פירוש ותגובה</h3>
+          <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+            ההודעה לא נענתה. זו עובדה. "הוא מזלזל בי" הוא פירוש. הטון, המריבה, או הניתוק שבאים אחר כך הם תגובה. רוב הזוגות מתווכחים על הפירוש כאילו היה נתון.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <RelatedTopicVideos
+      topicKey="consultation"
+      topicLabel="צפייה וחקירה: ייעוץ זוגי ושיחה"
+      intro="למי שרוצה לראות איך שכבת ההעמקה נראית מעבר לעמוד השירות, כאן נפתח רצף נוסף לחברי המועדון."
+    />
+
+    <section class="space-y-5 rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/92 p-6 shadow-[0_18px_50px_rgba(26,26,26,0.04)]">
+      <h2 class="nm-title-balance text-[clamp(1.6rem,1.35rem+0.8vw,2.3rem)] font-semibold">הגישה המקובלת מול הגישה של NeverMind</h2>
+      <div class="overflow-x-auto">
+        <table class="min-w-full border-collapse text-sm leading-7">
+          <thead>
+            <tr class="border-b border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)]">
+              <th class="px-3 py-3 text-right font-semibold text-[var(--nm-fg)]">הגישה המקובלת</th>
+              <th class="px-3 py-3 text-right font-semibold text-[var(--nm-fg)]">הגישה של NeverMind</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="border-b border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] align-top">
+              <td class="px-3 py-3">מתמקדת באיך לדבר יפה יותר בזמן שהמנגנון נשאר זהה.</td>
+              <td class="px-3 py-3">בודקת למה בכלל נולד המאבק, ואיזה פירוש מזין אותו.</td>
+            </tr>
+            <tr class="border-b border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] align-top">
+              <td class="px-3 py-3">מניחה שהבעיה היא תקשורת לקויה.</td>
+              <td class="px-3 py-3">מניחה שהבעיה מתחילה בהנחת יסוד שגויה על אהבה, כבוד, פחד או שליטה.</td>
+            </tr>
+            <tr class="border-b border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] align-top">
+              <td class="px-3 py-3">מנסה לאזן בין שני סיפורים.</td>
+              <td class="px-3 py-3">מפרידה בין נתון לבין הסיפור שנבנה סביבו.</td>
+            </tr>
+            <tr class="align-top">
+              <td class="px-3 py-3">שואלת איך לשמור על הקשר.</td>
+              <td class="px-3 py-3">שואלת מה באמת מחזיק את הקשר, ומה בתוכו כבר מזמן מתנהל מתוך פחד.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="space-y-5 rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/92 p-6 shadow-[0_18px_50px_rgba(26,26,26,0.04)]">
+      <h2 class="nm-title-balance text-[clamp(1.6rem,1.35rem+0.8vw,2.3rem)] font-semibold">המנגנון האנליטי</h2>
+      <div class="space-y-4">
+        <article class="rounded-[1.3rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-4">
+          <h3 class="text-lg font-semibold">בידוד הנתון הגולמי</h3>
+          <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+            מתחילים מהאירוע בלי דרמה: נשלחה הודעת ווטסאפ בשעה 16:10, נראתה בשעה 16:12, ולא נענתה עד 20:30. זה הנתון. לא "הוא התעלם ממני", לא "אני לא מעניינת אותו", ולא "הקשר גמור".
+          </p>
+        </article>
+        <article class="rounded-[1.3rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-4">
+          <h3 class="text-lg font-semibold">זיהוי המנגנון הפרשני</h3>
+          <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+            כאן בודקים איזה מנגנון קפץ על הנתון: פחד מדחייה, צורך בהוכחת אהבה, הרגל לקרוא איחור כביטול, או אגו שלא מוכן לאבד עדיפות. הפירוש הזה הוא מה שמצית את הסבל, לא המסך הכחול של הווטסאפ.
+          </p>
+        </article>
+        <article class="rounded-[1.3rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-4">
+          <h3 class="text-lg font-semibold">איון הרעש</h3>
+          <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+            אחרי שמזהים את הפירוש, מפסיקים להגיב כאילו הוא עובדה. זה לא מבטל כאב, אבל זה מונע ממך לבנות עליו חקירה, איום, התקפה או ניתוק. משם אפשר לראות אם יש בכלל בעיה בקשר, או רק רעש שנולד בתוך הראש.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <section class="space-y-5 rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/92 p-6 shadow-[0_18px_50px_rgba(26,26,26,0.04)]">
+      <h2 class="nm-title-balance text-[clamp(1.6rem,1.35rem+0.8vw,2.3rem)] font-semibold">מקרה מבחן לוגי</h2>
+      <div class="grid gap-4 md:grid-cols-3">
+        <article class="rounded-[1.3rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-4">
+          <h3 class="text-base font-semibold">נתון</h3>
+          <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+            בן הזוג חזר מאוחר, כמעט לא דיבר, ונכנס ישר למקלחת.
+          </p>
+        </article>
+        <article class="rounded-[1.3rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-4">
+          <h3 class="text-base font-semibold">פירוש</h3>
+          <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+            "הוא כבר לא רוצה אותי", "יש משהו שהוא מסתיר", "אני לא חשובה". הנתון נבלע מיד בתוך הסיפור הישן.
+          </p>
+        </article>
+        <article class="rounded-[1.3rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-4">
+          <h3 class="text-base font-semibold">פתרון לוגי</h3>
+          <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+            קודם מפרידים. אחר כך בודקים אם יש כאן דפוס עובדתי, או רק פירוש שמחפש שוב הוכחה לפחד ישן. רק אז שואלים מה באמת צריך להיבדק בקשר.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <section class="space-y-5 rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/92 p-6 shadow-[0_18px_50px_rgba(26,26,26,0.04)]">
+      <h2 class="nm-title-balance text-[clamp(1.6rem,1.35rem+0.8vw,2.3rem)] font-semibold">שאלות נפוצות</h2>
+      <div class="grid gap-3">
+        {faqItems.map((item) => (
+          <details class="rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] px-4 py-4">
+            <summary class="cursor-pointer list-none text-sm font-semibold text-[var(--nm-fg)] marker:hidden">{item.question}</summary>
+            <p class="mt-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">{item.answer}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+
+    <section class="space-y-5 rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--nm-bg-canvas)_96%,white),color-mix(in_srgb,var(--nm-surface-muted)_80%,white))] p-6 shadow-[0_18px_50px_rgba(26,26,26,0.04)]">
+      <h2 class="nm-title-balance text-[clamp(1.6rem,1.35rem+0.8vw,2.3rem)] font-semibold">לאן ממשיכים מכאן</h2>
+      <p class="text-sm leading-8 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+        אם התקיעות הזוגית היא רק שכבה אחת בתוך סיפור אישי ישן, תתחיל מ־<a href="/personal-consultation/" class="font-semibold text-[var(--nm-accent)] underline decoration-[color-mix(in_srgb,var(--nm-accent)_30%,transparent)] underline-offset-4">שיחה אישית</a>.
+        הקשר הלוגי פשוט: לפעמים הקשר לא קורס בגלל מה שהשני עשה, אלא בגלל הדרך שבה אתה מפרש אובדן, דחייה או איום.
+      </p>
+      <p class="text-sm leading-8 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+        אם אתה קורא לאחיזה, פחד או תלות בשם אהבה, תמשיך אל <a href="/definitions/love/" class="font-semibold text-[var(--nm-accent)] underline decoration-[color-mix(in_srgb,var(--nm-accent)_30%,transparent)] underline-offset-4">מה זו אהבה באמת</a>.
+        הקשר כאן הוא לא רומנטי אלא לוגי: כל פירוק זוגי נשען על ההגדרה שאתה נותן למילה "אהבה".
+      </p>
+      <p class="text-sm leading-8 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+        אם אתה רוצה לבדוק איך מריבה מתנפחת מבפנים עוד לפני שהיא מתפוצצת בחוץ, אפשר להמשיך גם אל <a href="/articles/resolving-fights/" class="font-semibold text-[var(--nm-accent)] underline decoration-[color-mix(in_srgb,var(--nm-accent)_30%,transparent)] underline-offset-4">לפתור מריבות</a> ולבדוק את אותו מנגנון על מקרה קיים.
+      </p>
+    </section>
+
+    <ServiceRouteGrid
+      title="אם הזוגי הוא רק השכבה העליונה"
+      intro="יש מצבים שבהם המריבה היא לא המסלול היחיד. כאן אפשר לעבור לייעוץ אישי, לארכיון, לאולפן או למסלול מקצועי למטפלים."
+    />
+  </section>
+</Layout>

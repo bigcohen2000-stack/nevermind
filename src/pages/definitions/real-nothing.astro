@@ -1,0 +1,59 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import RelatedTopicVideos from "../../components/articles/RelatedTopicVideos.astro";
+import VideoPlayer from "../../components/VideoPlayer.astro";
+---
+
+<Layout
+  title="מהו כלום אמיתי?"
+  description='הגדרה חדה ל"כלום אמיתי": למה כל ניסיון לדמיין כלום כבר יוצר יש, ואיך ההבנה הזאת משנה את היחס לריק, למוות ולגבול.'
+  breadcrumbCurrentLabel="מהו כלום אמיתי?"
+>
+  <section class="mx-auto max-w-3xl space-y-4 px-4 py-16 text-right text-[var(--nm-fg)]">
+    <h1 class="text-[clamp(1.7rem,1.4rem+1.2vw,2.5rem)] font-light">מהו כלום אמיתי?</h1>
+    <p class="leading-8 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+      כלום אמיתי אינו חושך, חלל, ריק לבן או שקט. כל אלה כבר תיאורים של משהו. ברגע שהמוח מצליח להצביע על צורה,
+      זמן, מרחב או חוויה כלשהי, הוא כבר לא מחזיק כלום אלא יש.
+    </p>
+    <p class="leading-8 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+      לכן הבעיה אינה "איך לדמיין כלום", אלא להבין לוגית למה זה בלתי אפשרי. ההבנה הזאת אינה משחק פילוסופי. היא נוגעת
+      ישירות בפחד מריק, ממוות, ומהרעיון שיש אני נפרד שעלול להיעלם.
+    </p>
+
+    <section class="space-y-3 rounded-[1.5rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/80 px-5 py-5 shadow-sm">
+      <h2 class="text-xl font-semibold">מה חשוב לראות כאן</h2>
+      <ul class="space-y-2 pr-5 text-[color-mix(in_srgb,var(--nm-fg)_76%,var(--nm-bg))]">
+        <li>המוח יודע לעבוד עם צורות. לכן כשהוא מנסה לתפוס כלום, הוא מייצר מיד משהו.</li>
+        <li>כלום אמיתי והכל האמיתי נפגשים באותה נקודה: היעדר מוחלט של גבול.</li>
+        <li>ברגע שההבחנה הזאת מתבהרת, גם החרדה מפני אין מתחילה לאבד אחיזה.</li>
+      </ul>
+    </section>
+
+    <div class="rounded-[1.5rem] border border-[color-mix(in_srgb,var(--nm-accent)_16%,transparent)] bg-[var(--nm-tint)] px-5 py-5">
+      <p class="text-sm font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">העמקה</p>
+      <h2 class="mt-2 text-xl font-semibold">המאמר המלא על כלום אמיתי</h2>
+      <p class="mt-2 leading-8 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+        אם המושג הזה כבר סדק אצלך משהו עמוק יותר, המאמר המלא מפרק את פרדוקס ההגדרה, את מפגש ההפכים בין אין להכל,
+        ואת מה שזה עושה לפחד הקיומי.
+      </p>
+      <a
+        href="/articles/real-nothing-logical-analysis/"
+        class="mt-4 inline-flex min-h-[44px] items-center justify-center rounded-full bg-[var(--nm-accent)] px-5 py-2.5 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]"
+      >
+        למאמר המלא
+      </a>
+    </div>
+
+    <section class="space-y-3 rounded-[1.5rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/80 px-5 py-5 shadow-sm">
+      <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">וידאו פתוח</p>
+      <h2 class="text-xl font-semibold">הווידאו הראשון שפותח את הכשל</h2>
+      <VideoPlayer youtubeId="0PPCXpA8KRI" title="מהו כלום אמיתי ולמה אי אפשר לדמיין אותו" />
+    </section>
+
+    <RelatedTopicVideos
+      topicKey="real-nothing"
+      topicLabel="עוד וידאו על כלום, אין ואינסוף"
+      intro="אם הנקודה הזאת כבר התחילה לזוז אצלך, כאן אפשר להמשיך לעוד שלושה פירוקים פתוחים לפני שנכנסים לרצף המלא."
+    />
+  </section>
+</Layout>

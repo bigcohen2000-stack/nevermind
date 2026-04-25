@@ -1,151 +1,18 @@
 ---
-import { getCollection } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
-import RoleGate from "../../components/admin/RoleGate.astro";
 
-const pageTitle = "ניהול ראשי";
-const pageDescription = "שער הכניסה לניהול הראשי של NeverMind.";
-
-const allArticles = await getCollection("articles");
-const stats = {
-  total: allArticles.length,
-  published: allArticles.filter((article) => !article.data.draft).length,
-  draft: allArticles.filter((article) => article.data.draft).length,
-  premium: allArticles.filter((article) => article.data.isPremium === true).length,
-};
-
-const controlCards = [
-  {
-    title: "ניהול חברים",
-    description: "מכאן עוברים לניהול גישה, כניסות אחרונות, Fraud Flags ופעילות חיה של המועדון.",
-    href: "/dashboard/#access",
-    cta: "לפתוח ניהול חברים",
-    eyebrow: "גישה חיה",
-  },
-  {
-    title: "מצב מערכת",
-    description: "כאן בודקים חיבורים ל־Cloudflare, מצב build, בדיקת מובייל ופערי חיפוש.",
-    href: "/dashboard/#system-health",
-    cta: "לבדוק מצב מערכת",
-    eyebrow: "בריאות מערכת",
-  },
-  {
-    title: "מחולל תוכן",
-    description: "מעבר לכלי הכתיבה הפנימי כדי לייצר טיוטות, frontmatter ושפה עקבית ל־NeverMind.",
-    href: "/admin/generator/",
-    cta: "לפתוח מחולל",
-    eyebrow: "תוכן",
-  },
-  {
-    title: "מחולל פרדוקסים",
-    description: "מסך נפרד לעבודה על ניסויי מחשבה ושאלות עומק בלי לערבב אותם עם ניהול האתר.",
-    href: "/admin/paradoxes/",
-    cta: "לפתוח מחולל פרדוקסים",
-    eyebrow: "תוכן",
-  },
-  {
-    title: "הגדרות אתר",
-    description: "מעבר להגדרות כלל האתר, שירותים, מבנה הבית ונקודות בקרה על מה שעולה בפועל.",
-    href: "/admin/settings/",
-    cta: "לפתוח הגדרות",
-    eyebrow: "תפעול",
-  },
-  {
-    title: "תצוגת חבר",
-    description: "בדיקה מהירה של מה שחבר פעיל רואה ושל מסך האורח לפני פתיחת גישה או אחרי שינוי.",
-    href: "/me/",
-    cta: "לפתוח תצוגת חבר",
-    eyebrow: "בדיקה חיה",
-  },
-];
-
-const statusCards = [
-  { label: "כל המאמרים", value: String(stats.total), helper: "כולל טיוטות ותוכן פרימיום" },
-  { label: "מאמרים פעילים", value: String(stats.published), helper: "זמינים לקריאה באתר" },
-  { label: "טיוטות", value: String(stats.draft), helper: "מחכות לעריכה או פרסום" },
-  { label: "תוכן למועדון", value: String(stats.premium), helper: "ננעל לחברים פעילים" },
-];
+const pageTitle = "מעבר ללוח הניהול";
+const pageDescription = "הניהול עבר למסלול /dashboard/ ונשען על Cloudflare Access.";
 ---
 
 <Layout title={pageTitle} description={pageDescription} noIndex={true}>
-  <RoleGate requiredRole="admin" fallback="נדרשת הרשאת מנהל כדי להיכנס למסך הזה">
-    <div class="mx-auto max-w-7xl space-y-8 px-5 py-8 text-right sm:px-8 lg:px-12">
-      <section class="overflow-hidden rounded-[32px] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[radial-gradient(circle_at_top_left,_rgba(212,43,43,0.14),_transparent_34%),linear-gradient(135deg,#ffffff_0%,#f4f2ed_100%)] p-6 shadow-[0_24px_70px_rgba(26,26,26,0.06)]">
-        <div class="grid gap-6 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] lg:items-end">
-          <div class="space-y-4">
-            <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--nm-accent)]">מנהל בלבד</p>
-            <h1 class="text-[clamp(2rem,1.55rem+1.6vw,3rem)] font-semibold leading-tight text-[var(--nm-fg)]">שער הכניסה לניהול הראשי</h1>
-            <p class="max-w-3xl text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
-              העמוד הזה מיועד רק לך. מכאן עוברים למחולל התוכן, לניהול החברים, לבדיקת תצוגת חבר ולבדיקת מצב הפריסה. החבר הרגיל לא רואה את המסך הזה.
-            </p>
-            <div class="flex flex-wrap gap-2 text-xs">
-              <span class="inline-flex items-center rounded-full border border-[color-mix(in_srgb,var(--nm-accent)_18%,transparent)] bg-[var(--nm-tint)] px-3 py-1 font-medium text-[var(--nm-accent)]">מומלץ לנעול את /admin/* ואת /dashboard/* ב־Cloudflare Access</span>
-              <span class="inline-flex items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/75 px-3 py-1 font-medium text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">bigcohen2000@gmail.com בלבד</span>
-            </div>
-          </div>
-
-          <div class="grid gap-3 sm:grid-cols-2">
-            {statusCards.map((card) => (
-              <article class="rounded-[24px] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/84 p-4 backdrop-blur-sm">
-                <p class="text-xs text-[color-mix(in_srgb,var(--nm-fg)_48%,var(--nm-bg))]">{card.label}</p>
-                <p class="mt-2 text-3xl font-semibold text-[var(--nm-fg)]">{card.value}</p>
-                <p class="mt-1 text-xs text-[color-mix(in_srgb,var(--nm-fg)_48%,var(--nm-bg))]">{card.helper}</p>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {controlCards.map((card) => (
-          <article class="rounded-[28px] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/92 p-5 shadow-[0_18px_50px_rgba(26,26,26,0.05)]">
-            <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">{card.eyebrow}</p>
-            <h2 class="mt-2 text-xl font-semibold text-[var(--nm-fg)]">{card.title}</h2>
-            <p class="mt-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_64%,var(--nm-bg))]">{card.description}</p>
-            <a
-              href={card.href}
-              class="mt-5 inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-[var(--nm-bg-canvas)] px-4 py-2 text-sm font-semibold text-[var(--nm-fg)] transition hover:border-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)] hover:text-[var(--nm-accent)]"
-            >
-              {card.cta}
-            </a>
-          </article>
-        ))}
-      </section>
-
-      <section class="grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(0,0.85fr)]">
-        <article class="rounded-[28px] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/92 p-5">
-          <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">מה מחובר עכשיו</p>
-          <ul class="mt-4 space-y-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
-            <li class="rounded-[18px] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] px-4 py-3">ניהול החברים והבקרה החיים יושבים בתוך הדשבורד ומושכים נתונים דרך ה־worker של המועדון.</li>
-            <li class="rounded-[18px] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] px-4 py-3">מצב המערכת מחובר לבדיקות runtime, למוני Cloudflare, לדוח build ולפערי חיפוש שנשמרים ב־KV.</li>
-            <li class="rounded-[18px] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] px-4 py-3">כלי התוכן נשארים נפרדים כדי לעבוד מהר, אבל נקודת הכניסה הראשית מסבירה לאן הולכים ומה כל מסך עושה.</li>
-          </ul>
-        </article>
-
-        <article class="rounded-[28px] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/92 p-5">
-          <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">בדיקות מהירות</p>
-          <div class="mt-4 grid gap-3">
-            <a href="/dashboard/#connections" class="rounded-[18px] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] px-4 py-3 text-sm font-semibold text-[var(--nm-fg)] transition hover:border-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)] hover:text-[var(--nm-accent)]">לראות חיבורים חיים</a>
-            <a href="/dashboard/#security-feed" class="rounded-[18px] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] px-4 py-3 text-sm font-semibold text-[var(--nm-fg)] transition hover:border-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)] hover:text-[var(--nm-accent)]">לראות Fraud Flags</a>
-            <a href="/me/unlock/" class="rounded-[18px] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] px-4 py-3 text-sm font-semibold text-[var(--nm-fg)] transition hover:border-[color-mix(in_srgb,var(--nm-accent)_22%,transparent)] hover:text-[var(--nm-accent)]">לבדוק מסך אורח</a>
-          </div>
-        </article>
-      </section>
-
-      <div class="flex justify-end gap-3">
-        <button type="button" id="admin-logout-btn" class="rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-6 py-3 font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]">
-          התנתקות
-        </button>
-      </div>
-    </div>
-
-    <script>
-      document.addEventListener("astro:page-load", () => {
-        const logoutBtn = document.getElementById("admin-logout-btn");
-        logoutBtn?.addEventListener("click", () => {
-          window.location.href = "/cdn-cgi/access/logout";
-        });
-      });
-    </script>
-  </RoleGate>
+  <section class="mx-auto max-w-2xl px-4 py-16 text-right text-[var(--nm-fg)]">
+    <p class="text-sm text-[color-mix(in_srgb,var(--nm-fg)_65%,var(--nm-bg))]">מעביר ללוח הניהול...</p>
+    <p class="mt-4 text-sm">
+      <a href="/dashboard/" class="font-semibold text-[var(--nm-accent)] underline underline-offset-4">לחץ כאן אם לא קרה כלום</a>
+    </p>
+  </section>
+  <script is:inline>
+    location.replace("/dashboard/");
+  </script>
 </Layout>

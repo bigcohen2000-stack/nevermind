@@ -5,6 +5,7 @@ import {
   MAX_DEEP_PAGE_VIEWS,
   MAX_INTEGRITY_REPORTS,
   PROGRESS_TOKEN_MAX_MS,
+  buildSharedIdentityKey,
   appendActivity,
   checkRateLimit,
   countDistinctIps,
@@ -15,6 +16,7 @@ import {
   getPasswordHashVersion,
   isExpired,
   json,
+  normalizeIdentityName,
   normalizePhone,
   readClientIp,
   requireAdminAuth,
@@ -398,6 +400,9 @@ export default {
       phone,
       memberName: String(member.memberName ?? fallbackName ?? "").trim() || "חבר",
       userAgent,
+      source: "LIVE",
+      identityKey: `member:${phone}`,
+      eventType: "login",
     };
 
     const nextMemberActivity = appendActivity(memberActivity, nextEntry);
@@ -647,10 +652,13 @@ async function handleAdminSharedAccessLog(request: Request, env: Env, headers: H
   }
 
   const phone = normalizePhone(payload?.phone ?? "");
-  const memberName = String(payload?.fullName ?? "").trim().slice(0, 80);
+  const memberName = normalizeIdentityName(payload?.fullName ?? "");
   const path = String(payload?.path ?? "/me/unlock/").trim().slice(0, 500);
+  const identityKey =
+    String(payload?.identityKey ?? "").trim() || buildSharedIdentityKey(memberName, phone);
+  const eventType = payload?.eventType === "heartbeat" ? "heartbeat" : "login";
 
-  if (!phone || memberName.length < 2) {
+  if (!phone || memberName.length < 2 || !identityKey) {
     return json({ ok: false, error: "צריך שם וטלפון תקינים." }, 400, headers);
   }
 
@@ -661,7 +669,7 @@ async function handleAdminSharedAccessLog(request: Request, env: Env, headers: H
   const ipHash = await sha256Hex(`${env.CLUB_IP_PEPPER}:${rawIp}`);
   const userAgent = (forwardedUserAgent || String(request.headers.get("user-agent") ?? "")).slice(0, 240);
 
-  const memberActivityKey = `activity:member:${phone}`;
+  const memberActivityKey = `activity:shared:${identityKey}`;
   const memberActivity = await readActivity(env.CLUB_ACTIVITY, memberActivityKey);
   const nextEntry: ActivityEntry = {
     ipHash,
@@ -670,6 +678,9 @@ async function handleAdminSharedAccessLog(request: Request, env: Env, headers: H
     phone,
     memberName,
     userAgent,
+    source: "SHARED",
+    identityKey,
+    eventType,
   };
   const nextMemberActivity = appendActivity(memberActivity, nextEntry);
 
@@ -681,6 +692,9 @@ async function handleAdminSharedAccessLog(request: Request, env: Env, headers: H
       phone,
       memberName,
       lastLoginAt: nowIso,
+      identityKey,
+      source: "SHARED",
+      eventType,
     },
     200,
     headers

@@ -2,29 +2,47 @@
 ---
 
 <div class="grid gap-4 lg:grid-cols-2 xl:grid-cols-4">
-  <div class="rounded-[24px] border border-black/8 bg-[#FAFAF8] p-4">
-    <p class="text-sm font-semibold text-[#1A1A1A]">Cloudflare Access</p>
+  <div class="rounded-[24px] border border-emerald-600/12 bg-emerald-600/[0.04] p-4">
+    <p class="text-sm font-semibold text-[#1A1A1A]">פעיל עכשיו</p>
     <p class="mt-2 text-sm leading-7 text-black/62">
-      נעל את <code class="rounded bg-white px-1.5 py-0.5 text-xs">/admin/*</code>, <code class="rounded bg-white px-1.5 py-0.5 text-xs">/dashboard/*</code>, <code class="rounded bg-white px-1.5 py-0.5 text-xs">/api/dashboard/*</code> ו־<code class="rounded bg-white px-1.5 py-0.5 text-xs">/api/club-admin/*</code>
-      למייל <code class="rounded bg-white px-1.5 py-0.5 text-xs">bigcohen2000@gmail.com</code> בלבד.
+      שכבת הבסיס כבר מחוברת:{" "}
+      <code class="rounded bg-white px-1.5 py-0.5 text-xs">NM_CLUB_AUTH_BASE_URL</code>,{" "}
+      <code class="rounded bg-white px-1.5 py-0.5 text-xs">NM_CLUB_ADMIN_SERVICE_KEY</code>,{" "}
+      <code class="rounded bg-white px-1.5 py-0.5 text-xs">PREMIUM_SESSION_SECRET</code>,{" "}
+      <code class="rounded bg-white px-1.5 py-0.5 text-xs">PUBLIC_CLUB_ADMIN_VIA_PROXY=true</code>,{" "}
+      <code class="rounded bg-white px-1.5 py-0.5 text-xs">SEARCH_GAPS</code>,{" "}
+      <code class="rounded bg-white px-1.5 py-0.5 text-xs">RESEND_API_KEY</code>
+      ו-<code class="rounded bg-white px-1.5 py-0.5 text-xs">RESEND_FROM_EMAIL</code>.
     </p>
   </div>
-  <div class="rounded-[24px] border border-black/8 bg-[#FAFAF8] p-4">
-    <p class="text-sm font-semibold text-[#1A1A1A]">משתני חובה</p>
+
+  <div class="rounded-[24px] border border-amber-500/12 bg-amber-500/[0.05] p-4">
+    <p class="text-sm font-semibold text-[#1A1A1A]">כדאי לאמת עכשיו</p>
     <p class="mt-2 text-sm leading-7 text-black/62">
-      ודא שיש ב־Pages production את <code class="rounded bg-white px-1.5 py-0.5 text-xs">NM_CLUB_AUTH_BASE_URL</code>, <code class="rounded bg-white px-1.5 py-0.5 text-xs">NM_CLUB_ADMIN_SERVICE_KEY</code>, <code class="rounded bg-white px-1.5 py-0.5 text-xs">PREMIUM_SESSION_SECRET</code> ו־<code class="rounded bg-white px-1.5 py-0.5 text-xs">PUBLIC_CLUB_ADMIN_VIA_PROXY=true</code>.
+      כרטיס Cloudflare נשען על{" "}
+      <code class="rounded bg-white px-1.5 py-0.5 text-xs">CF_API_TOKEN</code>
+      ו-<code class="rounded bg-white px-1.5 py-0.5 text-xs">CF_ZONE_ID</code>. המשתנים קיימים, אבל רק token עם{" "}
+      <span class="font-semibold text-[#1A1A1A]">Zone Analytics Read</span> יציג נתוני זמן אמת נקיים.
     </p>
   </div>
+
   <div class="rounded-[24px] border border-black/8 bg-[#FAFAF8] p-4">
-    <p class="text-sm font-semibold text-[#1A1A1A]">טפסים, מונים ופערי חיפוש</p>
+    <p class="text-sm font-semibold text-[#1A1A1A]">אופציונלי בלבד</p>
     <p class="mt-2 text-sm leading-7 text-black/62">
-      לטפסים צריך <code class="rounded bg-white px-1.5 py-0.5 text-xs">RESEND_API_KEY</code> ו־<code class="rounded bg-white px-1.5 py-0.5 text-xs">RESEND_FROM_EMAIL</code>. אם רוצים יעד נפרד למיילים, מוסיפים גם <code class="rounded bg-white px-1.5 py-0.5 text-xs">RESEND_TO_EMAIL</code>. אם רוצים hCaptcha גלוי, מוסיפים גם <code class="rounded bg-white px-1.5 py-0.5 text-xs">PUBLIC_HCAPTCHA_SITE_KEY</code>. לקאונטר החי צריך <code class="rounded bg-white px-1.5 py-0.5 text-xs">CF_API_TOKEN</code> עם הרשאת <span class="font-semibold text-[#1A1A1A]">Zone Analytics Read</span> ו־<code class="rounded bg-white px-1.5 py-0.5 text-xs">CF_ZONE_ID</code>. אם רוצים שפערי חיפוש יישמרו בין פריסות, מוסיפים גם KV binding בשם <code class="rounded bg-white px-1.5 py-0.5 text-xs">SEARCH_GAPS</code>.
+      <code class="rounded bg-white px-1.5 py-0.5 text-xs">PSI_API_KEY</code>
+      מיועד רק לבדיקת מובייל בלחיצה.{" "}
+      <code class="rounded bg-white px-1.5 py-0.5 text-xs">PUBLIC_HCAPTCHA_SITE_KEY</code>
+      נדרש רק אם יש ספאם אמיתי בטפסים. אם אין צורך מובהק, עדיף להשאיר את שתי השכבות האלה כבויות.
     </p>
   </div>
+
   <div class="rounded-[24px] border border-black/8 bg-[#FAFAF8] p-4">
-    <p class="text-sm font-semibold text-[#1A1A1A]">SSL ו־Indexing</p>
+    <p class="text-sm font-semibold text-[#1A1A1A]">הגנות שכבר קיימות</p>
     <p class="mt-2 text-sm leading-7 text-black/62">
-      ב־Cloudflare Dashboard ודא שה־SSL mode הוא <span class="font-semibold text-[#1A1A1A]">Full (strict)</span>. עמודי הניהול כבר מסומנים ב־noindex, ב־robots וב־headers, כך שלא צריך להוסיף canonical נוסף.
+      נתיבי ניהול, API פנימי ועמוד פתיחת הגישה כבר מסומנים{" "}
+      <code class="rounded bg-white px-1.5 py-0.5 text-xs">noindex</code> דרך{" "}
+      <code class="rounded bg-white px-1.5 py-0.5 text-xs">public/_headers</code>. אין צורך להוסיף שכבת SEO נוספת
+      כדי להסתיר את אזור הניהול ממנועי חיפוש.
     </p>
   </div>
 </div>

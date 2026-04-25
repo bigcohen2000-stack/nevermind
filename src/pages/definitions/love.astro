@@ -1,16 +1,117 @@
 ---
 import Layout from "../../layouts/Layout.astro";
+import RelatedTopicVideos from "../../components/articles/RelatedTopicVideos.astro";
 ---
 
 <Layout
   title="מה זו אהבה באמת?"
-  description="הגדרה קצרה לאהבה."
+  description="מהי אהבה ומה משמעותה לפי NeverMind. לא רגש, לא דרישה, אלא בדיקה של רצון, תלות ופירוש."
   breadcrumbCurrentLabel="מה זו אהבה באמת?"
 >
-  <section class="mx-auto max-w-3xl space-y-4 px-4 py-16 text-right text-[var(--nm-fg)]">
-    <h1 class="text-[clamp(1.7rem,1.4rem+1.2vw,2.5rem)] font-light">מה זו אהבה באמת?</h1>
+  <section class="mx-auto max-w-3xl space-y-5 px-4 py-16 text-right text-[var(--nm-fg)]">
+    <h1 class="text-[clamp(1.8rem,1.45rem+1.4vw,2.7rem)] font-light">מה זו אהבה באמת?</h1>
     <p class="leading-8 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
-      אהבה מתחילה כשרואים את מי שמולך כמו שהוא. בלי לנהל אותו. בלי לפחד לאבד שליטה.
+      השאלה מתחילה במילה אחת. אהבה. אבל המילה עצמה לא מסבירה כלום.
+      כל אדם מדביק לה כוונה אחרת. פעם זה חופש. פעם זה כסף. פעם זה אדם אחר.
     </p>
+    <p class="leading-8 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+      לכן צריך לעצור לפני הרומנטיקה. לא לשאול קודם מה אתה אוהב. לשאול מה
+      בדיוק המילה הזאת מנסה לתאר. רק שם מתחיל פירוק אמיתי.
+    </p>
+
+    <section class="space-y-3 rounded-[1.5rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/80 px-5 py-5 shadow-sm">
+      <h2 class="text-xl font-semibold">מה נשבר בדרך כלל בהבנה של אהבה</h2>
+      <ul class="space-y-2 pr-5 text-[color-mix(in_srgb,var(--nm-fg)_76%,var(--nm-bg))]">
+        <li>מבלבלים בין אהבה לבין רצון חזק להחזיק מקור סיפוק.</li>
+        <li>מבלבלים בין פחד מאובדן לבין עומק.</li>
+        <li>מבלבלים בין אהבה לבין דרישה שהאחר יתאים את עצמו אליך.</li>
+      </ul>
+    </section>
+
+    <section class="space-y-3 rounded-[1.5rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] px-5 py-5 shadow-sm">
+      <h2 class="text-xl font-semibold">מה המילה הזאת מנסה לכסות</h2>
+      <p class="leading-8 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+        אדם אומר שהוא אוהב חופש, כסף, שמש, שקט או אדם מסוים. אבל אם בודקים
+        לעומק, רואים שהוא לא מדבר על האובייקט עצמו. הוא מדבר על מה שהאובייקט
+        נותן לו. ערך, נוחות, ביטחון, קרבה או הקלה.
+      </p>
+      <p class="leading-8 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+        לכן אהבה, ברוב המקרים, אינה תיאור של הדבר בחוץ. היא תיאור של הקשר בין
+        הרצון שלך לבין מה שנדמה לך שהדבר הזה ממלא בתוכך.
+      </p>
+    </section>
+
+    <section class="space-y-3 rounded-[1.5rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/88 px-5 py-5 shadow-sm">
+      <h2 class="text-xl font-semibold">מהי אהבה אמיתית לפי האתר</h2>
+      <p class="leading-8 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+        אהבה אמיתית אינה דרישה. היא גם לא חוזה סמוי. היא מצב שבו האחר מפסיק
+        לשמש כלי לניהול הריק שלך. כאן נופלת התלות. רק אחר כך אפשר לדבר על
+        קרבה נקייה יותר.
+      </p>
+      <p class="leading-8 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+        במילים אחרות, אם משהו מחבר אותך לטוב שבתוכך או לרצון שלך, אתה קורא לזה
+        אהבה. אבל כל עוד המקור נתפס כנמצא רק בחוץ, תישאר גם תלות. האהבה
+        מתחלפת בפחד לאבד את מה שמחבר אותך לטוב הזה.
+      </p>
+    </section>
+
+    <div class="rounded-[1.5rem] border border-[color-mix(in_srgb,var(--nm-accent)_16%,transparent)] bg-[var(--nm-tint)] px-5 py-5">
+      <p class="text-sm font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">המשך מדויק</p>
+      <h2 class="mt-2 text-xl font-semibold">שני מאמרים שצריך לעבור דרכם</h2>
+      <p class="mt-2 leading-8 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+        בלי פירוק של אשליית האחר ושל שורש הרצון, המילה אהבה תישאר רק כותרת
+        עמומה. שני הצירים האלה מסבירים למה האדם נקשר, למה הוא נאחז, ולמה הוא
+        קורא לזה אהבה.
+      </p>
+      <div class="mt-4 flex flex-wrap gap-3">
+        <a
+          href="/articles/illusion-of-other-logical-analysis/"
+          class="inline-flex min-h-[44px] items-center justify-center rounded-full bg-[var(--nm-accent)] px-5 py-2.5 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]"
+        >
+          האשליה של האחר
+        </a>
+        <a
+          href="/articles/root-of-desire/"
+          class="inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-5 py-2.5 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]"
+        >
+          שורש הרצון
+        </a>
+      </div>
+    </div>
+
+    <div class="rounded-[1.5rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/88 px-5 py-5 shadow-sm">
+      <h2 class="text-xl font-semibold">המאמר המלא על אהבה אמיתית</h2>
+      <p class="mt-2 leading-8 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+        אם צריך את הפירוק המלא, שם בודקים מה ההבדל בין אהבה יחסית לבין אהבה
+        נקייה יותר. לא ברמת הסיסמה. ברמת המנגנון.
+      </p>
+      <a
+        href="/articles/true-love-logic-mechanism/"
+        class="mt-4 inline-flex min-h-[44px] items-center justify-center rounded-full bg-[var(--nm-inverse)] px-5 py-2.5 text-sm font-semibold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-inverse-hover)]"
+      >
+        למאמר המלא
+      </a>
+    </div>
+
+    <div class="rounded-[1.5rem] border border-[color-mix(in_srgb,var(--nm-accent)_16%,transparent)] bg-[var(--nm-tint)] px-5 py-5">
+      <p class="text-sm font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">ספר</p>
+      <h2 class="mt-2 text-xl font-semibold">אהבה ב-20 עמודים</h2>
+      <p class="mt-2 leading-8 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+        אם אתה מחפש פירוק קצר ומרוכז על אהבה, זוגיות ושורש הרצון, הספר יושב
+        בדיוק על הציר הזה. בלי להתפזר.
+      </p>
+      <a
+        href="/book/"
+        class="mt-4 inline-flex min-h-[44px] items-center justify-center rounded-full bg-[var(--nm-accent)] px-5 py-2.5 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]"
+      >
+        לעמוד הספר
+      </a>
+    </div>
+
+    <RelatedTopicVideos
+      topicKey="love"
+      topicLabel="צפייה וחקירה: מנגנון האהבה"
+      intro="כאן אפשר להתחיל בקטעים הפתוחים. אחר כך להמשיך לשכבת מועדון על אותו נושא."
+    />
   </section>
 </Layout>

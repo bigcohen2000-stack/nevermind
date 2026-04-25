@@ -87,15 +87,6 @@ function setupArticlePage() {
       }
     };
 
-    const hasDashboardAccess = () => {
-      try {
-        const raw = window.localStorage.getItem("nm_access_code");
-        return typeof raw === "string" && raw.trim().length > 0;
-      } catch {
-        return false;
-      }
-    };
-
     const hasPremiumLocalSession = () => {
       try {
         const raw = window.localStorage.getItem("nm-premium-access");
@@ -124,7 +115,7 @@ function setupArticlePage() {
       }
     };
 
-    const hasPremiumAccess = () => hasDashboardAccess() || hasPremiumLocalSession() || hasClubSession();
+    const hasPremiumAccess = () => hasPremiumLocalSession() || hasClubSession();
 
     const buildPremiumVaultShell = () => {
       if (!(paywallRoot instanceof HTMLElement)) {

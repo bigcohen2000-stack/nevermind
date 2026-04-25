@@ -11,45 +11,40 @@
 </script>
 
 <script>
-  type NmMetric = {
-    name: string;
-    value: number;
-    rating?: string;
-    delta?: number;
-    id?: string;
-  };
-
-  const reportWebVitals = (metric: NmMetric) => {
-    window.nmTrackEvent?.('web_vitals', {
+  // Web Vitals tracking
+  const reportWebVitals = (metric) => {
+    // Send to analytics
+    window.nmTrackEvent('web_vitals', {
       name: metric.name,
       value: metric.value,
       rating: metric.rating,
       delta: metric.delta,
-      id: metric.id,
+      id: metric.id
     });
 
+    // Log to console in development
     if (import.meta.env.DEV) {
       console.log('Web Vital:', metric);
     }
   };
 
-  import('web-vitals')
-    .then(({ onCLS, onINP, onFCP, onLCP, onTTFB }) => {
-      onCLS(reportWebVitals);
-      onINP(reportWebVitals);
-      onFCP(reportWebVitals);
-      onLCP(reportWebVitals);
-      onTTFB(reportWebVitals);
-    })
-    .catch((err) => {
-      console.warn('Web Vitals tracking failed to load:', err);
-    });
+  // Dynamic import to avoid bundle bloat
+  import('web-vitals').then(({ onCLS, onFID, onFCP, onLCP, onTTFB }) => {
+    onCLS(reportWebVitals);
+    onFID(reportWebVitals);
+    onFCP(reportWebVitals);
+    onLCP(reportWebVitals);
+    onTTFB(reportWebVitals);
+  }).catch(err => {
+    console.warn('Web Vitals tracking failed to load:', err);
+  });
 
+  // User interaction tracking
   let interactionCount = 0;
   const trackInteraction = () => {
     interactionCount++;
     if (interactionCount === 1) {
-      window.nmTrackEvent?.('first_interaction');
+      window.nmTrackEvent('first_interaction');
     }
   };
 
@@ -57,10 +52,12 @@
   document.addEventListener('keydown', trackInteraction, { once: true });
   document.addEventListener('touchstart', trackInteraction, { once: true });
 
-  const trackThemeChange = (theme: string) => {
-    window.nmTrackEvent?.('theme_change', { theme });
+  // Theme preference tracking
+  const trackThemeChange = (theme) => {
+    window.nmTrackEvent('theme_change', { theme });
   };
 
+  // Listen for theme changes
   const observer = new MutationObserver((mutations) => {
     mutations.forEach((mutation) => {
       if (mutation.type === 'attributes' && mutation.attributeName === 'data-theme') {
@@ -72,22 +69,21 @@
 
   observer.observe(document.documentElement, {
     attributes: true,
-    attributeFilter: ['data-theme'],
+    attributeFilter: ['data-theme']
   });
 
-  const trackSearch = (query: string, results: number) => {
-    window.nmTrackEvent?.('search', {
-      query: query.slice(0, 100),
+  // Search tracking
+  const trackSearch = (query, results) => {
+    window.nmTrackEvent('search', {
+      query: query.substring(0, 100), // Limit length
       results_count: results,
-      has_results: results > 0,
+      has_results: results > 0
     });
   };
 
+  // Listen for search events
   window.addEventListener('nm-search-performed', (event) => {
-    const customEvent = event as CustomEvent<{ query?: string; results?: number }>;
-    const detail = customEvent.detail ?? {};
-    const query = typeof detail.query === 'string' ? detail.query : '';
-    const results = typeof detail.results === 'number' ? detail.results : 0;
+    const { query, results } = event.detail;
     trackSearch(query, results);
   });
 </script>

@@ -13,7 +13,7 @@ const formsEnabled = MAIL_DELIVERY_ENABLED;
 ---
 
 <Layout title="יצירת קשר" description="אם משהו באתר פתח שאלה, אפשר לכתוב כאן. אפשר גם לעבור ישר לוואטסאפ או למייל.">
-  <section class="mx-auto max-w-3xl space-y-12 px-4 py-14 text-right text-[var(--nm-fg)]">
+  <section id="main-content" class="mx-auto max-w-3xl space-y-12 px-4 py-14 text-right text-[var(--nm-fg)]">
     <header class="space-y-4">
       <p class="text-sm font-semibold text-[var(--nm-accent)]">יצירת קשר</p>
       <h1 class="text-[clamp(2rem,1.5rem+2vw,3rem)] font-semibold leading-[1.15]">אם יש שאלה, אפשר לכתוב אותה פשוט.</h1>
@@ -49,7 +49,8 @@ const formsEnabled = MAIL_DELIVERY_ENABLED;
     <section aria-labelledby="contact-form-heading" class="space-y-4">
       <h2 id="contact-form-heading" class="text-xl font-semibold">לשלוח שאלה קצרה</h2>
       <p class="text-sm leading-[1.75] text-[color-mix(in_srgb,var(--nm-fg)_65%,var(--nm-bg))]">
-        השמירה המקומית פועלת אוטומטית. גם אם תצא מהעמוד, מה שכתבת נשאר על המכשיר שלך.
+        הטופס נשלח קודם דרך האתר. אם השרת לא מאשר קבלה, אפשר לעבור מיד לוואטסאפ בלי לאבד את
+        הכיוון.
       </p>
 
       <form id="contact-form" data-nm-antispam class="space-y-4 rounded-3xl border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/85 p-6" action="/api/forms/submit" method="POST">
@@ -112,7 +113,7 @@ const formsEnabled = MAIL_DELIVERY_ENABLED;
       const onSubmit = async (event) => {
         event.preventDefault();
         if (submitButton instanceof HTMLElement) {
-          window.__nmSetButtonLoading?.(submitButton, "מזקק את המנגנון...");
+          window.__nmSetButtonLoading?.(submitButton, "שולח דרך האתר...");
         }
 
         const fd = new FormData(contactForm);
@@ -146,7 +147,7 @@ const formsEnabled = MAIL_DELIVERY_ENABLED;
           const payload = await res.json().catch(() => null);
           if (res.ok && payload?.success === true) {
             contactForm.reset();
-            showStatus("השאלה נקלטה.");
+            showStatus("ההודעה נשלחה דרך האתר.");
             window.__nmClearConnectivityIssue?.();
             window.__nmHapticSuccess?.();
             window.__nmAnnounce?.("השאלה נקלטה");
@@ -157,13 +158,13 @@ const formsEnabled = MAIL_DELIVERY_ENABLED;
               : errorCode.includes("hcaptcha") || errorCode.includes("mandatory")
                 ? "צריך להשלים את האימות לפני השליחה."
                 : errorCode.includes("missing_mail_delivery_config")
-                  ? "שרת המייל עדיין לא הוגדר בפריסה."
-                  : "השרת לא אישר קבלה. אפשר לנסות שוב או פשוט לשלוח לנו הודעה בוואטסאפ.";
+                  ? "שרת המייל עדיין לא הוגדר בפריסה. אפשר לעבור לוואטסאפ כגיבוי."
+                  : "השליחה דרך האתר לא אושרה. אפשר לנסות שוב או לעבור לוואטסאפ.";
             showStatus(message);
             window.__nmReportConnectivityIssue?.(message);
           }
         } catch {
-          const message = "השרת לא אישר קבלה. אפשר לנסות שוב או פשוט לשלוח לנו הודעה בוואטסאפ.";
+          const message = "השליחה דרך האתר לא עברה. אפשר לנסות שוב או לעבור לוואטסאפ.";
           showStatus(message);
           window.__nmReportConnectivityIssue?.(message);
         } finally {

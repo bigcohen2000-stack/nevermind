@@ -1,0 +1,197 @@
+---
+import { getCollection } from "astro:content";
+import ServiceRouteGrid from "../../../components/services/ServiceRouteGrid.astro";
+import { listVideoTopics } from "../../../data/video-topics";
+import Layout from "../../../layouts/Layout.astro";
+import { buildWhatsAppHref, findServiceById, formatMoney } from "../../../lib/services";
+
+const archiveService = findServiceById("portal-access");
+
+const monthlyPrice = archiveService?.price_full ?? 175;
+const yearlyPlan = archiveService?.extensions?.find((item) => item.id === "portal-year");
+const yearlyPrice = yearlyPlan?.price ?? 1850;
+
+const premiumEntries = (await getCollection("articles", ({ data }) => !data.draft && data.isPremium)).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+
+const premiumArticles = premiumEntries.slice(0, 4).map((entry) => ({
+  title: entry.data.title,
+  href: `/articles/${entry.slug}/`,
+}));
+
+const archiveTagExamples = Array.from(
+  new Set(
+    premiumEntries
+      .flatMap((entry) => (Array.isArray(entry.data.tags) ? entry.data.tags : []))
+      .filter(Boolean)
+  )
+).slice(0, 8);
+
+const archiveTopicExamples = listVideoTopics()
+  .filter((topic) => topic.items.some((item) => item.access === "members"))
+  .slice(0, 4)
+  .map((topic) => ({
+    label: topic.label,
+    publicCount: topic.items.filter((item) => item.access === "public").length,
+    memberCount: topic.items.filter((item) => item.access === "members").length,
+    sampleTitles: topic.items.slice(0, 2).map((item) => item.title),
+  }));
+
+const faqItems = [
+  {
+    question: "זה רק מנוי לתוכן",
+    answer:
+      "לא. זה מסלול גישה לכל מה שלא נכון לפתוח בפומבי: סרטונים מלאים, תוכני עומק, שכבות המשך, ורצף חקירה שאפשר לחזור אליו בלי להתחיל כל פעם מחדש.",
+  },
+  {
+    question: "זה במקום שיחה אישית",
+    answer:
+      "לא. זה מסלול למי שרוצה לחקור לבד. אם צריך פירוק מדויק של מצב חי, שיחה אישית עדיין תהיה המסלול הנכון יותר.",
+  },
+  {
+    question: "יש כאן התחייבות כבדה",
+    answer:
+      "לא. המסלול החודשי נשאר גמיש. השנתי קיים למי שכבר מבין שהוא רוצה רצף קבוע ולא כניסות אקראיות.",
+  },
+];
+
+const includedItems = [
+  "סרטונים מלאים והמשך וידאו לפי נושא",
+  "מאמרים שלא מתאימים לעמוד פתוח רגיל",
+  "פלייליסטים שנשארים לחברים בלבד",
+  "גישה שקטה לספרייה ולעץ השורש",
+  "רצף למידה שאפשר לפתוח, לעצור ולחזור אליו",
+];
+
+const ctaHref = buildWhatsAppHref(
+  "היי, הגעתי מעמוד מנוי הארכיון. רוצה להבין איזה מסלול גישה נכון לי ומה בדיוק נפתח אחרי ההצטרפות."
+);
+---
+
+<Layout
+  title="מנוי ארכיון NeverMind"
+  description="מנוי ארכיון NeverMind פותח סרטונים מלאים, תכנים שלא מפורסמים בפומבי, והמשך חקירה שקט בקצב שלך."
+  faqItems={faqItems}
+  breadcrumbCurrentLabel="מנוי ארכיון"
+>
+  <section class="mx-auto max-w-5xl space-y-12 px-4 pb-24 pt-12 text-right text-[var(--nm-fg)]">
+    <header class="rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/92 px-6 py-8 shadow-[0_24px_80px_rgba(26,26,26,0.06)]">
+      <p class="text-sm font-semibold text-[var(--nm-accent)]">מנוי ארכיון</p>
+      <h1 class="mt-2 text-[clamp(2rem,1.65rem+1.4vw,3.6rem)] font-semibold leading-[1.08]">מנוי ארכיון NeverMind</h1>
+      <p class="mt-4 max-w-3xl text-base leading-8 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+        זה לא מנוי שמוכר עוד תוכן. זו גישה לשכבות שלא נכון לפרסם בפומבי, כדי לחקור לבד, לחזור שוב, ולפתוח אותו נושא דרך מאמר, וידאו ופלייליסט המשך בלי להיתקע רק בעמוד פתוח אחד.
+      </p>
+      <div class="mt-6 flex flex-wrap justify-end gap-3">
+        <a
+          href="/me/unlock/"
+          class="inline-flex min-h-[48px] items-center rounded-full bg-[var(--nm-accent)] px-6 py-3 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]"
+        >
+          בקשה להצטרף
+        </a>
+        <a
+          href={ctaHref}
+          target="_blank"
+          rel="noreferrer"
+          class="inline-flex min-h-[48px] items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-6 py-3 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]"
+        >
+          שאלה לפני כניסה
+        </a>
+      </div>
+    </header>
+
+    <section class="grid gap-5 md:grid-cols-2">
+      <article class="rounded-[1.7rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-6 shadow-[0_18px_50px_rgba(26,26,26,0.04)]">
+        <p class="text-sm font-semibold text-[var(--nm-accent)]">מה נפתח בפנים</p>
+        <ul class="mt-4 space-y-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+          {includedItems.map((item) => (
+            <li class="flex gap-2"><span aria-hidden="true" class="text-[var(--nm-accent)]">•</span><span>{item}</span></li>
+          ))}
+        </ul>
+      </article>
+
+      <article class="rounded-[1.7rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-6 shadow-[0_18px_50px_rgba(26,26,26,0.04)]">
+        <p class="text-sm font-semibold text-[var(--nm-accent)]">מחיר וגמישות</p>
+        <div class="mt-4 space-y-4 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+          <div class="rounded-[1.15rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white px-4 py-4">
+            <p class="font-semibold text-[var(--nm-fg)]">חודשי</p>
+            <p class="mt-1">{formatMoney(monthlyPrice)} בחודש. גישה מיידית, בלי התחייבות כבדה.</p>
+          </div>
+          <div class="rounded-[1.15rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white px-4 py-4">
+            <p class="font-semibold text-[var(--nm-fg)]">שנתי</p>
+            <p class="mt-1">{formatMoney(yearlyPrice)} לשנה. מתאים למי שכבר מבין שהוא רוצה רצף ולא כניסות אקראיות.</p>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section class="rounded-[1.7rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/92 p-6 shadow-[0_18px_50px_rgba(26,26,26,0.04)]">
+      <p class="text-sm font-semibold text-[var(--nm-accent)]">דוגמאות למה שנפתח אחרי ההרשמה</p>
+      <div class="mt-4 grid gap-5 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
+        <div class="space-y-4 rounded-[1.4rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-5">
+          <h2 class="nm-title-balance text-[clamp(1.4rem,1.2rem+0.7vw,2rem)] font-semibold">נושאים ותגיות שנפתחים בפנים</h2>
+          <div class="flex flex-wrap gap-2">
+            {archiveTagExamples.map((tag) => (
+              <span class="rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white px-3 py-1 text-sm font-semibold text-[var(--nm-fg)]">{tag}</span>
+            ))}
+          </div>
+          <div class="grid gap-3 sm:grid-cols-2">
+            {archiveTopicExamples.map((topic) => (
+              <article class="rounded-[1.1rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white px-4 py-4">
+                <h3 class="nm-title-balance text-base font-semibold text-[var(--nm-fg)]">{topic.label}</h3>
+                <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
+                  {topic.publicCount > 0 ? `${topic.publicCount} קטעים פתוחים` : "נושא עומק"}
+                  {topic.memberCount > 0 ? ` + ${topic.memberCount} שכבות סגורות לחברים` : ""}
+                </p>
+                {topic.sampleTitles.length > 0 ? (
+                  <p class="mt-2 text-xs leading-6 text-[color-mix(in_srgb,var(--nm-fg)_56%,var(--nm-bg))]">
+                    לדוגמה: {topic.sampleTitles.join(" | ")}
+                  </p>
+                ) : null}
+              </article>
+            ))}
+          </div>
+        </div>
+
+        <div class="space-y-4 rounded-[1.4rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-5">
+          <h2 class="nm-title-balance text-[clamp(1.4rem,1.2rem+0.7vw,2rem)] font-semibold">מאמרים ושכבות המשך</h2>
+          <p class="nm-copy-balanced text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">
+            בפועל זה לא רק עוד מאמר. כל נושא יכול להמשיך לעוד וידאו, פלייליסט נעול, ומאמרי המשך מאותו מנגנון.
+          </p>
+          <div class="rounded-[1.1rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white px-4 py-4 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
+            תגיות עומק כמו {archiveTagExamples.slice(0, 4).join(", ")}, נושאים שממשיכים לכמה וידאוים, ומאמרים שלא נשארים ברמת ההקדמה אלא פותחים עוד שכבות.
+          </div>
+          <ul class="space-y-3">
+            {premiumArticles.map((article) => (
+              <li class="rounded-[1.1rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white px-4 py-4">
+                <a
+                  href={article.href}
+                  class="font-semibold text-[var(--nm-fg)] underline underline-offset-4 decoration-[color-mix(in_srgb,var(--nm-accent)_28%,transparent)]"
+                >
+                  {article.title}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="rounded-[1.7rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/92 p-6 shadow-[0_18px_50px_rgba(26,26,26,0.04)]">
+      <p class="text-sm font-semibold text-[var(--nm-accent)]">מתי זה נכון</p>
+      <p class="mt-3 text-sm leading-8 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+        אם אתה לא צריך כרגע אדם מולך אלא רצף חקירה שקט, זה כנראה המסלול הנכון. אם יש קונפליקט חי שדורש פירוק מדויק, עדיף לעבור קודם דרך
+        <a href="/personal-consultation/" class="font-semibold text-[var(--nm-accent)] underline underline-offset-4"> ייעוץ אישי </a>
+        .
+        אם מה שמתפרק הוא קשר, עדיף לעבור דרך
+        <a href="/services/couples/" class="font-semibold text-[var(--nm-accent)] underline underline-offset-4"> ייעוץ זוגי </a>
+        .
+      </p>
+    </section>
+
+    <ServiceRouteGrid
+      title="אם ללמוד לבד כבר לא מספיק"
+      intro="כשצריך מישהו שיפריד יחד איתך בין עובדה, פירוש ותגובה, עוברים מכאן לשיחה אישית, זוגית, אולפן או מסלול למטפלים."
+    />
+  </section>
+</Layout>

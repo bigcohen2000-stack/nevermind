@@ -1,95 +1,198 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import Schema from "../components/Schema.astro";
+import VideoPlayer from "../components/VideoPlayer.astro";
+import { getCollection } from "astro:content";
 import appConfig from "../config/appConfig.json";
-import { buildServiceReservationWhatsAppHref, buildWhatsAppHref, findServiceById } from "../lib/services";
+import { buildWhatsAppHref } from "../lib/services";
+
+const allArticles = await getCollection("articles", ({ data }) => data.draft !== true);
+const loveTags = new Set(["אהבה אמיתית", "אהבה ללא תנאים", "אהבה טהורה"]);
+const relatedLoveArticles = allArticles
+  .filter((entry) => Array.isArray(entry.data.tags) && entry.data.tags.some((tag) => loveTags.has(tag)))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .slice(0, 6);
+
+const digitalHref = buildWhatsAppHref(
+  'היי, אני מעוניין בספר "אהבה ב-20 עמודים" בגרסה הדיגיטלית ב-199 ש"ח.'
+);
+const physicalHref = buildWhatsAppHref(
+  'היי, אני מעוניין בספר "אהבה ב-20 עמודים" בגרסה הפיזית ב-249 ש"ח.'
+);
 
 const siteUrlSlash = appConfig.site.url.endsWith("/") ? appConfig.site.url : `${appConfig.site.url}/`;
-const bookProductSchema = [
+const bookUrl = new URL("book/", siteUrlSlash).toString();
+const bookGraphs = [
   {
     "@context": "https://schema.org",
-    "@type": "Product",
-    name: "NeverMind - קביעת שיחה",
-    description: "שלושה צעדים: התאמה קצרה, בחירת מסלול, תיאום בפועל.",
-    url: new URL("book/", siteUrlSlash).toString(),
-    brand: { "@type": "Brand", name: appConfig.site.name },
-    offers: {
-      "@type": "Offer",
-      priceCurrency: "ILS",
-      availability: "https://schema.org/InStock",
-      url: new URL("services/", siteUrlSlash).toString(),
+    "@type": "Book",
+    name: "אהבה ב-20 עמודים",
+    description:
+      "ספר קצר שמפרק את מושג האהבה דרך שורש הרצון, אשליית האחר והבדל בין פחד מאובדן לבין אהבה אמיתית.",
+    inLanguage: "he-IL",
+    url: bookUrl,
+    author: {
+      "@type": "Person",
+      name: "השם לא משנה",
     },
+    offers: [
+      {
+        "@type": "Offer",
+        price: "199",
+        priceCurrency: "ILS",
+        availability: "https://schema.org/InStock",
+        url: digitalHref,
+        name: "עותק דיגיטלי",
+      },
+      {
+        "@type": "Offer",
+        price: "249",
+        priceCurrency: "ILS",
+        availability: "https://schema.org/InStock",
+        url: physicalHref,
+        name: "עותק פיזי",
+      },
+    ],
   },
 ];
-
-const phonePerspective = findServiceById("phone-perspective");
-const waBook = phonePerspective
-  ? buildServiceReservationWhatsAppHref(phonePerspective)
-  : buildWhatsAppHref(
-      "היי, אני רוצה לקבוע שיחה דרך עמוד הקביעה באתר. מה השלב הבא?"
-    );
 ---
 
 <Layout
-  title="קביעת שיחה"
-  description="שלושה צעדים ברורים: התאמה קצרה, בחירת מסלול, תיאום בפועל."
+  title="אהבה ב-20 עמודים"
+  description="ספר קצר על אהבה, זוגיות ושורש הרצון. עותק דיגיטלי או פיזי, עם וידאו פתוח, פלייליסט חינם והעמקה דרך המועדון."
+  breadcrumbCurrentLabel="אהבה ב-20 עמודים"
 >
-  <Schema graphs={bookProductSchema} />
-  <section class="mx-auto max-w-3xl space-y-10 px-4 py-14 text-right text-[var(--nm-fg)]">
-    <header class="space-y-4">
-      <p class="text-sm font-semibold uppercase tracking-[0.2em] text-[var(--nm-accent)]">המרה ישירה</p>
-      <h1 class="text-[clamp(2rem,1.5rem+2vw,3rem)] font-semibold leading-tight">קביעת שיחה</h1>
-      <p class="text-[clamp(1rem,0.95rem+0.25vw,1.15rem)] leading-[var(--line-height-ui)] text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
-        כאן אין סיבוב. אתה בוחר איך להמשיך. המחירים והמסלולים מופיעים בעמוד השירותים.
+  <Schema graphs={bookGraphs} />
+
+  <section class="mx-auto max-w-5xl space-y-10 px-4 py-14 text-right text-[var(--nm-fg)]">
+    <header class="rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/92 px-6 py-8 shadow-[0_24px_80px_rgba(26,26,26,0.06)]">
+      <p class="text-sm font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">📕 ספר</p>
+      <h1 class="mt-2 text-[clamp(2.1rem,1.7rem+1.7vw,3.6rem)] font-semibold leading-[1.06]">אהבה ב-20 עמודים</h1>
+      <p class="mt-3 text-[clamp(1.05rem,0.98rem+0.3vw,1.25rem)] leading-8 text-[var(--nm-accent)]">
+        ספר שמשנה את פרספקטיבת האהבה
       </p>
+      <span class="mt-4 inline-flex min-h-[36px] items-center rounded-full bg-[var(--nm-inverse)] px-4 py-2 text-sm font-semibold text-[var(--nm-inverse-fg)]">
+        ⏳ המלאי מוגבל
+      </span>
+      <div class="mt-6 max-w-3xl space-y-4 text-base leading-8 text-[color-mix(in_srgb,var(--nm-fg)_74%,var(--nm-bg))]">
+        <p>
+          הספר הזה לא מנסה לעטוף אהבה במילים יפות.
+          הוא מתמקד רק בשאלה מה באמת פועל שם.
+        </p>
+        <p>
+          במקום להתפזר, הוא נשאר על ציר אחד.
+          שורש הרצון, פחד מאובדן, אשליית האחר, ואהבה ללא תנאים.
+        </p>
+        <p>
+          אם מה שחסר לך הוא עוד ניסוח יפה, זה לא העמוד הנכון.
+          אם מה שחסר לך הוא פירוק חד של המנגנון, כאן מתחילים.
+        </p>
+      </div>
     </header>
 
-    <ol class="space-y-6 rounded-[1.5rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-6">
-      <li class="flex flex-col gap-2">
-        <span class="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--nm-accent)]">שלב 1</span>
-        <p class="font-semibold">בדיקת התאמה קצרה</p>
-        <p class="text-sm leading-[var(--line-height-ui)] text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">
-          טופס קצר שמסנן רעש. אם זה לא הזמן הנכון, תקבל כיוון ברור לארכיון.
+    <section class="space-y-4">
+      <h2 class="text-[clamp(1.35rem,1.2rem+0.7vw,2rem)] font-semibold">🎬 וידאו פתוח מתוך הציר הזה</h2>
+      <div class="rounded-[1.7rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/88 p-4 shadow-sm">
+        <VideoPlayer youtubeId="7WsDdS25Q50" title="אהבה ב-20 עמודים - וידאו פתוח" posterLoading="eager" posterFetchPriority="high" />
+      </div>
+    </section>
+
+    <section class="grid gap-5 md:grid-cols-2">
+      <article class="rounded-[1.7rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-6 shadow-sm">
+        <p class="text-sm font-semibold text-[var(--nm-accent)]">📄 עותק דיגיטלי</p>
+        <h2 class="mt-2 text-2xl font-semibold">199 ₪</h2>
+        <p class="mt-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">
+          למי שרוצה להיכנס ישר לטקסט.
+          בלי המתנה.
+          בלי משלוח.
+        </p>
+        <p class="mt-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))]">
+          מתאים למי שרוצה לקרוא היום, לסמן, לחזור, ולעבוד עם הרעיונות מייד.
         </p>
         <a
-          href="/intake/"
-          class="inline-flex min-h-[44px] min-w-[44px] items-center justify-center self-start rounded-full bg-[var(--nm-inverse)] px-6 py-3 text-sm font-semibold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-inverse-hover)]"
-        >
-          לטופס ההתאמה
-        </a>
-      </li>
-      <li class="flex flex-col gap-2 border-t border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] pt-6">
-        <span class="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--nm-accent)]">שלב 2</span>
-        <p class="font-semibold">בחירת מסלול ומחירון</p>
-        <p class="text-sm leading-[var(--line-height-ui)] text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">
-          רואים מה כלול, מה המחיר, ומה קורה אחרי התשלום.
-        </p>
-        <a
-          href="/services/#pricing"
-          class="inline-flex min-h-[44px] min-w-[44px] items-center justify-center self-start rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-6 py-3 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]"
-        >
-          לשירותים ולמחירון
-        </a>
-      </li>
-      <li class="flex flex-col gap-2 border-t border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] pt-6">
-        <span class="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--nm-accent)]">שלב 3</span>
-        <p class="font-semibold">תיאום בוואטסאפ</p>
-        <p class="text-sm leading-[var(--line-height-ui)] text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">
-          אם אתה מעדיף לדבר לפני תשלום, פותחים שיחה כאן.
-        </p>
-        <a
-          href={waBook}
+          href={digitalHref}
           target="_blank"
           rel="noreferrer"
-          class="inline-flex min-h-[44px] min-w-[44px] items-center justify-center self-start rounded-full bg-[var(--nm-accent)] px-6 py-3 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]"
+          class="mt-5 inline-flex min-h-[48px] items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-6 py-3 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]"
         >
-          פתיחת וואטסאפ
+          להזמין דיגיטלי בוואטסאפ
         </a>
-      </li>
-    </ol>
+      </article>
 
-    <p class="text-xs leading-[var(--line-height-ui)] text-[color-mix(in_srgb,var(--nm-fg)_52%,var(--nm-bg))]">
-      פרטי קשר מהאתר: {appConfig.contact.email} · {appConfig.contact.phoneDisplay}
-    </p>
+      <article class="rounded-[1.7rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-tint)] p-6 shadow-sm">
+        <p class="text-sm font-semibold text-[var(--nm-accent)]">📚 עותק פיזי</p>
+        <h2 class="mt-2 text-2xl font-semibold">249 ₪</h2>
+        <p class="mt-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">
+          למי שרוצה את הספר ביד.
+          אותו פירוק.
+          שכבה אחרת של נוכחות.
+        </p>
+        <p class="mt-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_78%,var(--nm-bg))]">
+          מתאים למי שרוצה להחזיק, לחזור, לסמן, ולהשאיר את זה קרוב.
+        </p>
+        <a
+          href={physicalHref}
+          target="_blank"
+          rel="noreferrer"
+          class="mt-5 inline-flex min-h-[48px] items-center rounded-full bg-[var(--nm-accent)] px-6 py-3 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]"
+        >
+          להזמין עותק פיזי בוואטסאפ
+        </a>
+      </article>
+    </section>
+
+    <section class="rounded-[1.7rem] border border-[color-mix(in_srgb,var(--nm-accent)_18%,transparent)] bg-[var(--nm-tint)] p-6 shadow-sm">
+      <p class="text-sm font-semibold text-[var(--nm-accent)]">למי זה מתאים</p>
+      <h2 class="mt-2 text-[clamp(1.35rem,1.2rem+0.7vw,2rem)] font-semibold">לא למי שמחפש סיסמה. כן למי שמוכן לבדוק.</h2>
+      <p class="mt-3 max-w-3xl text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+        הספר לא מנסה לשכנע אותך לאהוב יותר. הוא בודק מה אתה בכלל מכנה אהבה,
+        איזה חיסרון אתה מנהל דרכה, ולמה מה שנראה עמוק הוא לעיתים רק פחד מאובדן.
+      </p>
+    </section>
+
+    <section class="rounded-[1.7rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/92 p-6 shadow-sm">
+      <p class="text-sm font-semibold text-[var(--nm-accent)]">▶ עוד צפייה פתוחה מתוך האתר</p>
+      <h2 class="mt-2 text-[clamp(1.35rem,1.2rem+0.7vw,2rem)] font-semibold">אהבה ב-20 סרטונים</h2>
+      <p class="mt-3 max-w-3xl text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">
+        באתר עצמו יש גם רצף פתוח שלא קיים כרצף ברשתות.
+        אם רוצים להיכנס דרך פרידה, בגידה ומה שביניהן, אפשר להתחיל מכאן.
+      </p>
+      <div class="mt-4 flex flex-wrap gap-3">
+        <a
+          href="https://www.youtube.com/watch?v=CBo367wC_J8&list=PLwkkuwNJAgMjNCeQQJcwN6-PcBUdGo3Ea"
+          target="_blank"
+          rel="noreferrer"
+          class="inline-flex min-h-[44px] items-center rounded-full bg-[var(--nm-inverse)] px-5 py-2.5 text-sm font-semibold text-[var(--nm-inverse-fg)] transition hover:bg-[var(--nm-inverse-hover)]"
+        >
+          לפתוח פלייליסט חינמי 🎥
+        </a>
+        <a
+          href="/services/archive/"
+          class="inline-flex min-h-[44px] items-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-5 py-2.5 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]"
+        >
+          להעמקה דרך מועדון החברים 🔒
+        </a>
+      </div>
+    </section>
+
+    <section class="rounded-[1.7rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-6 shadow-sm">
+      <p class="text-sm font-semibold text-[var(--nm-accent)]">להמשך קריאה</p>
+      <div class="mt-4 grid gap-4 md:grid-cols-2">
+        {relatedLoveArticles.map((article) => (
+          <a
+            href={`/articles/${article.slug}/`}
+            class="rounded-[1.2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white p-4 transition hover:border-[color-mix(in_srgb,var(--nm-accent)_20%,transparent)]"
+          >
+            <h3 class="nm-title-balance text-base font-semibold">{article.data.title}</h3>
+            <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">{article.data.description}</p>
+          </a>
+        ))}
+      </div>
+      <div class="mt-5 flex flex-wrap gap-3">
+        <a href="/topics/love/" class="text-sm font-semibold text-[var(--nm-accent)] underline underline-offset-4">אשכול אהבה אמיתית</a>
+        <a href="/definitions/love/" class="text-sm font-semibold text-[var(--nm-accent)] underline underline-offset-4">מה זו אהבה באמת</a>
+        <a href="/services/archive/" class="text-sm font-semibold text-[var(--nm-accent)] underline underline-offset-4">מה נפתח במועדון</a>
+      </div>
+    </section>
   </section>
 </Layout>

@@ -19,8 +19,8 @@ export const brandVoiceProfile = {
 } as const;
 
 export const unlockTone = {
-  loadingClubData: "טוען נתוני מועדון...",
-  checkingClubData: "מזקק את נתוני המועדון...",
+  loadingClubData: "טוען את מצב הגישה...",
+  checkingClubData: "בודק את מצב הגישה...",
   liveCounter: {
     unavailableCount: "--",
     unavailableCopy: "כרגע אין כאן מונה חי זמין. כשהחיבור יפעל נחזיר אותו בלי לנחש מספרים.",
@@ -39,21 +39,21 @@ export const unlockTone = {
     activeLabel: "נורה ירוקה",
     inactiveLabel: "נורה אדומה",
     activeCopy: "יש כבר גישה פעילה במכשיר הזה. אפשר להמשיך ישר לאזור האישי או לקרוא בלי להיתקע בדרך.",
-    inactiveCopy: (price: number) =>
-      `אפשר לפתוח חודש ראשון במחיר השקה של ${price} ש\"ח, להיכנס בשקט, ולקבל גישה למה שנשמר לחברים.`,
+    inactiveCopy: () =>
+      "כדי לפתוח את התוכן הסגור צריך קוד גישה. אם אין לך קוד, מבקשים אחד ושומרים אחר כך שם וטלפון פעם אחת.",
     activeCta: "להיכנס לאזור האישי",
-    inactiveCta: (price: number) => `בקשה להצטרף לחודש ראשון ב-${price} ש\"ח`,
+    inactiveCta: () => "לבקש קוד גישה",
   },
   session: {
     active: "פעיל",
     pending: "ממתין",
     activeLine: "הכניסה פעילה",
     activePersonalized: (name: string) => `${name}, הכניסה פתוחה עכשיו`,
-    codeAccepted: "הקוד זוהה. נשאר רק שם וטלפון כדי להשלים כניסה",
+    codeAccepted: "הקוד זוהה. נשאר רק שם וטלפון כדי להשלים את הגישה במכשיר הזה",
     missingPersonalCode: "צריך לפתוח קודם את הקוד האישי",
     missingName: "צריך לכתוב שם כדי להמשיך",
     missingPhone: "צריך לכתוב טלפון תקין כדי להמשיך",
-    saving: "שומר את הכניסה השקטה שלך",
+    saving: "שומר את הגישה שלך",
     saved: (name: string) => `${name}, הכניסה נשמרה`,
     saveFailed: "לא הצלחנו לשמור את הכניסה כרגע. אפשר לנסות שוב בעוד רגע",
   },

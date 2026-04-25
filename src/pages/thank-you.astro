@@ -17,6 +17,7 @@ const formsEnabled = MAIL_DELIVERY_ENABLED;
 const heroSubtitle = isExistingBuyer
   ? "כבר קיימת רכישה קודמת. עכשיו אפשר להמשיך לשלב הבא בלי לחזור על אותו צעד."
   : "מכאן אפשר להמשיך לקריאה, לשאול שאלה נוספת, או לפתוח גישה לאזור האישי.";
+const isPwaInstaller = source === "pwa-install";
 ---
 
 <Layout title="תודה" description="הפנייה נקלטה. אפשר להמשיך מכאן לעמוד הבא, לשאלה נוספת, או לפתיחת גישה אישית.">
@@ -42,6 +43,23 @@ const heroSubtitle = isExistingBuyer
         </a>
       </div>
     </section>
+
+    {isPwaInstaller && (
+      <section class="relative overflow-hidden rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-accent)_20%,transparent)] bg-gradient-to-br from-[var(--nm-accent)]/10 to-[var(--nm-accent)]/5 p-10 text-[var(--nm-fg)] shadow-[0_22px_48px_color-mix(in_srgb,var(--nm-accent)_10%,transparent)]">
+        <div class="space-y-5">
+          <p class="text-sm font-semibold text-[var(--nm-accent)]">הצעה מיוחדת למתקיני האפליקציה</p>
+          <h2 class="text-[clamp(1.5rem,1.3rem+1vw,2.2rem)] font-semibold">תודה שהתקנת את NeverMind כאפליקציה!</h2>
+          <p class="text-[clamp(1rem,0.95rem+0.25vw,1.15rem)] leading-[1.75] text-[color-mix(in_srgb,var(--nm-fg)_84%,var(--nm-bg))]">
+            כי התקנת את האפליקציה, אתה מקבל גישה מיוחדת: שלושה חודשים ב-99 ש״ח בלבד. זה כולל את כל התוכן הפרימיום, הסרטונים הנוספים, והפלייליסטים השמורים.
+          </p>
+          <div class="flex flex-wrap justify-end gap-3">
+            <a href={pwaOfferHref} target="_blank" rel="noreferrer" class="inline-flex min-h-[48px] items-center rounded-full bg-[var(--nm-accent)] px-6 py-3 text-xl font-bold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]">
+              קבל את ההצעה עכשיו
+            </a>
+          </div>
+        </div>
+      </section>
+    )}
 
     <section class="relative overflow-hidden rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_22%,transparent)] bg-[var(--nm-inverse)] p-10 text-[var(--nm-inverse-fg)] shadow-[0_22px_48px_color-mix(in_srgb,var(--nm-fg)_5%,transparent)]">
       <div class="space-y-5">
@@ -122,7 +140,7 @@ const heroSubtitle = isExistingBuyer
       const onSubmit = async (event) => {
         event.preventDefault();
         if (submitButton instanceof HTMLElement) {
-          window.__nmSetButtonLoading?.(submitButton, "מזקק את המנגנון...");
+          window.__nmSetButtonLoading?.(submitButton, "שולח דרך האתר...");
         }
 
         const fd = new FormData(form);
@@ -156,7 +174,7 @@ const heroSubtitle = isExistingBuyer
           const payload = await res.json().catch(() => null);
           if (res.ok && payload?.success === true) {
             form.reset();
-            showStatus("השאלה נקלטה.");
+            showStatus("ההודעה נשלחה דרך האתר.");
             window.__nmClearConnectivityIssue?.();
             window.__nmHapticSuccess?.();
             window.__nmAnnounce?.("השאלה נקלטה");
@@ -167,13 +185,13 @@ const heroSubtitle = isExistingBuyer
               : errorCode.includes("hcaptcha") || errorCode.includes("mandatory")
                 ? "צריך להשלים את האימות לפני השליחה."
                 : errorCode.includes("missing_mail_delivery_config")
-                  ? "שרת המייל עדיין לא הוגדר בפריסה."
-                  : "השרת לא אישר קבלה. אפשר לנסות שוב או פשוט לשלוח לנו הודעה בוואטסאפ.";
+                  ? "שרת המייל עדיין לא הוגדר בפריסה. אפשר לעבור לוואטסאפ כגיבוי."
+                  : "השליחה דרך האתר לא אושרה. אפשר לנסות שוב או לעבור לוואטסאפ.";
             showStatus(message);
             window.__nmReportConnectivityIssue?.(message);
           }
         } catch {
-          const message = "השרת לא אישר קבלה. אפשר לנסות שוב או פשוט לשלוח לנו הודעה בוואטסאפ.";
+          const message = "השליחה דרך האתר לא עברה. אפשר לנסות שוב או לעבור לוואטסאפ.";
           showStatus(message);
           window.__nmReportConnectivityIssue?.(message);
         } finally {

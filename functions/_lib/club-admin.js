@@ -31,7 +31,10 @@ function readAccessEmail(request) {
 function isAuthorizedAccessEmail(request, env) {
   const email = readAccessEmail(request);
   const allowedEmails = readAllowedAdminEmails(env);
-  return email.length > 0 && allowedEmails.length > 0 && allowedEmails.includes(email);
+  if (allowedEmails.length === 0) {
+    return email.length > 0;
+  }
+  return email.length > 0 && allowedEmails.includes(email);
 }
 
 function isDashboardAuthorized(request, env) {

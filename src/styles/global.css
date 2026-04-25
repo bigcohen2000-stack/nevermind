@@ -63,6 +63,45 @@
 
   --color-valid: #16a34a;
   --color-mark-highlight: color-mix(in srgb, var(--color-accent) 20%, var(--color-surface-page));
+
+  /* WhatsApp brand */
+  --nm-whatsapp: #25d366;
+  --nm-whatsapp-hover: #1fae55;
+
+  /* Elevation scale */
+  --nm-shadow-sm: 0 14px 28px rgba(26, 26, 26, 0.03);
+  --nm-shadow-md: 0 18px 50px rgba(26, 26, 26, 0.05);
+  --nm-shadow-lg: 0 24px 80px rgba(26, 26, 26, 0.08);
+
+  /* Border radius scale */
+  --nm-radius-xs: 0.75rem;
+  --nm-radius-sm: 1.25rem;
+  --nm-radius-md: 1.5rem;
+  --nm-radius-lg: 2rem;
+
+  /* Mind-shift intensity scale */
+  --nm-ms-1: #ebeae7;
+  --nm-ms-2: #e0d2cc;
+  --nm-ms-3: #d4a399;
+  --nm-ms-4: #d14a3d;
+  --nm-ms-5: #0f172a;
+  --nm-ms-inactive: #e8e7e5;
+
+  /* Difficulty badge colors */
+  --nm-badge-beginner-bg: #f3faf6;
+  --nm-badge-beginner-border: #c8e6d8;
+  --nm-badge-beginner-text: #2a4d3d;
+  --nm-badge-advanced-bg: #f0f7fc;
+  --nm-badge-advanced-border: #b9d4ea;
+  --nm-badge-advanced-text: #254a63;
+  --nm-badge-deep-bg: #f6f3fb;
+  --nm-badge-deep-border: #d9d2ea;
+  --nm-badge-deep-text: #3f355b;
+
+  /* Reading time and freshness badge colors */
+  --nm-reading-bg: #faf9f7;
+  --nm-reading-border: #e5e1dc;
+  --nm-reading-text: #5a5652;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -95,6 +134,27 @@
     --nm-inverse-fg: var(--color-inverse-fg);
     --nm-code-bg: var(--color-code-bg);
     --nm-code-fg: var(--color-code-fg);
+
+    --nm-ms-1: #2a2825;
+    --nm-ms-2: #3d3028;
+    --nm-ms-3: #5a3028;
+    --nm-ms-4: #b53a2f;
+    --nm-ms-5: #8ab8ff;
+    --nm-ms-inactive: #252422;
+
+    --nm-badge-beginner-bg: #102519;
+    --nm-badge-beginner-border: #2a4d3d;
+    --nm-badge-beginner-text: #7dd4b4;
+    --nm-badge-advanced-bg: #0f1f30;
+    --nm-badge-advanced-border: #254a63;
+    --nm-badge-advanced-text: #7ab4e8;
+    --nm-badge-deep-bg: #1a1228;
+    --nm-badge-deep-border: #3f355b;
+    --nm-badge-deep-text: #b8a4e0;
+
+    --nm-reading-bg: #1a1a1a;
+    --nm-reading-border: #3d3d3d;
+    --nm-reading-text: #d4d4d4;
   }
 }
 
@@ -127,6 +187,27 @@ html[data-theme="dark"] {
   --nm-inverse-fg: var(--color-inverse-fg);
   --nm-code-bg: var(--color-code-bg);
   --nm-code-fg: var(--color-code-fg);
+
+  --nm-ms-1: #2a2825;
+  --nm-ms-2: #3d3028;
+  --nm-ms-3: #5a3028;
+  --nm-ms-4: #b53a2f;
+  --nm-ms-5: #8ab8ff;
+  --nm-ms-inactive: #252422;
+
+  --nm-badge-beginner-bg: #102519;
+  --nm-badge-beginner-border: #2a4d3d;
+  --nm-badge-beginner-text: #7dd4b4;
+  --nm-badge-advanced-bg: #0f1f30;
+  --nm-badge-advanced-border: #254a63;
+  --nm-badge-advanced-text: #7ab4e8;
+  --nm-badge-deep-bg: #1a1228;
+  --nm-badge-deep-border: #3f355b;
+  --nm-badge-deep-text: #b8a4e0;
+
+  --nm-reading-bg: #1a1a1a;
+  --nm-reading-border: #3d3d3d;
+  --nm-reading-text: #d4d4d4;
 }
 
 /* נגישות: הגדלת טקסט (A11yWidget) */
@@ -222,6 +303,21 @@ body {
   transition:
     background-color var(--transition-fast),
     color var(--transition-fast);
+}
+
+html[lang="he"] {
+  hyphens: auto;
+  -webkit-hyphens: auto;
+  -moz-hyphens: auto;
+}
+
+html[lang="he"] p,
+html[lang="he"] li,
+html[lang="he"] blockquote {
+  hyphens: auto;
+  -webkit-hyphens: auto;
+  -moz-hyphens: auto;
+  word-break: break-word;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -676,9 +772,7 @@ main article :where(p + p) {
   .nm-header-services-link {
     display: none !important;
   }
-}
 
-@media (max-width: 640px) {
   :root {
     --nm-nav-top: 1rem;
   }

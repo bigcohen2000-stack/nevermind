@@ -62,7 +62,12 @@ document.addEventListener(
     if (action && deferred) {
       try {
         await deferred.prompt();
-        await deferred.userChoice;
+        const choice = await deferred.userChoice;
+        if (choice.outcome === 'accepted') {
+          // Redirect to thank-you page with PWA install source
+          window.location.href = '/thank-you/?source=pwa-install';
+          return;
+        }
       } catch {
         /* ignore */
       }

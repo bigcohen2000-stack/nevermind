@@ -1,0 +1,117 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+import ServiceRouteGrid from "../../../components/services/ServiceRouteGrid.astro";
+import RelatedTopicVideos from "../../../components/articles/RelatedTopicVideos.astro";
+import { buildServiceReservationWhatsAppHref, findServiceById, type FlatService } from "../../../lib/services";
+
+const consultation = findServiceById("phone-perspective");
+const fallbackConsultation = ({
+  id: "phone-perspective",
+  title: "שיחת מיקוד למטפלים ומאמנים",
+  subtitle: "לוגיקה קלינית לפני עוד טכניקה",
+  description: "שיחה ממוקדת שמחזירה אותך להפרדה בין עובדה לפירוש, כדי שלא תלך לאיבוד בתוך דרמת המקרה.",
+  price_full: 650,
+  action_type: "whatsapp",
+  action_text: "לתיאום שיחת מיקוד",
+  visible: true,
+  badges: ["דיוק מקצועי"],
+  features: ["בהירות לוגית לפני פעולה", "מיפוי צומת קלינית בזמן אמת", "כיוון פרקטי למפגש הבא"],
+  stageName: "דיוק קליני",
+  targetAudience: "מטפלים ומאמנים שרוצים בהירות בזמן עומס",
+} as unknown as FlatService);
+
+const featuredService: FlatService = consultation ?? fallbackConsultation;
+const reservationHref = buildServiceReservationWhatsAppHref(featuredService);
+
+const faqItems = [
+  {
+    question: "זה מיועד רק למטפלים קליניים?",
+    answer: "לא. זה מיועד גם למאמנים, מלווים, מנחים, ואנשים שמחזיקים מרחב לאחרים ורוצים לא ללכת לאיבוד בתוך הסיפור של מי שמולם.",
+  },
+  {
+    question: "זה מחליף הדרכה מקצועית?",
+    answer: "לא. זה לא עוד מודל הדרכה. זו בדיקה של המנגנון הפנימי שלך בזמן עומס, כדי שלא תערבב בין המצוקה של האדם שמולך לבין הסיפור שנבנה אצלך תוך כדי.",
+  },
+  {
+    question: "צריך להביא מקרה מסודר מראש?",
+    answer: "לא. מספיק להגיע עם התקיעות כפי שהיא. מה שצריך סדר, יקבל סדר בתוך השיחה עצמה.",
+  },
+];
+---
+
+<Layout
+  title="למטפלים ומאמנים | לוגיקה לפני דרמה"
+  description="שיחה למטפלים ומאמנים שרוצים בהירות לוגית בזמן עומס קליני, לפני עוד טכניקה, עוד הכלה, או עוד סיפור על המקרה."
+  faqItems={faqItems}
+  breadcrumbCurrentLabel="למטפלים ומאמנים"
+>
+  <section class="mx-auto max-w-5xl space-y-10 px-4 pb-24 pt-12 text-right text-[var(--nm-fg)]">
+    <header class="space-y-5 rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/92 px-6 py-8 shadow-[0_24px_80px_rgba(26,26,26,0.06)] md:px-8">
+      <p class="text-sm font-semibold tracking-[0.18em] text-[var(--nm-accent)]">אישי ומקצועי</p>
+      <h1 class="text-[clamp(2.2rem,1.7rem+1.7vw,3.5rem)] font-semibold leading-[1.08]">
+        למטפלים ומאמנים - לוגיקה לפני עוד טכניקה
+      </h1>
+      <p class="max-w-4xl text-[clamp(1rem,0.96rem+0.25vw,1.12rem)] leading-8 text-[color-mix(in_srgb,var(--nm-fg)_74%,var(--nm-bg))]">
+        כשאתה מחזיק אחרים, קל לאבד את ההפרדה בין הנתון לבין הדרמה שנבנית סביבו. העמוד הזה לא נועד ללמד
+        אותך עוד שיטה. הוא נועד להחזיר אותך למבנה לוגי נקי, כדי שתראה מה באמת קורה בחדר ומה רק נצמד אליו.
+      </p>
+      <div class="flex flex-wrap justify-end gap-3">
+        <a
+          href={reservationHref}
+          target="_blank"
+          rel="noreferrer"
+          class="inline-flex min-h-[46px] items-center justify-center rounded-full bg-[var(--nm-accent)] px-5 py-3 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]"
+        >
+          לתאם שיחת מיקוד
+        </a>
+        <a
+          href="/personal-consultation/"
+          class="inline-flex min-h-[46px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-5 py-3 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]"
+        >
+          לחזור לייעוץ אישי
+        </a>
+      </div>
+    </header>
+
+    <section class="grid gap-4 md:grid-cols-3">
+      <article class="rounded-[1.35rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-5">
+        <h2 class="text-lg font-semibold">עובדה מול מטען</h2>
+        <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+          לא כל כאב של אדם מולך הוא קריאה לפעולה. לפעמים זו רק עובדה שצריך לראות לפני שמעמיסים עליה משמעות מקצועית.
+        </p>
+      </article>
+      <article class="rounded-[1.35rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-5">
+        <h2 class="text-lg font-semibold">מנגנון לפני סיפור מקרה</h2>
+        <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+          אם אתה לא מזהה איזה פחד, אגו או צורך שלך הופעלו, אתה כבר לא רואה את האדם שמולך אלא רק את ההדהוד שנוצר אצלך.
+        </p>
+      </article>
+      <article class="rounded-[1.35rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] p-5">
+        <h2 class="text-lg font-semibold">דיוק לפני סמכות</h2>
+        <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+          סמכות מקצועית לא נבנית מעוד מושג. היא נבנית מהיכולת שלך לראות נקי גם כשמולך יש כאב, לחץ או הצפה.
+        </p>
+      </article>
+    </section>
+
+    <RelatedTopicVideos
+      topicKey="consultation"
+      topicLabel="צפייה וחקירה: ייעוץ ופירוק למטפלים"
+      intro="למי שמחזיק אחרים ורוצה לראות איך שכבת ההעמקה נראית בפועל, כאן נפתח רצף נוסף לחברי המועדון."
+    />
+
+    <section class="space-y-4 rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/92 p-6 shadow-[0_18px_50px_rgba(26,26,26,0.04)]">
+      <h2 class="text-[clamp(1.6rem,1.35rem+0.8vw,2.3rem)] font-semibold">מה בודקים כאן בפועל</h2>
+      <ul class="space-y-3 text-sm leading-8 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+        <li class="flex gap-2"><span class="text-[var(--nm-accent)]">•</span><span>איפה אתה נסחף לסיפור של המקרה במקום להחזיק מבנה.</span></li>
+        <li class="flex gap-2"><span class="text-[var(--nm-accent)]">•</span><span>איזו הנחת יסוד שלך הופכת עומס רגשי לבלבול מקצועי.</span></li>
+        <li class="flex gap-2"><span class="text-[var(--nm-accent)]">•</span><span>מה בדיוק צריך להתבהר לפני הפגישה הבאה, בלי לפתוח עוד תיאוריה.</span></li>
+      </ul>
+    </section>
+
+    <ServiceRouteGrid
+      title="לא נשארים רק במסלול מקצועי"
+      intro="אם מה שיושב מתחת לעומס המקצועי הוא בכלל סיפור אישי, זוגי או צורך בלמידה שקטה, ממשיכים משם למסלול הנכון."
+    />
+  </section>
+</Layout>

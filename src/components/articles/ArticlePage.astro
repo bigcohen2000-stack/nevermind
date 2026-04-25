@@ -1,5 +1,6 @@
 ---
-import { type CollectionEntry } from "astro:content";
+import { getCollection, type CollectionEntry } from "astro:content";
+import ArticleCard, { type DifficultyKey } from "../ArticleCard.astro";
 import ClarityAnalogy from "../ClarityAnalogy.astro";
 import ConceptCallout from "../ConceptCallout.astro";
 import DeepDiveInquiry from "../DeepDiveInquiry.astro";
@@ -13,7 +14,10 @@ import SocialParadoxes from "../SocialParadoxes.astro";
 import SubscribeBanner from "../SubscribeBanner.astro";
 import TruthBlock from "../TruthBlock.astro";
 import ArticleYoutubeGate from "../ArticleYoutubeGate.astro";
+import ArticleAuthorSignal from "./ArticleAuthorSignal.astro";
+import RelatedTopicVideos from "./RelatedTopicVideos.astro";
 import { glossaryConcepts } from "../../data/glossary";
+import { getVideoTopic } from "../../data/video-topics";
 import { getArticleYoutubeId, getCanonicalArticleSlug } from "../../lib/articles";
 import { resolveArticleHeroImage } from "../../lib/resolve-article-hero-image";
 import ArticleLayout from "../../layouts/ArticleLayout.astro";
@@ -61,6 +65,58 @@ const youtubeIdArticle = getArticleYoutubeId(frontmatter);
 const videoSummaryPointsArticle = Array.isArray(frontmatter.videoSummaryPoints)
   ? frontmatter.videoSummaryPoints
   : [];
+const relatedVideos = Array.isArray(frontmatter.relatedVideos)
+  ? frontmatter.relatedVideos
+      .map((item) => ({
+        youtubeId: String(item?.youtubeId || "").trim(),
+        title: String(item?.title || "").trim(),
+        locked: item?.locked === true,
+      }))
+      .filter((item) => item.youtubeId && item.title)
+      .slice(0, 3)
+  : [];
+const topicMedia = typeof frontmatter.videoTopicKey === "string" ? getVideoTopic(frontmatter.videoTopicKey) : null;
+const topicMediaItems = topicMedia
+  ? topicMedia.items.map((item) =>
+      item.type === "playlist"
+        ? {
+            type: "playlist" as const,
+            title: item.title,
+            url: String(item.url || "").trim(),
+            locked: item.access === "members",
+          }
+        : {
+            type: "video" as const,
+            title: item.title,
+            youtubeId: String(item.youtubeId || "").trim(),
+            locked: item.access === "members",
+          },
+    )
+  : [];
+const videoTopicLabel =
+  typeof frontmatter.videoTopicLabel === "string" && frontmatter.videoTopicLabel.trim()
+    ? frontmatter.videoTopicLabel.trim()
+    : topicMedia?.label
+      ? topicMedia.label
+    : "עוד סרטונים בנושא";
+const videoSectionIntro =
+  typeof frontmatter.videoSectionIntro === "string" && frontmatter.videoSectionIntro.trim()
+    ? frontmatter.videoSectionIntro.trim()
+    : topicMedia?.intro
+      ? topicMedia.intro
+    : "אם המאמר הזה נוגע באותו מנגנון, אפשר להמשיך מכאן לעוד פירוקים קצרים וישירים.";
+const premiumPlaylistUrl =
+  typeof frontmatter.premiumPlaylistUrl === "string" && frontmatter.premiumPlaylistUrl.trim()
+    ? frontmatter.premiumPlaylistUrl.trim()
+    : "";
+const premiumPlaylistTitle =
+  typeof frontmatter.premiumPlaylistTitle === "string" && frontmatter.premiumPlaylistTitle.trim()
+    ? frontmatter.premiumPlaylistTitle.trim()
+    : "פלייליסט המשך לחברי המועדון";
+const premiumPlaylistIntro =
+  typeof frontmatter.premiumPlaylistIntro === "string" && frontmatter.premiumPlaylistIntro.trim()
+    ? frontmatter.premiumPlaylistIntro.trim()
+    : "מי שכבר מחובר למועדון יכול לפתוח מכאן רצף וידאו מלא על אותו נושא, בלי להתפזר לעוד חיפושים.";
 const hasQuestionForSchema = Boolean(String(frontmatter.questionForSchema ?? "").trim());
 const articleSimpleSummary =
   typeof frontmatter.simpleSummary === "string" && frontmatter.simpleSummary.trim()
@@ -76,8 +132,26 @@ const heroImageAlt =
     ? frontmatter.imageAlt.trim()
     : frontmatter.title;
 
+const resolveDifficulty = (level: DifficultyKey | undefined, body: string): DifficultyKey => {
+  if (level && (level === "beginner" || level === "advanced" || level === "deep")) return level;
+
+  const wordCount = body.replace(/<[^>]*>/g, " ").split(/\s+/).filter(Boolean).length;
+  if (wordCount > 1400) return "deep";
+  if (wordCount > 900) return "advanced";
+  return "beginner";
+};
+
+const resolveMindShift = (raw: unknown): number | undefined => {
+  if (typeof raw === "number" && raw >= 1 && raw <= 5) return raw;
+  if (typeof raw === "string" && /^[1-5]$/.test(raw.trim())) return Number(raw.trim());
+  return undefined;
+};
+
 const requestedConcepts = Array.isArray(frontmatter.relatedConcepts)
   ? frontmatter.relatedConcepts.map((item) => String(item).trim()).filter(Boolean)
+  : [];
+const currentTags = Array.isArray(frontmatter.tags)
+  ? frontmatter.tags.map((item) => String(item).trim()).filter(Boolean)
   : [];
 
 const glossaryLinks = requestedConcepts
@@ -125,6 +199,48 @@ const explorationCards = [
     label: frontmatter.isPremium ? "אזור אישי" : "מועדון",
   },
 ];
+
+const relatedArticles = (await getCollection("articles", ({ data }) => data.draft !== true))
+  .filter((article) => getCanonicalArticleSlug(article) !== canonicalSlug)
+  .map((article) => {
+    const articleTags = Array.isArray(article.data.tags)
+      ? article.data.tags.map((item) => String(item).trim()).filter(Boolean)
+      : [];
+    const articleConcepts = Array.isArray(article.data.relatedConcepts)
+      ? article.data.relatedConcepts.map((item) => String(item).trim()).filter(Boolean)
+      : [];
+    const sharedTags = articleTags.filter((tag) => currentTags.includes(tag)).length;
+    const sharedConcepts = articleConcepts.filter((concept) => requestedConcepts.includes(concept)).length;
+    const score = sharedTags * 3 + sharedConcepts * 4;
+    const body = article.body ?? "";
+    const difficultyKey = resolveDifficulty(article.data.difficultyLevel as DifficultyKey | undefined, body);
+    const plain = body.replace(/<[^>]*>/g, " ");
+    const wordCount = plain.split(/\s+/).filter(Boolean).length;
+    const readingMinutes = Math.max(1, Math.ceil(wordCount / 200));
+    const pub = article.data.pubDate;
+    const upd = article.data.updatedDate;
+    const freshnessSource = upd ?? pub;
+    const freshnessIso = freshnessSource.toISOString().slice(0, 10);
+
+    return {
+      slug: getCanonicalArticleSlug(article),
+      title: article.data.title,
+      description: article.data.simpleSummary ?? article.data.description,
+      tags: articleTags,
+      transitionId: article.slug.replace(/[^\w-]+/g, "-"),
+      difficultyKey,
+      readingMinutes,
+      isPremium: Boolean(article.data.isPremium),
+      mindShiftIntensity: resolveMindShift(article.data.mindShiftIntensity),
+      contentFreshnessIso: freshnessIso,
+      contentFreshnessIsUpdate: Boolean(upd),
+      score,
+      pubDateValue: pub.valueOf(),
+    };
+  })
+  .filter((article) => article.score > 0)
+  .sort((a, b) => b.score - a.score || b.pubDateValue - a.pubDateValue)
+  .slice(0, 3);
 ---
 
 <Layout
@@ -175,6 +291,8 @@ const explorationCards = [
       </section>
     ) : null}
 
+    <ArticleAuthorSignal author={frontmatter.author} />
+
     {showHeroImage ? (
       <figure class="mt-5 overflow-hidden rounded-[1.75rem] border border-[color-mix(in_srgb,var(--nm-fg)_8%,transparent)] bg-[var(--nm-bg-canvas)] shadow-[0_16px_34px_rgba(26,26,26,0.04)]">
         <img
@@ -202,6 +320,48 @@ const explorationCards = [
         <Content components={mdxComponents} />
       </ArticleLayout>
     </div>
+
+    <RelatedTopicVideos
+      items={topicMediaItems}
+      videos={relatedVideos}
+      topicLabel={videoTopicLabel}
+      intro={videoSectionIntro}
+      isPremium={Boolean(frontmatter.isPremium)}
+      lockPlaylist={Boolean(premiumPlaylistUrl)}
+      premiumPlaylistUrl={premiumPlaylistUrl}
+      premiumPlaylistTitle={premiumPlaylistTitle}
+      premiumPlaylistIntro={premiumPlaylistIntro}
+    />
+
+    {relatedArticles.length ? (
+      <section class="mt-8 rounded-[1.75rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/88 px-5 py-6 shadow-[0_14px_28px_rgba(26,26,26,0.03)]">
+        <div class="space-y-2">
+          <p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--nm-accent)]">המשך טבעי</p>
+          <h2 class="text-xl font-semibold text-[var(--nm-fg)]">עוד מאמרים שפותחים את אותו מנגנון</h2>
+          <p class="max-w-3xl text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_68%,var(--nm-bg))]">
+            אם המאמר הזה פגש אותך במקום נכון, אלה הצעדים הבאים שהכי הגיוני לפתוח מכאן.
+          </p>
+        </div>
+
+        <div class="mt-5 grid grid-cols-1 gap-4 md:grid-cols-3">
+          {relatedArticles.map((article) => (
+            <ArticleCard
+              slug={article.slug}
+              title={article.title}
+              description={article.description}
+              tagsCsv={article.tags.join(",")}
+              transitionId={article.transitionId}
+              difficultyKey={article.difficultyKey}
+              readingMinutes={article.readingMinutes}
+              isPremium={article.isPremium}
+              mindShiftIntensity={article.mindShiftIntensity}
+              contentFreshnessIso={article.contentFreshnessIso}
+              contentFreshnessIsUpdate={article.contentFreshnessIsUpdate}
+            />
+          ))}
+        </div>
+      </section>
+    ) : null}
 
     <section class="mt-6 grid gap-3 md:grid-cols-3">
       {explorationCards.map((item) => (

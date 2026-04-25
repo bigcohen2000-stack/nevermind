@@ -26,13 +26,17 @@ function buildAccessUrls(request) {
 export async function onRequestGet(context) {
   const { request, env } = context;
   const urls = buildAccessUrls(request);
+  const allowedEmails = readAllowedAdminEmails(env);
 
   if (isDashboardAuthorized(request, env) === false) {
     return json(
       {
         ok: false,
-        error: "נדרשת גישת Cloudflare Access עם מייל מורשה.",
-        allowedEmails: readAllowedAdminEmails(env),
+        error:
+          allowedEmails.length > 0
+            ? `נדרשת גישת Cloudflare Access עם ${allowedEmails.join(", ")}.`
+            : "נדרשת גישת Cloudflare Access עם המשתמש המורשה ב-Zero Trust.",
+        allowedEmails,
         challengeUrl: urls.challengeUrl,
         switchIdentityUrl: urls.switchIdentityUrl,
       },
@@ -48,7 +52,7 @@ export async function onRequestGet(context) {
     access: "cloudflare",
     email,
     identity,
-    allowedEmails: readAllowedAdminEmails(env),
+    allowedEmails,
     challengeUrl: urls.challengeUrl,
     switchIdentityUrl: urls.switchIdentityUrl,
   });

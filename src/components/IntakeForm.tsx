@@ -8,9 +8,9 @@ import { MAIL_DELIVERY_ENABLED } from "../lib/mail-delivery";
 import { FloatingInput } from "./ui/FloatingInput";
 
 const WA_MAX_CHARS = 3600;
-const INTAKE_HUMAN_EMPTY = "נדרשת תשובה קצרה לשאלה למעלה.";
-const INTAKE_HUMAN_WRONG = "משהו לא מדויק בתשובה, נסה שוב.";
-const INTAKE_HONEYPOT_FAIL = "לא נשלח. רענן את העמוד ונסה שוב.";
+const INTAKE_HUMAN_EMPTY = "כתוב משהו קצר. זה עוזר להבין לאן ללכת.";
+const INTAKE_HUMAN_WRONG = "התשובה לא נראית תקינה. נסה שוב.";
+const INTAKE_HONEYPOT_FAIL = "משהו לא עבד. רענן את העמוד ונסה שוב. הטיוטה נשמרה מקומית.";
 
 const waDigits = String((appConfig as { contact?: { whatsAppNumber?: string } }).contact?.whatsAppNumber ?? "").replace(
   /\D/g,
@@ -250,15 +250,15 @@ export default function IntakeForm() {
 
   const validate = useCallback(() => {
     if (!expressionMode) {
-      setClientError("בחר איך נוח לך להביע את עצמך.");
+      setClientError("בחר/י דרך שנוחה לך. אפשר לשנות בכל שלב.");
       return false;
     }
     if (!name.trim()) {
-      setClientError("שם נדרש לפני שליחה.");
+      setClientError("חסר שם. מוסיפים לפני שליחה?");
       return false;
     }
     if (!email.trim() || !isValidEmail(email)) {
-      setClientError("כתובת אימייל תקינה נדרשת לפני שליחה.");
+      setClientError("האימייל לא נראה תקין.");
       return false;
     }
     if ((faxHoneypotRef.current?.value ?? "").trim().length > 0) {
@@ -391,7 +391,7 @@ export default function IntakeForm() {
     }
 
     if (!MAIL_DELIVERY_READY) {
-      const message = "שליחה במייל ממתינה לחיבור שרת המייל. אפשר להמשיך בוואטסאפ.";
+      const message = "השליחה דרך האתר עוד לא זמינה. אפשר לעבור לוואטסאפ כגיבוי.";
       setClientError(message);
       if (typeof window !== "undefined") window.__nmReportConnectivityIssue?.(message);
       return;
@@ -400,7 +400,7 @@ export default function IntakeForm() {
     if (HCAPTCHA_SITE_KEY) {
       const t = hcaptchaToken?.trim() ?? "";
       if (!t) {
-        setClientError("נא להשלים את האימות למטה.");
+        setClientError("נא להשלים את האימות לפני השליחה.");
         return;
       }
     }
@@ -423,11 +423,15 @@ export default function IntakeForm() {
       fd.append("h-captcha-response", hcaptchaToken.trim());
     }
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000);
       const res = await fetch("/api/forms/submit", {
         method: "POST",
         headers: { Accept: "application/json" },
         body: fd,
+        signal: controller.signal,
       });
+      clearTimeout(timeoutId);
       let apiJson: { success?: boolean; message?: string } = {};
       try {
         apiJson = (await res.json()) as { success?: boolean; message?: string };
@@ -463,13 +467,13 @@ export default function IntakeForm() {
           typeof apiJson.message === "string" && apiJson.message.trim().length > 0
             ? ` (${apiJson.message.trim()})`
             : "";
-        const message = `השרת לא אישר קבלה${hint}. אפשר לנסות שוב או לשלוח בוואטסאפ.`;
+        const message = `השליחה דרך האתר לא אושרה${hint}. אפשר לנסות שוב או לעבור לוואטסאפ.`;
         setClientError(message);
         if (typeof window !== "undefined") window.__nmReportConnectivityIssue?.(message);
       }
     } catch {
       setStatus("idle");
-      const message = "רשת או חסימה. אפשר לנסות שוב או לכתוב בוואטסאפ.";
+      const message = "השליחה דרך האתר לא עברה. אפשר לנסות שוב או לעבור לוואטסאפ.";
       setClientError(message);
       if (typeof window !== "undefined") window.__nmReportConnectivityIssue?.(message);
     }

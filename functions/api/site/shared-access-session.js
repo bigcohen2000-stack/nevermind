@@ -1,25 +1,13 @@
 import { fetchClubWorkerJson, json } from "../../_lib/club-admin.js";
+import {
+  buildSharedIdentityKey,
+  normalizePhone,
+  normalizeSharedIdentityName,
+  readClientIp,
+} from "../../_lib/shared-access.js";
 import { resolveUnlockAccess } from "../../_lib/unlock-access.js";
 
 const SHARED_SESSION_HOURS = 168;
-
-function normalizePhone(raw) {
-  const digits = String(raw ?? "").replace(/\D/g, "");
-  if (!digits) return "";
-  if (digits.startsWith("972") && digits.length === 12) {
-    return `0${digits.slice(3)}`;
-  }
-  return digits;
-}
-
-function readClientIp(request) {
-  const headerValue =
-    request.headers.get("cf-connecting-ip") ??
-    request.headers.get("x-forwarded-for") ??
-    request.headers.get("x-real-ip") ??
-    "";
-  return String(headerValue).split(",")[0]?.trim() || "";
-}
 
 export async function onRequestPost(context) {
   const { request, env } = context;
@@ -32,9 +20,10 @@ export async function onRequestPost(context) {
   }
 
   const code = String(payload?.code ?? "").trim();
-  const fullName = String(payload?.fullName ?? "").trim().slice(0, 80);
+  const fullName = normalizeSharedIdentityName(payload?.fullName ?? "");
   const phone = normalizePhone(payload?.phone ?? "");
   const path = String(payload?.path ?? "/me/unlock/").trim().slice(0, 500) || "/me/unlock/";
+  const identityKey = buildSharedIdentityKey(fullName, phone);
 
   if (!code) {
     return json({ ok: false, error: "missing_code" }, 400);
@@ -58,7 +47,7 @@ export async function onRequestPost(context) {
   const workerResponse = await fetchClubWorkerJson(env, "/admin/shared-access-log", {
     method: "POST",
     headers: forwardedHeaders,
-    body: JSON.stringify({ fullName, phone, path }),
+    body: JSON.stringify({ fullName, phone, path, identityKey, eventType: "login" }),
   });
 
   if (!workerResponse.ok || workerResponse.payload?.ok !== true) {
@@ -78,6 +67,7 @@ export async function onRequestPost(context) {
     ok: true,
     memberName: String(workerResponse.payload?.memberName ?? fullName).trim() || fullName,
     phone,
+    identityKey,
     lastLoginAt: nowIso,
     expiresAt,
     liveStatus: "SHARED",

@@ -14,7 +14,7 @@ function WhatsAppGlyph({ className }: { className?: string }) {
 }
 
 const waProposalButtonClass =
-  "inline-flex min-h-[2.75rem] items-center justify-center gap-2 rounded-full bg-[#25D366] px-5 py-3 text-sm font-semibold text-white shadow-sm transition-colors duration-200 hover:bg-[#20BD5A] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#128C7E]";
+  "inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full bg-[var(--nm-whatsapp)] px-5 py-3 text-sm font-semibold text-white shadow-sm transition-colors duration-200 hover:bg-[var(--nm-whatsapp-hover)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--nm-whatsapp)]";
 
 type Props = {
   serviceJson: string;

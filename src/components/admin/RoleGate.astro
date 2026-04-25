@@ -1,5 +1,10 @@
 ---
-type AdminRole = "viewer" | "editor" | "admin";
+/**
+ * RoleGate.astro
+ * Shows content only if user has required role
+ */
+
+import type { AdminRole } from "../../lib/admin-auth";
 
 interface Props {
   requiredRole?: AdminRole;
@@ -7,105 +12,68 @@ interface Props {
   showIfAuthed?: boolean;
 }
 
-const {
-  requiredRole = "viewer",
-  fallback = "נדרשת גישת Cloudflare Access עם המייל המורשה כדי להיכנס למסך הזה",
-  showIfAuthed = false,
-} = Astro.props;
+const { requiredRole = "viewer", fallback = "אין לך הרשאה לתוכן זה", showIfAuthed = false } = Astro.props;
+
+// במקום לבדוק server-side (לא ניתן ב-static), נשתמש בפקד client-side
+// הרעיון: הסתר בצד שרת וגלה בצד client אם יש הרשאה
 ---
 
 <div class="role-gate" data-role-gate data-required-role={requiredRole} data-show-if-authed={showIfAuthed}>
+  <!-- תוכן הורי - יוסתר עד שנבדוק הרשאות -->
   <div class="gate-content hidden">
     <slot />
   </div>
 
+  <!-- Fallback message - יוצג עד שנבדוק הרשאות -->
   <div class="gate-fallback rounded-lg border border-yellow-200 bg-yellow-50 px-4 py-3 text-right text-sm text-yellow-800 hidden">
-    <p class="font-semibold">{fallback}</p>
-    <a
-      href="/cdn-cgi/access/login"
-      class="mt-2 inline-block text-yellow-700 underline underline-offset-2 hover:text-yellow-900"
-      data-role-gate-retry
-    >
-      לנסות שוב דרך Access
-    </a>
+    <p class="font-semibold">🔒 {fallback}</p>
+    <a href="/admin/login/" class="mt-2 inline-block text-yellow-700 underline underline-offset-2 hover:text-yellow-900">לחזור לכניסה</a>
   </div>
 
+  <!-- Loading state -->
   <div class="gate-loading animate-pulse rounded-lg bg-gray-200 px-4 py-3 text-right text-sm text-gray-600">
-    בודק הרשאה...
+    בדיקת הרשאות...
   </div>
 </div>
 
 <script>
+  import { AdminAuth } from "../../lib/admin-auth";
+
   document.addEventListener("astro:page-load", () => {
     const gates = document.querySelectorAll("[data-role-gate]");
-    const accessStatusUrl = new URL("/api/admin/access-status", window.location.origin);
-    accessStatusUrl.searchParams.set("returnTo", window.location.href);
-    const defaultChallengeUrl = window.location.href;
-    const defaultSwitchIdentityUrl = window.location.href;
-
-    const accessStatusPromise = fetch(accessStatusUrl, {
-      headers: { accept: "application/json" },
-      cache: "no-store",
-      credentials: "same-origin",
-    })
-      .then(async (response) => {
-        const payload = await response.json().catch(() => null);
-        return {
-          allowed: response.ok && payload?.ok === true,
-          allowedEmails: Array.isArray(payload?.allowedEmails) ? payload.allowedEmails : [],
-          challengeUrl:
-            typeof payload?.challengeUrl === "string" && payload.challengeUrl.trim().length > 0
-              ? payload.challengeUrl.trim()
-              : defaultChallengeUrl,
-          switchIdentityUrl:
-            typeof payload?.switchIdentityUrl === "string" && payload.switchIdentityUrl.trim().length > 0
-              ? payload.switchIdentityUrl.trim()
-              : defaultSwitchIdentityUrl,
-        };
-      })
-      .catch(() => ({
-        allowed: false,
-        allowedEmails: [],
-        challengeUrl: defaultChallengeUrl,
-        switchIdentityUrl: defaultSwitchIdentityUrl,
-      }));
 
     gates.forEach((gate) => {
       const content = gate.querySelector(".gate-content");
-      const fallbackNode = gate.querySelector(".gate-fallback");
+      const fallback = gate.querySelector(".gate-fallback");
       const loading = gate.querySelector(".gate-loading");
-      const retryLink = gate.querySelector("[data-role-gate-retry]");
+      const requiredRole = gate instanceof HTMLElement ? gate.dataset.requiredRole || "viewer" : "viewer";
+      const showIfAuthed = gate instanceof HTMLElement ? gate.dataset.showIfAuthed === "true" : false;
 
-      accessStatusPromise.then(({ allowed, allowedEmails, challengeUrl, switchIdentityUrl }) => {
-        loading?.classList.add("hidden");
+      const user = AdminAuth.getCurrentUser();
 
-        if (allowed) {
-          content?.classList.remove("hidden");
-          fallbackNode?.classList.add("hidden");
-          return;
+      // הסתר loading
+      loading?.classList.add("hidden");
+
+      if (!user) {
+        // אין משתמש
+        if (showIfAuthed) {
+          // הצג תוכן רק לחברים - הצג fallback
+          fallback?.classList.remove("hidden");
+          content?.classList.add("hidden");
         }
+        return;
+      }
 
-        const title = fallbackNode?.querySelector(".font-semibold");
-        if (title instanceof HTMLElement && allowedEmails.length > 0) {
-          title.textContent = `נדרשת גישת Cloudflare Access עם ${allowedEmails.join(", ")} כדי להיכנס למסך הזה`;
-        }
-
-        if (retryLink instanceof HTMLAnchorElement) {
-          retryLink.href = switchIdentityUrl;
-          retryLink.setAttribute("data-access-challenge-url", challengeUrl);
-        }
-
-        fallbackNode?.classList.remove("hidden");
+      // בדוק הרשאות
+      const requiredRoleSafe = (["viewer", "editor", "admin"].includes(requiredRole) ? requiredRole : "viewer") as import("../../lib/admin-auth").AdminRole;
+      if (AdminAuth.hasPermission(user.role, requiredRoleSafe)) {
+        // יש הרשאה - הצג תוכן
+        content?.classList.remove("hidden");
+        fallback?.classList.add("hidden");
+      } else {
+        // חסר הרשאה - הצג fallback
+        fallback?.classList.remove("hidden");
         content?.classList.add("hidden");
-      });
-
-      if (retryLink instanceof HTMLAnchorElement) {
-        retryLink.addEventListener("click", (event) => {
-          const challengeUrl = retryLink.getAttribute("data-access-challenge-url");
-          if (challengeUrl == null || challengeUrl.length === 0) return;
-          event.preventDefault();
-          window.location.assign(challengeUrl);
-        });
       }
     });
   });

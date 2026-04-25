@@ -18,6 +18,8 @@ import ServicePricingBlock from "../components/ServicePricingBlock";
 import ServicesPricingStickyBar from "../components/ServicesPricingStickyBar";
 import TopicQueryLandingBanner from "../components/TopicQueryLandingBanner";
 import PremiumClubGate from "../components/PremiumClubGate.astro";
+import ServiceRouteGrid from "../components/services/ServiceRouteGrid.astro";
+import RelatedTopicVideos from "../components/articles/RelatedTopicVideos.astro";
 
 const services = flattenVisibleServices();
 assertServicePricingConsistency(services);
@@ -43,7 +45,7 @@ const guideById = {
       "כיוון ברור להמשך בלי רעש מסביב",
     ],
     icons: ["📞 טלפון", "🎥 וידאו", "🕒 20-60 דקות"],
-    primaryHref: "/book/",
+    primaryHref: "/personal-consultation/",
     primaryLabel: "קביעת שיחה",
     trust: "לא צריך להגיע מוכן. מספיק להביא את מה שמציק עכשיו.",
   },
@@ -57,7 +59,7 @@ const guideById = {
       "אפשרות להמשיך עד שמרגישים בהירות ולא רק הקלה רגעית",
     ],
     icons: ["📍 פרונטלי", "🚗 אפשר להגיע אליך", "🎧 אפשר להוסיף תיעוד"],
-    primaryHref: "/book/",
+    primaryHref: "/personal-consultation/",
     primaryLabel: "קביעת שיחה",
     trust: "זה לא צריך להרגיש דרמטי. זה פשוט מרחב רגוע יותר לעבודה עמוקה.",
   },
@@ -71,7 +73,7 @@ const guideById = {
       "חוויה שמחברת בין הקשבה, קצב וקצת אומץ שקט",
     ],
     icons: ["🎙️ פודקאסט", "👥 קבוצה קטנה", "🕒 45-90 דקות"],
-    primaryHref: "/book/",
+    primaryHref: "/services/studio/",
     primaryLabel: "שריון מקום",
     trust: "לא חייבים לדבר הרבה כדי להרגיש את הערך. לפעמים מספיק להיות שם.",
   },
@@ -85,7 +87,7 @@ const guideById = {
       "גישה לקבוצה השקטה, לעץ שורש הבעיה ולספרייה האסורה",
     ],
     icons: ["📚 גישה מלאה", "🎬 סרטון בכל מאמר", "🔒 תכנים למנויים בלבד"],
-    primaryHref: "/me/unlock/",
+    primaryHref: "/services/archive/",
     primaryLabel: "בקשה להצטרף",
     trust: "המנוי לא נועד לייצר לחץ. הוא פשוט פותח את כל מה שלא נכנס לעמוד פתוח רגיל.",
   },
@@ -152,6 +154,24 @@ const trustCards = [
   },
 ];
 
+const specialistRoutes = [
+  {
+    href: "/services/therapists/",
+    title: "למטפלים ומאמנים",
+    body: "כשהעומס הוא לא רק אישי אלא מקצועי, והצורך הוא לוגיקה קלינית לפני עוד טכניקה.",
+  },
+  {
+    href: "/personal-consultation/",
+    title: "ייעוץ אישי",
+    body: "כשהתקיעות היא שלך, ואתה לא צריך לפתוח במה או קבוצה אלא פירוק ישיר וממוקד.",
+  },
+  {
+    href: "/services/couples/",
+    title: "ייעוץ זוגי",
+    body: "כשהקונפליקט כבר לא יושב רק בפנים אלא בתוך מערכת יחסים שמחזיקה פחד, אגו ותלות.",
+  },
+];
+
 const faqItems = [
   {
     question: "האם זה טיפול",
@@ -202,16 +222,16 @@ const archivePreviewItems = [
 >
   <TopicQueryLandingBanner client:visible />
 
-  <section class="mx-auto max-w-7xl space-y-14 px-4 pb-28 pt-14 text-[var(--nm-fg)] md:pb-24 md:pt-18">
+  <section id="main-content" class="mx-auto max-w-7xl space-y-14 px-4 pb-28 pt-14 text-[var(--nm-fg)] md:pb-24 md:pt-18">
     <ServicesPricingStickyBar client:idle />
 
     <header class="space-y-8 rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[linear-gradient(180deg,color-mix(in_srgb,var(--nm-bg-canvas)_96%,white),color-mix(in_srgb,var(--nm-surface-muted)_76%,white))] px-6 py-8 text-center shadow-[0_20px_70px_color-mix(in_srgb,var(--nm-fg)_5%,transparent)] md:px-8 md:py-10">
       <div class="space-y-4">
         <p class="text-sm font-semibold tracking-[0.18em] text-[var(--nm-accent)]">שירותים</p>
-        <h1 class="text-[clamp(2.2rem,1.6rem+2.2vw,4rem)] font-semibold leading-[1.06] tracking-tight">
+        <h1 class="nm-title-balance text-[clamp(2.2rem,1.6rem+2.2vw,4rem)] font-semibold leading-[1.06] tracking-tight">
           הדרכים שבהן אפשר לעבוד יחד
         </h1>
-        <p class="mx-auto max-w-3xl text-[clamp(1rem,0.96rem+0.28vw,1.15rem)] leading-8 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
+        <p class="nm-copy-balanced mx-auto max-w-3xl text-[clamp(1rem,0.96rem+0.28vw,1.15rem)] leading-8 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]">
           אם משהו בפנים לא יושב, לא חייבים לנחש מה נכון לבחור. כאן רואים ארבע דרכים פשוטות להמשיך: שיחה קצרה, מפגש עומק, נוכחות באולפן, או מנוי ארכיון למי שרוצה לחקור לבד.
         </p>
       </div>
@@ -228,6 +248,12 @@ const archivePreviewItems = [
           class="inline-flex min-h-[52px] w-full items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-7 py-3 text-base font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)] sm:w-auto"
         >
           מה מתאים לי עכשיו
+        </a>
+        <a
+          href="/services/couples/"
+          class="inline-flex min-h-[52px] w-full items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-7 py-3 text-base font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)] sm:w-auto"
+        >
+          תקיעות זוגית לא חייבת לעבור דרך עמוד כללי
         </a>
       </div>
 
@@ -247,6 +273,7 @@ const archivePreviewItems = [
           <button
             type="button"
             id="services-install-trigger"
+            hidden
             class="mt-4 inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] px-5 py-2.5 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]"
           >
             התקנה
@@ -265,6 +292,12 @@ const archivePreviewItems = [
       </div>
     </header>
 
+    <RelatedTopicVideos
+      topicKey="consultation"
+      topicLabel="צפייה וחקירה: ייעוץ, שיחה ומבנה עבודה"
+      intro="לפני שבוחרים מסלול, אפשר לראות כאן את רצף ההעמקה שנפתח לחברי המועדון סביב שיחה, ייעוץ ופירוק."
+    />
+
     <section id="tracks" class="scroll-mt-28 space-y-6" tabindex="-1">
       <div class="text-right">
         <p class="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--nm-accent)]">ארבעה מסלולים</p>
@@ -274,7 +307,7 @@ const archivePreviewItems = [
         </p>
       </div>
 
-      <div class="grid gap-5 md:grid-cols-2 2xl:grid-cols-4">
+      <div class="nm-card-grid-comfort nm-card-grid-comfort--2up xl:grid-cols-3 2xl:grid-cols-4">
         {
           featuredServices.map((item) => (
             <article
@@ -286,8 +319,8 @@ const archivePreviewItems = [
                 <span class="rounded-full bg-[var(--nm-tint)] px-3 py-1 text-sm font-semibold text-[var(--nm-fg)]">{item.priceLead}</span>
               </div>
 
-              <h3 class="mt-3 text-2xl font-semibold text-[var(--nm-fg)]">{item.title}</h3>
-              <p class="mt-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">{item.fit}</p>
+              <h3 class="nm-title-balance mt-3 text-2xl font-semibold text-[var(--nm-fg)]">{item.title}</h3>
+              <p class="nm-copy-balanced mt-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">{item.fit}</p>
 
               <div class="mt-4 flex flex-wrap gap-2 text-sm">
                 {item.icons.map((line) => (
@@ -351,6 +384,13 @@ const archivePreviewItems = [
           ))
         }
       </div>
+    </section>
+
+    <section class="rounded-[1.6rem] border border-[color-mix(in_srgb,var(--nm-accent)_18%,transparent)] bg-[color-mix(in_srgb,var(--nm-accent)_7%,white)] px-5 py-5 text-right shadow-[0_12px_34px_color-mix(in_srgb,var(--nm-fg)_4%,transparent)]">
+      <p class="text-sm font-semibold text-[var(--nm-fg)]">אם התקיעות היא זוגית, יש עכשיו עמוד ייעודי</p>
+      <p class="mt-2 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_70%,var(--nm-bg))]">
+        לא עוד הפניה לשיחה כללית. עמוד <a href="/services/couples/" class="font-semibold text-[var(--nm-accent)] underline decoration-[color-mix(in_srgb,var(--nm-accent)_30%,transparent)] underline-offset-4">ייעוץ זוגי</a> מפרק מריבות, תלות ופחד דרך ההפרדה בין נתון, פירוש ותגובה.
+      </p>
     </section>
 
     <section class="grid gap-5 lg:grid-cols-[minmax(0,1.2fr)_minmax(18rem,0.8fr)]">
@@ -434,6 +474,12 @@ const archivePreviewItems = [
         </article>
       ))}
     </section>
+
+    <ServiceRouteGrid
+      title="מסלולים ייעודיים"
+      intro="מעבר לכרטיסי השירות, יש כאן גם עמודים ייעודיים לפי סוג הבדיקה. כך לא צריך לנחש לאן להיכנס."
+      items={specialistRoutes}
+    />
 
     <section class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,22rem)] lg:items-start">
       <div class="space-y-6 rounded-[1.8rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/90 p-6 shadow-[0_16px_44px_color-mix(in_srgb,var(--nm-fg)_5%,transparent)]">
@@ -619,6 +665,10 @@ const archivePreviewItems = [
           hiddenAction.click();
         }
       };
+    });
+    window.addEventListener("beforeinstallprompt", () => {
+      const trigger = document.getElementById("services-install-trigger");
+      if (trigger instanceof HTMLButtonElement) trigger.hidden = false;
     });
   </script>
 

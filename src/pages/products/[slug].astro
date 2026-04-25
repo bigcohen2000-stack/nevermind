@@ -2,14 +2,27 @@
 import StaticRedirectPage from "../../components/StaticRedirectPage.astro";
 import { CORE_REDIRECTS } from "../../data/migration-map";
 
+const BOOK_PRODUCT_SLUGS = new Set([
+  "אהבה-ב-20-עמודים",
+  "love-in-20-pages",
+]);
+
 export function getStaticPaths() {
   const slugs = new Set<string>();
   for (const dest of Object.values(CORE_REDIRECTS)) {
-    const m = String(dest).match(/^\/products\/(.+)\/$/);
-    if (m) slugs.add(m[1]);
+    const match = String(dest).match(/^\/products\/(.+)\/$/);
+    if (match) slugs.add(match[1]);
   }
   return [...slugs].map((slug) => ({ params: { slug } }));
 }
+
+const { slug = "" } = Astro.params;
+const target = BOOK_PRODUCT_SLUGS.has(String(slug)) ? "/book/" : "/products/";
 ---
 
-<StaticRedirectPage to="/book/" title="Redirecting..." message="This page has moved." />
+<StaticRedirectPage
+  to={target}
+  title="מעביר לעמוד הנכון"
+  message={target === "/book/" ? "המוצר הזה יושב עכשיו בעמוד הספר." : "עמוד המוצר הישן כבר לא פעיל."}
+  ctaLabel={target === "/book/" ? "לעמוד הספר" : "למוצרים"}
+/>

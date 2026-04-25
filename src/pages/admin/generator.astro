@@ -5,6 +5,7 @@ import RoleGate from "../../components/admin/RoleGate.astro";
 import { FloatingInput } from "../../components/ui/FloatingInput";
 import appConfig from "../../config/appConfig.json";
 import { ARTICLE_TAG_WHITELIST } from "../../data/article-tags";
+import { listVideoTopics } from "../../data/video-topics";
 
 const pageTitle = "אשף מאמרים";
 const pageDescription = "אשף שלושה שלבים ליצירת פרומפט מדויק לכתיבת מאמר.";
@@ -20,6 +21,13 @@ const latestArticlesForWizard = [...publishedArticles]
     href: `/articles/${e.slug}/`,
   }));
 const tagWhitelist = [...ARTICLE_TAG_WHITELIST];
+const videoTopicsForWizard = listVideoTopics().map((topic) => ({
+  key: topic.key,
+  label: topic.label,
+  intro: topic.intro,
+  publicCount: topic.items.filter((item) => item.access === "public").length,
+  memberCount: topic.items.filter((item) => item.access === "members").length,
+}));
 ---
 
 <Layout title={pageTitle} description={pageDescription} noIndex={true}>
@@ -50,8 +58,8 @@ const tagWhitelist = [...ARTICLE_TAG_WHITELIST];
       background: var(--nm-tint);
     }
     </style>
-    <script is:inline define:vars={{ existingSlugs, latestArticlesForWizard, tagWhitelist }}>
-      window.__NM_WIZARD_BOOT = { existingSlugs, latestArticlesForWizard, tagWhitelist };
+    <script is:inline define:vars={{ existingSlugs, latestArticlesForWizard, tagWhitelist, videoTopicsForWizard }}>
+      window.__NM_WIZARD_BOOT = { existingSlugs, latestArticlesForWizard, tagWhitelist, videoTopicsForWizard };
     </script>
     <section class="mx-auto max-w-4xl space-y-8 px-4 pb-16 text-right text-[var(--nm-fg)]">
     <header class="space-y-3">
@@ -250,6 +258,47 @@ const tagWhitelist = [...ARTICLE_TAG_WHITELIST];
           hideValidation={true}
           className="[&_.nm-floating-control]:bg-transparent [&_.nm-floating-control]:text-left"
         />
+        <label class="block space-y-2">
+          <span class="text-sm font-semibold">נושא וידאו קיים</span>
+          <select id="wiz-video-topic-key" class="w-full rounded-[1rem] border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-transparent px-4 py-3 outline-none focus:border-[color-mix(in_srgb,var(--nm-accent)_35%,transparent)]">
+            <option value="">ללא נושא וידאו קבוע</option>
+          </select>
+          <p id="wiz-video-topic-meta" class="text-xs leading-6 text-[color-mix(in_srgb,var(--nm-fg)_60%,var(--nm-bg))]">
+            אם בוחרים נושא קיים, המאמר יוכל לשלוף ממנו סרטונים ופלייליסטים בלי למלא הכול ידנית.
+          </p>
+        </label>
+        <details class="rounded-[1rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-4">
+          <summary class="cursor-pointer list-none text-sm font-semibold text-[var(--nm-fg)] marker:hidden">התאמות וידאו ידניות</summary>
+          <p class="mt-3 text-xs leading-6 text-[color-mix(in_srgb,var(--nm-fg)_62%,var(--nm-bg))]">
+            אם אין עדיין נושא וידאו קבוע, אפשר להוסיף כאן כותרת, פתיח ועד שלושה סרטונים ידניים.
+          </p>
+          <div class="mt-4 space-y-4">
+            <FloatingInput
+              client:load
+              id="wiz-video-topic-label"
+              label="כותרת לאזור הווידאו"
+              hideValidation={true}
+              className="[&_.nm-floating-control]:bg-transparent"
+            />
+            <FloatingInput
+              client:load
+              id="wiz-video-topic-intro"
+              label="שורת פתיחה קצרה לפני הסרטונים"
+              multiline
+              rows={2}
+              hideValidation={true}
+              className="[&_.nm-floating-control]:bg-transparent"
+            />
+            <div class="grid gap-4 md:grid-cols-2">
+              <FloatingInput client:load id="wiz-related-video-1-title" label="כותרת סרטון 1" hideValidation={true} className="[&_.nm-floating-control]:bg-transparent" />
+              <FloatingInput client:load id="wiz-related-video-1-id" label="YouTube ID / link 1" dir="ltr" hideValidation={true} className="[&_.nm-floating-control]:bg-transparent [&_.nm-floating-control]:text-left" />
+              <FloatingInput client:load id="wiz-related-video-2-title" label="כותרת סרטון 2" hideValidation={true} className="[&_.nm-floating-control]:bg-transparent" />
+              <FloatingInput client:load id="wiz-related-video-2-id" label="YouTube ID / link 2" dir="ltr" hideValidation={true} className="[&_.nm-floating-control]:bg-transparent [&_.nm-floating-control]:text-left" />
+              <FloatingInput client:load id="wiz-related-video-3-title" label="כותרת סרטון 3" hideValidation={true} className="[&_.nm-floating-control]:bg-transparent" />
+              <FloatingInput client:load id="wiz-related-video-3-id" label="YouTube ID / link 3" dir="ltr" hideValidation={true} className="[&_.nm-floating-control]:bg-transparent [&_.nm-floating-control]:text-left" />
+            </div>
+          </div>
+        </details>
         <FloatingInput
           client:load
           id="wiz-body"
@@ -323,40 +372,45 @@ const tagWhitelist = [...ARTICLE_TAG_WHITELIST];
         <a id="wiz-open-github" href={githubNewArticleBase} target="_blank" rel="noreferrer" class="inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-transparent px-6 py-3 text-sm font-semibold text-[var(--nm-fg)] no-underline transition hover:bg-[var(--nm-surface-muted)]">
           פתח יצירה ב-GitHub
         </a>
-        <FloatingInput
-          client:load
-          id="wiz-external-mdx"
-          label="הדבק כאן פלט MDX ממודל חיצוני"
-          multiline
-          rows={10}
-          hideValidation={true}
-          className="[&_.nm-floating-control]:bg-[var(--nm-surface-muted)] [&_.nm-floating-control]:leading-7"
-        />
-        <div class="flex flex-wrap gap-3">
-          <button id="wiz-validate-external" type="button" class="inline-flex min-h-[44px] items-center justify-center rounded-full bg-[var(--nm-accent)] px-6 py-3 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]">
-            בדוק ונקה
-          </button>
-          <button id="wiz-invert-claim" type="button" class="inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-transparent px-6 py-3 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]">
-            הפוך טענה
-          </button>
-        </div>
-        <div
-          id="wiz-external-result"
-          class="hidden rounded-[1rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3 text-xs leading-6 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]"
-        />
-        <div id="wiz-inversion-wrap" class="hidden space-y-2 rounded-[1rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3">
-          <p class="text-xs font-semibold text-[var(--nm-accent)]">בדיקת היפוך לפני הורדה</p>
-          <p id="wiz-claim-source" class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_74%,var(--nm-bg))]"></p>
-          <FloatingInput
-            client:load
-            id="wiz-claim-inversion"
-            label="כתוב את ההיפוך של המשפט הזה"
-            multiline
-            rows={3}
-            hideValidation={true}
-            className="[&_.nm-floating-control]:bg-transparent"
-          />
-        </div>
+        <details class="rounded-[1rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-4">
+          <summary class="cursor-pointer list-none text-sm font-semibold text-[var(--nm-fg)] marker:hidden">כלים מתקדמים: פלט חיצוני והיפוך</summary>
+          <div class="mt-4 space-y-4">
+            <FloatingInput
+              client:load
+              id="wiz-external-mdx"
+              label="הדבק כאן פלט JSON או MDX ממודל חיצוני"
+              multiline
+              rows={10}
+              hideValidation={true}
+              className="[&_.nm-floating-control]:bg-[var(--nm-surface-muted)] [&_.nm-floating-control]:leading-7"
+            />
+            <div class="flex flex-wrap gap-3">
+              <button id="wiz-validate-external" type="button" class="inline-flex min-h-[44px] items-center justify-center rounded-full bg-[var(--nm-accent)] px-6 py-3 text-sm font-semibold text-[var(--nm-on-accent)] transition hover:bg-[var(--nm-accent-hover)]">
+                בדוק ונקה
+              </button>
+              <button id="wiz-invert-claim" type="button" class="inline-flex min-h-[44px] items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--nm-fg)_12%,transparent)] bg-transparent px-6 py-3 text-sm font-semibold text-[var(--nm-fg)] transition hover:bg-[var(--nm-surface-muted)]">
+                הפוך טענה
+              </button>
+            </div>
+            <div
+              id="wiz-external-result"
+              class="hidden rounded-[1rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-surface-muted)] px-4 py-3 text-xs leading-6 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))]"
+            />
+            <div id="wiz-inversion-wrap" class="hidden space-y-2 rounded-[1rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/80 px-4 py-3">
+              <p class="text-xs font-semibold text-[var(--nm-accent)]">בדיקת היפוך לפני הורדה</p>
+              <p id="wiz-claim-source" class="text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_74%,var(--nm-bg))]"></p>
+              <FloatingInput
+                client:load
+                id="wiz-claim-inversion"
+                label="כתוב את ההיפוך של המשפט הזה"
+                multiline
+                rows={3}
+                hideValidation={true}
+                className="[&_.nm-floating-control]:bg-transparent"
+              />
+            </div>
+          </div>
+        </details>
         <p id="wiz-save-status" class="text-xs font-semibold text-[color-mix(in_srgb,var(--nm-fg)_62%,var(--nm-bg))]"></p>
       </section>
 
