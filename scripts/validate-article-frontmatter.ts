@@ -7,6 +7,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import yaml from "js-yaml";
 import { validateAndClassify } from "../src/utils/contentValidator.ts";
+import { ARTICLE_TAG_WHITELIST_SET } from "../src/data/article-tags.ts";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, "..");
@@ -14,21 +15,7 @@ const articlesDir = path.join(root, "src", "content", "articles");
 
 const ISO = /^\d{4}-\d{2}-\d{2}$/;
 const normalizeTag = (tag: string): string => tag.trim().normalize("NFC");
-const WHITELIST = new Set([
-  "חופש",
-  "מכניקת מחשבה",
-  "העצמי",
-  "בהירות",
-  "בחירה",
-  "זוגיות",
-  "משפחה וחינוך",
-  "פילוסופיה וחברה",
-  "תודעה ורצון",
-  "חשיבה ביקורתית",
-  "שאלות גדולות",
-  "רגשות",
-  "ניסויי מחשבה",
-].map(normalizeTag));
+const WHITELIST = ARTICLE_TAG_WHITELIST_SET;
 
 function parseFrontmatter(raw: string) {
   const m = raw.match(/^---\r?\n([\s\S]*?)\r?\n---/);
