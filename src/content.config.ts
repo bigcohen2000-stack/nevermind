@@ -59,6 +59,21 @@ const articles = defineCollection({
       .regex(/^[a-zA-Z0-9._-]+\.(mp3|m4a|ogg|wav)$/)
       .optional(),
     youtubeId: z.string().trim().optional(),
+    relatedVideos: z
+      .array(
+        z.object({
+          youtubeId: z.string().trim(),
+          title: z.string().trim(),
+          locked: z.boolean().optional(),
+        })
+      )
+      .optional(),
+    videoTopicKey: z.string().trim().optional(),
+    videoTopicLabel: z.string().trim().optional(),
+    videoSectionIntro: z.string().trim().optional(),
+    premiumPlaylistUrl: z.string().trim().optional(),
+    premiumPlaylistTitle: z.string().trim().optional(),
+    premiumPlaylistIntro: z.string().trim().optional(),
     /** וידאו נוסף לבעלי סשן פרימיום בלבד (מאמר חינמי) */
     premiumYoutubeId: z.string().optional(),
     /** כותרת לווידאון הפרימיום (לנגן ולנגישות) */
