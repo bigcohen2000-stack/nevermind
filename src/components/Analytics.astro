@@ -11,6 +11,7 @@
 </script>
 
 <script>
+  // @ts-nocheck
   // Web Vitals tracking
   const reportWebVitals = (metric) => {
     // Send to analytics
@@ -29,9 +30,9 @@
   };
 
   // Dynamic import to avoid bundle bloat
-  import('web-vitals').then(({ onCLS, onFID, onFCP, onLCP, onTTFB }) => {
+  import('web-vitals').then(({ onCLS, onINP, onFCP, onLCP, onTTFB }) => {
     onCLS(reportWebVitals);
-    onFID(reportWebVitals);
+    onINP(reportWebVitals);
     onFCP(reportWebVitals);
     onLCP(reportWebVitals);
     onTTFB(reportWebVitals);

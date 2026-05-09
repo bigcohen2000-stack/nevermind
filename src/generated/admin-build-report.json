@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-04-25T15:20:19.159Z",
-  "stage": "postbuild",
+  "generatedAt": "2026-05-09T20:04:14.749Z",
+  "stage": "prebuild",
   "readability": {
     "articleCount": 40,
     "averageScore": 98,
@@ -80,8 +80,8 @@
     "htmlPages": 169,
     "rssReady": true,
     "internalLinks": {
-      "ok": true,
-      "checkedAt": "2026-04-25T15:20:19.189Z"
+      "ok": null,
+      "checkedAt": null
     }
   }
 }
