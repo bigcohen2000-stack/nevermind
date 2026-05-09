@@ -433,7 +433,7 @@ export function buildServiceProposalWhatsAppMessage(args: {
   }
   chunks.push(`שלום, ראיתי את האפשרות של ${serviceName} עם הרחבת ${extensionName}.`);
   if (focusRaw.length > 0) {
-    const focusSentence = /[.!?]$/.test(focusRaw) ? focusRaw : `${focusRaw}.`;
+    const focusSentence = /[.?]$/.test(focusRaw) ? focusRaw : `${focusRaw}.`;
     chunks.push(`אני רוצה להתמקד ב: ${focusSentence}`);
   }
   chunks.push("מתי נוכל להתקדם?");
@@ -610,7 +610,7 @@ export const buildArticleReadContextLine = (
   return "קראתי מאמר באתר NeverMind.";
 };
 
-const HEBREW_TITLE_ONLY_REGEX = /^[\u0590-\u05FF\s\-.,'"!?()]+$/;
+const HEBREW_TITLE_ONLY_REGEX = /^[\u0590-\u05FF\s\-.,'"?()]+$/;
 const SAFE_SLUG_REGEX = /^[a-z0-9-]+$/;
 const HAS_HEBREW_REGEX = /[\u0590-\u05FF]/;
 const HAS_LATIN_REGEX = /[A-Za-z]/;

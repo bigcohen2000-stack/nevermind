@@ -87,7 +87,7 @@ const serviceJson = JSON.stringify(service);
             data-nm-availability=""
             data-spots={String(service.availability?.spots_left ?? "")}
             data-updated-at={service.availability?.updated_at?.trim() ?? ""}
-            data-label={service.availability!.label?.trim() || "נותרו"}
+            data-label={service.availability.label?.trim() || "נותרו"}
           >
             {availabilityLine}
           </p>

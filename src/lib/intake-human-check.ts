@@ -64,5 +64,5 @@ const CHALLENGES: IntakeHumanChallenge[] = [
 
 export function pickIntakeHumanChallenge(): IntakeHumanChallenge {
   const idx = Math.floor(Math.random() * CHALLENGES.length);
-  return CHALLENGES[idx]!;
+  return CHALLENGES[idx];
 }

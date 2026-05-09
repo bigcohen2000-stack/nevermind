@@ -99,26 +99,26 @@ export function buildSiteBreadcrumbTrail(
   if (segments[0] === "journey" && segments.length === 2) {
     return [
       { label: BREADCRUMB_HOME_LABEL, href: "/" },
-      { label: titleOpt || labelForSegment(segments[1]!), href: null },
+      { label: titleOpt || labelForSegment(segments[1]), href: null },
     ];
   }
   if (segments[0] === "topics" && segments.length === 2) {
     return [
       { label: BREADCRUMB_HOME_LABEL, href: "/" },
-      { label: titleOpt || labelForSegment(segments[1]!), href: null },
+      { label: titleOpt || labelForSegment(segments[1]), href: null },
     ];
   }
   if (segments[0] === "definitions" && segments.length === 2) {
     return [
       { label: BREADCRUMB_HOME_LABEL, href: "/" },
-      { label: titleOpt || labelForSegment(segments[1]!), href: null },
+      { label: titleOpt || labelForSegment(segments[1]), href: null },
     ];
   }
 
   const out: SiteBreadcrumbCrumb[] = [{ label: BREADCRUMB_HOME_LABEL, href: "/" }];
   let acc = "";
   for (let i = 0; i < segments.length; i++) {
-    const seg = segments[i]!;
+    const seg = segments[i];
     acc += `/${seg}`;
     const pathWithSlash = acc.endsWith("/") ? acc : `${acc}/`;
     const isLast = i === segments.length - 1;

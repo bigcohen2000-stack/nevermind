@@ -1,0 +1,114 @@
+---
+import { glossaryConcepts } from "../data/glossary";
+const suggestions = glossaryConcepts.slice(0, 6).map(c => c.title);
+---
+
+<div
+  id="search-modal"
+  class="fixed inset-0 z-[60] flex items-center justify-center bg-[#1A1A1A]/40 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-300"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="search-title"
+>
+  <div
+    id="search-container"
+    class="w-[min(640px,92vw)] rounded-[2.5rem] border border-[#1A1A1A]/10 bg-[#FAFAF8] p-8 shadow-2xl translate-y-4 transition-all duration-300"
+  >
+    <div class="flex items-center justify-between mb-8">
+      <h2 id="search-title" class="text-2xl font-semibold">חיפוש</h2>
+      <button id="close-search" class="p-2 hover:text-[#D42B2B]">
+        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <input
+      type="search"
+      id="search-input"
+      placeholder="מה מעסיק אותך כרגע?"
+      class="w-full text-xl bg-transparent border-b-2 border-[#1A1A1A]/10 py-4 focus:border-[#D42B2B] outline-none"
+    />
+
+    <div class="mt-8">
+      <h3 class="text-xs font-bold uppercase tracking-widest text-[#1A1A1A]/30 mb-4">מושגים נפוצים</h3>
+      <div class="flex flex-wrap gap-2">
+        {suggestions.map(s => (
+          <button class="suggestion-btn px-4 py-2 bg-[#1A1A1A]/5 rounded-full text-sm hover:bg-[#D42B2B] hover:text-white transition-colors">
+            {s}
+          </button>
+        ))}
+      </div>
+    </div>
+
+    <div id="search-results" class="mt-10 max-h-[40vh] overflow-y-auto space-y-6">
+      <!-- Results will be injected here -->
+    </div>
+  </div>
+</div>
+
+<script>
+  import { runPagefindSearch } from "../lib/pagefind-client.js";
+
+  const modal = document.getElementById('search-modal');
+  const container = document.getElementById('search-container');
+  const input = document.getElementById('search-input') as HTMLInputElement;
+  const resultsContainer = document.getElementById('search-results');
+  const closeBtn = document.getElementById('close-search');
+
+  function openSearch() {
+    modal?.classList.remove('opacity-0', 'pointer-events-none');
+    container?.classList.remove('translate-y-4');
+    input?.focus();
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeSearch() {
+    modal?.classList.add('opacity-0', 'pointer-events-none');
+    container?.classList.add('translate-y-4');
+    document.body.style.overflow = '';
+  }
+
+  window.addEventListener('open-search', openSearch);
+  closeBtn?.addEventListener('click', closeSearch);
+  modal?.addEventListener('click', (e) => {
+    if (e.target === modal) closeSearch();
+  });
+
+  let debounceTimer: number;
+  input?.addEventListener('input', (e) => {
+    const query = (e.target as HTMLInputElement).value;
+    clearTimeout(debounceTimer);
+    debounceTimer = window.setTimeout(async () => {
+      if (query.length < 2) {
+        if (resultsContainer) resultsContainer.innerHTML = '';
+        return;
+      }
+
+      const results = await runPagefindSearch(query, 5);
+      if (resultsContainer) {
+        resultsContainer.innerHTML = results.map(r => `
+          <a href="${r.url}" class="block group">
+            <h4 class="font-semibold group-hover:text-[#D42B2B]">${r.title}</h4>
+            <p class="text-sm text-[#1A1A1A]/50 line-clamp-1">${r.excerpt}</p>
+          </a>
+        `).join('');
+      }
+    }, 300);
+  });
+
+  document.querySelectorAll('.suggestion-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      input.value = (btn as HTMLButtonElement).innerText;
+      input.dispatchEvent(new Event('input'));
+    });
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeSearch();
+    if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
+      e.preventDefault();
+      openSearch();
+    }
+  });
+</script>
