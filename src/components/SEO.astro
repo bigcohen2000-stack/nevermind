@@ -4,9 +4,17 @@ import siteSettings from "../config/siteSettings.json";
 import { jsonLdForInlineScript } from "../lib/json-ld-inline";
 import {
   buildSiteBreadcrumbTrail,
-  parseBreadcrumbOverride,
   breadcrumbTrailToJsonLd,
 } from "../lib/site-breadcrumbs";
+
+interface Props {
+  title?: string;
+  description?: string;
+  frontmatter?: any;
+  image?: string;
+  noIndex?: boolean;
+  faqItems?: { question: string; answer: string }[];
+}
 
 const {
   title,
@@ -14,11 +22,7 @@ const {
   frontmatter,
   image,
   noIndex = false,
-  waArticleSlug = "",
-  faqItems,
-  hasInquirySection,
-  articlePaywalled = false,
-  seoArticleBody = "",
+  faqItems = [],
 } = Astro.props;
 
 const brandCfg = (siteSettings as any).brand ?? {};
@@ -38,15 +42,33 @@ const logoAbsolute = new URL(logoPath.replace(/^\//, ""), siteUrlSlash).toString
 const ogImage = image || frontmatter?.image || logoPath;
 const ogImageAbsolute = ogImage.startsWith("http") ? ogImage : new URL(ogImage.replace(/^\//, ""), siteUrlSlash).toString();
 
-// Schema logic
+// Organization Schema
 const organizationSchema = {
   "@context": "https://schema.org",
   "@type": "Organization",
   name: siteTitle,
   url: siteUrl,
   logo: logoAbsolute,
+  image: logoAbsolute,
+  description: siteDescription,
+  inLanguage: "he-IL",
 };
 
+// Website Schema
+const websiteSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: siteTitle,
+  url: siteUrl,
+  inLanguage: "he-IL",
+  potentialAction: {
+    "@type": "SearchAction",
+    target: new URL("search/?q={search_term_string}", siteUrlSlash).toString(),
+    "query-input": "required name=search_term_string",
+  },
+};
+
+// Breadcrumb Schema
 const breadcrumbCrumbs = buildSiteBreadcrumbTrail(Astro.url.pathname, { currentPageTitle: title || frontmatter?.title });
 const breadcrumbJsonLdItems = breadcrumbTrailToJsonLd(breadcrumbCrumbs, pageUrl, siteUrlSlash);
 
@@ -61,7 +83,21 @@ const breadcrumbSchema = breadcrumbCrumbs.length > 0 ? {
   })),
 } : null;
 
-const coreStructuredData = [organizationSchema, breadcrumbSchema].filter(Boolean);
+// FAQ Schema
+const faqSchema = faqItems.length > 0 ? {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: faqItems.map((item) => ({
+    "@type": "Question",
+    name: item.question,
+    acceptedAnswer: {
+      "@type": "Answer",
+      text: item.answer,
+    },
+  })),
+} : null;
+
+const coreStructuredData = [organizationSchema, websiteSchema, breadcrumbSchema, faqSchema].filter(Boolean);
 ---
 
 <title>{pageTitle}</title>
@@ -73,6 +109,7 @@ const coreStructuredData = [organizationSchema, breadcrumbSchema].filter(Boolean
 <meta property="og:description" content={pageDescription} />
 <meta property="og:image" content={ogImageAbsolute} />
 <meta property="og:url" content={pageUrl} />
+<meta property="og:type" content={frontmatter?.pubDate ? "article" : "website"} />
 <meta name="twitter:card" content="summary_large_image" />
 
 <script is:inline type="application/ld+json" set:html={jsonLdForInlineScript(coreStructuredData)}></script>

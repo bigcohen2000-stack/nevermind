@@ -1,4 +1,11 @@
 ---
+interface Props {
+  wordmarkHe: string;
+  logoPath: string;
+  footerLinkColumns: { title: string; links: { href: string; label: string }[] }[];
+  disclaimerLong: string;
+}
+
 const { wordmarkHe, logoPath, footerLinkColumns, disclaimerLong } = Astro.props;
 const currentYear = new Date().getFullYear();
 ---
@@ -16,11 +23,11 @@ const currentYear = new Date().getFullYear();
         </p>
       </div>
 
-      {footerLinkColumns.map(col => (
+      {footerLinkColumns.map((col) => (
         <div class="space-y-6">
           <h3 class="text-xs font-bold uppercase tracking-widest text-[#1A1A1A]/30">{col.title}</h3>
           <ul class="space-y-4">
-            {col.links.map(link => (
+            {col.links.map((link) => (
               <li>
                 <a href={link.href} class="text-sm font-medium text-[#1A1A1A]/60 hover:text-[#D42B2B] transition-colors">
                   {link.label}

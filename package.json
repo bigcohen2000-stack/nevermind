@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "astro dev",
+    "check": "astro check",
     "check:text": "node scripts/check-text-integrity.mjs",
     "validate:articles": "tsx scripts/validate-article-frontmatter.ts",
     "validate": "npm run check:text && npm run validate:articles && node scripts/pre-publish-check.mjs",

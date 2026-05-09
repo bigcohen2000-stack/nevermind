@@ -1,16 +1,10 @@
 ---
 import { getCollection } from "astro:content";
 import Layout from "../layouts/Layout.astro";
-import MethodTextBlock from "../components/methodology/MethodTextBlock.astro";
-import { buildWhatsAppHref } from "../lib/services";
 
 const allArticles = await getCollection("articles", ({ data }) => data.draft !== true);
 const sortedArticles = allArticles.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 const sampleArticles = sortedArticles.slice(0, 3);
-
-const waHref = buildWhatsAppHref(
-  "היי, הגעתי מדף הבית. רוצה להבין איך מצטרפים ל-NeverMind."
-);
 
 const values = [
   { title: "בהירות", body: "לראות מה באמת מפעיל אותך, בלי הדרמה." },

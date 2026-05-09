@@ -28,7 +28,7 @@ type Props = {
 };
 
 const { entry } = Astro.props as Props;
-const frontmatter = entry.data;
+const frontmatter = entry.data as any;
 const canonicalSlug = getCanonicalArticleSlug(entry);
 const { Content } = await entry.render();
 const faqItems = Array.isArray(frontmatter.faq) ? frontmatter.faq : [];
@@ -67,17 +67,17 @@ const videoSummaryPointsArticle = Array.isArray(frontmatter.videoSummaryPoints)
   : [];
 const relatedVideos = Array.isArray(frontmatter.relatedVideos)
   ? frontmatter.relatedVideos
-      .map((item) => ({
+      .map((item: any) => ({
         youtubeId: String(item?.youtubeId || "").trim(),
         title: String(item?.title || "").trim(),
         locked: item?.locked === true,
       }))
-      .filter((item) => item.youtubeId && item.title)
+      .filter((item: any) => item.youtubeId && item.title)
       .slice(0, 3)
   : [];
 const topicMedia = typeof frontmatter.videoTopicKey === "string" ? getVideoTopic(frontmatter.videoTopicKey) : null;
 const topicMediaItems = topicMedia
-  ? topicMedia.items.map((item) =>
+  ? topicMedia.items.map((item: any) =>
       item.type === "playlist"
         ? {
             type: "playlist" as const,
@@ -96,14 +96,14 @@ const topicMediaItems = topicMedia
 const videoTopicLabel =
   typeof frontmatter.videoTopicLabel === "string" && frontmatter.videoTopicLabel.trim()
     ? frontmatter.videoTopicLabel.trim()
-    : topicMedia?.label
-      ? topicMedia.label
+    : (topicMedia as any)?.label
+      ? (topicMedia as any).label
     : "עוד סרטונים בנושא";
 const videoSectionIntro =
   typeof frontmatter.videoSectionIntro === "string" && frontmatter.videoSectionIntro.trim()
     ? frontmatter.videoSectionIntro.trim()
-    : topicMedia?.intro
-      ? topicMedia.intro
+    : (topicMedia as any)?.intro
+      ? (topicMedia as any).intro
     : "אם המאמר הזה נוגע באותו מנגנון, אפשר להמשיך מכאן לעוד פירוקים קצרים וישירים.";
 const premiumPlaylistUrl =
   typeof frontmatter.premiumPlaylistUrl === "string" && frontmatter.premiumPlaylistUrl.trim()
@@ -117,13 +117,13 @@ const premiumPlaylistIntro =
   typeof frontmatter.premiumPlaylistIntro === "string" && frontmatter.premiumPlaylistIntro.trim()
     ? frontmatter.premiumPlaylistIntro.trim()
     : "מי שכבר מחובר למועדון יכול לפתוח מכאן רצף וידאו מלא על אותו נושא, בלי להתפזר לעוד חיפושים.";
-const hasQuestionForSchema = Boolean(String(frontmatter.questionForSchema ?? "").trim());
+
 const articleSimpleSummary =
   typeof frontmatter.simpleSummary === "string" && frontmatter.simpleSummary.trim()
     ? frontmatter.simpleSummary.trim()
     : frontmatter.description;
 const articleQuickTakeaways = Array.isArray(frontmatter.quickTakeaways)
-  ? frontmatter.quickTakeaways.map((item) => String(item).trim()).filter(Boolean).slice(0, 3)
+  ? frontmatter.quickTakeaways.map((item: string) => String(item).trim()).filter(Boolean).slice(0, 3)
   : [];
 const heroImage = resolveArticleHeroImage(canonicalSlug, frontmatter.image);
 const showHeroImage = heroImage !== "/images/logo.svg";
@@ -148,20 +148,20 @@ const resolveMindShift = (raw: unknown): number | undefined => {
 };
 
 const requestedConcepts = Array.isArray(frontmatter.relatedConcepts)
-  ? frontmatter.relatedConcepts.map((item) => String(item).trim()).filter(Boolean)
+  ? frontmatter.relatedConcepts.map((item: string) => String(item).trim()).filter(Boolean)
   : [];
 const currentTags = Array.isArray(frontmatter.tags)
-  ? frontmatter.tags.map((item) => String(item).trim()).filter(Boolean)
+  ? frontmatter.tags.map((item: string) => String(item).trim()).filter(Boolean)
   : [];
 
 const glossaryLinks = requestedConcepts
-  .map((item) => {
+  .map((item: string) => {
     const match = glossaryConcepts.find(
       (concept) => concept.slug === item || concept.title === item
     );
     return match
       ? {
-          href: `/glossary/${match.slug}/`,
+          href:  `/glossary/\${match.slug}/ `,
           title: match.title,
           description: match.summary,
         }
@@ -172,7 +172,7 @@ const glossaryLinks = requestedConcepts
 
 const explorationCards = [
   ...(glossaryLinks.length > 0
-    ? glossaryLinks.map((item) => ({
+    ? glossaryLinks.map((item: { href: string; title: string; description: string }) => ({
         ...item,
         label: "מושג קרוב",
       }))
@@ -204,10 +204,10 @@ const relatedArticles = (await getCollection("articles", ({ data }) => data.draf
   .filter((article) => getCanonicalArticleSlug(article) !== canonicalSlug)
   .map((article) => {
     const articleTags = Array.isArray(article.data.tags)
-      ? article.data.tags.map((item) => String(item).trim()).filter(Boolean)
+      ? article.data.tags.map((item: string) => String(item).trim()).filter(Boolean)
       : [];
     const articleConcepts = Array.isArray(article.data.relatedConcepts)
-      ? article.data.relatedConcepts.map((item) => String(item).trim()).filter(Boolean)
+      ? article.data.relatedConcepts.map((item: string) => String(item).trim()).filter(Boolean)
       : [];
     const sharedTags = articleTags.filter((tag) => currentTags.includes(tag)).length;
     const sharedConcepts = articleConcepts.filter((concept) => requestedConcepts.includes(concept)).length;
@@ -248,9 +248,6 @@ const relatedArticles = (await getCollection("articles", ({ data }) => data.draf
   description={frontmatter.description}
   frontmatter={frontmatter}
   faqItems={faqItems}
-  hasInquirySection={faqItems.length > 0 || hasQuestionForSchema}
-  seoArticleBody={seoArticleBody}
-  articlePaywalled={frontmatter.isPremium}
 >
   <section class="mx-auto max-w-4xl px-4 pb-20 text-right text-[var(--nm-fg)]">
     <header class="rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/88 px-6 py-8 shadow-[0_18px_42px_rgba(26,26,26,0.04)]">
@@ -283,7 +280,7 @@ const relatedArticles = (await getCollection("articles", ({ data }) => data.draf
         </div>
         {articleQuickTakeaways.length ? (
           <ul class="mt-4 grid gap-3 text-sm leading-7 text-[color-mix(in_srgb,var(--nm-fg)_72%,var(--nm-bg))] md:grid-cols-3">
-            {articleQuickTakeaways.map((item) => (
+            {articleQuickTakeaways.map((item: string) => (
               <li class="rounded-[1.1rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-[var(--nm-bg-canvas)] px-4 py-3">{item}</li>
             ))}
           </ul>
@@ -417,7 +414,7 @@ const relatedArticles = (await getCollection("articles", ({ data }) => data.draf
         const arr = Array.isArray(prev) ? prev : [];
         const next = [row, ...arr.filter((x) => x && x.slug !== row.slug)].slice(0, 40);
         localStorage.setItem(key, JSON.stringify(next));
-        const onceKey = `nm_sec_once_${slug}`;
+        const onceKey =  `nm_sec_once_\${slug} `;
         if (!sessionStorage.getItem(onceKey)) {
           sessionStorage.setItem(onceKey, "1");
           const sec = Math.floor(Number.parseInt(localStorage.getItem("nm_reading_seconds_local") || "0", 10) || 0);
