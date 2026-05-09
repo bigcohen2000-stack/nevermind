@@ -14,6 +14,7 @@ interface Props {
   image?: string;
   noIndex?: boolean;
   faqItems?: { question: string; answer: string }[];
+  articleBody?: string;
 }
 
 const {
@@ -23,6 +24,7 @@ const {
   image,
   noIndex = false,
   faqItems = [],
+  articleBody,
 } = Astro.props;
 
 const brandCfg = (siteSettings as any).brand ?? {};
@@ -97,7 +99,36 @@ const faqSchema = faqItems.length > 0 ? {
   })),
 } : null;
 
-const coreStructuredData = [organizationSchema, websiteSchema, breadcrumbSchema, faqSchema].filter(Boolean);
+// Article Schema
+const articleSchema = frontmatter?.pubDate ? {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  headline: frontmatter.title || title,
+  description: pageDescription,
+  image: ogImageAbsolute,
+  datePublished: new Date(frontmatter.pubDate).toISOString(),
+  dateModified: new Date(frontmatter.updatedDate || frontmatter.pubDate).toISOString(),
+  author: {
+    "@type": "Person",
+    name: frontmatter.author || "יקיר כהן",
+  },
+  publisher: {
+    "@type": "Organization",
+    name: siteTitle,
+    logo: {
+      "@type": "ImageObject",
+      url: logoAbsolute,
+    },
+  },
+  mainEntityOfPage: {
+    "@type": "WebPage",
+    "@id": pageUrl,
+  },
+  isAccessibleForFree: !frontmatter.isPremium,
+  articleBody: articleBody || undefined,
+} : null;
+
+const coreStructuredData = [organizationSchema, websiteSchema, breadcrumbSchema, faqSchema, articleSchema].filter(Boolean);
 ---
 
 <title>{pageTitle}</title>

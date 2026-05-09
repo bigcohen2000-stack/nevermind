@@ -161,13 +161,13 @@ const glossaryLinks = requestedConcepts
     );
     return match
       ? {
-          href:  `/glossary/\${match.slug}/ `,
+          href: `/glossary/${match.slug}/`,
           title: match.title,
           description: match.summary,
         }
       : null;
   })
-  .filter((item): item is { href: string; title: string; description: string } => item !== null)
+  .filter((item: any): item is { href: string; title: string; description: string } => item !== null)
   .slice(0, 2);
 
 const explorationCards = [
@@ -248,6 +248,7 @@ const relatedArticles = (await getCollection("articles", ({ data }) => data.draf
   description={frontmatter.description}
   frontmatter={frontmatter}
   faqItems={faqItems}
+  articleBody={seoArticleBody}
 >
   <section class="mx-auto max-w-4xl px-4 pb-20 text-right text-[var(--nm-fg)]">
     <header class="rounded-[2rem] border border-[color-mix(in_srgb,var(--nm-fg)_10%,transparent)] bg-white/88 px-6 py-8 shadow-[0_18px_42px_rgba(26,26,26,0.04)]">
@@ -414,7 +415,7 @@ const relatedArticles = (await getCollection("articles", ({ data }) => data.draf
         const arr = Array.isArray(prev) ? prev : [];
         const next = [row, ...arr.filter((x) => x && x.slug !== row.slug)].slice(0, 40);
         localStorage.setItem(key, JSON.stringify(next));
-        const onceKey =  `nm_sec_once_\${slug} `;
+        const onceKey = `nm_sec_once_${slug}`;
         if (!sessionStorage.getItem(onceKey)) {
           sessionStorage.setItem(onceKey, "1");
           const sec = Math.floor(Number.parseInt(localStorage.getItem("nm_reading_seconds_local") || "0", 10) || 0);

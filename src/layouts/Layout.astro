@@ -20,6 +20,7 @@ const {
   image,
   noIndex = false,
   faqItems,
+  articleBody,
 } = Astro.props;
 
 const brandCfg = (siteSettings as any).brand ?? {};
@@ -64,6 +65,7 @@ const footerLinkColumns = [
       image={image}
       noIndex={noIndex}
       faqItems={faqItems}
+      articleBody={articleBody}
     />
     <meta name="theme-color" content="#FAFAF8" />
     <meta name="color-scheme" content="light" />
