@@ -11,10 +11,12 @@
 </script>
 
 <script>
+  import type { Metric } from 'web-vitals';
+
   // Web Vitals tracking
-  const reportWebVitals = (metric) => {
+  const reportWebVitals = (metric: Metric) => {
     // Send to analytics
-    window.nmTrackEvent('web_vitals', {
+    (window as any).nmTrackEvent?.('web_vitals', {
       name: metric.name,
       value: metric.value,
       rating: metric.rating,
@@ -29,12 +31,12 @@
   };
 
   // Dynamic import to avoid bundle bloat
-  import('web-vitals').then(({ onCLS, onFID, onFCP, onLCP, onTTFB }) => {
+  import('web-vitals').then(({ onCLS, onFCP, onLCP, onTTFB, onINP }) => {
     onCLS(reportWebVitals);
-    onFID(reportWebVitals);
     onFCP(reportWebVitals);
     onLCP(reportWebVitals);
     onTTFB(reportWebVitals);
+    if (onINP) onINP(reportWebVitals);
   }).catch(err => {
     console.warn('Web Vitals tracking failed to load:', err);
   });
@@ -44,7 +46,7 @@
   const trackInteraction = () => {
     interactionCount++;
     if (interactionCount === 1) {
-      window.nmTrackEvent('first_interaction');
+      (window as any).nmTrackEvent?.('first_interaction');
     }
   };
 
@@ -53,8 +55,8 @@
   document.addEventListener('touchstart', trackInteraction, { once: true });
 
   // Theme preference tracking
-  const trackThemeChange = (theme) => {
-    window.nmTrackEvent('theme_change', { theme });
+  const trackThemeChange = (theme: string) => {
+    (window as any).nmTrackEvent?.('theme_change', { theme });
   };
 
   // Listen for theme changes
@@ -73,8 +75,8 @@
   });
 
   // Search tracking
-  const trackSearch = (query, results) => {
-    window.nmTrackEvent('search', {
+  const trackSearch = (query: string, results: number) => {
+    (window as any).nmTrackEvent?.('search', {
       query: query.substring(0, 100), // Limit length
       results_count: results,
       has_results: results > 0
@@ -82,8 +84,10 @@
   };
 
   // Listen for search events
-  window.addEventListener('nm-search-performed', (event) => {
-    const { query, results } = event.detail;
-    trackSearch(query, results);
+  window.addEventListener('nm-search-performed', (event: any) => {
+    const { query, results } = event.detail || {};
+    if (query !== undefined && results !== undefined) {
+      trackSearch(query, results);
+    }
   });
 </script>

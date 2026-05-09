@@ -30,8 +30,8 @@ function isWordChar(ch: string): boolean {
 }
 
 function boundaryOk(value: string, start: number, len: number): boolean {
-  const before = start > 0 ? value[start - 1]! : "\n";
-  const after = start + len < value.length ? value[start + len]! : "\n";
+  const before = start > 0 ? value[start - 1] : "\n";
+  const after = start + len < value.length ? value[start + len] : "\n";
   return !isWordChar(before) && !isWordChar(after);
 }
 
@@ -115,7 +115,7 @@ export default function remarkGlossaryLinks() {
         }
 
         if (!chosen) {
-          pushChar(value[i]!);
+          pushChar(value[i]);
           i += 1;
           continue;
         }

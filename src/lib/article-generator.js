@@ -51,7 +51,7 @@ function uniq(values) {
 function slugify(value) {
   return String(value ?? "")
     .toLowerCase()
-    .replace(/['".,!?()[\]{}]+/g, " ")
+    .replace(/['".,?()[\]{}]+/g, " ")
     .replace(/&/g, " and ")
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "")
@@ -120,7 +120,7 @@ function normalizeFaq(value) {
 function sameish(a, b) {
   const normalize = (value) =>
     collapseWhitespace(value)
-      .replace(/[.,/#!$%^&*;:{}=\-_`~()"'""׳'?]/g, "")
+      .replace(/[.,/#$%^&*;:{}=\-_`~()"'""׳'?]/g, "")
       .trim();
   return Boolean(normalize(a) && normalize(a) === normalize(b));
 }

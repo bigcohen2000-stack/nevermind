@@ -242,7 +242,7 @@ export default function IntakeForm() {
       if (!removing) {
         setLastTag(key);
       } else {
-        setLastTag(next.length ? next[next.length - 1]! : null);
+        setLastTag(next.length ? next[next.length - 1] : null);
       }
       return next;
     });

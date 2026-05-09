@@ -70,7 +70,7 @@ function normalizeMdxWhitespace(text) {
 function countLongSentences(body) {
   const t = String(body || "").trim();
   if (!t) return 0;
-  const sentences = t.split(/[.!?\n]+/).map((x) => x.trim()).filter(Boolean);
+  const sentences = t.split(/[.?\n]+/).map((x) => x.trim()).filter(Boolean);
   let n = 0;
   for (const sent of sentences) {
     const wc = sent.split(/\s+/).filter(Boolean).length;
@@ -234,7 +234,7 @@ function pickClaimForInversion(text) {
     .replace(/\s+/g, " ")
     .trim();
   const candidates = cleaned
-    .split(/[.!?]\s+/)
+    .split(/[.?]\s+/)
     .map((line) => line.trim())
     .filter((line) => line.length >= 20);
   return candidates[0] || "";

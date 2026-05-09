@@ -1,135 +1,146 @@
 ---
-/**
- * NeverMind SEO - canonical, OG/Twitter, JSON-LD (Schema.org)
- * קלט מ-migration-map; JSON-LD כטקסט מסונן (לא משפיע על INP לעומת בלוק סקריפט חיצוני)
- */
 import appConfig from "../config/appConfig.json";
-import {
-  SITE_NAME,
-  TITLE_TEMPLATE,
-  DEFAULT_DESCRIPTION,
-  OG_IMAGE_DEFAULT,
-} from "../data/migration-map";
+import siteSettings from "../config/siteSettings.json";
 import { jsonLdForInlineScript } from "../lib/json-ld-inline";
+import {
+  buildSiteBreadcrumbTrail,
+  breadcrumbTrailToJsonLd,
+} from "../lib/site-breadcrumbs";
 
-export interface Props {
-  title: string;
+interface Props {
+  title?: string;
   description?: string;
+  frontmatter?: any;
   image?: string;
-  canonical?: string;
-  type?: "website" | "article" | "product";
-  price?: string;
-  datePublished?: string;
+  noIndex?: boolean;
+  faqItems?: { question: string; answer: string }[];
+  articleBody?: string;
 }
-
-const siteUrl = String(appConfig.site?.url ?? "https://www.nevermind.co.il").trim();
-const siteUrlSlash = siteUrl.endsWith("/") ? siteUrl : `${siteUrl}/`;
 
 const {
   title,
-  description = DEFAULT_DESCRIPTION,
-  image = OG_IMAGE_DEFAULT,
-  canonical,
-  type = "website",
-  price,
-  datePublished,
+  description,
+  frontmatter,
+  image,
+  noIndex = false,
+  faqItems = [],
+  articleBody,
 } = Astro.props;
 
-const trimMetaDescription = (value: string) => {
-  const normalized = String(value || "")
-    .trim()
-    .replace(/\s+/g, " ");
-  if (normalized.length <= 155) return normalized;
-  return `${normalized.slice(0, 152).trimEnd()}...`;
+const brandCfg = (siteSettings as any).brand ?? {};
+const siteWordmark = brandCfg.wordmarkHe || "השם לא משנה";
+const siteTitle = `${siteWordmark} | NeverMind`;
+const siteDescription = "הבית של NeverMind: שקט נפשי, בהירות, חשיבה צלולה והפרדה בין עובדה, פירוש ותגובה.";
+const siteUrl = appConfig.site.url;
+const siteUrlSlash = siteUrl.endsWith("/") ? siteUrl : `${siteUrl}/`;
+
+const pageTitle = title ? (title.includes(siteWordmark) ? title : `${title} | ${siteWordmark}`) : siteTitle;
+const pageDescription = (description ?? frontmatter?.description ?? siteDescription).slice(0, 155);
+const pageUrl = new URL(Astro.url.pathname, siteUrl).toString();
+
+const logoPath = brandCfg.logoPath || "/images/logo.svg";
+const logoAbsolute = new URL(logoPath.replace(/^\//, ""), siteUrlSlash).toString();
+
+const ogImage = image || frontmatter?.image || logoPath;
+const ogImageAbsolute = ogImage.startsWith("http") ? ogImage : new URL(ogImage.replace(/^\//, ""), siteUrlSlash).toString();
+
+// Organization Schema
+const organizationSchema = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: siteTitle,
+  url: siteUrl,
+  logo: logoAbsolute,
+  image: logoAbsolute,
+  description: siteDescription,
+  inLanguage: "he-IL",
 };
 
-const metaDescription = trimMetaDescription(description);
-const rawTitle = String(title || "").trim();
-const formattedTitle = TITLE_TEMPLATE.replace("%s", rawTitle.length > 0 ? rawTitle : SITE_NAME);
+// Website Schema
+const websiteSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: siteTitle,
+  url: siteUrl,
+  inLanguage: "he-IL",
+  potentialAction: {
+    "@type": "SearchAction",
+    target: new URL("search/?q={search_term_string}", siteUrlSlash).toString(),
+    "query-input": "required name=search_term_string",
+  },
+};
 
-const resolvedPageUrl =
-  Astro.site != null
-    ? new URL(Astro.url.pathname, Astro.site).toString()
-    : new URL(Astro.url.pathname, siteUrl).toString();
+// Breadcrumb Schema
+const breadcrumbCrumbs = buildSiteBreadcrumbTrail(Astro.url.pathname, { currentPageTitle: title || frontmatter?.title });
+const breadcrumbJsonLdItems = breadcrumbTrailToJsonLd(breadcrumbCrumbs, pageUrl, siteUrlSlash);
 
-const canonicalURL =
-  typeof canonical === "string" && canonical.trim().length > 0 ? canonical.trim() : resolvedPageUrl;
+const breadcrumbSchema = breadcrumbCrumbs.length > 0 ? {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: breadcrumbJsonLdItems.map((item, index) => ({
+    "@type": "ListItem",
+    position: index + 1,
+    name: item.name,
+    item: item.item,
+  })),
+} : null;
 
-function resolveAbsoluteImage(href: string): string {
-  const t = href.trim();
-  if (t.startsWith("http://") || t.startsWith("https://")) return t;
-  return new URL(t.replace(/^\//, ""), siteUrlSlash).toString();
-}
-
-const ogImageAbsolute = resolveAbsoluteImage(image);
-
-type JsonLdRecord = Record<string, unknown>;
-
-let jsonLd: JsonLdRecord;
-
-if (type === "article") {
-  jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Article",
-    headline: rawTitle,
-    description: metaDescription,
-    image: ogImageAbsolute,
-    ...(datePublished ? { datePublished } : {}),
-    author: {
-      "@type": "Person",
-      name: "השם לא משנה",
+// FAQ Schema
+const faqSchema = faqItems.length > 0 ? {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: faqItems.map((item) => ({
+    "@type": "Question",
+    name: item.question,
+    acceptedAnswer: {
+      "@type": "Answer",
+      text: item.answer,
     },
-    mainEntityOfPage: {
-      "@type": "WebPage",
-      "@id": canonicalURL,
-    },
-  };
-} else if (type === "product" && price) {
-  jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Product",
-    name: rawTitle,
-    description: metaDescription,
-    image: ogImageAbsolute,
-    offers: {
-      "@type": "Offer",
-      price,
-      priceCurrency: "ILS",
-      availability: "https://schema.org/InStock",
-      url: canonicalURL,
-    },
-  };
-} else {
-  jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "ProfessionalService",
-    name: SITE_NAME,
-    image: ogImageAbsolute,
-    url: siteUrl.replace(/\/$/, "") || siteUrl,
-  };
-}
+  })),
+} : null;
 
-const ogType = type === "article" ? "article" : type === "product" ? "product" : "website";
+// Article Schema
+const articleSchema = frontmatter?.pubDate ? {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  headline: frontmatter.title || title,
+  description: pageDescription,
+  image: ogImageAbsolute,
+  datePublished: new Date(frontmatter.pubDate).toISOString(),
+  dateModified: new Date(frontmatter.updatedDate || frontmatter.pubDate).toISOString(),
+  author: {
+    "@type": "Person",
+    name: frontmatter.author || "יקיר כהן",
+  },
+  publisher: {
+    "@type": "Organization",
+    name: siteTitle,
+    logo: {
+      "@type": "ImageObject",
+      url: logoAbsolute,
+    },
+  },
+  mainEntityOfPage: {
+    "@type": "WebPage",
+    "@id": pageUrl,
+  },
+  isAccessibleForFree: !frontmatter.isPremium,
+  articleBody: articleBody || undefined,
+} : null;
 
-const jsonLdHtml = jsonLdForInlineScript(jsonLd);
+const coreStructuredData = [organizationSchema, websiteSchema, breadcrumbSchema, faqSchema, articleSchema].filter(Boolean);
 ---
 
-<title>{formattedTitle}</title>
-<meta name="description" content={metaDescription} />
-<link rel="canonical" href={canonicalURL} />
+<title>{pageTitle}</title>
+<meta name="description" content={pageDescription} />
+<meta name="robots" content={noIndex ? "noindex, nofollow" : "index, follow"} />
+<link rel="canonical" href={pageUrl} />
 
-<meta property="og:type" content={ogType} />
-<meta property="og:url" content={canonicalURL} />
-<meta property="og:title" content={formattedTitle} />
-<meta property="og:description" content={metaDescription} />
+<meta property="og:title" content={pageTitle} />
+<meta property="og:description" content={pageDescription} />
 <meta property="og:image" content={ogImageAbsolute} />
-<meta property="og:site_name" content={SITE_NAME} />
-<meta property="og:locale" content="he_IL" />
-
+<meta property="og:url" content={pageUrl} />
+<meta property="og:type" content={frontmatter?.pubDate ? "article" : "website"} />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:url" content={canonicalURL} />
-<meta name="twitter:title" content={formattedTitle} />
-<meta name="twitter:description" content={metaDescription} />
-<meta name="twitter:image" content={ogImageAbsolute} />
 
-<script is:inline type="application/ld+json" set:html={jsonLdHtml}></script>
+<script is:inline type="application/ld+json" set:html={jsonLdForInlineScript(coreStructuredData)}></script>

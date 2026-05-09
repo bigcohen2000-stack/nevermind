@@ -61,8 +61,8 @@ function readOpenLog(): Array<{ slug: string; title: string; at: number }> {
     const arr = JSON.parse(raw) as Array<{ slug?: string; title?: string; at?: number }>;
     if (!Array.isArray(arr)) return [];
     return arr
-      .filter((x) => x.slug && x.title)
-      .map((x) => ({ slug: x.slug!, title: x.title!, at: x.at ?? 0 }))
+      .filter((x): x is { slug: string; title: string; at?: number } => Boolean(x.slug && x.title))
+      .map((x) => ({ slug: x.slug, title: x.title, at: x.at ?? 0 }))
       .sort((a, b) => b.at - a.at);
   } catch {
     return [];
